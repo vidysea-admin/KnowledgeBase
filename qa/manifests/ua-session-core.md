@@ -1,0 +1,108 @@
+# Manifest — ua-session-core
+**Contract:** none specific; criteria C1..C9 below (D-206; docs/features/user-accounts/plan.md row A3 and the "A3 ua-session-core" acceptance list; spec.md UA-9, UA-9a, UA-9b, UA-13..UA-19, UA-23 trust proxy, UA-27, UA-28, UA-29; no qa/contracts file, the maker never edits qa/contracts/)
+**Goal task:** none
+**Date:** 2026-10-29
+**Status:** ready-for-check
+**Handshake status:** ready-for-check
+**Fix cycle:** 0
+**Dual check:** required
+dual-trigger: auth apps/api/src/auth.ts:76
+**Persona walk:** skip (no screen, flow or user type; request-path principal, session store and guards only; the /auth and /admin routers are A4/A6)
+**Issues addressed:** ISS-415, ISS-411
+**Executor:** claude-sonnet-subagent
+**Executor rationale:** one multi-file auth unit built by a single builder in a private worktree; no external executor was worthy.
+
+Authority: D-206 (docs/DECISIONS.md). Role table docs/user-accounts/roles.md is PROPOSED, not approved (plan item H-6: Umesh approves before merge).
+
+## Acceptance criteria
+- **C1** Principal resolution matrix: Bearer only; cookie only; both (Bearer wins, cookie ignored); neither (401); revoked (401 `session_revoked`); idle-expired (401 `session_expired`); `pending` (scopes `[]`, 403 `account_not_active` outside `/auth`); `disabled|rejected|unverified|active-without-role` (401); cross-tenant row mismatch (401).
+- **C2** Existing auth tests pass unmodified (UA-28); API-key path unchanged.
+- **C3** Cookie attributes asserted on the exact `Set-Cookie` string for base paths `/knowledgebase`, `/`, trailing slash.
+- **C4** Rotation: after 24 h the token rotates by compare-and-swap; parallel requests with one cookie all succeed, exactly one wins, the family is not forked; a replay of a retired token after the 30 s grace revokes the family and writes an audit event (real Mongo).
+- **C5** CSRF on session principals for unsafe methods (Origin allowlist + `X-LKB-CSRF`); Bearer never demanded; GET never.
+- **C6** Viewer guard: generated route-enumeration test over every mounted write route (UA-9a); a throwaway unguarded route makes it fail; the read-like POST allowlist is pinned.
+- **C7** Role to scope derived per request; no role holds an operator scope; `mint-scopes.test.mjs` passes with the three new names.
+- **C8** Trust proxy only as configured (0, 1, 2 hops), invalid value gives 0, startup log line.
+- **C9** ISS-415: cookie-only lookup is one explicit global hash lookup with a `user.tenantId == session.tenantId` check (fail closed), indexed (no COLLSCAN); every duplicate-email E11000 maps to one generic response. ISS-411: `.txt` runtime assets land in the bundle.
+
+## What changed
+- EDIT apps/api/src/auth.ts: `VerifiedKey` gets optional session fields; `SessionAuthenticator` type; `requireAuth(store, session?)` consults the cookie only when the Authorization header is absent/empty (line 76); the Bearer path strips session-only fields from a key (a key never acts as a user); `actorId(auth)`.
+- EDIT apps/api/src/server.ts: `applyTrustProxy` after the logger, `mountUserAccounts(...)` before the perimeter, `requireAuth(deps.keyStore, deps.userAccounts?.session)`. `ServerDeps` gains `userAccounts?` and `trustProxyHops?`.
+- NEW apps/api/src/user-accounts/{roles,cookie,csrf,sessions,principal,viewer-guard}.ts, `sessions.testsupport.ts`, and tests cookie/sessions/principal/viewer-guard/sessions.mongo.
+- NEW apps/api/src/composition/integrations/user-accounts.ts: trust proxy, Mongo session store (`createMongoSessionStore`, the only unscoped read is `findByTokenHash`), `buildUserAccounts(env, db, log)` (undefined unless `AUTH_CSRF_SECRET` >= 32 bytes), `mountUserAccounts` (`/auth` public with a soft principal and terminal 404, `/admin` self-authenticating, 503 `not_implemented` placeholders for A4/A6).
+- EDIT scripts/lib/mint-scopes.mjs: `EXTRA_SCOPES` + `user-admin`, `whatsapp-link`, `whatsapp-admin` (its test unmodified).
+- EDIT apps/api/scripts/build.mjs (ISS-411): runtime-asset regex `.(?:ps1|txt)`.
+- NEW docs/user-accounts/roles.md (PROPOSED).
+- OUTSIDE the row A3 file list (mechanical, reported): apps/api/src/routes/system-status.test.ts (lines 112, 123) and apps/api/src/activity-health/setup-status.test.ts (line 62): three source-text assertions looked up the literal `requireAuth(deps.keyStore)`; the call now has a second argument, so the closing parenthesis was dropped from the literal. Without the edit line 123 failed and the other two would have passed vacuously (`> -1`).
+
+## Open points for the coordinator
+1. production.ts / index.ts does not call `buildUserAccounts` yet, so nothing is live: A4 must wire it and supply `authRouter`; A6 supplies `adminRouter`. Until then `/auth/*` and `/admin/*` answer 503 `not_implemented` when deps are injected, 404 when not.
+2. The production entry does not import password-policy yet, so `common-passwords.txt` appears in `dist` only once A4 imports it. The build fix is proven with an isolated bundle (see ISS-411 below).
+3. Duplicate-email mapper for A4: `isDuplicateEmailError(err)` and `GENERIC_SIGNUP_RESPONSE` (202 `{ok:true,next:"check_email"}`) in principal.ts. A4 must return it for BOTH "email exists in this tenant" and "E11000 from another tenant".
+4. Origin enforcement on the public `/auth` POSTs (login/signup) is A4's: the session CSRF guard applies only to session principals.
+5. structure.config.json dirsize for `apps/api/src/user-accounts` will need an override when A4/A6 add files (now 20 files; not touched here).
+6. roles.md approval (H-6) pending; do not merge before it.
+7. Pre-existing, unrelated: `src/activity-health/router.test.ts` test 3 (Python producer plus real production Mongo binding) fails in this environment with `upload queue operation timeout`; it does not touch auth code paths.
+8. Commit trailer: the harness attribution for this session is "Claude Sonnet 5.5", used instead of the "Opus 5.5" wording in the brief.
+
+## Verification scope
+Policy-Version: proportional-verification/2026-10-19.17
+Round: tier H, 9 criteria, single builder, est 240 min, no checker dispatch by the builder
+Tier: H (authentication, sessions, tenancy, authorization)
+Base / checked state: base a5141234; code commits 23eb642c, 4c7a1184, 979ae0b1 (this manifest follows and touches only qa/).
+Affected tests: apps/api/src/user-accounts/{cookie,sessions,principal,viewer-guard,sessions.mongo}.test.ts, apps/api/src/server.test.ts, apps/api/src/routes/system-status.test.ts, apps/api/src/activity-health/setup-status.test.ts, scripts/lib/mint-scopes.test.mjs, plus a one-file-per-invocation sweep of the 68 test files that import createServer/requireAuth/server.js/auth.js (all pass except open point 7).
+Real Mongo: docker `lkb-a3-mongo` (mongo:7, 127.0.0.1:27098), opt-in `LKB_UA_SESSION_MONGO_URI=mongodb://127.0.0.1:27098/?directConnection=true`; the test creates `lkb_ua_session_test_<hex>` and drops it. Without the env var it skips.
+Not run / limits: no production or shared Mongo; no end-to-end login (A4); no browser; the real `dist` bundle (see open point 2).
+Tests[C1]: apps/api/src/user-accounts/principal.test.ts (HTTP matrix through createServer) + sessions.test.ts::"status matrix", "revoked session", "idle expiry", "cross-tenant mismatch is refused" - they drive every row of the matrix the diff adds in auth.ts:76 and sessions.ts
+Tests[C2]: apps/api/src/server.test.ts, apps/api/src/routes/system-status.test.ts, apps/api/src/activity-health/setup-status.test.ts - the unmodified requireAuth/requireScope consumers plus the two source-text assertions touched by the new second argument
+Tests[C3]: apps/api/src/user-accounts/cookie.test.ts - asserts the exact Set-Cookie string for three base paths
+Tests[C4]: apps/api/src/user-accounts/sessions.test.ts::"rotation after 24 h", "two simultaneous rotations" + sessions.mongo.test.ts::"parallel requests with one cookie after 24 h" - the rotation CAS and replay revoke added in sessions.ts and the Mongo store
+Tests[C5]: apps/api/src/user-accounts/cookie.test.ts (csrf checks) + principal.test.ts (CSRF with cookie, Bearer exempt, GET exempt) - csrf.ts and its wiring in principal.ts
+Tests[C6]: apps/api/src/user-accounts/viewer-guard.test.ts - generated route enumeration, enumerator self-test, detector bite, pinned allowlist
+Tests[C7]: apps/api/src/user-accounts/sessions.test.ts::"a role change applies on the very next request" + principal.test.ts (operator scopes in no role) + scripts/lib/mint-scopes.test.mjs - roles.ts and the three EXTRA_SCOPES names
+Tests[C8]: apps/api/src/user-accounts/cookie.test.ts - trust proxy with 0/1/2 hops in the composition module
+Tests[C9]: apps/api/src/user-accounts/sessions.mongo.test.ts::"duplicate email in ANOTHER tenant", "global hash lookup", "the three lookups are served by indexes" + sessions.test.ts::"duplicate-email errors" - the ISS-415 mapper and lookups; ISS-411 by the isolated-bundle probe
+Pre-check[C1]: 979ae0b1 cd apps/api; node --test --import tsx src/user-accounts/principal.test.ts src/user-accounts/sessions.test.ts -> exit 0, 23 passed, 0 failed t=1
+Pre-check[C2]: 979ae0b1 cd apps/api; node --test --import tsx src/server.test.ts src/routes/system-status.test.ts src/activity-health/setup-status.test.ts -> exit 0, 24 passed, 0 failed t=1
+Pre-check[C3]: 979ae0b1 cd apps/api; node --test --import tsx src/user-accounts/cookie.test.ts -> exit 0, 6 passed, 0 failed t=1
+Pre-check[C4]: 979ae0b1 cd apps/api; LKB_UA_SESSION_MONGO_URI=mongodb://127.0.0.1:27098/?directConnection=true node --test --import tsx src/user-accounts/sessions.test.ts src/user-accounts/sessions.mongo.test.ts -> exit 0, 20 passed, 0 failed, 0 skipped t=1
+Pre-check[C5]: 979ae0b1 cd apps/api; node --test --import tsx src/user-accounts/cookie.test.ts src/user-accounts/principal.test.ts -> exit 0, 15 passed, 0 failed t=1
+Pre-check[C6]: 979ae0b1 cd apps/api; node --test --import tsx src/user-accounts/viewer-guard.test.ts -> exit 0, 4 passed, 0 failed t=1
+Pre-check[C7]: 979ae0b1 node --test scripts/lib/mint-scopes.test.mjs; cd apps/api; node --test --import tsx src/user-accounts/sessions.test.ts src/user-accounts/principal.test.ts -> exit 0, 10 + 23 passed, 0 failed t=1
+Pre-check[C8]: 979ae0b1 cd apps/api; node --test --import tsx src/user-accounts/cookie.test.ts -> exit 0, 6 passed, 0 failed t=1
+Pre-check[C9]: 979ae0b1 cd apps/api; LKB_UA_SESSION_MONGO_URI=mongodb://127.0.0.1:27098/?directConnection=true node --test --import tsx src/user-accounts/sessions.mongo.test.ts src/user-accounts/sessions.test.ts -> exit 0, 20 passed, 0 failed t=1
+Pre-check[T1]: 979ae0b1 npx tsc --noEmit -p apps/api/tsconfig.json; pnpm lint:structure; node scripts/snapshot.mjs --check -> exit 0, tsc no output, `lint:structure: OK (10 stages, 0 failed)`, `OK: docs/SNAPSHOT.md matches a fresh regeneration` t=1
+mutant-cap-raise: one falsification per criterion is mandatory; C1, C4, C5, C6 carry several because each has independent conjuncts
+Metrics: builder_min=240 mutants=14 policy=proportional-verification/2026-10-19.17 cycle=0 suite_runs=0 repeat_runs=0 tokens=unavailable
+
+## Red evidence (TDD)
+Strictly red-first for cookie, CSRF and trust-proxy tests (they failed with "module not found" / assertion before the modules existed). The sessions, principal and viewer-guard tests were written alongside the code and NOT observed red first; this is disclosed, and compensated by the falsification table below (each behaviour is shown to be pinned by killing a mutant). The ISS-411 fix was red first: an isolated bundle without `src` threw `ENOENT ... common-passwords.txt`; after the regex change the probe printed `PROBE {"ok":true}` and `runtime-assets/c3dc20f32c53-common-passwords.txt` is 14334 bytes, byte-equal to the source.
+
+## Falsifications (one or more per criterion)
+Harness: a python script (private scratchpad, not committed) mutates the file in place after the code commit, with a per-mutation byte backup, a 170 s timeout per test run, restore in a finally block plus atexit and SIGINT/SIGTERM handlers, and after each mutation `git hash-object <file>` must equal `git rev-parse HEAD:<file>` (D-020 amendment). All 14 reported `head-fidelity=OK`.
+
+| Criterion | falsifying edit | observed |
+|---|---|---|
+| C4/C9 | remove `store.revokeFamily(... "reuse_detected")` from replay handling | KILLED: sessions.test.ts |
+| C1/C9 | delete the `user.tenantId !== row.tenantId \|\| user._id !== row.userId` check | KILLED: sessions.test.ts (lying-store case) |
+| C5 | CSRF token comparison replaced by `return true` | KILLED: principal.test.ts |
+| C5 | Origin allowlist check disabled | KILLED: principal.test.ts |
+| C6 | viewer guard condition `userRole === "viewer"` -> `"nobody"` | KILLED: viewer-guard.test.ts |
+| C6 | add `POST /ingest` to `READ_LIKE_POSTS` | first run SURVIVED (the enumeration test imported the same set); fixed with a pinned-allowlist test; re-run KILLED |
+| C1 | precedence flipped (`session && header === ""` -> `session`) | KILLED: principal.test.ts |
+| C8 | `trust proxy` set to `true` instead of the hop count | KILLED: cookie.test.ts |
+| C4 | in-grace test replaced by `true` | KILLED: sessions.test.ts |
+| C1 | idle expiry disabled | KILLED: sessions.test.ts |
+| C1 | `notActive` 403 guard disabled | KILLED: principal.test.ts |
+| C4 | rotation never due (`>= Infinity`) | KILLED: sessions.test.ts |
+| C4 | CAS filter drops `tokenHash` and `rotatedAt` | KILLED: sessions.mongo.test.ts (first attempt dropped only `rotatedAt` and SURVIVED: EQUIVALENT, `tokenHash` already changes on rotation, so it is not counted) |
+
+## ISS-415 / ISS-411 (re-run of the recorded cases, by id)
+- ISS-415 (1): the ledger row records prose, no attack list. Its two requirements: explicit hash-only lookup (`findByTokenHash`, global, `tokenHash` unique) and `user.tenantId == session.tenantId` fail-closed. 3/3 recorded sub-requirements pass: cross-tenant row mismatch refused 401 (memory store and lying store, sessions.test.ts), real Mongo cross-tenant `userId` refused and global uniqueness of `tokenHash` enforced (E11000), three lookups IXSCAN not COLLSCAN.
+- ISS-415 (2): E11000 from another tenant (both directions) recognised by `isDuplicateEmailError` on a real Mongo; non-email E11000 and non-Mongo errors are not. A4 owns the route; the mapper and `GENERIC_SIGNUP_RESPONSE` are exported. Left open for A4 and named.
+- ISS-411: `.txt` assets copied; proven by the isolated-bundle probe above (red, then green).
+
+## How to verify
+- From apps/api: `node --test --import tsx src/user-accounts/<file>.test.ts` one file at a time; real Mongo: `docker run -d --rm --name lkb-a3-mongo -p 127.0.0.1:27098:27017 mongo:7`, then `LKB_UA_SESSION_MONGO_URI=mongodb://127.0.0.1:27098/?directConnection=true node --test --import tsx src/user-accounts/sessions.mongo.test.ts`.
+- `npx tsc --noEmit -p tsconfig.json`; `pnpm lint:structure`; `node scripts/snapshot.mjs --check`.
+- Cleanup: `docker stop lkb-a3-mongo` (started with --rm).
