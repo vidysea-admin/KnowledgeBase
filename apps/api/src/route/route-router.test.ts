@@ -240,7 +240,7 @@ test("cycle 1: a never-resolving fingerprint read is bounded by the hard deadlin
   const s = await startTestServer(buildTestDeps({ keyStore: KEYS, route, routeOptions: { deadlineMs: 100, cacheTtlMs: 600_000 } }));
   try {
     for (let i = 0; i < 2; i++) {
-      const t0 = Date.now(), res = await get(s.baseUrl, "/route?q=hello", "a-key");
+      const t0 = Date.now(), res = await fetch(`${s.baseUrl}/route?q=hello`, { headers: { authorization: "Bearer a-key" }, signal: AbortSignal.timeout(1500) }); // a hang fails fast instead of waiting
       assert.ok(Date.now() - t0 < 700, `answered after ${Date.now() - t0} ms`);
       assert.equal(res.status, 200);
     }
@@ -252,7 +252,7 @@ test("cycle 1: a hung fingerprint read plus work that cannot finish in the remai
   const route: RouteDeps = { route: () => NEVER(), fingerprint: NEVER };
   const s = await startTestServer(buildTestDeps({ keyStore: KEYS, route, routeOptions: { deadlineMs: 100 } }));
   try {
-    const t0 = Date.now(), res = await get(s.baseUrl, "/route?q=hello", "a-key");
+    const t0 = Date.now(), res = await fetch(`${s.baseUrl}/route?q=hello`, { headers: { authorization: "Bearer a-key" }, signal: AbortSignal.timeout(1500) }); // a hang fails fast instead of waiting
     assert.ok(Date.now() - t0 < 700, `answered after ${Date.now() - t0} ms`);
     assert.equal(res.status, 503);
     assert.deepEqual(await res.json(), { error: "route_timeout" });

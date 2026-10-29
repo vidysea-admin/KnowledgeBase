@@ -183,7 +183,7 @@ test("cycle 1: a never-resolving fingerprint read is bounded by the call's deadl
     return name === "transcript_reviews" ? { ...c, find: (f: unknown, o?: unknown) => ((o as { projection?: unknown } | undefined)?.projection ? { toArray: () => new Promise(() => undefined) } : (c.find as (f: unknown, o?: unknown) => unknown)(f, o)) } : c; } };
   const deps = createMongoSearchDeps({ db: hung as never, cacheTtlMs: 600_000 });
   for (let i = 0; i < 2; i++) {
-    const t0 = Date.now(), hits = await deps.search("toc", "visa", 10, { deadlineAt: Date.now() + 150 });
+    const t0 = Date.now(), hits = await Promise.race([deps.search("toc", "visa", 10, { deadlineAt: Date.now() + 150 }), new Promise<never>((_, rej) => setTimeout(() => rej(new Error("still hung after 1500 ms")), 1500).unref())]); // a hang fails fast
     assert.ok(Date.now() - t0 < 1000, `took ${Date.now() - t0} ms`);
     assert.deepEqual(hits.map((h) => h.turnId), ["t1"]);
   }
