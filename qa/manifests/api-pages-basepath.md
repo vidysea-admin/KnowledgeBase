@@ -2,8 +2,8 @@
 **Contract:** none specific (ISS-408 medium; D-205 / D-206 go-live work; APP_BASE_PATH runtime support)
 **Goal task:** none
 **Date:** 2026-10-29
-**Status:** ready-for-check
-**Handshake status:** ready-for-check
+**Status:** checked-PASS
+**Handshake status:** checked-PASS
 **Fix cycle:** 0
 **Dual check:** no (no auth, tenancy or data-write change: HTML templates and their inline client script only; no new route, no scope change)
 **Persona walk:** skip (no new screen, flow or user type; existing pages keep their layout, only link/fetch targets change)
