@@ -109,6 +109,67 @@ services:
       - "${WEB_PORT:-8080}:80"
     restart: unless-stopped
 
+  # Linux meeting bot (D-205 U1): headed Chrome under Xvfb + PulseAudio null sink, tab-capture recording,
+  # `run-pipeline --run --watch`. OPT-IN: profile `bot`, so a plain `docker compose up` never starts it.
+  #   docker compose --profile bot up -d bot
+  # Doctor only (no pipeline, no credentials needed):
+  #   docker compose --profile bot run --rm -e BOT_MODE=doctor bot
+  # One-time Google sign-in of the bot profile (VNC published on host loopback only; VNC_PASSWORD required):
+  #   docker compose --profile bot run --rm -p 127.0.0.1:5900:5900 -e BOT_MODE=login bot
+  # No published ports on the service itself. Secrets/config are value-less pass-through from the shell or
+  # main .env (same rule as api above): an absent name stays undefined. No env_file, no .env in the image.
+  # MONGO_WORK_DB must name an isolated work database (run-pipeline refuses production names).
+  bot:
+    profiles: ["bot"]
+    build:
+      context: .
+      dockerfile: docker/meeting-bot/Dockerfile
+      args:
+        GWS_VERSION: ${GWS_VERSION:-0.22.5}
+        GWS_URL: ${GWS_URL:-}
+        GWS_SHA256: ${GWS_SHA256:-}
+    init: true
+    shm_size: 2gb
+    restart: unless-stopped
+    environment:
+      MONGODB_URL:
+      MONGO_WORK_DB:
+      LKB_TENANT_ID:
+      LKB_API_URL:
+      LKB_API_KEY:
+      LKB_JOIN_RULES_ENFORCE:
+      LKB_AUTOJOIN_DISCOVERY:
+      LKB_AUTOJOIN_WEBINARS:
+      LKB_AUTOJOIN_CAREER_PRIORITY:
+      LKB_AUTOJOIN_TEST_DATA_ROUTING:
+      LKB_AUTOJOIN_CONFIG:
+      LKB_CAREER_TOPICS_FILE:
+      LKB_WEBINAR_REGISTRATION_CONFIG:
+      LKB_ALERT_EMAIL:
+      LKB_ALERT_DASHBOARD:
+      LKB_ALERT_CALENDAR:
+      LKB_ALERT_EMAIL_TO:
+      LKB_ALERT_EMAIL_TEST_DATA:
+      LKB_ALERT_EMAIL_PER_HOUR:
+      LKB_GMAIL_ALIASES:
+      LKB_GMAIL_LABEL_IDS:
+      AUTO_RECORD_TRUSTED_EMAILS:
+      AUTO_RECORD_TRUSTED_DOMAINS:
+      TELEGRAM_BOT_TOKEN:
+      TELEGRAM_CHAT_ID:
+      NOTIFY_CHANNELS:
+      NOTIFY_CHANNELS_DIGEST:
+      NOTIFY_CHANNELS_BOT_STATUS:
+      GEMINI_API_KEY:
+      OLLAMA_API_KEY:
+      VNC_PASSWORD:
+      LKB_CHROME_NO_SANDBOX:
+    volumes:
+      - lkb-bot-profile:/data/bot-profile
+      - lkb-bot-recordings:/app/raw/webinars
+      - lkb-bot-data:/app/data
+      - lkb-bot-gws:/home/node/.config/gws
+
   local-mongo:
     image: mongo:7
     profiles: ["local-dev"]
@@ -122,3 +183,7 @@ volumes:
   lkb-counsellor-state:
   lkb-local-mongo:
   lkb-join-rules-state:
+  lkb-bot-profile:
+  lkb-bot-recordings:
+  lkb-bot-data:
+  lkb-bot-gws:
