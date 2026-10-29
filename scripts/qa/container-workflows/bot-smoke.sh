@@ -13,9 +13,11 @@
 # Why HTTPS: record consent (record-consent/context.ts recordMeetingHash) refuses non-https meeting URLs,
 # and detectPlatform() reports a localhost URL as "unknown" (accepted: no platform logic is bypassed).
 # Chrome must trust the fixture certificate, so the smoke imports it into the node user's NSS db
-# (certutil, package libnss3-tools, shipped in the image). The throwaway container runs with
-# `--network none`: everything the smoke touches is loopback or already in the image, so the run needs
-# no network (building the image does).
+# (certutil, package libnss3-tools, shipped in the image). The throwaway container runs on a throwaway
+# `docker network create --internal` network: no route to the internet, so the run needs no network access
+# (building the image does). Plain `--network none` is NOT enough: with no interface at all Chrome's tab
+# capture tracks end early ("audio/video track ended unexpectedly", record exit 1); an internal network
+# gives it an interface and still isolates it.
 # Modes (internal): --inside (runs in the container), --check <rec_dir> <record_exit> (criteria a-d only).
 set -uo pipefail
 
@@ -150,10 +152,12 @@ host_main() {
   [ -n "$image" ] || { echo "usage: BOT_IMAGE=<image> $0   (docker build -f docker/meeting-bot/Dockerfile -t <image> .)" >&2; return 2; }
   docker image inspect "$image" >/dev/null 2>&1 || { echo "image '$image' not found; build it first" >&2; return 2; }
   name="bot-smoke-$$"   # global on purpose: the EXIT trap runs after this function's locals are gone
-  cleanup() { docker rm -f -v "$name" >/dev/null 2>&1 || true; }
+  cleanup() { docker rm -f -v "$name" >/dev/null 2>&1 || true; docker network rm "$net" >/dev/null 2>&1 || true; }
+  net="bot-smoke-net-$$"
   trap cleanup EXIT INT TERM
   echo "SMOKE container $name from $image"
-  docker run -d --name "$name" --network none --shm-size 1g --entrypoint /usr/bin/tini "$image" -s -- sleep 900 >/dev/null || return 2
+  docker network create --internal "$net" >/dev/null || return 2
+  docker run -d --name "$name" --network "$net" --shm-size 1g --entrypoint /usr/bin/tini "$image" -s -- sleep 900 >/dev/null || return 2
   docker exec "$name" sh -c 'command -v certutil >/dev/null' \
     || { echo "SMOKE FAIL certutil missing from the image (libnss3-tools); rebuild the image" >&2; return 1; }
   docker exec -i "$name" sh -c 'mkdir -p /tmp/bot-smoke-work && cat > /tmp/bot-smoke-work/bot-smoke-meeting.html' < <(tr -d "\r" < "$here/fixtures/bot-smoke-meeting.html") || return 1

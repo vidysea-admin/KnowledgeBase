@@ -82,10 +82,12 @@ test('entrypoint removes the VNC pass file when x11vnc fails (ISS-410)', () => {
   assert.ok(trap.index < /^\s*x11vnc /m.exec(e).index, 'trap must be armed before x11vnc runs');
 });
 
-test('container smoke needs no network: no apt step and the container runs with --network none', () => {
+test('container smoke needs no network: no apt step and the container runs on an --internal network', () => {
   const s = read('scripts/qa/container-workflows/bot-smoke.sh');
   assert.doesNotMatch(s, /apt-get|apt install/, 'smoke must not install packages at run time');
-  assert.match(s, /docker run -d --name "\$name" --network none /);
+  assert.match(s, /docker network create --internal "\$net"/);
+  assert.match(s, /docker run -d --name "\$name" --network "\$net" /);
+  assert.match(s, /docker network rm "\$net"/, 'the throwaway network must be removed');
 });
 
 test('shell scripts are pinned to LF in the checkout (.gitattributes)', () => {
