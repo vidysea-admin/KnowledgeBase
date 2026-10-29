@@ -16,3 +16,7 @@ ask: [ollama-cloud, ollama-cloud-verifier]
 note-judge: [ollama-cloud-verifier, ollama-cloud]
 # Vision remains on the existing capability-specific path; cloud text models are not STT.
 vision: [ollama, gemini]
+# D-207 item 3: /route step B (one bounded node-selection round, 1.2 s budget, falls back to step A). gemini-3.5-flash-lite with
+# thinkingLevel minimal; the provider is registered in composition/production.ts. Single-member chain on purpose: no slower
+# second model inside a 1.2 s budget, and an unconfigured key simply degrades to step A.
+route: [gemini-flash-lite]

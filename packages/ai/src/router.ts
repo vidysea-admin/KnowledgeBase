@@ -56,6 +56,7 @@ export async function complete(jobKind: string, job: Job, config: RoutingConfig)
   const attempts: { provider: string; error: string }[] = [];
 
   for (const provider of providers) {
+    if (job.signal?.aborted) break; // the caller gave up (e.g. a request deadline): never start another provider's call
     try {
       const result = await provider.complete(job);
       await recordJob(

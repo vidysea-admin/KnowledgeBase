@@ -10,6 +10,7 @@ import { createMongoSearchDeps } from "../search-store.js";
 import { createRouteDeps, RouteNoTree, RouteTimeout, type RouteStats } from "./route-store.js";
 import { NATURAL_QUESTIONS, fakeRouteDb, sessionIdOf, syntheticTree } from "./route.testsupport.js";
 import { queryFacetTokens } from "./facets.js";
+import { createKnowledgeVisibility } from "../visibility/knowledge.js";
 
 const far = () => ({ deadlineAt: Date.now() + 60_000 });
 const sessionNode = (tenant: string, i: number) => `${tenant}/year:2026/month:03/session:${sessionIdOf(i)}`;
@@ -138,4 +139,57 @@ test("no-LLM end to end on the synthetic 22-session / 110-topic corpus (warm ind
     assert.ok(ms < 300, `${q} took ${ms}ms`);
   }
   console.log("ROUTE-TIMINGS " + timings.join(" | "));
+});
+
+// ---- ISS-421 abort / ISS-427 maxTimeMS ------------------------------------------------------------------------------------
+test("ISS-421 step B: the model call receives an AbortSignal that fires when the step B budget runs out", async () => {
+  let signal: AbortSignal | undefined;
+  const { deps, stats } = setup({}, { complete: (job) => { signal = (job as Job & { signal?: AbortSignal }).signal; return new Promise<CompleteResult>(() => undefined); }, stepBTimeoutMs: 40 });
+  await deps.route("toc", "orientation panel counsellor", 5, far());
+  assert.ok(signal, "the job carries a signal");
+  assert.equal(signal!.aborted, true, "the pending model call was aborted when step B gave up");
+  assert.ok(stats[0]!.llmFailed);
+});
+
+test("ISS-421 deadline: aborting the request signal mid step B aborts the model call and rejects with RouteTimeout", async () => {
+  let signal: AbortSignal | undefined;
+  const ctl = new AbortController();
+  const { deps } = setup({}, { complete: (job) => { signal = (job as Job & { signal?: AbortSignal }).signal; setTimeout(() => ctl.abort(new RouteTimeout()), 20); return new Promise<CompleteResult>(() => undefined); }, stepBTimeoutMs: 5_000 });
+  const t0 = Date.now();
+  await assert.rejects(deps.route("toc", "orientation panel counsellor", 5, { deadlineAt: Date.now() + 60_000, signal: ctl.signal }), RouteTimeout);
+  assert.ok(Date.now() - t0 < 1500, "did not wait for the 5 s step B budget");
+  assert.equal(signal!.aborted, true);
+});
+
+test("ISS-421 deadline: an already-aborted signal stops before any read", async () => {
+  const { deps, calls } = setup();
+  const ctl = new AbortController(); ctl.abort(new RouteTimeout());
+  await assert.rejects(deps.route("toc", "visa requirements for Germany", 5, { deadlineAt: Date.now() + 60_000, signal: ctl.signal }), RouteTimeout);
+  assert.ok(!calls.some((c) => c.coll === "turns"));
+});
+
+test("ISS-427 every Mongo read of a /route call carries maxTimeMS derived from the deadline", async () => {
+  const { deps, calls } = setup();
+  await deps.route("toc", "visa requirements for Germany", 5, { deadlineAt: Date.now() + 900 });
+  assert.ok(calls.some((c) => c.coll === "turns") && calls.some((c) => c.coll === "sessions"));
+  for (const c of calls) {
+    const ms = c.options?.maxTimeMS as number | undefined;
+    assert.ok(typeof ms === "number" && ms >= 1 && ms <= 900, `${c.coll} maxTimeMS=${ms}`);
+  }
+});
+
+test("ISS-427 the fingerprint read is also deadline-bounded and tenant-confined", async () => {
+  const { deps, calls } = setup();
+  const state = await deps.fingerprint!("toc", { deadlineAt: Date.now() + 700 });
+  assert.match(state.fingerprint, /^[0-9a-f]{64}$/);
+  assert.ok(calls.length === 4 && calls.every((c) => c.filter.tenantId === "toc" && typeof c.options?.maxTimeMS === "number" && (c.options.maxTimeMS as number) <= 700));
+});
+
+test("cycle 1 (C6 low): a request abort that lands while the step B frontier is being gated never starts the model call", async () => {
+  const f = fakeRouteDb(), ctl = new AbortController(), real = createKnowledgeVisibility(f.db);
+  let started = 0;
+  const visibility = { ...real, sessionVisible: async (t: string, id: string) => { ctl.abort(new RouteTimeout()); return real.sessionVisible(t, id); } };
+  const deps = createRouteDeps({ db: f.db, tree: { load: async (t) => syntheticTree({ tenantId: t }) }, visibility, complete: async () => { started++; return reply([]); } });
+  await assert.rejects(deps.route("toc", "campus orientation panel", 5, { deadlineAt: Date.now() + 60_000, signal: ctl.signal }), RouteTimeout);
+  assert.equal(started, 0, "the model call must not start for an already-aborted request");
 });

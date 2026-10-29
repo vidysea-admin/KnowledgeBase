@@ -7,7 +7,7 @@ import assert from "node:assert/strict";
 import type { TreeIndexNode } from "@lkb/core";
 import { bm25Scores, buildBm25, tokenize } from "./bm25.js";
 import { facetsOf, queryFacetTokens } from "./facets.js";
-import { buildRouteIndex, routeStepA, topicCountryView } from "./bm25-router.js";
+import { buildRouteIndex, CONFIDENCE_MARGIN, routeStepA, topicCountryView } from "./bm25-router.js";
 import { NATURAL_QUESTIONS, syntheticTree } from "./route.testsupport.js";
 
 test("BM25: rare terms outrank common ones and length normalisation prefers the tighter document", () => {
@@ -67,4 +67,35 @@ test("a tree carrying another tenant's marker, a cycle-sized tree, or native bra
     { node_id: "toc/native:1/p", title: "p", level: "native-passage", summary: "germany", children: [] }] }] } as TreeIndexNode;
   const ix = buildRouteIndex(withNative, "toc");
   assert.ok(!ix.docs.some((d) => d.nodeId.includes("native")), "native branches are not routed as transcript sessions");
+});
+
+// ISS-417: pin CONFIDENCE_MARGIN. The 3rd kept session vs the best one left out: a tie and a near-tie are NOT confident,
+// 1.259 (just over 1.25) is. Measured margins for the tree below: 1.000 / 1.211 / 1.259 (padding = filler words in the summary).
+function marginTree(padThird: number, padFourth: number): TreeIndexNode {
+  const text = (n: number) => "zebra " + "filler ".repeat(n);
+  const sums = [text(0), text(0), text(padThird), text(padFourth), text(20)];
+  return { node_id: "tenant:t", tenantId: "t", title: "t", level: "tenant", summary: "", children: sums.map((summary, i) => ({
+    node_id: `t/s${i}`, title: `Session ${i}`, level: "session", summary, evidence: { sessionRef: `s${i}` }, children: [] })) } as TreeIndexNode;
+}
+const stepA = (a: number, b: number) => routeStepA(buildRouteIndex(marginTree(a, b), "t"), "zebra");
+
+test("ISS-417 confidence margin: the constant is 1.25", () => { assert.equal(CONFIDENCE_MARGIN, 1.25); });
+test("ISS-417 confidence margin: an exact tie between the 3rd kept and the 4th session is not confident (margin 1.0)", () => {
+  const a = stepA(3, 3);
+  assert.ok(Math.abs(a.margin - 1) < 1e-9 && a.confident === false);
+});
+test("ISS-417 confidence margin: a near-tie just UNDER 1.25 is not confident", () => {
+  const a = stepA(3, 7);
+  assert.ok(a.margin > 1.2 && a.margin < 1.25, `margin ${a.margin}`);
+  assert.equal(a.confident, false);
+});
+test("ISS-417 confidence margin: just OVER 1.25 is confident", () => {
+  const a = stepA(3, 8);
+  assert.ok(a.margin > 1.25 && a.margin < 1.3, `margin ${a.margin}`);
+  assert.equal(a.confident, true);
+});
+test("ISS-417 confidence margin: nothing left out (fewer than 4 matching sessions) is confident", () => {
+  const index = buildRouteIndex({ ...marginTree(0, 0), children: marginTree(0, 0).children.slice(0, 3) } as TreeIndexNode, "t");
+  const a = routeStepA(index, "zebra");
+  assert.equal(a.margin, Infinity); assert.equal(a.confident, true);
 });

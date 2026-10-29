@@ -37,7 +37,7 @@ Exactly the `/search` shape: `{ "query": "<q as sent>", "hits": SearchHit[] }`.
 | 400 | `{error:"bad_request", message}` | missing/blank/oversized `q` |
 | 401 / 403 | auth middleware | no or bad key / key lacks `search` scope |
 | 404 | `{error:"not_found", message}` | the tenant has no tree index yet (fall back to `/search`) |
-| 503 | `{error:"route_timeout"}` | the 3 s hard deadline was exceeded (never a hang) |
+| 503 | `{error:"route_timeout"}` | the 3 s hard deadline was exceeded. The timer starts before the first await, so every wait (the cache fingerprint read included) is inside it; the work is aborted |
 | 503 | `{error:"route_unavailable"}` | any other failure (tree or database unavailable) |
 
 Failures are never cached.
@@ -61,12 +61,33 @@ Failures are never cached.
 
 ## Caching and tenancy
 
-- Result cache: per tenant first (`tenantId -> k + normalised query`), 20 s TTL, at most 100 entries per tenant. A
-  consent withdrawal can therefore still be served from cache for up to 20 s.
+- Result cache: the same `TenantSearchCache` `/search` uses (`apps/api/src/search-cache/search-cache.ts`): per tenant first
+  (`tenantId -> normalised query + k`), 20 s TTL, at most 100 entries per tenant. **Every entry is bound to the shared visibility
+  fingerprint** (ISS-420): a hash of the tenant's source kind + consent, session -> source binding + index status, transcript-review
+  head revisions and WhatsApp review-candidate links, read on every request that could be served from cache (four small
+  tenant-scoped projected reads). A consent withdrawal, an index failure, a relabel, a new session, a transcript correction or a
+  WhatsApp link therefore takes effect on the **very next** `/route` and `/search` call; the TTL no longer bounds withdrawal. The TTL
+  only bounds what the fingerprint cannot see (for example turns appended to an existing session).
+  - If the fingerprint cannot be read (database slow or down) the cache is bypassed, never replaced by a constant: nothing is served
+    from or stored in the cache for that request. The read gets at most half of the time left to the deadline (also in `/search`), so a hung
+    read costs a cache bypass, not the request; the remaining budget is left for the real work.
+  - A result that touches a WhatsApp-batch session is never cached (its approval can be withdrawn through claims/candidates the
+    fingerprint does not read).
+  - `/search` hides a withdrawn session; it does not hide an index-failed one (it never has), `/route` hides both. Either way the
+    cache never serves a stale label or hit.
 - Routing index cache: per tenant, built from the trusted tree reader (ineligible sessions already excluded), 60 s TTL,
   single-flight refresh, stale index served while refreshing. It holds routing text only. A session withdrawn inside that
-  window is still removed by step C and is not offered to the model in step B.
+  window is still removed by step C (which re-checks the gate on every uncached request) and is not offered to the model in step B.
 - Every read goes through the tenant-scoped collection accessors; the tests assert the tenant filter on every query.
+
+## Deadline, abort and database time limits
+
+- The 3 s deadline (ISS-421) is real work cancellation, not just a 503: when it passes (or the request fails) the handler aborts the
+  `AbortSignal` it passed to `route()`. `route()` stops before the next read, and the step B model call is aborted (the signal reaches
+  the HTTP transport, so the fetch is cancelled) and no further provider in the chain is tried.
+- Every MongoDB read of a `/route` request (fingerprint, session gate, turns, review overlay, visibility) carries `maxTimeMS` derived
+  from the time left until the deadline (floor 1 ms), so the server stops working when the client has already been answered 503
+  (ISS-427). `/search` does the same for its reads when it is called with a deadline.
 
 ## Latency targets
 
@@ -81,6 +102,13 @@ Failures are never cached.
 ## Wiring
 
 `ServerDeps.route` (optional; absent means the route is not mounted) is set in `composition/production.ts` with
-`createRouteDeps({ tree: createMongoTreeStore(...), complete })`. `complete` currently uses the `ask` provider chain.
-Routing to Gemini 3.5 flash-lite with minimal thinking needs an `ai-routing.yaml` chain and a thinking-level option in
-the provider layer; both are outside this unit's authorised files and are noted as a follow-up.
+`createRouteDeps({ tree: createMongoTreeStore(...), complete })`. `complete` routes through the **`route` chain** in
+`config/ai-routing.yaml` (D-207 item 3): `route: [gemini-flash-lite]`, i.e. `gemini-3.5-flash-lite` with
+`thinkingConfig.thinkingLevel = "minimal"` (provider `gemini-flash-lite`, registered in `production.ts`; the `thinkingLevel` option
+lives in `packages/ai/src/providers/gemini.ts`). The chain has one member on purpose: a slower second model cannot finish inside the
+1.2 s step B budget, and a missing `GEMINI_API_KEY` or any provider error simply degrades to step A. The default `gemini` provider
+(transcription) and the cloud text chains (`ask`, `summarize`, ...) are unchanged.
+
+The offline tree-summary build is not on this chain: session and topic summaries are produced under the job kinds `summarize`
+and `topics`, which share their chains with claims extraction and are pinned by D-173 tests. Pointing them at flash-lite is a
+separate, quality-gated change.

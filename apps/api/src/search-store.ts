@@ -5,14 +5,13 @@
  * rather than a new one.
  */
 import type { Db } from "mongodb";
-import { assertValidTenantId, getDb, scopedCollection, withTenant } from "@lkb/db";
+import { assertValidTenantId, getDb, scopedCollection } from "@lkb/db";
 import { lexicalQueryTokens, lexicalSearchTurns, treeIndexRootFilter, type LexicalHit } from "@lkb/index";
 import type { NativeSourceLocator, Turns } from "@lkb/core";
 import { buildTurnPrefilter } from "./search-prefilter.js";
 import { readSearchCandidateTurns } from "./transcript-review/search-reader.js";
 import { createKnowledgeVisibility, newVisibilityRequestMemo, withDeadline, type FilterTurnsOptions } from "./visibility/knowledge.js";
-import { searchCacheKey, TenantSearchCache } from "./search-cache/search-cache.js";
-import { createHash } from "node:crypto";
+import { searchCacheKey, TenantSearchCache, fingerprintWithin, visibilityFingerprint, withReadDeadline, type VisibilityState } from "./search-cache/search-cache.js";
 import type { NativeSearchHit, NativeSearchResult, SearchCallOptions, SearchDeps, SearchHit } from "./routes/search.js";
 import { parseNativeSourceLocator, type NativeEvidenceResolver, type ResolvedNativeEvidence } from "./native-evidence/resolver.js";
 
@@ -124,31 +123,6 @@ async function treeNativeLocators(db: Pick<Db, "collection">, tenantId: string):
 }
 
 
-/**
- * Everything that decides what a tenant may see, hashed: source kind + consent, session -> source binding and index status,
- * every transcript-review head revision and every WhatsApp review candidate link (a candidate over a non-WhatsApp source hides it). Read on EVERY cached request (four small tenant-scoped reads), so a consent
- * withdrawal, relabel, new session or transcript correction invalidates the cache immediately instead of after the TTL.
- * `waSessions` are sessions whose source is a whatsapp-batch: results touching them are never cached, because WhatsApp
- * visibility also depends on per-candidate approvals this fingerprint does not read.
- */
-async function visibilityFingerprint(db: Pick<Db, "collection">, tenantId: string): Promise<{ fingerprint: string; waSessions: Set<string> }> {
-  assertValidTenantId(tenantId, "search.cache");
-  const read = async (name: string, projection: Record<string, 1>): Promise<Record<string, unknown>[]> => {
-    const rows = await db.collection<Record<string, unknown> & { tenantId: string }>(name).find(withTenant<Record<string, unknown> & { tenantId: string }>(tenantId, {}), { projection }).toArray();
-    if (rows.some(row => row.tenantId !== tenantId)) throw new Error("fingerprint scope mismatch");
-    return rows;
-  };
-  // tenantId is part of every projection so the scope check above is a real check, not a vacuous one.
-  const [sources, sessions, heads, candidates] = await Promise.all([
-    read("sources", { _id: 1, tenantId: 1, kind: 1, consent: 1 }), read("sessions", { _id: 1, tenantId: 1, sourceId: 1, status: 1 }),
-    read("transcript_reviews", { _id: 1, tenantId: 1, revision: 1 }), read("whatsapp_candidates", { _id: 1, tenantId: 1, sourceId: 1, sessionId: 1 }),
-  ]);
-  const byId = (rows: Record<string, unknown>[]) => [...rows].sort((a, b) => String(a._id).localeCompare(String(b._id)));
-  const waSources = new Set(sources.filter(row => row.kind === "whatsapp-batch").map(row => String(row._id)));
-  const fingerprint = createHash("sha256").update(JSON.stringify([byId(sources), byId(sessions), byId(heads), byId(candidates)])).digest("hex");
-  return { fingerprint, waSessions: new Set(sessions.filter(row => waSources.has(String(row.sourceId))).map(row => String(row._id))) };
-}
-
 const DEFAULT_CACHE_TTL_MS = 45_000;
 /** Visibility is judged on the best-scoring candidates first: the first slice is a few multiples of k, then it doubles. */
 const FIRST_SLICE_FACTOR = 4, MIN_FIRST_SLICE = 24;
@@ -183,17 +157,18 @@ export function createMongoSearchDeps(deps: SearchStoreDeps = {}): SearchDeps {
     async search(tenantId, query, k, options: SearchCallOptions = {}): Promise<SearchHit[]> {
       // Resolved per call, not at construction: production builds these deps at boot, before
       // connect(). Tenant-scoping still runs through scopedCollection on the injected handle.
-      const db = deps.db ?? getDb();
+      // ISS-427: with a deadline, every read below carries maxTimeMS derived from it (see `withReadDeadline`).
+      const db = withReadDeadline(deps.db ?? getDb(), options.deadlineAt);
       // buildTurnPrefilter owns the superset invariant and is pinned by search-prefilter.test.ts
       // (ISS-072: this construction previously lived inline here, where no test could fail on it).
       const prefilter = buildTurnPrefilter(query);
       if (prefilter === null) return [];
       // Cache rule (D-206 K5): serve only a same-tenant entry younger than the TTL whose visibility fingerprint, read NOW,
       // is unchanged. A failure to compute the fingerprint bypasses the cache; it never serves on a guess.
-      let state: { fingerprint: string; waSessions: Set<string> } | null = null;
+      let state: VisibilityState | null = null;
       const key = searchCacheKey(query, k);
       if (cache.enabled) {
-        try { state = await visibilityFingerprint(db, tenantId); } catch { state = null; }
+        state = await fingerprintWithin(() => visibilityFingerprint(db, tenantId), options.deadlineAt);
         const cached = state ? cache.get(tenantId, key, state.fingerprint) : undefined;
         if (cached) return cached;
       }

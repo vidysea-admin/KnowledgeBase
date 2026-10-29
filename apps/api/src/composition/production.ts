@@ -125,6 +125,7 @@ export function buildRouting(): {
   // not just a targeted patch for the one job kind that happened to be caught.
   const providers: Record<string, Provider> = {
     gemini: new GeminiProvider(realTransport, { apiKey: process.env.GEMINI_API_KEY ?? "" }),
+    "gemini-flash-lite": new GeminiProvider(realTransport, { apiKey: process.env.GEMINI_API_KEY ?? "", model: "gemini-3.5-flash-lite", thinkingLevel: "minimal", name: "gemini-flash-lite" }), // D-207: /route step B (chain `route`)
     "claude-code": new ClaudeCodeProvider(realTransport),
     ...createOllamaCloudProviders(realTransport, {
       apiKey: process.env.OLLAMA_API_KEY ?? "",
@@ -213,7 +214,7 @@ export function buildProductionDeps(options: { onIndexCommitted?: IndexCommitted
     // surface GET /watch-state serves (routes/watched-sources.ts).
     watchedSources: { ...createMongoWatchedSourceDeps(), ...createMongoWatchStateReadDeps() },
     search: createMongoSearchDeps({ nativeEvidence: native.resolver }),
-    route: createRouteDeps({ tree: createMongoTreeStore(native.resolver), complete: (job, tenantId) => routeComplete("ask", job, { chains, providers, write: jobWrite, tenantId }) }), // D-206 vectorless /route
+    route: createRouteDeps({ tree: createMongoTreeStore(native.resolver), complete: (job, tenantId) => routeComplete("route", job, { chains, providers, write: jobWrite, tenantId }) }), // D-206 vectorless /route, step B on the D-207 flash-lite chain
     // D-173: dormant semantic routes cannot be enabled through an old environment flag.
     semanticSearch: undefined,
     graph: createMongoGraphReadDeps(),
