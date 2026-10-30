@@ -3,7 +3,7 @@
 **Goal task:** whatsapp-multiuser W11 part B follow-up (`wa-revoked-link-gate`)
 **Date:** 2026-10-30
 **Policy-Version:** proportional-verification/2026-10-19.17
-**Status:** ready-for-check
+**Status:** checked-PASS (dual A 630019d0 + B 7fbc4bd8, cycle 0, 2026-10-30)
 **Handshake status:** ready-for-check
 **Fix cycle:** 0
 **Dual check:** required
