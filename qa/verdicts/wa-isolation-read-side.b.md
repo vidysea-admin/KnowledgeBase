@@ -1,59 +1,47 @@
-# Verdict B: wa-isolation-read-side (W7)
-
-Cycle checked: 0
-Checked: base aa8ef31a, head bfc5350f (bound HEAD later fc4060c2; `git diff bfc5350f HEAD -- apps packages schema scripts` = 0 lines, so evidence holds)
-Contract: W7 acceptance in docs/features/whatsapp-multiuser/plan.md + spec.md R-25..R-30 (no qa/contracts file)
+# Verdict B: wa-isolation-read-side (Mode A, dual check, second coordinator)
+Date: 2026-10-30 · Cycle checked: 1 (dispatch text said "0"; manifest Fix cycle is 1 and the handshake requires equality, so 1 is stamped) · Head: 7ab17ee6 (code 21dfc204) · Base: aa8ef31a · Policy: proportional-verification/2026-10-19.17
+Cycle-0 verdict archived at qa/verdicts/wa-isolation-read-side.b.r0-1.md (renamed, not edited). Bound to D:/KnowledgeBase/.worktrees/wa-isolation-read-side. No ledger rows written, no goal task closed (dual check).
 
 ## Check plan
-Tier L (tenancy trigger apps/api/src/whatsapp/owner-config.ts:184). API-only, no browser. Steps: (1) re-run manifest verify commands in a
-scratch copy of `git archive bfc5350f` (worktree has no node_modules); (2) adversarial probes per criterion; (3) ISS-API-003 recorded
-reproductions through the real store + router; (4) one falsification per criterion, per-mutation backup + trap + HEAD-fidelity (D-020);
-(5) judge ISS-WAOWNER-002 (409/404 mapping, caller+linkId threading, repair-path scope) and -005. No mongod locally, so no real-Mongo run.
+Repair checker (cycle 1), Tier L: tenancy / cross-tenant raw read (owner-config.ts:184). api-only: no browser walk, no personas.
+Scope: my cycle-0 FAIL and P-lines (C6 marker side effect, marker key and repair shape, link-state gate), the gate answer (qa/gates/wa-revoked-link-read-access.md),
+the production composition of the session read path, plus the repair diff read in full and the whole-unit diff scanned (4c). All work ran in a git-archive copy of 21dfc204 outside the bound root (junctioned node_modules).
 
-VERDICT: FAIL
-SCOREBOARD: criteria 5/6 met (C1 C2 C3 C4 C5 PASS; C6 FAIL). Baseline: isolation-read/write 26 pass 0 fail; regression set 33 pass 0 fail.
-TIER: L (policy proportional-verification/2026-10-19.17)
+## Cycle-0 findings, re-checked
+- P1 (high, C6): rejected cross-owner ingest left a pending-invalidation marker. Cycle-0 probe w7chk-probe1 re-run VERBATIM at 21dfc204: markers after rejected ingest [] (was 1), after bogus jid [], repair [], sources 0 (was 1). FIXED.
+- P2 (medium, key shape and repair): marker is now keyed per (group, resolved link); repair skips malformed link ids, catches not_found/ambiguous per marker and continues. Proven by B1CHK-W3 (other-tenant marker untouched, old-key marker cleared by _id, uppercase/23-hex/numeric/null link ids skipped) and by F5/F6 below. FIXED.
+- P3 (low, gate): owner view needs link.state === "active"; admin passes and is audited; unstamped fallback is active-only and unique. B1CHK-2 (state revoked/suspended/rejected/unlinked/pending/"ACTIVE"/" active"/""/null/7): owner 404 on session detail, session list and review get/source/approve/reject/list, source reader never called, no publish, other owner unaffected, admin 200 with exactly one admin.raw_read (linkId LA). FIXED.
+- Production composition (re-derived independently): withSessionArtifacts(trustedBrainReads(...)) as composition/production.ts:167 and store.ts:93 build it. B1CHK-1: owner A own 200; B/L/X 404 identical to a missing id; admin and adminKey 200 with one event each (actorKind user/key), no raw text in any event; other-tenant admin 404, no event; owner reads write no event.
 
-FAILURES:
-- high | P1 | C6 "fail WITHOUT SIDE EFFECTS" + ISS-WAOWNER-002 repair-path scope
-  apps/api/src/whatsapp/review/ingest.ts:30-31 writes the `pending-invalidation` marker (carrying the caller-supplied `linkId`) BEFORE
-  `base.ingestGroup` authorizes/resolves the group, and never deletes it when ingest rejects with 404/409.
-  Repro (scratch probe w7chk-probe1.test.ts): member A (uA) ingests B's jid with linkId=LB -> correctly WhatsAppGroupNotFoundError (404),
-  but a marker for that jid with the attacker-chosen linkId remains. A bogus jid also leaves a marker. Consequences, all measured/read:
-  (a) visibility/knowledge.ts pending() (~54-58) sees the marker, approved() (~59-60) returns null, so B's approved claims for that jid vanish
-  from Search/Ask until a repair succeeds (pinned by visibility/knowledge.test.ts:125-131); review-source.ts:66/:83 throw ReviewSourceStaleError.
-  (b) repairPendingInvalidations (compose.ts) then re-ingests with internal {kind:"key",admin:true} narrowed by the attacker's linkId:
-  sources 0 -> 1 in the probe, an unauthorized ingest side effect.
-  Existing tests (isolation-write-side.test.ts ~195-197, repair test) never assert that no marker remains after a rejected ingest.
-  Marker write pre-dates W7, but W7 edited this exact line to add the caller-supplied linkId, and C6 requires zero side effects.
-- medium | P2 | compose.ts repairPendingInvalidations catches only WhatsAppAmbiguousLinkError; a WhatsAppGroupNotFoundError marker (from P1) is
-  rethrown and aborts the whole repair loop for the tenant (poison marker). Reproduced in the same probe.
-- low | P3 | owner-config.ts unstamped-source fallback `links(tenantId).findOne({archiverOwnerId})` ignores link `state` and picks an arbitrary
-  link when duplicates exist; ownerView does not check state === "active".
+## Criteria (plan W7 acceptance, C1-C6)
+C1 PASS (production wiring matrix, audit written once) · C2 PASS (viewer/member/plain key 404; approved claims path untouched, visibility/knowledge.ts has no link-state use and no diff) · C3 PASS (probe3 ISS-API-003: 2/2 recorded plus corpus, body only {error,code,linkId})
+C4 PASS (duplicate flag test green after the ingest reorder) · C5 PASS (legacy link: owner 404, admin/adminKey 200 audited) · C6 PASS (cycle-0 repro now zero side effects; B1CHK-W1 route-level foreign/ambiguous/plain-key cases: 404/503, 0 markers/sources/sessions/turns).
 
-PROPOSED-ISSUE: P1 high (tenancy) - move marker write after group authorization/resolution (or delete it on 404/409); validate marker.linkId
-  against the caller's permitted set; add test asserting no marker + no source row after rejected cross-owner ingest.
-PROPOSED-ISSUE: P2 medium - repair loop must skip/delete not-found markers and continue, not abort.
-PROPOSED-ISSUE: P3 low - fallback owner lookup should require state active and unique match.
+## Commands (copy of 21dfc204)
+- node --test --import tsx isolation-read-side + isolation-write-side: 37/37 (20+17). Wider affected set (13 files): 124 tests, 123 pass, 0 fail, 1 skipped (needs a replica-set mongod; not run, no real Mongo this cycle). tsc --noEmit apps/api exit 0.
+- Cycle-0 probes 1/2/3 verbatim: 6/6 pass. New probes (qa/evidence/wa-isolation-read-side-B/): B1CHK-1/2/3, W1-W4 all pass.
 
-CAPABILITY-COVERAGE: 6/6 falsification rows reproduced (each green before, red after, restored, restored=yes by git hash-object == HEAD:file):
-  F1 C1 drop `link.userId === caller.userId` (owner-config.ts): 9 red | F2 C2 trusted-readers list pushes all WA sessions: 1 red
-  F3 C3 502 code = error message: 2 red | F4 C4 drop otherCandidates from knownContent (ingest.ts): 1 red
-  F5 C5 let legacy link through (owner-config.ts): 4 red | F6 C6 remove deny in review-source.ts source route: 2 red
-  (Note F6 pins the route-level deny only; it does not cover the marker side effect in P1.)
-LIVE-BROWSER: not-applicable (API-only)
-ISSUES-WRITTEN: none (dual check: findings are PROPOSED-ISSUE lines)
-EXECUTOR: checker coordinator B (sonnet), scratch tree w7chk-B-tree in the session scratchpad, node --test --import tsx, in-memory Mongo fixtures
+## Falsification (7 edits, each in the copy; green-before, red-after, restored, hash == 21dfc204 blob; per-mutation backup and trap, timeout 240; script and output in the evidence dir)
+F1 brain.ts drop `read` in withSessionArtifacts.getSessionDetail (C1) -> 7 red · F2 ingest.ts not-found no longer throws before the marker (C6) -> 4 builder tests + cycle-0 probe1 red
+F3 owner-config.ts drop `link.state === "active"` (gate) -> 4 red · F4 fallback drops `state: "active"` -> 1 red · F5 compose.ts drop the NotFound catch (resilience) -> 1 red
+F6 marker key drops the link part -> 1 red · F7 fallback `length === 1` -> `>= 1` -> 1 red. Seven mutants, within the L cap of 10.
+Note: route-level W1 stays green under F2 because the route lists groups before ingest; the marker path is killed by the store-level tests and probe1.
 
-EXPLANATION:
-C1 two owners/one tenant: A gets own, 404 for B's raw id; admin sees both; non-owner admin read writes one admin.raw_read (no text; schema already allows it).
-C2 viewer/non-owner get 404/403 on raw sessions/turns/candidates, approved claims via Search/Ask remain, no unapproved raw turns, no tenant-B content.
-C3 ISS-API-003: 2/2 recorded reproductions refused, plus 9/9 authored shapes; 502 body is always {error, code, linkId}; GET /groups errors close to 500/503.
-C4 cross-owner duplicate gives one candidate flagged duplicate with an opaque pointer, no auto-merge/drop. C5 legacy/plain-key/unresolvable links admin-only.
-C6 swapped-tenant approve replay (header/query/body) -> 404/400 no row/no event; forged/unstamped/cross-tenant stamps grant nothing; other-owner candidate
-id guess -> 404; other-owner groupJid and plain Bearer on non-legacy link -> rejected, BUT the rejected ingest leaves the P1 marker, so criterion 6 fails.
-ISS-WAOWNER-002: 409 ambiguous_link / 404 mapping and caller+linkId threading verified OK; repair-path scope NOT OK (P1/P2). ISS-WAOWNER-005 guards pinned by tests.
-Declared open points reconfirmed, not failed: marker keyed by groupJid only; opaque duplicate pointer; admin session list unaudited; no replica-set run;
-legacy/plain-key admin-only vs R-24 continuity (plan acceptance 5 governs).
+## 4c diff scope
+Repair diff (7 product files plus tests) read in full; whole-unit stat scanned: every changed file is in the manifest "What changed". Removed lines are signature extensions (trustedBrainReads, createWhatsAppReviewSourceRouter, createWhatsAppReviewWiring, createWhatsAppReviewRouter), `ScopedWhatsAppRouteDeps` kept as an alias, and two test assertions replaced by stronger ones (ISS-API-003 closed body; caller arg). No export, route or test deleted.
+Consent code not touched (D-210). R-24 legacy-key reads out of scope per dispatch.
 
-Metrics: start=2026-10-30T11:26:01Z end=2026-10-30T11:40:00Z wall_min=14 agent_min=unavailable blocked_min=0 suite_runs=0 repeat_runs=0 mutations=6 cycle=0 resumes=1 tokens=unavailable policy=proportional-verification/2026-10-19.17 check_s=840 mutants=6 defects_unit=1 defects_6c=0
+## Observations (non-blocking)
+Re-link takeover of an unstamped pre-W7 source is impossible: migrations/20261029120000-whatsapp-links.cjs makes archiverOwnerId unique across tenants and states (B1CHK-3 only shows the shape in a fixture without that index).
+PROPOSED-ISSUE: {"id":"P1","sev":"low","type":"resilience","where":"apps/api/src/whatsapp/review/compose.ts:56-65","summary":"repairPendingInvalidations rethrows any error other than not_found/ambiguous (for example one owner's archive down), so later owners' markers in the same tenant are not attempted; reproduced by B1CHK-W4 (A's marker first, archive down for A: repair threw 'archive down', B's good marker not repaired). Also no production caller of repairPendingInvalidations (definition only), pre-existing at base. Direction: continue the loop, collect failures, rethrow at the end; wire a caller or file the gap against the review-wire work.","candidate":"queue, not a unit"}
+
+VERDICT: PASS
+SCOREBOARD: 6/6 criteria met, 0/0 invariants (no qa/contracts file; the plan acceptance list is the contract)
+TIER: L (tenancy / cross-tenant raw read, apps/api/src/whatsapp/owner-config.ts:184)
+FAILURES: none
+CAPABILITY-COVERAGE: 7/7 falsifying edits reproduced red-after, restored (hash == 21dfc204 blob)
+LIVE-BROWSER: not-applicable (api-only, no UI paths changed)
+ISSUES-WRITTEN: none (dual check; PROPOSED-ISSUE P1 above, low)
+EXECUTOR: claude-sonnet-5-5 (checker: claude-sonnet-subagent)
+EXPLANATION: Every cycle-0 side-B finding (marker side effect, per-link marker key and resilient repair, active-link gate) is fixed and re-proved by the verbatim cycle-0 probes, fresh probes and seven falsifications; the production composition now carries the read context and audits an admin read exactly once. One low resilience note (P1); real replica-set Mongo was not run (fixture Mongo only).
+Metrics: start=2026-10-30T17:31:45+05:30 end=2026-10-30T17:53:00+05:30 wall_min=21 agent_min=21 blocked_min=0 suite_runs=0 repeat_runs=0 mutations=7 cycle=1 resumes=0 tokens=unavailable policy=proportional-verification/2026-10-19.17 check_s=1275 mutants=7 defects_unit=0 defects_6c=0
