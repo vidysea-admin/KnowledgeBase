@@ -8,7 +8,7 @@
     "testMax": 400,
     "testPatterns": ["\\.test\\.ts$", "^test_.*\\.py$", "\\.test\\.mjs$"]
   },
-  "dirsize": { "$comment": "D-180: schema/ allows 55 canonical collection schemas (54 plus D-208 route_index) plus index.json and validate.py (D-176/D-177 speaker relationships and attributes, D-180 registration link approvals, D-206 users, user_sessions, user_tokens, auth_throttles, auth_events, D-206 W1 whatsapp_links, whatsapp_sync_runs, whatsapp_events); packages/db/src/collections allows 40 for the five D-206 user-account stores, their two tests and the W1 whatsapp-links accessor and test; other directory budgets remain unchanged.", "maxFiles": 30, "overrides": { "scripts": 32, "apps/api/src": 31, "schema": 57, "packages/db/src/collections": 40 } },
+  "dirsize": { "$comment": "D-180: schema/ allows 55 canonical collection schemas (54 plus D-208 route_index) plus index.json and validate.py (D-176/D-177 speaker relationships and attributes, D-180 registration link approvals, D-206 users, user_sessions, user_tokens, auth_throttles, auth_events, D-206 W1 whatsapp_links, whatsapp_sync_runs, whatsapp_events); packages/db/src/collections allows 40 for the five D-206 user-account stores, their two tests and the W1 whatsapp-links accessor and test; scripts allows 34 for the D-206 A6 bootstrap script create-admin.mjs and its test; other directory budgets remain unchanged.", "maxFiles": 30, "overrides": { "scripts": 34, "apps/api/src": 31, "schema": 57, "packages/db/src/collections": 40 } },
   "root": {
     "maxLooseFiles": 16,
     "architectureFile": "ARCHITECTURE.md",
