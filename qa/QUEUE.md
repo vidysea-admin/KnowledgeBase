@@ -1225,3 +1225,5 @@ Current source-table tracker verification: `node scripts/tracker-audit.mjs --jso
 - DONE `wa-owner-resolver` (W4): dual PASS cycle 0, senior review Approve; merged locally ebc4ef8f. Ledger qa/issues.waowner.jsonl ISS-WAOWNER-001..005 (2 medium, 3 low).
 - W7 brief MUST include ISS-WAOWNER-002 (route 409 ambiguous_link / 404 absent group, caller + linkId threading, repair path scope); W5/W9 briefs must include ISS-WAOWNER-001 (seed before reading whatsapp_links).
 - W3 `wa-archiver-client`: checker A PASS, checker B and review pending/in (review Warning, lows).
+- DONE `wa-archiver-client` (W3): dual PASS cycle 0, review Warning (lows); merged locally 7b572ebc (76 tests: 57 pass, 0 fail, 19 skipped by design on merged head). Criterion 5 compose half HELD at HUMAN_GATE H-11 (ISS-WAARCH-001: compose forwards + keep/rename/drop WHATSAPP_ARCHIVER_API_ALLOW_PRIVATE_HTTP). ISS-WAARCH-002..003 low.
+- IN PROGRESS: W7 `wa-isolation-read-side` (carries ISS-WAOWNER-002), W9 `wa-sync-scheduler` (carries ISS-WAOWNER-001). W5 waits on HUMAN_GATE H-4 (self-approval rule when Umesh is the only admin).
