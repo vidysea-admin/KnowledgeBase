@@ -124,7 +124,7 @@ export function createKnowledgeVisibility(db: ReadDb, nativeEvidence?: NativeEvi
       const source = text(sourceId) ? await one<Sources>("sources", tenantId, { _id: sourceId }) : null;
       const linkId = (source?.sourceMeta as Record<string, unknown> | undefined)?.whatsappLinkId, wa = /^whatsapp/.test(String(source?.kind)); // unstamped legacy source: no link to resolve, excluded
       const link = wa && text(linkId) ? await one<WhatsappLinks>("whatsapp_links", tenantId, { _id: linkId }) : null;
-      return source !== null && (!wa || (link !== null && link._id === linkId && link.studentData === "no"));
+      return source !== null && (!wa || (link !== null && link._id === linkId && link.live === true && link.state !== "suspended" && link.studentData === "no")); // H-14: revoked/unlinked/rejected (live false) and suspended (live true by isLiveLinkState) fail closed
     }));
     return extMemo.get(key)!;
   };

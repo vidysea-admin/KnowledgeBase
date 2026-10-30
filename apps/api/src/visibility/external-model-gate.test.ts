@@ -5,7 +5,8 @@ import { test } from "node:test";
 import { createKnowledgeVisibility } from "./knowledge.js";
 import { indexSession } from "../indexing/session.js";
 import { memoryDb, PUB_SESSION, PUB_SOURCE, TENANT, WA_SESSION, WA_SOURCE, waWorld } from "./wa-quarantine.testsupport.js";
-import { EXCLUDED, linkCase } from "./external-model.testsupport.js";
+import { TERMINAL_LINK_STATES, isLiveLinkState } from "@lkb/db";
+import { EXCLUDED, NON_LIVE_STATES, linkCase } from "./external-model.testsupport.js";
 
 test("a WhatsApp source whose link is studentData no is eligible, by source and by session", async () => {
   const w = waWorld("approved"); linkCase(w, "no");
@@ -21,6 +22,25 @@ for (const kind of EXCLUDED) {
     assert.equal(await v.externalModelEligibleSession(TENANT, WA_SESSION), false);
   });
 }
+// H-14 (fail closed): a link that is not live never feeds an external model, whatever studentData says.
+test("H-14: the non-live fixtures cover every terminal link state of the state model, and none of them is live", () => {
+  assert.deepEqual([...NON_LIVE_STATES].sort(), [...TERMINAL_LINK_STATES].sort());
+  for (const state of NON_LIVE_STATES) assert.equal(isLiveLinkState(state), false);
+});
+for (const state of ["requested", "approved", "active"]) {
+  test(`H-14: a live ${state} link with studentData no stays eligible, by source and by session`, async () => {
+    const w = waWorld("approved"); linkCase(w, "no"); w.data.whatsapp_links![0]!.state = state;
+    const v = createKnowledgeVisibility(w.db);
+    assert.equal(await v.externalModelEligible(TENANT, WA_SOURCE), true);
+    assert.equal(await v.externalModelEligibleSession(TENANT, WA_SESSION), true);
+  });
+}
+test("H-14: a link that goes revoked after being eligible is excluded on the next request", async () => {
+  const w = waWorld("approved"); linkCase(w, "no");
+  assert.equal(await createKnowledgeVisibility(w.db).externalModelEligible(TENANT, WA_SOURCE), true);
+  Object.assign(w.data.whatsapp_links![0]!, { state: "revoked", live: false });
+  assert.equal(await createKnowledgeVisibility(w.db).externalModelEligible(TENANT, WA_SOURCE), false);
+});
 test("non-WhatsApp sources are unaffected whatever the links say", async () => {
   const w = waWorld("approved"); linkCase(w, "yes");
   const v = createKnowledgeVisibility(w.db);
