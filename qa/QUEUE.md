@@ -1199,3 +1199,14 @@ Remaining acceptance is explicitly split:
 - **Tracker state:** seven started parents remain in_progress, T-059/T-060 remain pending, and no parent is marked done here. `.goal/goal.json` project_path still stores the historical D:\KnowledgeBase value: repo-wide targeted reader search found no consumer proving it is a current runtime checkout selector, so it was preserved rather than guessing external semantics.
 
 Current source-table tracker verification: `node scripts/tracker-audit.mjs --json --gate g1` -> exit 0, `ok: true`, `findings: []`, after canonical source-state and acceptance-gate notes were updated.
+
+## 2026-10-30 user-accounts wave 3 close-out (A4 + A6 dual PASS, merged locally 33670a8e / cdc61b36, not pushed)
+- TODO `ua-production-enable` (plan gap, needed before A9): `composition/production.ts` never sets `ServerDeps.userAccounts`, so `/auth` and `/admin` are unmounted in production even with `AUTH_CSRF_SECRET`. One-line enablement `userAccounts: buildUserAccounts(process.env, db, logger)`; production.ts sits at exactly its 300-line budget, so first move a self-contained helper (e.g. the watch-silence deps) out. Tier L (auth), dual-trigger. In scope of the approved user-accounts plan (gate plan-approved-user-accounts.md).
+- IN CHECK `ua-admin-mount` (the A6 CORE-REQUEST, be587455): qa/manifests/ua-admin-mount.md.
+
+### Candidates (human picks) — from the A4/A6 dual checks
+- priority: security · ISS-UAAUTH-001 (medium) lockout TOCTOU: concurrent wrong-password burst bypasses the 5-failure lock (qa/issues.uaauth.jsonl).
+- priority: security · ISS-UAAUTH-002 (medium) login racing a password reset keeps a session alive / rehash can overwrite the new password.
+- priority: security · ISS-UAADMIN-001 (medium, data write) admin change applied with no audit row when the audit write fails; retry 409.
+- priority: security · ISS-UAADMIN-002 (low, owner decision) an admin may issue a password-reset link for another admin (peer takeover).
+- low: ISS-UAAUTH-003..005, ISS-UAADMIN-003..004.
