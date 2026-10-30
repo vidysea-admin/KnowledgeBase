@@ -209,6 +209,8 @@ test("R-10 account coupling: disable / reject / demote-to-viewer suspends the AC
   assert.deepEqual([a1, a2, other].map(l => r.store.rows.get(l._id)!.state), ["suspended", "suspended", "active"], "only the affected person's links");
   assert.deepEqual(r.store.events.map(e => [e.eventType, e.actorKind, (e.data as any).reason]), [["link.suspended", "system", "account_inactive"], ["link.suspended", "system", "account_inactive"]]);
   assert.equal(await r.svc.accountChanged(T1, "u-member", { status: "active", role: "member" }), 0, "re-enable is an input that does nothing");
+  assert.equal(await r.svc.accountChanged(T1, "u-other", { status: "active", role: "member" }), 0, "a healthy account event never suspends an ACTIVE link");
+  assert.equal(r.store.rows.get(other._id)!.state, "active");
   assert.equal(await r.svc.accountChanged(T1, "u-member", { status: "active", role: "admin" }), 0);
   assert.equal(r.store.rows.get(a1._id)!.state, "suspended", "re-enabling never resumes (an admin must)");
   assert.equal(await r.svc.accountChanged(T2, "u-other", { status: "disabled" }), 0, "tenant-scoped");
