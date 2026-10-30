@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { useAuth } from "../../auth/AuthContext.js";
+import { WriteScope } from "../../auth/WriteScope.js";
 import { getPageDocument, getDocumentPage, importPageDocument, listPageDocuments, saveDocumentHighlight } from "./documentClient.js";
 import { documentPageHref, type DocumentDetail, type DocumentPageEvidence, type DocumentSummary } from "./documentPageModel.js";
 import { DocumentPageEvidenceView } from "./DocumentPageEvidence.js";
@@ -42,18 +43,18 @@ export function KnowledgeDocumentsPage(): React.ReactElement {
         <p>{cur.documents.length} returned document versions.{cur.truncated ? " More documents are available; this view is bounded to 100." : ""}</p>
         <ul>{cur.documents.map(d => <li key={d.id}><Link to={`/knowledge/documents/${encodeURIComponent(d.id)}`}>{d.title}</Link> ({d.pageCount} pages · {d.format.toUpperCase()})</li>)}</ul>
         {!cur.documents.length && <p>No page-evidenced documents imported.</p>}
-        <form onSubmit={e => { e.preventDefault(); if (file) void run(() => importPageDocument(apiKey, file, title)); }}>
+        <WriteScope><form onSubmit={e => { e.preventDefault(); if (file) void run(() => importPageDocument(apiKey, file, title)); }}>
           <h2>Import PDF or DOCX</h2><p>Up to 512 KB. DOCX requires the configured document renderer; unavailable rendering fails explicitly.</p>
           <label>Document title <input required maxLength={200} value={title} onChange={e => setTitle(e.target.value)} /></label>
           <label>Document file <input type="file" accept=".pdf,.docx" onChange={e => setFile(e.target.files?.[0] ?? null)} /></label><button disabled={busy || !file}>Import</button>
-        </form>
+        </form></WriteScope>
         {cur.detail && <><p>Source version: {cur.detail.version}</p><nav aria-label="Document pages" style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>{Array.from({ length: cur.detail.pageCount }, (_, i) => <Link key={i} to={documentPageHref(cur.detail!.id, i + 1)}>Page {i + 1}</Link>)}</nav>
           <DocumentPageEvidenceView document={cur.detail} pages={cur.pages} />
           {cur.detail.highlights.length > 50 && <p>Quote resolution is limited to the first 50 highlights; unresolved highlights are withheld.</p>}
           {cur.page && <section><h2>{cur.page.title} · Page {cur.page.pageNumber}</h2><pre style={{ whiteSpace: "pre-wrap", overflowWrap: "anywhere" }}>{cur.page.text || "No extractable text on this page."}</pre>
-            <form onSubmit={e => { e.preventDefault(); void run(() => saveDocumentHighlight(apiKey, cur.detail!, cur.page!.pageNumber, quote)); }}>
+            <WriteScope><form onSubmit={e => { e.preventDefault(); void run(() => saveDocumentHighlight(apiKey, cur.detail!, cur.page!.pageNumber, quote)); }}>
               <label>Exact quote from this page <textarea required maxLength={4000} value={quote} onChange={e => setQuote(e.target.value)} /></label><button disabled={busy || !quote || !cur.page.text.includes(quote)}>Save highlight</button>
-            </form></section>}
+            </form></WriteScope></section>}
         </>}
       </>}
     </>}

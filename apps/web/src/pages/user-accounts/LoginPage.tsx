@@ -23,13 +23,16 @@ export function Field({ label, ...input }: { label: string } & InputHTMLAttribut
 }
 
 /** A router-state `from` is honoured only when it is an in-app absolute path (never a scheme or protocol-relative URL). */
-export function safeFrom(state: unknown): string {
-  const from = (state as { from?: unknown } | null)?.from;
+export function safeFrom(state: unknown, signedInUserId?: string | null): string {
+  const s = state as { from?: unknown; fromUserId?: unknown } | null;
+  const from = s?.from;
+  // The return path belongs to whoever was signed in when it was recorded: another account never lands on that person's page.
+  if (typeof s?.fromUserId === "string" && s.fromUserId !== signedInUserId) return "/";
   return typeof from === "string" && /^\/(?![/\\])/.test(from) ? from : "/";
 }
 
 export function LoginPage(): ReactNode {
-  const { apiKey, accountState, authError, restoring, adoptSession } = useAuth();
+  const { apiKey, accountState, authError, restoring, adoptSession, user } = useAuth();
   const location = useLocation();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -38,7 +41,7 @@ export function LoginPage(): ReactNode {
   const [blocked, setBlocked] = useState<"rejected" | "disabled" | null>(null);
 
   if (restoring) return <AuthCard title="Living Knowledge Base"><p role="status">Checking your session…</p></AuthCard>;
-  if (apiKey) return <Navigate to={accountState === "pending" ? "/pending" : safeFrom(location.state)} replace />;
+  if (apiKey) return <Navigate to={accountState === "pending" ? "/pending" : safeFrom(location.state, user?.id)} replace />;
 
   async function submit(e: FormEvent): Promise<void> {
     e.preventDefault();

@@ -15,6 +15,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useAuth } from "../auth/AuthContext.js";
+import { useCanWrite, WriteScope } from "../auth/WriteScope.js";
 import { listSessions } from "../api/sessions.js";
 import { listUpcomingMeetings, type CalendarWorkerHealth } from "../api/calendar.js";
 import { scanGmail, listMeetingCandidates, approveMeetingCandidate, rejectMeetingCandidate } from "../api/meeting-candidates.js";
@@ -35,6 +36,7 @@ import {
 
 export function CalendarPage(): React.ReactElement {
   const { apiKey } = useAuth();
+  const canWrite = useCanWrite();
   const activeKey = useRef(apiKey); activeKey.current = apiKey;
   // Never render a previous signed-in key's source inventory while another request is pending.
   const [sessionState, setSessionState] = useState<{ owner: string | null; rows: SessionSummary[] | null; error: string | null } | null>(null);
@@ -247,7 +249,7 @@ export function CalendarPage(): React.ReactElement {
             <div className="card" style={{ width: 300, maxWidth: "100%", flex: "0 1 300px" }}>
               <EventDetail event={selected} onClose={() => setParam("event", null)} />
               {selectedMeeting && apiKey && (
-                <OptOutControl
+                <WriteScope><OptOutControl
                   key={selectedMeeting.id}
                   apiKey={apiKey}
                   eventId={selectedMeeting.id}
@@ -256,7 +258,7 @@ export function CalendarPage(): React.ReactElement {
                   linkCount={optedOut.linkCount}
                   optedOut={optedOut.ids?.has(selectedMeeting.id) ?? false}
                   onOptedOut={optedOut.add}
-                />
+                /></WriteScope>
               )}
             </div>
           )}
@@ -287,7 +289,7 @@ export function CalendarPage(): React.ReactElement {
 
       <div className="section-title" style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
         <span>Needs review (from Gmail)</span>
-        <button type="button" onClick={handleScan} disabled={scanning} style={{ fontSize: "0.75rem", padding: "0.3rem 0.6rem", borderRadius: 6, border: "1px solid var(--line)", background: "var(--card)", cursor: "pointer" }}>
+        <button type="button" onClick={handleScan} disabled={!canWrite || scanning} style={{ fontSize: "0.75rem", padding: "0.3rem 0.6rem", borderRadius: 6, border: "1px solid var(--line)", background: "var(--card)", cursor: "pointer" }}>
           {scanning ? "Scanning…" : "Scan Gmail"}
         </button>
       </div>
@@ -318,11 +320,11 @@ export function CalendarPage(): React.ReactElement {
             {c.evidenceIssue && <div className="row-meta" role="status">Needs review: {c.evidenceIssue === "unresolved-body" ? "message body could not be resolved" : "attachment evidence is unsupported"}. This evidence cannot authorize attendance.</div>}
             {(c.meetingLinkIssue || c.youtubeWatchIssue || c.registrationOnly) && <div className="row-meta">Needs review: {c.meetingLinkIssue ?? (c.youtubeWatchIssue ? "ambiguous watch target" : "registration-only")}. Attendance is not authorized by this evidence.</div>}
             <div style={{ marginTop: "0.4rem", display: "flex", gap: "0.5rem" }}>
-              <button type="button" disabled={Boolean(c.evidenceIssue)} onClick={() => handleDecision(c._id, "approve")} className="badge badge-good" style={{ border: "none", cursor: "pointer" }}>
+              <button type="button" disabled={!canWrite || Boolean(c.evidenceIssue)} onClick={() => handleDecision(c._id, "approve")} className="badge badge-good" style={{ border: "none", cursor: "pointer" }}>
                 Approve
               </button>
-              {apiKey && <GmailPatternControl apiKey={apiKey} candidate={c} onSaved={refreshCandidates} />}
-              <button type="button" onClick={() => handleDecision(c._id, "reject")} className="badge badge-bad" style={{ border: "none", cursor: "pointer" }}>
+              {apiKey && <WriteScope><GmailPatternControl apiKey={apiKey} candidate={c} onSaved={refreshCandidates} /></WriteScope>}
+              <button type="button" disabled={!canWrite} onClick={() => handleDecision(c._id, "reject")} className="badge badge-bad" style={{ border: "none", cursor: "pointer" }}>
                 Reject
               </button>
             </div>

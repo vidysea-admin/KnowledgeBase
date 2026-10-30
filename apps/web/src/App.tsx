@@ -2,6 +2,7 @@ import { useEffect, type ReactNode } from "react";
 import { BrowserRouter, Navigate, Routes, Route, useLocation } from "react-router-dom";
 import { routerBasename } from "./config/runtime.js";
 import { AuthProvider, useAuth } from "./auth/AuthContext.js";
+import { WriteScope } from "./auth/WriteScope.js";
 import { accountsEnabled } from "./api/user-accounts.js";
 import { LoginGate } from "./auth/LoginGate.js";
 import { AppShell } from "./layout/AppShell.js";
@@ -72,31 +73,31 @@ function Shell(): React.ReactElement {
               <Route path="/" element={<DashboardPage />} />
               <Route path="/operations" element={<OperationsPage />} />
               <Route path="/counsellor" element={<CounsellorPage />} />
-              <Route path="/calibration-review" element={<CalibrationReviewPage />} />
-              <Route path="/extraction-review" element={<ExtractionReviewPage />} />
-              <Route path="/label-review" element={<LabelReviewPage />} />
-              <Route path="/championship" element={<ChampionshipPage />} />
-              <Route path="/automation/forms" element={<ApplicationFormsPage />} />
+              <Route path="/calibration-review" element={<WriteScope><CalibrationReviewPage /></WriteScope>} />
+              <Route path="/extraction-review" element={<WriteScope><ExtractionReviewPage /></WriteScope>} />
+              <Route path="/label-review" element={<WriteScope><LabelReviewPage /></WriteScope>} />
+              <Route path="/championship" element={<WriteScope><ChampionshipPage /></WriteScope>} />
+              <Route path="/automation/forms" element={<WriteScope><ApplicationFormsPage /></WriteScope>} />
               <Route path="/sessions" element={<SessionsListPage enableFilters={import.meta.env.VITE_SESSIONS_FILTERS === "1"} />} />
               <Route path="/sessions/:id" element={<SessionDetailPage />} />
               <Route path="/ask" element={<PolicyAskPage />} />
-              <Route path="/answer-policy" element={<PolicyManager />} />
-              <Route path="/answer-policies" element={<PolicyManager />} />
-              <Route path="/answer-review" element={<AnswerReviewPage />} />
+              <Route path="/answer-policy" element={<WriteScope><PolicyManager /></WriteScope>} />
+              <Route path="/answer-policies" element={<WriteScope><PolicyManager /></WriteScope>} />
+              <Route path="/answer-review" element={<WriteScope><AnswerReviewPage /></WriteScope>} />
               <Route path="/knowledge/documents" element={<KnowledgeDocumentsPage />} />
               <Route path="/knowledge/documents/:id" element={<KnowledgeDocumentsPage />} />
               <Route path="/knowledge/documents/:id/pages/:page" element={<KnowledgeDocumentsPage />} />
-              <Route path="/knowledge/collections" element={<CuratedCollections />} />
+              <Route path="/knowledge/collections" element={<WriteScope><CuratedCollections /></WriteScope>} />
               <Route path="/knowledge/topics" element={<KnowledgeTopicsPage />} />
               <Route path="/knowledge/topics/:id" element={<KnowledgeTopicsPage />} />
               <Route path="/knowledge/resources" element={<KnowledgeResourcesPage />} />
               <Route path="/knowledge/profiles" element={<KnowledgeProfilesPage />} />
               <Route path="/knowledge/speakers" element={<KnowledgeSpeakerProfilePage />} />
               <Route path="/knowledge/speakers/:personId" element={<KnowledgeSpeakerProfilePage />} />
-              <Route path="/knowledge-outputs" element={<KnowledgeOutputsPage />} />
-              <Route path="/accounts" element={<CounsellorAccountsPage />} />
-              <Route path="/automation" element={<AutomationPage />} />
-              <Route path="/connectors" element={<ConnectorsPage />} />
+              <Route path="/knowledge-outputs" element={<WriteScope><KnowledgeOutputsPage /></WriteScope>} />
+              <Route path="/accounts" element={<WriteScope><CounsellorAccountsPage /></WriteScope>} />
+              <Route path="/automation" element={<WriteScope><AutomationPage /></WriteScope>} />
+              <Route path="/connectors" element={<WriteScope><ConnectorsPage /></WriteScope>} />
               <Route path="/transcript-review" element={<TranscriptReviewPage />} />
               <Route path="/transcript-review/:id" element={<TranscriptReviewPage />} />
               <Route path="/search" element={<SearchPage />} />
@@ -111,14 +112,14 @@ function Shell(): React.ReactElement {
               <Route path="/calendar" element={<CalendarPage />} />
               <Route path="/watch" element={<WatchPage />} />
               <Route path="/sources" element={<SourcesPage />} />
-              <Route path="/settings" element={<SettingsPage />} />
+              <Route path="/settings" element={<WriteScope><SettingsPage /></WriteScope>} />
               <Route path="/jobs" element={<JobsPage />} />
               <Route path="/claims" element={<ClaimsPage />} />
               <Route path="/status" element={<SystemStatusPage />} />
               <Route path="/setup" element={<SetupWizardPage />} />
               <Route path="/ops-health" element={<OpsHealthPage />} />
               <Route path="/notifications" element={<NotificationsPage />} />
-              <Route path="/ingest" element={<IngestPage />} />
+              <Route path="/ingest" element={<WriteScope><IngestPage /></WriteScope>} />
               <Route path="/meeting-bot" element={<MeetingBotPage />} />
               <Route path="/whatsapp" element={<WhatsAppPage />} />
               <Route path="/whatsapp/review/:id/source" element={<ReviewSourcePage />} />
@@ -133,10 +134,10 @@ function Shell(): React.ReactElement {
 
 /** Signed-out visitors go to /login (remembering where they were); a pending account waits on /pending. */
 function AccountGate({ children }: { children: ReactNode }): ReactNode {
-  const { apiKey, accountState, restoring } = useAuth();
+  const { apiKey, accountState, restoring, lastUserId } = useAuth();
   const location = useLocation();
   if (restoring) return <p className="empty-note" role="status">Checking your session…</p>;
-  if (apiKey === null) return <Navigate to="/login" replace state={{ from: `${location.pathname}${location.search}` }} />;
+  if (apiKey === null) return <Navigate to="/login" replace state={{ from: `${location.pathname}${location.search}`, fromUserId: lastUserId }} />;
   if (accountState === "pending") return <Navigate to="/pending" replace />;
   return children;
 }

@@ -3,10 +3,10 @@ import { useState, type FormEvent, type ReactNode } from "react";
 import { Link } from "react-router-dom";
 import { describeAuthError, resetPassword } from "../../api/user-accounts.js";
 import { AuthCard, Field } from "./LoginPage.js";
-import { takeFragmentToken } from "./VerifyPage.js";
+import { useFragmentToken } from "./VerifyPage.js";
 
 export function ResetPage(): ReactNode {
-  const [token] = useState(takeFragmentToken);
+  const token = useFragmentToken();
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
   const [busy, setBusy] = useState(false);

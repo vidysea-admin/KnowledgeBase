@@ -17,6 +17,7 @@ import {
   type ReactNode,
 } from "react";
 import { advanceAuthSession, AUTH_INVALIDATED_EVENT, AUTH_KEY_STORAGE_KEY, SESSION_CREDENTIAL, setCsrfToken, type AuthInvalidationEventDetail } from "../api/client.js";
+import { ReadOnlyContext } from "./WriteScope.js";
 import { accountsEnabled, fetchSession, logout as logoutRequest, type SessionInfo, type SessionUser } from "../api/user-accounts.js";
 
 export interface AuthContextValue {
@@ -39,9 +40,16 @@ export interface AuthContextValue {
   restoreSession: () => Promise<void>;
   /** After a successful login response. */
   adoptSession: (session: SessionInfo) => void;
-  /** POST /auth/logout, then forget the session locally whatever the server said. Resolves true when the server confirmed. */
+  /** POST /auth/logout; the session is forgotten locally only once the server confirmed (a failed call keeps the person signed in and sets `signOutError`). Resolves true when the server confirmed. */
   signOut: () => Promise<boolean>;
+  /** Visible at the sign-out call sites after a failed `signOut`; cleared by the next attempt, sign-in or sign-out. */
+  signOutError: string | null;
+  /** Id of the last account that was signed in during this page load (kept after sign-out), so the login page can refuse another person a stale return path. */
+  lastUserId: string | null;
 }
+
+/** Shown where the person pressed "Sign out" when the server did not confirm: the cookie is still valid, so they must not look signed out. */
+export const SIGN_OUT_FAILED = "Could not sign you out, try again.";
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
@@ -67,6 +75,8 @@ export function AuthProvider({ children }: { children: ReactNode }): ReactNode {
   const [sessionVersion, setSessionVersion] = useState(0);
   const [authError, setAuthError] = useState<string | null>(null);
   const [session, setSession] = useState<SessionInfo | null>(null);
+  const [signOutError, setSignOutError] = useState<string | null>(null);
+  const [lastUserId, setLastUserId] = useState<string | null>(null);
   const [restoring, setRestoring] = useState<boolean>(() => accountsEnabled() && readStoredKey() === null);
   const versionRef = useRef(0);
 
@@ -79,6 +89,7 @@ export function AuthProvider({ children }: { children: ReactNode }): ReactNode {
     versionRef.current += 1;
     setCsrfToken(null);
     setSession(null);
+    setSignOutError(null);
     setRestoring(false);
     setSessionVersion((version) => version + 1);
     try {
@@ -97,6 +108,7 @@ export function AuthProvider({ children }: { children: ReactNode }): ReactNode {
     versionRef.current += 1;
     setCsrfToken(null);
     setSession(null);
+    setSignOutError(null);
     setRestoring(false);
     setSessionVersion((version) => version + 1);
     removeStoredKey();
@@ -120,7 +132,7 @@ export function AuthProvider({ children }: { children: ReactNode }): ReactNode {
       keyRef.current = null;
       const fallback = failed === SESSION_CREDENTIAL ? "You were signed out. Sign in again." : "That API key was not accepted.";
       setAuthError(typeof detail?.message === "string" && detail.message !== "" ? detail.message : fallback);
-      if (failed === SESSION_CREDENTIAL) { setCsrfToken(null); setSession(null); }
+      if (failed === SESSION_CREDENTIAL) { setCsrfToken(null); setSession(null); setSignOutError(null); }
       setApiKeyState(null);
     }
   }, []);
@@ -134,6 +146,7 @@ export function AuthProvider({ children }: { children: ReactNode }): ReactNode {
     setCsrfToken(next.csrfToken);
     keyRef.current = SESSION_CREDENTIAL;
     setSession(next);
+    setSignOutError(null);
     setRestoring(false);
     setAuthError(null);
     setSessionVersion((version) => version + 1);
@@ -151,16 +164,22 @@ export function AuthProvider({ children }: { children: ReactNode }): ReactNode {
 
   const signOut = useCallback(async (): Promise<boolean> => {
     const wasSession = keyRef.current === SESSION_CREDENTIAL;
+    const started = versionRef.current;
     let confirmed = false;
     if (wasSession) {
+      setSignOutError(null);
       try { await logoutRequest(); confirmed = true; } catch { confirmed = false; }
+      // A sign-in/out that happened while the request was in flight owns the state now (and a 401 already cleared the session through the invalidation event).
+      if (versionRef.current !== started || keyRef.current !== SESSION_CREDENTIAL) return confirmed;
+      // Not confirmed: the cookie is still valid on the server, so stay signed in and say so at the call site.
+      if (!confirmed) { setSignOutError(SIGN_OUT_FAILED); return false; }
     }
-    // Local state resets either way: the person asked to leave. (A failed call leaves the cookie; the next page load would restore it.)
     advanceAuthSession();
     versionRef.current += 1;
     setCsrfToken(null);
     keyRef.current = null;
     setSession(null);
+    setSignOutError(null);
     setRestoring(false);
     setAuthError(null);
     setSessionVersion((version) => version + 1);
@@ -178,11 +197,13 @@ export function AuthProvider({ children }: { children: ReactNode }): ReactNode {
   const user = session?.user ?? null;
   const accountState = session?.state ?? null;
   const readOnly = user?.role === "viewer";
+  const userId = user?.id ?? null;
+  useEffect(() => { if (userId !== null) setLastUserId(userId); }, [userId]);
   const value = useMemo(
-    () => ({ apiKey, sessionVersion, authError, setApiKey, clearApiKey, user, accountState, restoring, readOnly, restoreSession, adoptSession, signOut }),
-    [apiKey, sessionVersion, authError, setApiKey, clearApiKey, user, accountState, restoring, readOnly, restoreSession, adoptSession, signOut],
+    () => ({ apiKey, sessionVersion, authError, setApiKey, clearApiKey, user, accountState, restoring, readOnly, restoreSession, adoptSession, signOut, signOutError, lastUserId }),
+    [apiKey, sessionVersion, authError, setApiKey, clearApiKey, user, accountState, restoring, readOnly, restoreSession, adoptSession, signOut, signOutError, lastUserId],
   );
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+  return <AuthContext.Provider value={value}><ReadOnlyContext.Provider value={readOnly}>{children}</ReadOnlyContext.Provider></AuthContext.Provider>;
 }
 
 export function useAuth(): AuthContextValue {

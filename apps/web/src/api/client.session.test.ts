@@ -69,6 +69,19 @@ describe("apiFetch with the account session", () => {
     expect(calls.map((c) => c[2])).toEqual(["stale", null, "fresh"]);
   });
 
+  test("a proof fetched for a session that was replaced while the refresh was in flight is not adopted", async () => {
+    const fetchMock = vi.fn(async (url: string, init?: RequestInit) => {
+      if (url.endsWith("/auth/session")) { advanceAuthSession(); setCsrfToken(null); return json(200, { csrfToken: "proof-of-the-old-login" }); } // a sign-in/out lands mid-refresh
+      return json(403, { error: "csrf", message: "missing or invalid CSRF proof" });
+    });
+    vi.stubGlobal("fetch", fetchMock);
+    setCsrfToken("stale");
+    await expect(apiFetch("/things", SESSION_CREDENTIAL, { method: "POST", body: {} })).rejects.toMatchObject({ status: 403, code: "csrf" });
+    fetchMock.mockClear();
+    await apiFetch("/other", SESSION_CREDENTIAL, { method: "POST", body: {} }).catch(() => undefined);
+    expect(new Headers(lastInit(fetchMock, 0).headers).get("x-lkb-csrf")).toBeNull();
+  });
+
   test("403 csrf that persists is surfaced after exactly one replay (no loop)", async () => {
     const fetchMock = vi.fn(async (url: string) => (url.endsWith("/auth/session") ? json(200, { csrfToken: "fresh" }) : json(403, { error: "csrf", message: "no" })));
     vi.stubGlobal("fetch", fetchMock);

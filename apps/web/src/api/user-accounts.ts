@@ -142,7 +142,7 @@ export function describeAuthError(err: unknown): string {
       return why.length > 0 ? `Check the password: ${why.join("; ")}.` : "Check the fields and try again.";
     }
     case 404: return "Not found.";
-    case 409: return err.code === "last_admin" ? "This is the only admin; keep at least one." : err.code === "self_action" ? "You cannot do that to your own account." : err.message;
+    case 409: return err.code === "last_admin" ? "This is the only admin; keep at least one." : err.code === "self_action" ? "You cannot do that to your own account." : "That change conflicts with the current state. Reload and try again.";
     default: return "Something went wrong. Try again.";
   }
 }

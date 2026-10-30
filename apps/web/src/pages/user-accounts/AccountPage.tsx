@@ -4,7 +4,7 @@ import { useAuth } from "../../auth/AuthContext.js";
 import { changePassword, describeAuthError, listMySessions, logoutAll, revokeMySession, type MySession } from "../../api/user-accounts.js";
 
 export function AccountPage(): ReactNode {
-  const { user, signOut, clearApiKey } = useAuth();
+  const { user, signOut, signOutError, clearApiKey } = useAuth();
   const [sessions, setSessions] = useState<MySession[] | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [current, setCurrent] = useState("");
@@ -66,6 +66,7 @@ export function AccountPage(): ReactNode {
           <button type="button" onClick={() => void signOut()}>Sign out</button>{" "}
           <button type="button" onClick={() => void signOutEverywhere()}>Sign out everywhere</button>
         </p>
+        {signOutError && <p role="alert" className="error-note">{signOutError}</p>}
       </section>
     </div>
   );

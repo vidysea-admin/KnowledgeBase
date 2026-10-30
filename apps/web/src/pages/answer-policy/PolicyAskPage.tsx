@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { useAuth } from "../../auth/AuthContext.js";
+import { WriteScope } from "../../auth/WriteScope.js";
 import { ApiError } from "../../api/client.js";
 import { useAskHandoff } from "../search/AskHandoff.js";
 import { AnswerSources } from "./AnswerSources.js";
@@ -127,10 +128,10 @@ export function PolicyAskPage(): React.ReactElement {
       {result.answer ? <p style={{ whiteSpace: "pre-wrap" }}>{result.answer}</p> : <p>Candidate withheld: {result.state}. Authorized review or a new query with supported evidence is required.</p>}
     </section><AnswerSources answer={result} excerpts={evidenceMode} />
       <section className="card"><h2>Follow-up questions</h2>{result.followUps.map((q) => <button key={q} disabled={busy} onClick={() => setQuery(q)}>{q}</button>)}</section>
-      <section className="card"><h2>Feedback for this answer</h2><label htmlFor="answer-feedback">Feedback note</label><input id="answer-feedback" maxLength={500} value={feedback} disabled={busy} onChange={(e) => setFeedback(e.target.value)} />
+      <WriteScope><section className="card"><h2>Feedback for this answer</h2><label htmlFor="answer-feedback">Feedback note</label><input id="answer-feedback" maxLength={500} value={feedback} disabled={busy} onChange={(e) => setFeedback(e.target.value)} />
         {(["helpful", "unhelpful"] as const).map((rating) => <button key={rating} disabled={busy || !feedback.trim()} onClick={() => { const current = result; void perform(async (token) => { await saveAnswerFeedback(apiKey, current.runId, rating, feedback); if (token === generation.current) setNotice("Feedback saved for this answer revision."); }); }}>{rating}</button>)}
-      </section>
-      <section className="card"><h2>Report conflicting evidence</h2><p>Select two cited sources with opposing statements. Reporting withholds this answer until a reviewed resolution produces a new answer.</p>
+      </section></WriteScope>
+      <WriteScope><section className="card"><h2>Report conflicting evidence</h2><p>Select two cited sources with opposing statements. Reporting withholds this answer until a reviewed resolution produces a new answer.</p>
         <label htmlFor="evidence-conflict-a">First source</label><select id="evidence-conflict-a" value={conflictA} disabled={busy} onChange={(e) => setConflictA(e.target.value)}><option value="">Select source</option>{result.sourceEvidence.map((s) => <option key={s.id} value={s.id}>{s.id}</option>)}</select>
         <label htmlFor="evidence-conflict-b">Opposing source</label><select id="evidence-conflict-b" value={conflictB} disabled={busy} onChange={(e) => setConflictB(e.target.value)}><option value="">Select source</option>{result.sourceEvidence.map((s) => <option key={s.id} value={s.id}>{s.id}</option>)}</select>
         <label htmlFor="evidence-conflict-note">Explain the contradiction</label><input id="evidence-conflict-note" maxLength={500} value={conflictNote} disabled={busy} onChange={(e) => setConflictNote(e.target.value)} />
@@ -138,7 +139,7 @@ export function PolicyAskPage(): React.ReactElement {
           await reportAnswerConflict(apiKey, current.runId, conflictA, conflictB, conflictNote); const h = await answerHistory(apiKey);
           if (token === generation.current) { setHistory(h.history); display(h.history.find((i) => i.id === current.runId)?.result ?? { ...current, answer: "", state: "conflicted" }); setNotice("Evidence conflict recorded; candidate withheld."); }
         }); }}>Report evidence conflict</button>
-      </section></>}
+      </section></WriteScope></>}
     <section className="card"><h2>Saved question history</h2><p>The 100 most recent saved answers for this tenant.</p>{!history.length && <p>No saved answers for this tenant.</p>}
       <ul>{history.map((item) => <li key={item.id}><button disabled={operationBusy} onClick={() => selectHistory(item)}>{item.query}</button> · {item.createdAt} · {item.result.state}</li>)}</ul>
     </section>

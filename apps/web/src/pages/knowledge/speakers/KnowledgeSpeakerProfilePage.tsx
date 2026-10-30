@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { useAuth } from "../../../auth/AuthContext.js";
+import { WriteScope } from "../../../auth/WriteScope.js";
 import { getCollectionMembers, type MemberChoice } from "../collectionsClient.js";
 import { loadCitedSpeakerProfile, loadSpeakerKnowledge, type SpeakerKnowledgeResponse, type CitedSpeakerProfile, type SpeakerCitation } from "./speakerProfileClient.js";
 import { apiFetch, ApiError } from "../../../api/client.js";
@@ -36,7 +37,7 @@ function SpeakerRelationships({ apiKey, personId, authSession }: { apiKey: strin
   return <section aria-label="Speaker relationship source">
     <button type="button" onClick={() => refresh(n => n + 1)}>Refresh relationship source</button>
     {!current && !error && <p role="status">Loading current relationship source…</p>}{error && <p role="alert">{error}</p>}
-    <SpeakerRelationWorkbench apiKey={apiKey} personId={personId} authSession={authSession} authority={current} onChanged={() => refresh(n => n + 1)} />
+    <WriteScope><SpeakerRelationWorkbench apiKey={apiKey} personId={personId} authSession={authSession} authority={current} onChanged={() => refresh(n => n + 1)} /></WriteScope>
   </section>;
 }
 function Evidence({ values }: { values: SpeakerCitation[] }): React.ReactElement {

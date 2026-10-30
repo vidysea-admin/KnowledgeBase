@@ -6,7 +6,7 @@ import { describeAuthError, fetchSession } from "../../api/user-accounts.js";
 import { AuthCard } from "./LoginPage.js";
 
 export function PendingPage(): ReactNode {
-  const { apiKey, accountState, user, restoring, adoptSession, signOut } = useAuth();
+  const { apiKey, accountState, user, restoring, adoptSession, signOut, signOutError } = useAuth();
   const [note, setNote] = useState<string | null>(null);
   if (restoring) return <AuthCard title="Living Knowledge Base"><p role="status">Checking your session…</p></AuthCard>;
   if (!apiKey) return <Navigate to="/login" replace />;
@@ -26,6 +26,7 @@ export function PendingPage(): ReactNode {
       {note && <p role="status">{note}</p>}
       <button type="button" onClick={() => void recheck()}>Check again</button>
       <p className="auth-links"><button type="button" className="link-button" onClick={() => void signOut()}>Sign out</button></p>
+      {signOutError && <p role="alert" className="error-note">{signOutError}</p>}
     </AuthCard>
   );
 }

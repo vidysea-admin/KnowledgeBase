@@ -115,14 +115,32 @@ describe("signOut", () => {
     expect(ctx).toMatchObject({ apiKey: null, user: null });
   });
 
-  test("server unreachable: the person still leaves locally and the caller learns it was not confirmed", async () => {
+  test("server unreachable or erroring: the person STAYS signed in and signOutError is set; the next success clears it", async () => {
     vi.stubGlobal("fetch", vi.fn(async () => { throw new TypeError("offline"); }));
     mount();
     act(() => { ctx.adoptSession(info()); });
     let ok = true;
     await act(async () => { ok = await ctx.signOut(); });
     expect(ok).toBe(false);
-    expect(ctx).toMatchObject({ apiKey: null, user: null });
+    expect(ctx).toMatchObject({ apiKey: SESSION_CREDENTIAL, signOutError: "Could not sign you out, try again." });
+    expect(ctx.user).not.toBeNull();
+    vi.stubGlobal("fetch", vi.fn(async () => json(500, { error: "internal", message: "x" })));
+    await act(async () => { ok = await ctx.signOut(); });
+    expect(ok).toBe(false);
+    expect(ctx.apiKey).toBe(SESSION_CREDENTIAL);
+    vi.stubGlobal("fetch", vi.fn(async () => json(200, { ok: true })));
+    await act(async () => { ok = await ctx.signOut(); });
+    expect(ok).toBe(true);
+    expect(ctx).toMatchObject({ apiKey: null, user: null, signOutError: null });
+  });
+
+  test("a 401 on the logout call (session already ended) leaves the person signed out without a sign-out error", async () => {
+    vi.stubGlobal("fetch", vi.fn(async () => json(401, { error: "session_revoked", message: "this session has ended; sign in again" })));
+    mount();
+    act(() => { ctx.adoptSession(info()); });
+    await act(async () => { await ctx.signOut(); });
+    await waitFor(() => expect(ctx.apiKey).toBeNull());
+    expect(ctx.signOutError).toBeNull();
   });
 });
 

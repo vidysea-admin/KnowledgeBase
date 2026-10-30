@@ -171,11 +171,13 @@ async function send<T>(path: string, apiKey: string, options: ApiFetchOptions, m
 
 /** GET /auth/session for a fresh CSRF proof. True only when one was obtained; never throws, never invalidates auth. */
 async function refreshCsrfToken(): Promise<boolean> {
+  const started = authSession;
   try {
     const res = await fetch(`${API_BASE_URL}/auth/session`, { credentials: "same-origin" });
     if (!res.ok) return false;
     const body = (await res.json()) as { csrfToken?: unknown };
     if (typeof body.csrfToken !== "string" || body.csrfToken === "") return false;
+    if (authSession !== started) return false; // a sign-in/out happened while this was in flight: its proof is not ours to adopt
     csrfToken = body.csrfToken;
     return true;
   } catch {

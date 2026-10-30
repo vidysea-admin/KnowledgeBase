@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { useAuth } from "../../auth/AuthContext.js";
+import { WriteScope } from "../../auth/WriteScope.js";
 import { TranscriptReview } from "./TranscriptReview.js";
 
 /** Both /transcript-review and /transcript-review/:id are real product entry points. */
@@ -17,6 +18,6 @@ export function TranscriptReviewPage(): React.ReactElement {
       <label>Session identifier <input aria-label="Session identifier" value={sessionId} maxLength={400} onChange={(e) => setSessionId(e.target.value)} /></label>
       <button disabled={!sessionId.trim()}>Open transcript</button>
     </form>}
-    {target && <TranscriptReview apiKey={apiKey} sessionId={target} />}
+    {target && <WriteScope><TranscriptReview apiKey={apiKey} sessionId={target} /></WriteScope>}
   </>;
 }

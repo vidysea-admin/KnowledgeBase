@@ -1,7 +1,7 @@
 /** ua-web A7 pages: signup/forgot/reset/verify, the account page, and the admin pages (users, detail, audit). Fake fetch records every call. */
 import { cleanup, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { useEffect, type ReactNode } from "react";
+import { StrictMode, useEffect, type ReactNode } from "react";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 import { setCsrfToken } from "../../api/client.js";
@@ -183,6 +183,53 @@ describe("user detail", () => {
     page("/admin/users/u9", "/admin/users/:id", <UserDetailPage />, { id: "other", role: "admin" });
     await user.click(await screen.findByRole("button", { name: "Set role" }));
     expect(await screen.findByRole("alert")).toHaveTextContent("only admin");
+  });
+
+  test("an unknown 409 shows a fixed sentence, never the server's own message text", async () => {
+    responder = (c) => detail({ status: "active", role: "admin" })(c) ?? (c.method === "POST" ? json(409, { error: "something_new", message: "SERVER-INTERNAL-DETAIL" }) : undefined);
+    const user = userEvent.setup();
+    page("/admin/users/u9", "/admin/users/:id", <UserDetailPage />, { id: "other", role: "admin" });
+    await user.click(await screen.findByRole("button", { name: "Set role" }));
+    const alert = await screen.findByRole("alert");
+    expect(alert).toHaveTextContent("conflicts with the current state");
+    expect(alert).not.toHaveTextContent("SERVER-INTERNAL-DETAIL");
+  });
+});
+
+describe("token links under <StrictMode> (dev double render and double effect)", () => {
+  const strict = (path: string, route: string, element: ReactNode) =>
+    render(<StrictMode><AuthProvider><MemoryRouter initialEntries={[path]}><Routes><Route path={route} element={element} /></Routes></MemoryRouter></AuthProvider></StrictMode>);
+
+  test("a valid #token verify link still shows the action, strips the fragment, and sends the token on the click", async () => {
+    window.history.pushState({}, "", "/verify#token=tok-strict");
+    const user = userEvent.setup();
+    strict("/verify", "/verify", <VerifyPage />);
+    const confirm = await screen.findByRole("button", { name: "Confirm my email" });
+    expect(screen.queryByText(/missing its code/)).not.toBeInTheDocument();
+    expect(window.location.hash).toBe("");
+    expect(calls).toHaveLength(0); // nothing is spent on load
+    await user.click(confirm);
+    await screen.findByRole("heading", { name: "Email confirmed" });
+    expect(calls.find((c) => c.path === "/auth/verify-email")?.body).toEqual({ token: "tok-strict" });
+  });
+
+  test("a valid #token reset link still accepts a new password under StrictMode", async () => {
+    window.history.pushState({}, "", "/reset#token=tok-reset");
+    const user = userEvent.setup();
+    strict("/reset", "/reset", <ResetPage />);
+    await user.type(await screen.findByLabelText("New password"), "brand new passphrase");
+    await user.type(screen.getByLabelText("Confirm new password"), "brand new passphrase");
+    expect(screen.queryByText(/missing its code/)).not.toBeInTheDocument();
+    expect(window.location.hash).toBe("");
+    await user.click(screen.getByRole("button", { name: "Set password" }));
+    await screen.findByRole("heading", { name: "Password changed" });
+    expect(calls.find((c) => c.path === "/auth/password/reset")?.body).toMatchObject({ token: "tok-reset" });
+  });
+
+  test("a link without a token still says so", async () => {
+    window.history.pushState({}, "", "/verify");
+    strict("/verify", "/verify", <VerifyPage />);
+    expect(await screen.findByRole("alert")).toHaveTextContent("missing its code");
   });
 });
 

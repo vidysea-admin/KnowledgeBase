@@ -1,18 +1,23 @@
 /** apps/web/src/pages/user-accounts/VerifyPage.tsx -- unit ua-web, UA-4. The admin-issued link carries the token in the URL FRAGMENT (`#token=...`), so it never reaches a server log or Referer. */
-import { useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { Link } from "react-router-dom";
 import { describeAuthError, verifyEmail } from "../../api/user-accounts.js";
 import { AuthCard } from "./LoginPage.js";
 
-/** Reads `#token=<value>` and removes the fragment from the address bar so the token is not left in history / shared screenshots. */
-export function takeFragmentToken(): string {
-  const raw = new URLSearchParams(window.location.hash.replace(/^#/, "")).get("token") ?? "";
-  if (window.location.hash) window.history.replaceState(null, "", window.location.pathname + window.location.search);
-  return raw;
+/**
+ * Reads `#token=<value>` once and removes the fragment from the address bar (in an effect) so the token is not left in history / shared
+ * screenshots. The read is pure and the strip is idempotent, so <StrictMode>'s double initializer / double effect in dev cannot lose the token.
+ */
+export function useFragmentToken(): string {
+  const [token] = useState(() => new URLSearchParams(window.location.hash.replace(/^#/, "")).get("token") ?? "");
+  useEffect(() => {
+    if (window.location.hash) window.history.replaceState(null, "", window.location.pathname + window.location.search);
+  }, []);
+  return token;
 }
 
 export function VerifyPage(): ReactNode {
-  const [token] = useState(takeFragmentToken);
+  const token = useFragmentToken();
   const [state, setState] = useState<"idle" | "busy" | "done">("idle");
   const [error, setError] = useState<string | null>(null);
 

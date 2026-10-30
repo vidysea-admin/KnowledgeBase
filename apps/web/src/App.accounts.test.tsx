@@ -14,7 +14,7 @@ interface Req { method: string; path: string; body: unknown; auth: string | null
 
 function makeServer() {
   const users: U[] = [{ id: "u-admin", name: "Ada Admin", email: "ada@x.org", password: "correct horse battery", status: "active", role: "admin" }];
-  const st = { sid: null as string | null, revokedSid: null as string | null, cookiesWork: true, blockLogin: null as null | { status: number; body: unknown }, reqs: [] as Req[], tokens: new Map<string, string>(), n: 0 };
+  const st = { sid: null as string | null, revokedSid: null as string | null, logoutFails: false, cookiesWork: true, blockLogin: null as null | { status: number; body: unknown }, reqs: [] as Req[], tokens: new Map<string, string>(), n: 0 };
   const json = (status: number, body: unknown) => new Response(JSON.stringify(body), { status, headers: { "content-type": "application/json" } });
   const sessionUser = () => users.find((u) => st.sid && st.sid === `sid-${u.id}`);
   const sessionBody = (u: U) => ({ state: u.status, user: { id: u.id, displayName: u.name, role: u.role }, csrfToken: `csrf-${st.sid}` });
@@ -43,7 +43,7 @@ function makeServer() {
       st.sid = `sid-${u.id}`; st.revokedSid = null;
       return json(200, sessionBody(u));
     }
-    if (h.get("authorization") === "Bearer operator-key") return json(200, { policies: [], history: [], sessions: [], questions: [], conflicts: [], items: [], events: [], next: null });
+    if (h.get("authorization") === "Bearer operator-key") return json(200, { policies: [], history: [], sessions: [], questions: [], conflicts: [], items: [], events: [], sources: [], keys: [], gaps: [], next: null });
     // everything below needs the cookie
     if (!hasCookie) return json(401, { error: "unauthorized", message: "sign in required" });
     if (st.revokedSid === st.sid) return json(401, { error: "session_revoked", message: "this session has ended; sign in again" });
@@ -51,7 +51,7 @@ function makeServer() {
     if (h.get("authorization")) return json(403, { error: "key_not_allowed", message: "x" });
     if (path === "/auth/session") return json(200, sessionBody(me));
     if (method !== "GET" && h.get("x-lkb-csrf") !== `csrf-${st.sid}`) return json(403, { error: "csrf", message: "missing or invalid CSRF proof" });
-    if (path === "/auth/logout") { st.sid = null; return json(200, { ok: true }); }
+    if (path === "/auth/logout") { if (st.logoutFails) return json(500, { error: "internal", message: "x" }); st.sid = null; return json(200, { ok: true }); }
     if (me.status !== "active") return json(403, { error: "account_not_active", message: "x" });
     if (me.role === "viewer" && method !== "GET") return json(403, { error: "read_only_role", message: "x" });
     if (path.startsWith("/admin/users") && method === "GET") {
@@ -65,7 +65,7 @@ function makeServer() {
       if (me.role !== "admin") return json(403, { error: "admin_session_required", message: "x" });
       const u = users.find((x) => x.id === approve[1])!; u.status = "active"; u.role = body.role; return json(200, { user: {} });
     }
-    return json(200, { policies: [], history: [], sessions: [], questions: [], conflicts: [], items: [], events: [], next: null });
+    return json(200, { policies: [], history: [], sessions: [], questions: [], conflicts: [], items: [], events: [], sources: [], keys: [], gaps: [], next: null });
   };
   return { users, st, handler, jar: { revoke: () => { st.revokedSid = st.sid; } } };
 }
@@ -170,7 +170,7 @@ describe("persona walk T1..T5 (item 1, client side)", () => {
     expect(server.st.sid).toBeNull();
     await expect(apiFetch("/sessions", SESSION_CREDENTIAL)).rejects.toMatchObject({ status: 401 });
     expect(server.st.reqs.every((r) => r.auth === null && (r.path.startsWith("/auth/") ? true : r.credentials === "same-origin"))).toBe(true);
-  });
+  }, 30000); // a full five-step walk takes ~4s alone; the default 5s flaked under a loaded machine
 });
 
 describe("viewer (item 2, client side)", () => {
@@ -301,5 +301,76 @@ describe("base path (item 3)", () => {
     const first = (vi.mocked(fetch).mock.calls[0] as unknown as [string])[0];
     expect(first).toBe("/knowledgebase/api/auth/session");
     vi.unstubAllEnvs();
+  });
+});
+
+describe("fix cycle 1: pending guard, sign-out failure, stale return path", () => {
+  test("a pending session that opens /ask directly ends on /pending (the gate redirect, not the login page)", async () => {
+    server.users.push({ id: "u-p", name: "Pia Pending", email: "pia@x.org", password: "pending passphrase 1", status: "pending", role: null });
+    server.st.sid = "sid-u-p"; // the cookie from an earlier visit
+    visit("/ask");
+    await screen.findByRole("heading", { name: "Waiting for approval" });
+    expect(window.location.pathname).toBe("/pending");
+    expect(screen.queryByLabelText("Question")).not.toBeInTheDocument();
+    expect(paths()[0]).toBe("GET /auth/session");
+  });
+
+  test("when POST /auth/logout fails the person stays signed in and sees 'Could not sign you out' (sidebar and account page)", async () => {
+    server.st.sid = "sid-u-admin";
+    server.st.logoutFails = true;
+    const user = userEvent.setup();
+    visit("/account");
+    await screen.findByRole("heading", { name: "Your account" });
+    await user.click(screen.getAllByRole("button", { name: "Sign out" })[0]!); // sidebar
+    await screen.findAllByText("Could not sign you out, try again.");
+    expect(server.st.sid).toBe("sid-u-admin");
+    expect(window.location.pathname).toBe("/account");
+    expect(screen.getByRole("heading", { name: "Your account" })).toBeInTheDocument();
+    await user.click(screen.getAllByRole("button", { name: "Sign out" })[1]!); // account page button
+    expect(screen.getAllByText("Could not sign you out, try again.").length).toBe(2);
+    // the server recovers: the next attempt signs out for real and the error is gone
+    server.st.logoutFails = false;
+    await user.click(screen.getAllByRole("button", { name: "Sign out" })[0]!);
+    await screen.findByRole("button", { name: "Sign in" });
+    expect(server.st.sid).toBeNull();
+    expect(screen.queryByText("Could not sign you out, try again.")).not.toBeInTheDocument();
+  });
+
+  test("the pending page shows the same sign-out failure and stays put", async () => {
+    server.users.push({ id: "u-p", name: "Pia Pending", email: "pia@x.org", password: "pending passphrase 1", status: "pending", role: null });
+    server.st.sid = "sid-u-p"; server.st.logoutFails = true;
+    const user = userEvent.setup();
+    visit("/pending");
+    await user.click(await screen.findByRole("button", { name: "Sign out" }));
+    expect(await screen.findByRole("alert")).toHaveTextContent("Could not sign you out, try again.");
+    expect(window.location.pathname).toBe("/pending");
+    expect(server.st.sid).toBe("sid-u-p");
+  });
+
+  test("signing out of one account and into another does not land on the first person's page", async () => {
+    server.users.push({ id: "u-m", name: "Mo Member", email: "mo@x.org", password: "member passphrase 1", status: "active", role: "member" });
+    const user = userEvent.setup();
+    visit("/admin/users");
+    await signIn(user, "ada@x.org", "correct horse battery");
+    await screen.findByRole("heading", { name: /users/i });
+    expect(window.location.pathname).toBe("/admin/users");
+    await user.click(screen.getAllByRole("button", { name: "Sign out" })[0]!);
+    await screen.findByRole("button", { name: "Sign in" });
+    await signIn(user, "mo@x.org", "member passphrase 1");
+    await waitFor(() => expect(screen.queryByRole("button", { name: "Sign in" })).not.toBeInTheDocument());
+    expect(window.location.pathname).toBe("/");
+  });
+
+  test("the same person signing back in after a session ended still returns to where they were", async () => {
+    const user = userEvent.setup();
+    visit("/account");
+    await signIn(user, "ada@x.org", "correct horse battery");
+    await screen.findByRole("heading", { name: "Your account" });
+    server.jar.revoke();
+    await apiFetch("/sessions", SESSION_CREDENTIAL).catch(() => undefined);
+    await screen.findByRole("button", { name: "Sign in" });
+    await signIn(user, "ada@x.org", "correct horse battery");
+    await screen.findByRole("heading", { name: "Your account" });
+    expect(window.location.pathname).toBe("/account");
   });
 });

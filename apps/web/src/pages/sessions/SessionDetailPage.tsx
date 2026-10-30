@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useLocation, useParams } from "react-router-dom";
 import { useAuth } from "../../auth/AuthContext.js";
+import { WriteScope } from "../../auth/WriteScope.js";
 import { getSession, getSessionMedia, streamSessionMedia } from "../../api/sessions.js";
 import { ApiError } from "../../api/client.js";
 import type { SessionDetail } from "../../api/types.js";
@@ -137,10 +138,10 @@ export function SessionDetailPage(): React.ReactElement {
         <p>{detail.page ? detail.page.summary : "(no summary yet)"}</p>
       </div>
 
-      <SpeakerSuggestions apiKey={apiKey} sessionId={detail.session._id} />
+      <WriteScope><SpeakerSuggestions apiKey={apiKey} sessionId={detail.session._id} /></WriteScope>
       <GroundedContentPanel apiKey={apiKey} sessionId={detail.session._id} />
       <SessionDecisionsPanel apiKey={apiKey} sessionId={detail.session._id} sessionVersion={sessionVersion} revision={revision} />
-      <TranscriptReview key={`${sessionVersion}:${detail.session._id}`} apiKey={apiKey} sessionId={detail.session._id} onCommitted={() => setRevision(value => value + 1)} />
+      <WriteScope><TranscriptReview key={`${sessionVersion}:${detail.session._id}`} apiKey={apiKey} sessionId={detail.session._id} onCommitted={() => setRevision(value => value + 1)} /></WriteScope>
 
       {detail.media && <div className="card">
         <div className="section-title">Recording</div>

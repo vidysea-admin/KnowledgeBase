@@ -103,6 +103,7 @@ export function NavSidebar(): React.ReactElement {
           <div className="nav-account">
             <span>{auth.user.displayName} ({auth.user.role ?? "pending"})</span>
             <button type="button" onClick={() => void auth.signOut()}>Sign out</button>
+            {auth.signOutError && <p role="alert" className="error-note">{auth.signOutError}</p>}
           </div>
         )}
         <a href={`${API_BASE_URL}/compete`}><ExternalLinkIcon /><span>Compete</span></a>
