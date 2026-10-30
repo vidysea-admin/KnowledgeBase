@@ -4,8 +4,7 @@
  * The admin SERVICE behind `/admin/*`: list/read users, approve, reject, change role, disable, enable, revoke sessions,
  * unlock a locked email, issue a single-use verify/reset link (A5 mailer is DROPPED: no mail is ever sent, so an admin
  * hands the link over), and read the audit log. Storage is an injected `AdminStore` (Mongo in production through the A1
- * collection modules, an in-memory double in unit tests), so every rule is tested without a database and the
- * race-sensitive ones (CAS, last-admin) are re-proved against a real mongod (admin.mongo.test.ts).
+ * collection modules, an in-memory double in unit tests); the race-sensitive rules are re-proved on a real mongod (admin.mongo.test.ts).
  *
  * Rules enforced here (the router only authenticates and validates the shape):
  *  - Every mutation runs under a per-tenant lock and RE-READS the acting admin: a session that was valid when the
