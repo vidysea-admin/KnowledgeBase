@@ -84,6 +84,35 @@ describe.skipIf(!HAVE_SH)("web container runtime config (APP_BASE_PATH)", () => 
     expect(r.nginx).toContain("proxy_pass http://10.0.0.5:3300/;");
   });
 
+  // ISS-UAWEB-004: the account sign-in flag. Dark unless APP_USER_ACCOUNTS is exactly 1 or true (any case).
+  it("config.js carries userAccounts: false when APP_USER_ACCOUNTS is absent", () => {
+    const r = run({});
+    expect(r.status).toBe(0);
+    expect(r.configJs).toContain("userAccounts: false");
+    expect(r.configJs).not.toContain("userAccounts: true");
+  });
+
+  it.each(["true", "TRUE", "True", "1"])("config.js carries userAccounts: true for APP_USER_ACCOUNTS=%j", (raw) => {
+    const r = run({ APP_USER_ACCOUNTS: raw });
+    expect(r.status).toBe(0);
+    expect(r.configJs).toContain("userAccounts: true");
+    expect(r.configJs).toContain('basePath: ""'); // the other keys are untouched
+  });
+
+  it.each(["false", "0", "", "yes", "on", "true;alert(1)", " "])("config.js stays userAccounts: false for APP_USER_ACCOUNTS=%j", (raw) => {
+    const r = run({ APP_USER_ACCOUNTS: raw });
+    expect(r.status).toBe(0);
+    expect(r.configJs).toContain("userAccounts: false");
+    expect(r.configJs).not.toContain("alert");
+  });
+
+  it("the flag survives a base path and parses as a script (window.__LKB_CONFIG__ is an object literal)", () => {
+    const r = run({ APP_BASE_PATH: "/knowledgebase", APP_USER_ACCOUNTS: "true" });
+    const win: { __LKB_CONFIG__?: { basePath: string; apiBase: string; userAccounts: unknown } } = {};
+    new Function("window", r.configJs)(win);
+    expect(win.__LKB_CONFIG__).toEqual({ basePath: "/knowledgebase", apiBase: "", userAccounts: true });
+  });
+
   it("re-running on an already patched index.html is idempotent (container restart)", () => {
     const r = run({ APP_BASE_PATH: "/knowledgebase" });
     expect(r.indexHtml.match(/<base href=/g)?.length).toBe(1);
