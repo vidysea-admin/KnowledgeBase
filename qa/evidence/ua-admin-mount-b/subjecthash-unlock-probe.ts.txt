@@ -1,0 +1,73 @@
+// Checker-B probe (throwaway, lives only in scratch copies). In-memory fake Db: NO real Mongo is contacted.
+// Proves: the adminRouter built by buildUserAccounts unlocks exactly the throttle row that A4's own login-failure path wrote.
+import assert from "node:assert/strict";
+import test from "node:test";
+import type { AddressInfo } from "node:net";
+import express from "express";
+import { buildUserAccounts } from "../composition/integrations/user-accounts.js";
+
+type Doc = Record<string, any>;
+function matches(doc: Doc, filter: Doc): boolean {
+  for (const [k, v] of Object.entries(filter)) {
+    if (k === "$or") { if (!(v as Doc[]).some((f) => matches(doc, f))) return false; continue; }
+    const d = doc[k];
+    if (v && typeof v === "object" && !(v instanceof Date) && Object.keys(v).some((x) => x.startsWith("$"))) {
+      for (const [op, arg] of Object.entries(v as Doc)) {
+        if (op === "$exists") { if ((d !== undefined) !== arg) return false; }
+        else if (op === "$ne") { if (d === arg) return false; }
+        else if (op === "$gt") { if (!(d > arg)) return false; }
+        else if (op === "$gte") { if (!(d >= arg)) return false; }
+        else if (op === "$lt") { if (!(d < arg)) return false; }
+        else throw new Error("unsupported op " + op);
+      }
+    } else if (JSON.stringify(d) !== JSON.stringify(v)) return false;
+  }
+  return true;
+}
+const store = new Map<string, Doc[]>();
+const rows = (n: string) => { let r = store.get(n); if (!r) { r = []; store.set(n, r); } return r; };
+const fakeDb = {
+  collection: (name: string) => ({
+    findOne: async (f: Doc) => rows(name).find((d) => matches(d, f)) ?? null,
+    insertOne: async (d: Doc) => { rows(name).push({ ...d }); return { insertedId: d._id }; },
+    updateOne: async (f: Doc, u: Doc) => {
+      const d = rows(name).find((x) => matches(x, f));
+      if (!d) return { matchedCount: 0, modifiedCount: 0 };
+      Object.assign(d, u.$set ?? {}); for (const k of Object.keys(u.$unset ?? {})) delete d[k];
+      return { matchedCount: 1, modifiedCount: 1 };
+    },
+    deleteMany: async (f: Doc) => { const before = rows(name).length; store.set(name, rows(name).filter((d) => !matches(d, f))); return { deletedCount: before - rows(name).length }; },
+    countDocuments: async (f: Doc) => rows(name).filter((d) => matches(d, f)).length,
+  }),
+} as unknown as import("mongodb").Db;
+
+test("[probe] admin unlock via buildUserAccounts().adminRouter deletes the exact A4 throttle row", async () => {
+  const ua = buildUserAccounts({ AUTH_CSRF_SECRET: "s".repeat(48), USER_SIGNUP_TENANT: "toc", APP_PUBLIC_ORIGIN: "https://kb.example.org", APP_BASE_PATH: "/knowledgebase" }, fakeDb, { warn: () => {} });
+  assert.ok(ua?.adminRouter && ua.auth);
+  const now = new Date().toISOString();
+  const base = { tenantId: "toc", createdAt: now, updatedAt: now, displayName: "x", statusChangedAt: now };
+  rows("users").push({ ...base, _id: "admin1", emailNormalized: "admin@example.org", status: "active", role: "admin" });
+  rows("users").push({ ...base, _id: "target1", emailNormalized: "t@example.org", status: "active", role: "member" });
+  // A4 path: wrong passwords until the throttle row exists and locks
+  for (let i = 0; i < 8; i++) await ua!.auth.login("toc", { email: "t@example.org", password: "wrong-password-123" });
+  const want = ua!.auth.subjectHash("toc", "t@example.org");
+  const thr = rows("auth_throttles");
+  assert.equal(thr.length, 1, "A4 login failures wrote exactly one throttle row");
+  assert.equal(thr[0]!.subjectHash, want, "A4 keys the row by auth.subjectHash");
+  assert.ok(thr[0]!.lockedUntil !== undefined, "row is locked");
+
+  const app = express();
+  app.use(express.json());
+  app.use((req, _res, next) => { (req as any).auth = { tenantId: "toc", scopes: ["user-admin"], principal: "session", userId: "admin1", userRole: "admin" }; next(); });
+  app.use("/admin", ua!.adminRouter!);
+  const srv = await new Promise<import("node:http").Server>((r) => { const s = app.listen(0, "127.0.0.1", () => r(s)); });
+  try {
+    const port = (srv.address() as AddressInfo).port;
+    const res = await fetch(`http://127.0.0.1:${port}/admin/users/target1/unlock`, { method: "POST", headers: { "content-type": "application/json" }, body: "{}" });
+    const body = await res.json();
+    assert.equal(res.status, 200, JSON.stringify(body));
+    assert.equal((body as any).cleared, true, "unlock reports it cleared a throttle row");
+    assert.equal(rows("auth_throttles").length, 0, "the A4 throttle row is gone");
+    assert.ok(rows("auth_events").some((e) => e.type === "unlocked"), "unlocked audit event written");
+  } finally { await new Promise((r) => srv.close(r)); }
+});
