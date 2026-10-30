@@ -382,3 +382,11 @@ test("helpers: ipPrefixOf truncates to /24 and /48 and rejects junk", () => {
   assert.equal(ipPrefixOf("2001:DB8:0001:0002:0:0:0:9"), "2001:db8:1::/48");
   for (const bad of [undefined, "", "999.1.1.1", "1.2.3", "gggg::1", "1::2::3", "a.b.c.d"]) assert.equal(ipPrefixOf(bad), undefined, String(bad));
 });
+
+test("[A6 wiring] buildUserAccounts builds the /admin router, so the production mount is no longer the 503 placeholder", async () => {
+  const { buildUserAccounts } = await import("../composition/integrations/user-accounts.js");
+  const fakeDb = { collection: () => ({}) } as unknown as import("mongodb").Db;
+  const ua = buildUserAccounts({ AUTH_CSRF_SECRET: "x".repeat(40), USER_SIGNUP_TENANT: "toc", APP_PUBLIC_ORIGIN: ORIGIN }, fakeDb, { warn: () => {} });
+  assert.ok(ua, "a usable AUTH_CSRF_SECRET enables user accounts");
+  assert.equal(typeof ua.adminRouter, "function", "adminRouter is built, not left to the placeholder");
+});

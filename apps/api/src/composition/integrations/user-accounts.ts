@@ -4,9 +4,9 @@
  *  - `applyTrustProxy`: Express `trust proxy` ONLY as configured by TRUST_PROXY_HOPS (UA-23); logs the effective value.
  *  - `createMongoSessionStore`: the Mongo `SessionStore` (the one unscoped read is the hash lookup, ISS-415).
  *  - `createMongoAuthStore` (unit A4, ua-auth-api): the Mongo `AuthStore` behind the `/auth` service (users, tokens, throttles, audit).
- *  - `buildUserAccounts`: env + db -> session service, auth service + router, cookie/CSRF config and the authenticator `requireAuth` takes.
- *  - `mountUserAccounts`: mounts `/auth` (public perimeter, soft principal; A4's `authRouter`) and the `/admin` (authenticated) placeholder
- *    that unit A6 (admin-router) replaces by passing `adminRouter`.
+ *  - `buildUserAccounts`: env + db -> session service, auth service + router, admin router, cookie/CSRF config and the authenticator `requireAuth` takes.
+ *  - `mountUserAccounts`: mounts `/auth` (public perimeter, soft principal; A4's `authRouter`) and `/admin` (authenticated; A6's
+ *    `adminRouter`, built by `buildUserAccounts`). An absent router answers a 503 placeholder.
  */
 import { randomUUID } from "node:crypto";
 import type { UserSessions } from "@lkb/core";
@@ -15,6 +15,8 @@ import type { Db } from "mongodb";
 import { Router, type Express, type Request, type RequestHandler, type Response } from "express";
 import { isValidTenantId, requireAuth, type ApiKeyStore, type SessionAuthenticator } from "../../auth.js";
 import type { Logger } from "../logger.js";
+import { createAdminRouter } from "../../user-accounts/admin-router.js";
+import { createMongoAdminStore } from "../../user-accounts/admin-service.js";
 import { createAuthRouter } from "../../user-accounts/auth-router.js";
 import { createAuthService, DEFAULT_SIGNUP_DAILY_CAP, type AuthService, type AuthStore } from "../../user-accounts/auth-service.js";
 import { normalizeBasePath, type CookieConfig } from "../../user-accounts/cookie.js";
@@ -136,7 +138,8 @@ export function buildUserAccounts(env: Record<string, string | undefined>, db: D
   if (signupTenant === undefined) log.warn("user accounts: USER_SIGNUP_TENANT is unset or invalid, signup and sign-in answer 503");
   const auth = createAuthService({ store: createMongoAuthStore(db), sessions, password, csrfSecret: env.AUTH_CSRF_SECRET, signupDailyCap: parseSignupCap(env.USER_SIGNUP_DAILY_CAP), log });
   const authRouter = createAuthRouter({ service: auth, cookie, csrf, signupTenant, log });
-  return { session: createSessionAuth({ sessions, cookie, csrf }), authRouter, sessions, cookie, csrf, auth };
+  const adminRouter = createAdminRouter({ store: createMongoAdminStore(db), subjectHash: auth.subjectHash, publicOrigin: env.APP_PUBLIC_ORIGIN, basePath: env.APP_BASE_PATH, log });
+  return { session: createSessionAuth({ sessions, cookie, csrf }), authRouter, adminRouter, sessions, cookie, csrf, auth };
 }
 
 const placeholder = (what: string): RequestHandler => (_req: Request, res: Response) => { res.status(503).json({ error: "not_implemented", message: `${what} routes are not available yet` }); };
