@@ -1238,3 +1238,4 @@ Current source-table tracker verification: `node scripts/tracker-audit.mjs --jso
 - W8 done: wa-unlink-consent dual PASS cycle 1 (verdicts fc8313f8, d419df81), merged locally ac60c0dc, not pushed. Ledger qa/issues.wa-unlink-consent.jsonl ISS-WAUNLINK-001..005 (001 medium: R-10 hook has no durable retry). 6c pre-push (full suite, .13-2a security units W8/W11B) dispatched on ac60c0dc.
 - QUEUE: wa-revoked-link-gate closed (dual PASS c0), merged 461e341e; ISS-WARLG-001 high security /route stale index next
 - 2026-10-30 wa-route-link-staleness closed (dual PASS cycle 0), ISS-WARLG-001 fixed; ISS-WARLS-001 medium cost filed; next: wa-events-feed dual check, then 6c full
+- 2026-10-30 wa-events-feed (W12) dual PASS cycle 0, merged; ISS-WAEF-001..005 filed (002 folds into ISS-WASEL-001 wiring); candidate.created per batch (gate answered)
