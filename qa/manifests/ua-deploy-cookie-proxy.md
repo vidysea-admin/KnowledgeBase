@@ -3,7 +3,7 @@
 **Goal task:** user-accounts A8 (docs by the maker; host work is human) plus the runtime flag
 **Date:** 2026-10-30
 **Policy-Version:** proportional-verification/2026-10-19.17
-**Status:** ready-for-check
+**Status:** checked-PASS
 **Handshake status:** ready-for-check
 **Fix cycle:** 0
 **Dual check:** no (docs plus a runtime config flag that only writes the literal `true` or `false` into the public `config.js`; no auth, tenancy, session or data-write code changed; the cookie behaviour itself is proven in A3 and A9)

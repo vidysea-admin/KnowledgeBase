@@ -14,7 +14,7 @@ Everything is off until the variables below are set; unsetting them returns the 
 | Name | Read by | Required | Meaning |
 |---|---|---|---|
 | `AUTH_CSRF_SECRET` | api | yes, to enable accounts | Random, 32 bytes or more. Missing or short: the API logs `user accounts disabled` and the whole session path stays off; API keys are unaffected. Generate on the server, store in the server `.env` only. |
-| `USER_SIGNUP_TENANT` | api | yes, to allow signup and sign-in | The tenant new accounts join. Set to `toc`. Unset or invalid: signup and sign-in answer 503 `signup_not_configured`. |
+| `USER_SIGNUP_TENANT` | api | yes, to allow signup and sign-in | The tenant new accounts join. Set to `toc`. Unset or invalid: signup answers 503 `signup_not_configured`; sign-in and the other public auth routes answer 503 `auth_not_configured`. |
 | `APP_PUBLIC_ORIGIN` | api | yes | The public origin of the site as the browser sees it, scheme and host with no path, no trailing slash (the vidysea.com origin). It is the allowed `Origin` for cookie requests (CSRF) and the base of every link in verification and reset mail. |
 | `APP_BASE_PATH` | api and web | yes under a prefix | `/knowledgebase` in production (default `/`). Must be identical for the api and web containers: it sets the cookie `Path`, the SPA base and the nginx proxy prefix. |
 | `TRUST_PROXY_HOPS` | api | yes | Number of reverse proxies in front of the API that append to `X-Forwarded-For`, integer 0 to 5 (anything else is treated as 0 and a warning is logged). Chain is front proxy, web nginx, API, so the expected value is `2` [ASSUMPTION, verify with the check in section 4]. Too high lets a client forge its IP; too low puts every user in the proxy's rate-limit bucket. |
@@ -25,9 +25,16 @@ Everything is off until the variables below are set; unsetting them returns the 
 `.env.example` carries these names with no values.
 
 `docker-compose.yml` forwards only the names it lists. The forwards for the `api` and `web`
-services need an `Approved-by` entry from Umesh (the file is an enforcement path); the exact lines
-are in the manifest `qa/manifests/ua-deploy-cookie-proxy.md`, open point 1. Until they are merged
-these variables never reach the containers.
+services need an `Approved-by` entry from Umesh (the file is an enforcement path). The exact
+value-less pass-through lines needed are:
+
+- `api` service `environment`: `AUTH_CSRF_SECRET:`, `USER_SIGNUP_TENANT:`, `USER_SIGNUP_DAILY_CAP:`,
+  `APP_PUBLIC_ORIGIN:`, `APP_BASE_PATH:`, `TRUST_PROXY_HOPS:`
+- `web` service `environment`: `APP_USER_ACCOUNTS: ${APP_USER_ACCOUNTS:-}`
+
+`APP_BASE_PATH` is forwarded to `web` only today; the api builds the cookie `Path` from it, so
+without the `api` forward the cookie lands on `/api` and is never sent to `/knowledgebase/api`.
+Until these lines are merged the variables never reach the containers.
 
 Mail (verification, reset) needs a sender account that is not decided yet (plan Q-A, human item H-1).
 Without it, an admin issues one-time links from the admin page; see the A5 unit when it lands.
