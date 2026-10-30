@@ -1229,3 +1229,8 @@ Current source-table tracker verification: `node scripts/tracker-audit.mjs --jso
 - IN PROGRESS: W7 `wa-isolation-read-side` (carries ISS-WAOWNER-002), W9 `wa-sync-scheduler` (carries ISS-WAOWNER-001). W5 waits on HUMAN_GATE H-4 (self-approval rule when Umesh is the only admin).
 - DONE 2026-10-30: W9 `wa-sync-scheduler` dual PASS cycle 1, merged b1b135cc; ISS-WASYNC-001..004 (001 medium: unlink retry inert until W8 schema field). IN PROGRESS: W7 (A PASS c1, B pending), W5 `wa-links-api` building. Gates H-4, H-9 answered.
 - DONE 2026-10-30: W7 `wa-isolation-read-side` dual PASS cycle 1, merged; ISS-WAIRS-001..005 (001 medium: repair loop has no production caller). Next: W8 after W5.
+
+## 2026-10-30 whatsapp-multiuser W6 + W10 close-out
+- W6 done: wa-selection-api dual PASS cycle 0, merged locally 886aeef7, not pushed. ISS-WASEL-001 (routers not mounted in production) stays open for the W5/W6 production-wiring unit.
+- W10 done: wa-web dual PASS cycle 0 (qa/verdicts/wa-web.md, wa-web.b.md), merged locally d35e4072, not pushed. Ledger rows ISS-WAWEB-001..005 in qa/issues.wa-web.jsonl (005 medium: restrictToPeople partial failure leaves the UI stale).
+- Push of these merges waits on a fresh 6c pre-push check.
