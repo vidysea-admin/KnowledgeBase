@@ -51,6 +51,22 @@ test("links: every lifecycle state validates and each acceptance rejection fires
   assert.equal(v({ ...valid[""], live: false }), false, "live must agree with state");
 });
 
+test("links: archiverUnlinkPending (W8) is a boolean, allowed only on a terminal link, and reaches the Mongo validator", () => {
+  const v = validatorFor("whatsapp_links");
+  const pending = fixture("whatsapp_links", "valid-unlinked-pending.json");
+  assert.equal(pending.archiverUnlinkPending, true);
+  assert.equal(v(pending), true, JSON.stringify(v.errors));
+  assert.equal(v({ ...pending, state: "revoked", revokedAt: pending.unlinkedAt, revokedBy: "admin-1", revokedReason: "admin_revoked" }), true, "a revoked link may owe the archiver step too");
+  assert.equal(v({ ...pending, archiverUnlinkPending: "yes" }), false, "boolean only");
+  assert.equal(v(fixture("whatsapp_links", "invalid-live-pending.json")), false, "a live link never owes an archiver unlink");
+  assert.equal(v({ ...fixture("whatsapp_links", "valid-approved.json"), archiverUnlinkPending: false }), true, "false is harmless on a live link");
+  const mv = migration.mongoValidator(schemaOf("whatsapp_links"));
+  assert.deepEqual(mv.properties.archiverUnlinkPending.bsonType, "bool");
+  const guard = createRequire(import.meta.url)("./20261030120000-whatsapp-links-unlink-pending.cjs");
+  assert.equal(typeof guard.up, "function");
+  return assert.rejects(() => guard.down(), /Refusing rollback/);
+});
+
 test("sync runs: closed error codes only; events: R-39 forbidden payload fields are rejected", () => {
   const runs = validatorFor("whatsapp_sync_runs");
   assert.equal(runs({ ...fixture("whatsapp_sync_runs", "valid.json"), errorCode: "connect ECONNREFUSED 10.0.0.5:27017" }), false);
