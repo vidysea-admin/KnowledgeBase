@@ -1240,3 +1240,4 @@ Current source-table tracker verification: `node scripts/tracker-audit.mjs --jso
 - 2026-10-30 wa-route-link-staleness closed (dual PASS cycle 0), ISS-WARLG-001 fixed; ISS-WARLS-001 medium cost filed; next: wa-events-feed dual check, then 6c full
 - 2026-10-30 wa-events-feed (W12) dual PASS cycle 0, merged; ISS-WAEF-001..005 filed (002 folds into ISS-WASEL-001 wiring); candidate.created per batch (gate answered)
 - 2026-10-30 wa-events-cursor merged 7178555a (ISS-WAEF-001 fixed; single PASS cycle 0; ISS-WAEC-001..004 low)
+- 2026-10-30 ua-web-401-signout merged c58061b9 (ISS-UAWEB-001 fixed; dual PASS cycle 0; ISS-UAW401-001 medium, 002..004 low)
