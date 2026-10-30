@@ -1,12 +1,12 @@
-# Checkpoint - wa-unlink-consent coordinator B (cycle 0)
-Head 26416d51 base 74568a6c. Environment: git archive copy outside bound root, node_modules junctions, node v24, local mongod 7.0 replica set (PID started and stopped by this run).
+# Checkpoint - wa-unlink-consent coordinator B (cycle 1)
+Code head b7d4f0d7 (branch head 95ab9656, manifest only), base bf86b0b3. Environment: bound tree for read-only test runs, git archive copy outside it for mutations, node v24, own mongod 7.0.28 replica set (started and stopped by this run).
 | check | command | scope | result | identity |
 |---|---|---|---|---|
-| criteria tests | node --test --import tsx src/whatsapp/links/unlink.test.ts src/whatsapp/review/link-data.test.ts | 21 tests | 21 pass | code @26416d51, tsx, mongodb 7.6.0 |
-| migration test (no mongo) | node --test migrations/whatsapp-links.migration.test.mjs | 8 | 7 pass 1 skipped | same |
-| migration test (mongo) | same with WA_REVIEW_TEST_MONGO_URL (local rs) | 8 | 8 pass | same |
-| real-Mongo W8-6 as committed | node --test unlink.mongo.test.ts + WA_REVIEW_TEST_MONGO_URL | 1 | FAIL (env guard) | see evidence |
-| real-Mongo W8-6 corrected copy | patched env + relaxed late-approval assertion | 5x20 rounds | pass | see evidence |
-| falsification | 13 mutants + S1 | isolated copies | all red, green-before in copy | qa/evidence/wa-unlink-consent-b/falsification.md |
-| diff scope 4c | git diff 74568a6c..26416d51 --stat | 17 files | no deletions beyond the createMongoLinksStore move (service.ts -> router.ts, importers updated) | |
+| real-Mongo trio | WA_REVIEW_TEST_MONGO_URL=... node --test --import tsx unlink.mongo.test.ts links.mongo.test.ts account-coupling.mongo.test.ts | 3 | 3 pass, 0 skipped; tally approvalFirst 21 / unlinkFirst 1 | 95ab9656 |
+| W8-4 + regression | account-coupling, unlink, link-data, consent-cas, consent-race, service, router, notice, mounted-routes, admin-router tests | 97 | 97 pass | 95ab9656 |
+| user-accounts regression | node --test --import tsx src/user-accounts/*.test.ts | 174 | 171 pass, 3 skipped, 0 fail | 95ab9656 |
+| typecheck | npx tsc --noEmit -p apps/api | api | exit 0 | 95ab9656 |
+| wiring trace | production.ts:265 -> buildUserAccounts default hook -> createAdminRouter -> event() -> accountChanged | static + tests | wired | b7d4f0d7 |
+| falsification | 9 W8-4 + 2 W8-6 mutants | archive copy | 11/11 red, 11/11 HEAD-fidelity | qa/evidence/wa-unlink-consent-b/falsification-c1.md |
+| diff scope | git diff --stat bf86b0b3..b7d4f0d7 | 9 files | all in manifest; no consent file | |
 Checker: coordinator B (claude-sonnet-5-5).
