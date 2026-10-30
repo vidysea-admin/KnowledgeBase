@@ -3,7 +3,7 @@
 **Goal task:** whatsapp-multiuser W8 `wa-unlink-consent`
 **Date:** 2026-10-30
 **Policy-Version:** proportional-verification/2026-10-19.17
-**Status:** ready-for-check
+**Status:** checked-PASS (dual, cycle 1: qa/verdicts/wa-unlink-consent.md PASS fc8313f8, qa/verdicts/wa-unlink-consent.b.md PASS d419df81)
 **Handshake status:** ready-for-check
 **Fix cycle:** 1
 **Dual check:** required
