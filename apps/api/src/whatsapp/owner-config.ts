@@ -194,12 +194,18 @@ export function createWhatsAppRawAccess(db: Pick<Db, "collection">): WhatsAppRaw
       const sourceOwner: unknown = (source as unknown as { ownerUserId?: unknown }).ownerUserId; // set by the WhatsApp source adapter
       let link: ActiveLinkRow | null = null;
       if (typeof stamped === "string" && LINK_ID.test(stamped)) link = await stores.getLink(tenantId, stamped);
-      else if (typeof sourceOwner === "string" && OWNER_ID.test(sourceOwner)) link = await stores.links(tenantId).findOne({ archiverOwnerId: sourceOwner });
+      else if (typeof sourceOwner === "string" && OWNER_ID.test(sourceOwner)) {
+        // Unstamped source: the link is found by archiver owner among ACTIVE links only, and exactly one must match (duplicates: nobody is the owner).
+        const candidates = await stores.links(tenantId).find({ archiverOwnerId: sourceOwner, state: "active" }).toArray();
+        link = candidates.length === 1 ? candidates[0]! : null;
+      }
       // A stamp that disagrees with the source's own archiver owner is a broken binding: nobody is the owner.
       if (link && typeof sourceOwner === "string" && link.archiverOwnerId !== sourceOwner) link = null;
       if (link && link.tenantId !== tenantId) link = null;
       const linkId = link && typeof link._id === "string" ? link._id : null;
-      const ownerView = caller.kind === "session" && link !== null && typeof link.userId === "string" && link.userId.length > 0 && link.userId === caller.userId;
+      // Gate answer 2026-10-30 (W7 revoked-link read access): an owner reads raw content only through an ACTIVE link; a revoked or suspended link
+      // stops the owner (admin still passes, and is audited as any non-owner admin read).
+      const ownerView = caller.kind === "session" && link !== null && link.state === "active" && typeof link.userId === "string" && link.userId.length > 0 && link.userId === caller.userId;
       if (ownerView || caller.admin === true) return { allowed: true, linkId, sourceId, ownerView };
       return deny;
     } catch { return deny; }

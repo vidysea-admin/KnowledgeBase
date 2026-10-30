@@ -213,7 +213,7 @@ test("ISS-011: a missing snapshot fails closed with data untouched; the affected
   const { fx, db, wiring, drop } = setup(["Scholarship closes Friday.", "Interview prep is on Monday."], (collection, op, filter) => filters.push({ collection, op, filter: filter as Record<string, unknown> }));
   await wiring.whatsapp.ingestGroup("tenant-a", "g@g.us");
   const before = JSON.stringify([fx.rows("turns"), fx.rows("claims"), fx.rows("whatsapp_candidates")]);
-  const blind = createReviewedWhatsAppDeps({ base: { listGroups: async () => [], ingestGroup: async () => ({ sessionId: "s", sourceId: "x", turnCount: 0 }) } as never, appDb: () => db,
+  const blind = createReviewedWhatsAppDeps({ base: { listGroups: async () => [{ groupJid: "g@g.us", ownerUserId: OWNER, subject: "G", trackedPersonCount: 1 }], ingestGroup: async () => ({ sessionId: "s", sourceId: "x", turnCount: 0 }) } as never, appDb: () => db,
     repository: wiring.repository, withSnapshot: async run => ({ value: await run(), messageIds: undefined }) });
   await assert.rejects(blind.ingestGroup("tenant-a", "g@g.us"), /snapshot unavailable/u);
   assert.equal(JSON.stringify([fx.rows("turns"), fx.rows("claims"), fx.rows("whatsapp_candidates")]), before);

@@ -10,12 +10,14 @@ import type { Router } from "express";
 import { getDb } from "@lkb/db";
 import type { WhatsAppRouteDeps } from "../../routes/whatsapp.js";
 import { createMongoWhatsAppDeps, fetchWhatsAppMessages, type WhatsAppStoreOptions } from "../store.js";
-import { createWhatsAppRawAccess, WhatsAppAmbiguousLinkError, type WhatsAppRawAccess } from "../owner-config.js";
+import { createWhatsAppRawAccess, WhatsAppAmbiguousLinkError, WhatsAppGroupNotFoundError, type WhatsAppRawAccess } from "../owner-config.js";
 import { createReviewedWhatsAppDeps } from "./ingest.js";
 import { WHATSAPP_REVIEW_LOG } from "./invalidate.js";
 import { materializeWhatsAppClaim } from "./materializer.js";
 import { createWhatsAppReviewRouter } from "./router.js";
 import { createMongoWhatsAppReviewRepository, type WhatsAppReviewRepository } from "./store.js";
+
+const LINK_ID = /^[0-9a-f]{24}$/;
 
 export interface WhatsAppReviewWiring {
   whatsapp: WhatsAppRouteDeps; reviewRouter: Router; repository: WhatsAppReviewRepository;
@@ -45,14 +47,23 @@ export function createWhatsAppReviewWiring(options: WhatsAppStoreOptions & { now
     whatsapp: { listGroups: reviewed.listGroups, ingestGroup: reviewed.ingestGroup }, forceIngestGroup: reviewed.forceIngestGroup,
     reviewRouter: createWhatsAppReviewRouter(repository, options.access ?? createWhatsAppRawAccess(appDb())), repository,
     async repairPendingInvalidations(tenantId) {
-      const markers = await appDb().collection<{ groupJid: string; tenantId: string; linkId?: string }>(WHATSAPP_REVIEW_LOG)
-        .find({ tenantId, kind: "pending-invalidation" } as never).toArray();
+      const log = appDb().collection<{ _id: string; groupJid: string; tenantId: string; linkId?: unknown }>(WHATSAPP_REVIEW_LOG);
+      const markers = await log.find({ tenantId, kind: "pending-invalidation" } as never).toArray();
       const repaired: string[] = [];
       // Internal system caller (never reachable from a route): an admin-equivalent key, narrowed to the link the marker recorded when it has one.
-      // A marker whose group is still ambiguous across links stays pending (it needs an operator), instead of repairing the wrong owner's data.
+      // The ingest authorizes and resolves the group against the tenant's ACTIVE links before it writes anything, so a marker naming a link that
+      // is not (or no longer) permitted can ingest nothing. A marker that is ambiguous, not found or carries a malformed link id stays pending
+      // (it needs an operator) and is recorded on the marker row; it never stops the other markers of the tenant from being repaired.
       for (const marker of markers) {
-        try { await reviewed.ingestGroup(tenantId, marker.groupJid, { caller: { kind: "key", admin: true }, ...(marker.linkId ? { linkId: marker.linkId } : {}) }); }
-        catch (error) { if (error instanceof WhatsAppAmbiguousLinkError) continue; throw error; }
+        const skip = async (reason: string) => { await log.updateOne({ _id: marker._id, tenantId } as never, { $set: { lastRepairSkipped: reason, lastRepairAt: new Date().toISOString() } } as never); };
+        if (marker.linkId !== undefined && (typeof marker.linkId !== "string" || !LINK_ID.test(marker.linkId))) { await skip("invalid_link_id"); continue; }
+        try { await reviewed.ingestGroup(tenantId, marker.groupJid, { caller: { kind: "key", admin: true }, ...(marker.linkId ? { linkId: marker.linkId as string } : {}) }); }
+        catch (error) {
+          if (error instanceof WhatsAppAmbiguousLinkError) { await skip("ambiguous_link"); continue; }
+          if (error instanceof WhatsAppGroupNotFoundError) { await skip("not_found"); continue; }
+          throw error;
+        }
+        await log.deleteOne({ _id: marker._id, tenantId } as never); // a marker written under an older key shape is cleared by its own id
         repaired.push(marker.groupJid);
       }
       return repaired;

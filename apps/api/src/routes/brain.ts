@@ -84,9 +84,10 @@ export function withSessionArtifacts(deps: BrainReadDeps, root: string): BrainRe
     if (!relative || relative.startsWith("..") || path.isAbsolute(relative)) throw new Error("outside artifact root");
     return actual;
   }
-  async function artifacts(tenantId: string, id: string) {
+  /** `known` is a detail already read (and, for a WhatsApp session, authorized and audited) under the caller's read context; it is reused so the audit event is written once. */
+  async function artifacts(tenantId: string, id: string, known?: SessionDetail) {
     if (!/^[a-zA-Z0-9][a-zA-Z0-9._-]{0,149}$/.test(id)) return null;
-    const detail = await deps.getSessionDetail(tenantId, id);
+    const detail = known ?? await deps.getSessionDetail(tenantId, id);
     if (!detail || detail.session.tenantId !== tenantId || detail.session._id !== id) return null;
     const source = (await deps.listSources(tenantId)).find((s) => s._id === detail.session.sourceId && s.tenantId === tenantId);
     if (!source) return null;
@@ -151,12 +152,13 @@ export function withSessionArtifacts(deps: BrainReadDeps, root: string): BrainRe
       });
       return {...projectWebinarOperations({operations, omitted: 0}), discovery};
     },
-    async getSessionDetail(tenantId, id) {
-      const original = await deps.getSessionDetail(tenantId, id);
+    async getSessionDetail(tenantId, id, read) {
+      // W7: forward the read context. Dropping it here turned the owner/admin raw read (and its admin.raw_read audit) into a 404 in production.
+      const original = await deps.getSessionDetail(tenantId, id, read);
       if (!original || original.session.tenantId !== tenantId || original.session._id !== id) return null;
       const detail: SessionDetail = { ...original, media: undefined, notes: undefined, frames: undefined };
       try {
-        const a = await artifacts(tenantId, id);
+        const a = await artifacts(tenantId, id, original);
         if (!a) return detail;
         const media = mediaAsset(a.source);
         if (media) detail.media = { available: true, bytes: media.bytes, mime: media.mime };

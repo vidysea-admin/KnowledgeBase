@@ -15,6 +15,7 @@ import { WhatsAppAmbiguousLinkError, WhatsAppGroupNotFoundError, type WhatsAppCa
 import { createWhatsAppReviewWiring } from "./review/compose.js";
 import { SnapshotShrinkError, WHATSAPP_REVIEW_LOG, whatsAppLogId } from "./review/invalidate.js";
 import { wireMongoFixture } from "./review/wire-fixtures.js";
+import { createKnowledgeVisibility } from "../visibility/knowledge.js";
 
 const LA = "a".repeat(24), LB = "b".repeat(24), OA = "1".repeat(24), OB = "2".repeat(24);
 const PRINCIPALS: Record<string, VerifiedKey> = {
@@ -133,16 +134,17 @@ test("ISS-API-003 authored corpus: no upstream text of any shape reaches the 502
 });
 
 // ---- store + ingest wiring over the in-memory Mongo ----
-function setup(texts: Record<string, string[]> = { [OA]: ["Topic: Scholarship opens Monday"], [OB]: ["Topic: Scholarship opens Monday"] }) {
+function setup(texts: Record<string, string[]> = { [OA]: ["Topic: Scholarship opens Monday"], [OB]: ["Topic: Scholarship opens Monday"] }, groups?: Record<string, string[]>) {
+  const flags = { archiveDown: false };
   const fx = wireMongoFixture();
   const grants: WhatsAppOwnerGrant[] = [{ linkId: LA, ownerUserId: OA }, { linkId: LB, ownerUserId: OB }];
   const resolveOwners = async (_tenant: string, caller?: WhatsAppCaller): Promise<WhatsAppOwnerGrant[]> =>
     caller?.admin ? grants : caller?.kind === "session" ? grants.filter(g => g.linkId === (caller.userId === "uA" ? LA : LB)) : [];
   const wiring = createWhatsAppReviewWiring({ appDb: () => fx.db, resolveOwners, now: () => "2026-10-14T11:00:00.000Z",
-    listGroups: async owner => [{ groupJid: "g@g.us", ownerUserId: owner, subject: "G", trackedPersonCount: 1 }],
-    fetchMessages: async (_group, owner) => (texts[owner] ?? []).map((text, i): WhatsAppMessage => ({ messageId: `m-${owner}-${i}`, personId: "p1", displayName: "Expert", text, ts: new Date(Date.parse("2026-10-14T10:00:00Z") + i * 1000).toISOString() })) });
+    listGroups: async owner => (groups?.[owner] ?? ["g@g.us"]).map(groupJid => ({ groupJid, ownerUserId: owner, subject: "G", trackedPersonCount: 1 })),
+    fetchMessages: async (_group, owner) => { if (flags.archiveDown) throw new Error("archive down"); return (texts[owner] ?? []).map((text, i): WhatsAppMessage => ({ messageId: `m-${owner}-${i}`, personId: "p1", displayName: "Expert", text, ts: new Date(Date.parse("2026-10-14T10:00:00Z") + i * 1000).toISOString() })); } });
   const as = (userId: string): WhatsAppResolveScope => ({ caller: { kind: "session", userId, admin: false } });
-  return { fx, wiring, as };
+  return { fx, wiring, as, flags };
 }
 
 test("W7 acceptance 4: the same message captured by A then B yields B's own candidates flagged duplicate with a pointer; nothing merged, nothing dropped, A untouched", async () => {
@@ -211,4 +213,92 @@ test("W7 repair: pending-invalidation markers re-ingest with an internal admin c
   const sources = second.fx.rows("sources") as unknown as { sourceMeta?: { whatsappLinkId?: string } }[];
   assert.equal(sources.length, 1); assert.equal(sources[0]!.sourceMeta?.whatsappLinkId, LB);
   assert.equal(second.fx.rows(WHATSAPP_REVIEW_LOG).filter(r => r.kind === "pending-invalidation").length, 0, "marker cleared after the narrowed repair");
+});
+
+// ---- fix cycle 1: B-P1 / B-P2 / A-P2 the pending-invalidation marker (criterion 6: a rejected ingest has no side effects) ----
+const markers = (fx: ReturnType<typeof wireMongoFixture>) => fx.rows(WHATSAPP_REVIEW_LOG).filter(r => r.kind === "pending-invalidation");
+const OWN_GROUPS = { [OA]: ["ga@g.us"], [OB]: ["gb@g.us"] };
+
+test("W7 B-P1: a rejected ingest (another owner's jid, a bogus jid, a foreign linkId, an ambiguous jid) leaves no marker and no source row", async () => {
+  const { fx, wiring, as } = setup(undefined, OWN_GROUPS);
+  await assert.rejects(() => wiring.whatsapp.ingestGroup("tenant-a", "gb@g.us", as("uA")), WhatsAppGroupNotFoundError);
+  await assert.rejects(() => wiring.whatsapp.ingestGroup("tenant-a", "gb@g.us", { ...as("uA"), linkId: LB }), WhatsAppGroupNotFoundError);
+  await assert.rejects(() => wiring.whatsapp.ingestGroup("tenant-a", "ga@g.us", { ...as("uA"), linkId: LB }), WhatsAppGroupNotFoundError);
+  await assert.rejects(() => wiring.whatsapp.ingestGroup("tenant-a", "bogus@g.us", as("uA")), WhatsAppGroupNotFoundError);
+  await assert.rejects(() => wiring.whatsapp.ingestGroup("tenant-a", "bogus@g.us", { caller: { kind: "key", admin: true }, linkId: LA }), WhatsAppGroupNotFoundError);
+  await assert.rejects(() => wiring.forceIngestGroup("tenant-a", "gb@g.us", as("uA")), WhatsAppGroupNotFoundError);
+  assert.equal(markers(fx).length, 0); assert.equal(fx.rows("sources").length, 0); assert.equal(fx.rows("sessions").length, 0);
+  const shared = setup(); // both owners mark g@g.us: an admin naming no link is ambiguous
+  await assert.rejects(() => shared.wiring.whatsapp.ingestGroup("tenant-a", "g@g.us", { caller: { kind: "session", userId: "boss", admin: true } }), WhatsAppAmbiguousLinkError);
+  assert.equal(markers(shared.fx).length, 0); assert.equal(shared.fx.rows("sources").length, 0);
+});
+
+test("W7 B-P1: after a rejected cross-owner ingest the real owner's approved claims are still visible (no stale marker hides them)", async () => {
+  const { fx, wiring, as } = setup({ [OA]: ["Topic: Scholarship opens Monday"], [OB]: ["Topic: Visa slots open in May"] }, OWN_GROUPS);
+  await wiring.whatsapp.ingestGroup("tenant-a", "ga@g.us", as("uA"));
+  const [candidate] = await wiring.repository.list("tenant-a"); await wiring.repository.decide("tenant-a", candidate!._id, "approved", "user:uA@link:" + LA);
+  const claim = fx.rows("claims")[0] as never;
+  const visibility = createKnowledgeVisibility(fx.db);
+  assert.equal(await visibility.claimVisible("tenant-a", claim), true, "approved and visible before the attack");
+  await assert.rejects(() => wiring.whatsapp.ingestGroup("tenant-a", "ga@g.us", as("uB")), WhatsAppGroupNotFoundError);
+  await assert.rejects(() => wiring.whatsapp.ingestGroup("tenant-a", "ga@g.us", { ...as("uB"), linkId: LA }), WhatsAppGroupNotFoundError);
+  assert.equal(markers(fx).length, 0);
+  assert.equal(await visibility.claimVisible("tenant-a", claim), true, "B's rejected attempts do not hide A's approved claim");
+  assert.deepEqual(await wiring.repairPendingInvalidations("tenant-a"), [], "and nothing is repaired on anyone's behalf");
+  assert.equal(fx.rows("sources").length, 1);
+});
+
+test("W7 B-P1/A-P2: the marker names the RESOLVED link (never caller input), is keyed per (group, link), and a shared jid repairs under each owner", async () => {
+  const { fx, wiring, as, flags } = setup();
+  flags.archiveDown = true; // the run dies after the marker is written
+  await assert.rejects(() => wiring.whatsapp.ingestGroup("tenant-a", "g@g.us", as("uA")), /archive down/);
+  await assert.rejects(() => wiring.whatsapp.ingestGroup("tenant-a", "g@g.us", as("uB")), /archive down/);
+  const rows = markers(fx) as unknown as { _id: string; linkId?: string }[];
+  assert.equal(rows.length, 2, "two owners sharing a jid do not collide on one marker");
+  assert.deepEqual(rows.map(r => r.linkId).sort(), [LA, LB]);
+  assert.deepEqual(rows.map(r => r._id).sort(), [whatsAppLogId("tenant-a", "pending-invalidation", "g@g.us", LA), whatsAppLogId("tenant-a", "pending-invalidation", "g@g.us", LB)].sort());
+  flags.archiveDown = false;
+  assert.deepEqual((await wiring.repairPendingInvalidations("tenant-a")).sort(), ["g@g.us", "g@g.us"], "each owner's marker is repaired once");
+  const sources = fx.rows("sources") as unknown as { sourceMeta?: { whatsappLinkId?: string } }[];
+  assert.deepEqual(sources.map(x => x.sourceMeta?.whatsappLinkId).sort(), [LA, LB]);
+  assert.equal(markers(fx).length, 0);
+});
+
+test("W7 B-P2: a poison marker (not found, unauthorized link, malformed link id) is recorded and skipped; it never aborts the tenant's repair loop or ingests for an unauthorized link", async () => {
+  const { fx, wiring } = setup();
+  const put = (id: string, extra: Record<string, unknown>) => fx.put(WHATSAPP_REVIEW_LOG, { _id: `m-${id}`, tenantId: "tenant-a", kind: "pending-invalidation", at: "t", ...extra });
+  put("gone", { groupJid: "gone@g.us", linkId: LA });
+  put("foreign", { groupJid: "g@g.us", linkId: "f".repeat(24) });
+  put("malformed", { groupJid: "g@g.us", linkId: { $ne: null } });
+  put("good", { groupJid: "g@g.us", linkId: LB });
+  assert.deepEqual(await wiring.repairPendingInvalidations("tenant-a"), ["g@g.us"], "the good marker after the poison ones is still repaired");
+  const left = markers(fx) as unknown as { _id: string; lastRepairSkipped?: string }[];
+  assert.deepEqual(left.map(m => [m._id, m.lastRepairSkipped]).sort(), [["m-foreign", "not_found"], ["m-gone", "not_found"], ["m-malformed", "invalid_link_id"]]);
+  const sources = fx.rows("sources") as unknown as { sourceMeta?: { whatsappLinkId?: string } }[];
+  assert.equal(sources.length, 1); assert.equal(sources[0]!.sourceMeta?.whatsappLinkId, LB, "only the authorized link was ingested");
+});
+
+test("W7 A-P2: a linkless (legacy) ingest keeps the group-only marker key and clears a stale linkId on it", async () => {
+  const fx = wireMongoFixture();
+  let down = true;
+  const legacy = createWhatsAppReviewWiring({ appDb: () => fx.db, resolveOwners: async () => [{ linkId: null, ownerUserId: OA }], now: () => "2026-10-14T11:00:00.000Z",
+    listGroups: async owner => [{ groupJid: "legacy@g.us", ownerUserId: owner, subject: "L", trackedPersonCount: 1 }],
+    fetchMessages: async () => { if (down) throw new Error("archive down"); return [{ messageId: "m", personId: "p", displayName: "E", text: "hello", ts: "2026-10-14T10:00:00.000Z" }]; } });
+  fx.put(WHATSAPP_REVIEW_LOG, { _id: whatsAppLogId("tenant-a", "pending-invalidation", "legacy@g.us"), tenantId: "tenant-a", kind: "pending-invalidation", groupJid: "legacy@g.us", at: "t", linkId: LA });
+  await assert.rejects(() => legacy.whatsapp.ingestGroup("tenant-a", "legacy@g.us"), /archive down/);
+  const rows = markers(fx); assert.equal(rows.length, 1); assert.equal("linkId" in rows[0]!, false, "the stale link id is removed");
+  down = false;
+  assert.deepEqual(await legacy.repairPendingInvalidations("tenant-a"), ["legacy@g.us"]);
+  assert.equal(markers(fx).length, 0);
+});
+
+// ---- fix cycle 1: A-P4 pin the archive-owner filter in the store's ingestGroup (not the review wrapper's pre-check) ----
+test("W7 A-P4: ingestGroup uses a group row only when it belongs to the owner it was queried for (a poisoned archive answer ingests nothing)", async () => {
+  const fx = wireMongoFixture(); let fetched = 0;
+  const store = createMongoWhatsAppDeps(undefined, { appDb: () => fx.db, resolveOwners: async () => [{ linkId: LA, ownerUserId: OA }],
+    listGroups: async () => [{ groupJid: "g@g.us", ownerUserId: OB, subject: "B's group", trackedPersonCount: 1 }], // asked for OA, answered with OB's row
+    fetchMessages: async () => { fetched++; return [{ messageId: "m", personId: "p", displayName: "E", text: "B secret", ts: "2026-10-14T10:00:00.000Z" }]; } });
+  await assert.rejects(() => store.ingestGroup("tenant-a", "g@g.us", { caller: { kind: "session", userId: "uA", admin: false } }), WhatsAppGroupNotFoundError);
+  assert.equal(fetched, 0); assert.equal(fx.rows("sources").length, 0); assert.equal(fx.rows("turns").length, 0);
+  assert.deepEqual(await store.listGroups("tenant-a", { caller: { kind: "session", userId: "uA", admin: false } }), [], "and the same poisoned row is not listed");
 });
