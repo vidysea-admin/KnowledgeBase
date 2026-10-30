@@ -1,0 +1,13 @@
+A4-1 KILLED | existing-email signup returns 409 | [('auth-service.test.ts', 2), ('auth-router.test.ts', 1)] green: [('auth-service.test.ts', 17, 0), ('auth-router.test.ts', 15, 0)]
+A4-2 KILLED | stale-unverified check removed from verify | [('auth-service.test.ts', 1)] green: [('auth-service.test.ts', 17, 0)]
+A4-3 KILLED | unknown email skips the password verify | [('auth-service.test.ts', 1)] green: [('auth-service.test.ts', 17, 0)]
+A4-4 KILLED | lock threshold 6 | [('throttle.test.ts', 1), ('auth-service.test.ts', 4)] green: [('throttle.test.ts', 7, 0), ('auth-service.test.ts', 17, 0)]
+A4-5 KILLED | reset no longer revokes sessions | [('auth-service.test.ts', 1), ('auth-router.test.ts', 1)] green: [('auth-service.test.ts', 17, 0), ('auth-router.test.ts', 15, 0)]
+A4-6 KILLED | change password revokes current session too | [('auth-service.test.ts', 1), ('auth-router.test.ts', 0)] green: [('auth-service.test.ts', 17, 0), ('auth-router.test.ts', 15, 0)]
+A4-7 KILLED | logout-all revokes nothing | [('auth-service.test.ts', 1), ('auth-router.test.ts', 1)] green: [('auth-service.test.ts', 17, 0), ('auth-router.test.ts', 15, 0)]
+A4-8 KILLED | login route without per-IP limiter | [('auth-router.test.ts', 1)] green: [('auth-router.test.ts', 15, 0)]
+A4-9 KILLED | password_reset ok writes no audit event | [('auth-service.test.ts', 1)] green: [('auth-service.test.ts', 17, 0)]
+A4-10 KILLED | Authorization header check disabled | [('auth-router.test.ts', 1)] green: [('auth-router.test.ts', 15, 0)]
+X-lock-unreg KILLED | never-registered email is not counted toward lockout | [('auth-service.test.ts', 2), ('auth-router.test.ts', 0)] green: [('auth-service.test.ts', 17, 0), ('auth-router.test.ts', 15, 0)]
+X-reset-rejected KILLED | rejected/disabled reset allowed | [('auth-service.test.ts', 1)] green: [('auth-service.test.ts', 17, 0)]
+elapsed 45
