@@ -1241,3 +1241,4 @@ Current source-table tracker verification: `node scripts/tracker-audit.mjs --jso
 - 2026-10-30 wa-events-feed (W12) dual PASS cycle 0, merged; ISS-WAEF-001..005 filed (002 folds into ISS-WASEL-001 wiring); candidate.created per batch (gate answered)
 - 2026-10-30 wa-events-cursor merged 7178555a (ISS-WAEF-001 fixed; single PASS cycle 0; ISS-WAEC-001..004 low)
 - 2026-10-30 ua-web-401-signout merged c58061b9 (ISS-UAWEB-001 fixed; dual PASS cycle 0; ISS-UAW401-001 medium, 002..004 low)
+- 2026-10-30 wa-composition-wiring merged 8e2474ba (ISS-WASEL-001, ISS-WAEF-002 fixed; dual PASS cycle 0; ISS-WACW-001 medium, 002..004 low; gate wa-events-archiver-gate)
