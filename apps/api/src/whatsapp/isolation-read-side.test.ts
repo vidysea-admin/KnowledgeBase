@@ -274,6 +274,18 @@ test("ISS-WAOWNER-005: a session principal with an empty userId is a plain non-a
   assert.deepEqual(whatsAppCallerFromAuth(undefined), { kind: "key", admin: false });
 });
 
+test("ISS-WAOWNER-005: the authority itself refuses an empty-userId session against an empty-userId link (defence in depth behind the caller derivation)", async () => {
+  const w = await world();
+  try {
+    const OE = "e".repeat(24); const LE = "f".repeat(24);
+    w.f.seed("whatsapp_links", link(LE, "", OE));
+    w.f.seed("sources", { _id: "src-e", tenantId: "tenant-a", kind: "whatsapp-batch", path: "wa/e", consent: { given: true, recordedBy: "test" }, sourceMeta: { ownerUserId: OE, whatsappLinkId: LE } });
+    const access = createWhatsAppRawAccess(w.f.db);
+    assert.deepEqual(await access.forSource("tenant-a", "src-e", { kind: "session", userId: "", admin: false }), { allowed: false });
+    assert.deepEqual(await access.forSource("tenant-a", "src-e", { kind: "key", admin: false }), { allowed: false });
+  } finally { await w.close(); }
+});
+
 test("W7: the raw-access authority is itself fail-closed (bad tenant, empty ids, throwing database)", async () => {
   const w = await world();
   try {
