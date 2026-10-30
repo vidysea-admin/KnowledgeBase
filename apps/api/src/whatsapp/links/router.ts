@@ -113,13 +113,21 @@ export function buildWhatsAppLinks(env: Record<string, string | undefined>, db: 
   try { const cfg = loadArchiverConfig(env); archiver = cfg ? createArchiverClient(cfg) : null; } catch { log.warn("whatsapp links: archiver service API config is invalid, connect answers 503"); }
   const notice = tryLoadNotice(undefined, env);
   if (!notice) log.warn("whatsapp links: notice file unreadable, link requests answer 503");
-  const service = createLinksService({
-    store: createMongoLinksStore(db), archiver, data: createLinkDataPort(db), notice: () => notice, log,
-    countActiveAdmins: (tenantId) => users(tenantId, db).countDocuments({ status: "active", role: "admin" }),
-    userStatus: async (tenantId, userId) => { const u = await findUserById(tenantId, userId, db); return u ? { status: u.status, ...(u.role ? { role: u.role } : {}) } : null; },
-    ...overrides,
-  });
+  const service = createLinksService({ store: createMongoLinksStore(db), archiver, data: createLinkDataPort(db), notice: () => notice, log, ...mongoUserDeps(db), ...overrides });
   return { service, notice: () => notice };
+}
+
+const mongoUserDeps = (db: Db): Pick<LinksServiceDeps, "countActiveAdmins" | "userStatus"> => ({
+  countActiveAdmins: (tenantId) => users(tenantId, db).countDocuments({ status: "active", role: "admin" }),
+  userStatus: async (tenantId, userId) => { const u = await findUserById(tenantId, userId, db); return u ? { status: u.status, ...(u.role ? { role: u.role } : {}) } : null; },
+});
+
+/**
+ * R-10 production hook (W8): the account admin calls it after a disable / reject / role change. It suspends the user's ACTIVE links over the same Mongo store
+ * as the links router. It needs no archiver and no notice (suspending touches only the link row and its event), so nothing here starts a connect surface.
+ */
+export function buildAccountCoupling(db: Db, log: Pick<Logger, "warn" | "error">): (tenantId: string, userId: string, to: { status: string; role?: string }) => Promise<number> {
+  return createLinksService({ store: createMongoLinksStore(db), archiver: null, data: createLinkDataPort(db), notice: () => null, log, ...mongoUserDeps(db) }).accountChanged;
 }
 
 const isDupKey = (e: unknown): boolean => (e as { code?: unknown } | null)?.code === 11000;

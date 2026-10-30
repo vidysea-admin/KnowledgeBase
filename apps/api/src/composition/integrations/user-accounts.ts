@@ -15,8 +15,9 @@ import type { Db } from "mongodb";
 import { Router, type Express, type Request, type RequestHandler, type Response } from "express";
 import { isValidTenantId, requireAuth, type ApiKeyStore, type SessionAuthenticator } from "../../auth.js";
 import type { Logger } from "../logger.js";
+import { buildAccountCoupling } from "../../whatsapp/links/router.js";
 import { createAdminRouter } from "../../user-accounts/admin-router.js";
-import { createMongoAdminStore } from "../../user-accounts/admin-service.js";
+import { createMongoAdminStore, type AdminServiceDeps } from "../../user-accounts/admin-service.js";
 import { createAuthRouter } from "../../user-accounts/auth-router.js";
 import { createAuthService, DEFAULT_SIGNUP_DAILY_CAP, type AuthService, type AuthStore } from "../../user-accounts/auth-service.js";
 import { normalizeBasePath, type CookieConfig } from "../../user-accounts/cookie.js";
@@ -126,7 +127,8 @@ export function parseSignupCap(raw: string | undefined): number {
 }
 
 /** undefined (session path OFF, API keys unaffected) unless AUTH_CSRF_SECRET is a usable secret. */
-export function buildUserAccounts(env: Record<string, string | undefined>, db: Db, log: Pick<Logger, "warn">): UserAccountsRuntime | undefined {
+/** `onAccountChange` (R-10) defaults to the WhatsApp links coupling over the same `db`: a disable / reject / viewer-demotion suspends the person's ACTIVE links. Tests inject their own. */
+export function buildUserAccounts(env: Record<string, string | undefined>, db: Db, log: Pick<Logger, "warn" | "error">, onAccountChange: AdminServiceDeps["onAccountChange"] = buildAccountCoupling(db, log)): UserAccountsRuntime | undefined {
   try { assertCsrfSecret(env.AUTH_CSRF_SECRET); } catch { log.warn("user accounts disabled: AUTH_CSRF_SECRET is missing or shorter than 32 bytes"); return undefined; }
   const cookie: CookieConfig = { basePath: normalizeBasePath(env.APP_BASE_PATH), production: env.NODE_ENV === "production" };
   const allowedOrigins = [env.APP_PUBLIC_ORIGIN, ...(env.CORS_ORIGINS ?? "").split(",")].map((s) => (s ?? "").trim()).filter(Boolean);
@@ -138,7 +140,7 @@ export function buildUserAccounts(env: Record<string, string | undefined>, db: D
   if (signupTenant === undefined) log.warn("user accounts: USER_SIGNUP_TENANT is unset or invalid, signup and sign-in answer 503");
   const auth = createAuthService({ store: createMongoAuthStore(db), sessions, password, csrfSecret: env.AUTH_CSRF_SECRET, signupDailyCap: parseSignupCap(env.USER_SIGNUP_DAILY_CAP), log });
   const authRouter = createAuthRouter({ service: auth, cookie, csrf, signupTenant, log });
-  const adminRouter = createAdminRouter({ store: createMongoAdminStore(db), subjectHash: auth.subjectHash, publicOrigin: env.APP_PUBLIC_ORIGIN, basePath: env.APP_BASE_PATH, log });
+  const adminRouter = createAdminRouter({ store: createMongoAdminStore(db), subjectHash: auth.subjectHash, publicOrigin: env.APP_PUBLIC_ORIGIN, basePath: env.APP_BASE_PATH, log, onAccountChange });
   return { session: createSessionAuth({ sessions, cookie, csrf }), authRouter, adminRouter, sessions, cookie, csrf, auth };
 }
 
