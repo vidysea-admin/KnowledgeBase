@@ -145,6 +145,13 @@ export function reviewMongoFixture(inputs: readonly WhatsAppReviewInput[] = [rev
           calls.push({ collection: name, filter: structuredClone(filter), operation: "find" });
           return { async toArray() { return structuredClone(isolation ? rows[name]!.filter(row => matches(visible(row), filter)).map(visible) : rows[name]!.filter(row => matches(row, filter))); } };
         },
+        /** Plain append (used by the W7 `admin.raw_read` audit event). Duplicate `_id` rejects, like a unique index. */
+        async insertOne(doc: Row) {
+          calls.push({ collection: name, filter: {}, operation: "insertOne" });
+          if (doc._id !== undefined && rows[name]!.some(row => row._id === doc._id)) throw Object.assign(new Error("E11000 duplicate key"), { code: 11000 });
+          rows[name]!.push(structuredClone(doc));
+          return { acknowledged: true, insertedId: doc._id };
+        },
         async updateOne(filter: Filter, update: { $set?: Row; $setOnInsert?: Row; $inc?: Record<string, number> }, options: { session?: unknown; upsert?: boolean } = {}) {
           calls.push({ collection: name, filter: structuredClone(filter), session: options.session, operation: "updateOne" });
           const inTxn = Boolean(options.session && journal);
@@ -181,6 +188,8 @@ export function reviewMongoFixture(inputs: readonly WhatsAppReviewInput[] = [rev
   } as unknown as Db;
   return {
     db, calls, rows: (name: string) => structuredClone(rows[name] ?? []),
+    /** Adds rows (links, extra sources/sessions/turns/candidates) to the fixture before a test starts. */
+    seed: (name: string, ...added: Row[]) => { (rows[name] ??= []).push(...structuredClone(added)); },
     removeTurn: (id: string) => { rows.turns = rows.turns!.filter(row => row._id !== id); },
     replaceTurn: (row: Turns) => { rows.turns = rows.turns!.filter(old => old._id !== row._id || old.tenantId !== row.tenantId); rows.turns.push(row as unknown as Row); },
     counts: () => ({ sessions: sessionCount, ended }),

@@ -21,6 +21,7 @@ const one = (value: unknown, expected: unknown): boolean => {
     const op = expected as Row;
     if ("$in" in op) return (op.$in as unknown[]).some(item => (value ?? null) === item);
     if ("$ne" in op) return value !== op.$ne;
+    if ("$exists" in op) return (value !== undefined) === op.$exists;
   }
   return (value ?? null) === (expected ?? null);
 };
@@ -52,6 +53,8 @@ export function wireMongoFixture(seed: Record<string, Row[]> = {}) {
     collection: (name: string) => ({
       find: (filter: Filter = {}) => ({ async toArray() { return structuredClone(coll(name).filter(r => matches(r, filter))); } }),
       async findOne(filter: Filter = {}) { return structuredClone(coll(name).find(r => matches(r, filter)) ?? null); },
+      /** Plain append; a duplicate `_id` throws like a unique index (W7 audit events and seeds). */
+      async insertOne(doc: Row) { insertRow(name, doc); return { acknowledged: true, insertedId: doc._id }; },
       async countDocuments(filter: Filter = {}) { return coll(name).filter(r => matches(r, filter)).length; },
       async replaceOne(filter: Filter, replacement: Row, options: { upsert?: boolean } = {}) {
         const index = coll(name).findIndex(r => matches(r, filter));

@@ -91,16 +91,16 @@ test("a client-supplied ownerUserId in the body is ignored, never trusted (regre
       headers: { authorization: "Bearer wa-key", "content-type": "application/json" },
       body: JSON.stringify({ groupJid: "g1@g.us", ownerUserId: "attacker-supplied-owner-id" }),
     });
-    // Real assertion: the route only ever forwards (tenantId, groupJid) -- a client-supplied
+    // Real assertion: the route forwards (tenantId, groupJid) plus the caller derived from the verified principal -- a client-supplied
     // ownerUserId in the body has no way to reach ingestGroup's real implementation, which
     // resolves the owner itself from the live trackable-groups list.
-    assert.deepEqual(receivedArgs, ["tenant-1", "g1@g.us"]);
+    assert.deepEqual(receivedArgs, ["tenant-1", "g1@g.us", { caller: { kind: "key", admin: false } }]);
   } finally {
     await server.close();
   }
 });
 
-test("a real fetch/adapter failure surfaces as 502 with the real error message, never a silent 500", async () => {
+test("a real fetch/adapter failure surfaces as 502 with a closed code and never echoes the upstream text, never a silent 500", async () => {
   const server = await startTestServer(
     buildTestDeps({
       keyStore: fakeKeyStore({ "wa-key": { tenantId: "tenant-1", scopes: ["whatsapp"] } }),
@@ -116,8 +116,9 @@ test("a real fetch/adapter failure surfaces as 502 with the real error message, 
       body: JSON.stringify({ groupJid: "g1@g.us" }),
     });
     assert.equal(res.status, 502);
-    const body = (await res.json()) as { message: string };
-    assert.match(body.message, /whatsapp_msg Mongo unreachable/);
+    const text = await res.text();
+    assert.deepEqual(JSON.parse(text), { error: "whatsapp_ingest_failed", code: "unknown", linkId: null });
+    assert.ok(!/Mongo unreachable|whatsapp_msg/.test(text), "ISS-API-003: upstream error text must not be echoed");
   } finally {
     await server.close();
   }

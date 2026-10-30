@@ -11,6 +11,7 @@ import { materializeWhatsAppClaim, whatsAppClaimId } from "../whatsapp/review/ma
 import { reviewInput, reviewMongoFixture, REVIEW_TIME } from "../whatsapp/review/test-fixtures.js";
 import { headId, type ReviewHead } from "../transcript-review/store.js";
 import { createMongoWhatsAppReviewSourceReader, createWhatsAppReviewSourceRouter, ReviewSourceStaleError } from "./review-source.js";
+import { createWhatsAppRawAccess } from "../whatsapp/owner-config.js";
 
 async function fixture() {
   const input = reviewInput(), sibling = { ...input.turns[0]!, _id: "unrelated-turn", text: "PRIVATE unrelated sibling" };
@@ -141,8 +142,8 @@ test("collection-only reader cannot return evidence without a snapshot capabilit
 });
 test("actual authenticated HTTP source route uses whatsapp scope and fixed private errors", async () => {
   const f = await fixture(); let calls = 0, unavailable = false;
-  const app = express(); app.use(requireAuth(fakeKeyStore({ WA: { tenantId: "tenant-a", scopes: ["whatsapp"] }, CIT: { tenantId: "tenant-a", scopes: ["citations"] }, OTHER: { tenantId: "tenant-b", scopes: ["whatsapp"] } })));
-  app.use(createWhatsAppReviewSourceRouter({ get: async (...args) => { calls++; if (unavailable) throw new Error("PRIVATE storage error"); return f.reader.get(...args); } }));
+  const app = express(); app.use(requireAuth(fakeKeyStore({ WA: { tenantId: "tenant-a", scopes: ["whatsapp", "whatsapp-admin"] }, CIT: { tenantId: "tenant-a", scopes: ["citations"] }, OTHER: { tenantId: "tenant-b", scopes: ["whatsapp", "whatsapp-admin"] } })));
+  app.use(createWhatsAppReviewSourceRouter({ get: async (...args) => { calls++; if (unavailable) throw new Error("PRIVATE storage error"); return f.reader.get(...args); } }, createWhatsAppRawAccess(f.db)));
   const server = app.listen(0, "127.0.0.1"); await new Promise<void>(resolve => server.once("listening", resolve));
   const addr = server.address(); assert.ok(addr && typeof addr !== "string");
   const url = `http://127.0.0.1:${addr.port}/whatsapp/review/${encodeURIComponent(f.candidate._id)}/source`;

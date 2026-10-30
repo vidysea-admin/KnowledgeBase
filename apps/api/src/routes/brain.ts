@@ -13,6 +13,7 @@ import { existsSync, readFileSync, realpathSync, statSync } from "node:fs";
 import path from "node:path";
 import type { Claims, Gaps, SkipReason, Sessions, SessionPages, Sources, Turns } from "@lkb/core";
 import { requireScope } from "../auth.js";
+import { auditWho, callerOf, type WhatsAppCaller } from "../whatsapp/owner-config.js";
 
 export interface SessionDetail {
   session: Sessions;
@@ -62,9 +63,13 @@ export function projectWebinarOperations(input: unknown): WebinarOperations {
   return {operations: operations.slice(0, 200), omitted: Number(value.omitted ?? 0) + Math.max(0, operations.length - 200)};
 }
 
+/** W7 (R-26): who is reading. Passed by the routes only; internal callers that omit it keep the trusted (approved-content-only) view. A WhatsApp session is returned
+ * to its link owner or an admin and is invisible (404 / absent from the list) to everyone else. `who` is the verified audit identity, or null when none exists. */
+export interface SessionReadContext { caller: WhatsAppCaller; who: { actorKind: "user" | "key"; actorId: string } | null }
+
 export interface BrainReadDeps {
-  listSessions(tenantId: string): Promise<Sessions[]>;
-  getSessionDetail(tenantId: string, sessionId: string): Promise<SessionDetail | null>;
+  listSessions(tenantId: string, read?: SessionReadContext): Promise<Sessions[]>;
+  getSessionDetail(tenantId: string, sessionId: string, read?: SessionReadContext): Promise<SessionDetail | null>;
   listSources(tenantId: string): Promise<Sources[]>;
   listGaps(tenantId: string): Promise<Gaps[]>;
   getSessionAsset?(tenantId: string, sessionId: string, frameId?: string): Promise<SessionAsset | null>;
@@ -195,6 +200,8 @@ export function publicSourceView(row: Sources): Record<string, unknown> {
   return out;
 }
 
+const readContext = (req: Request): SessionReadContext => ({ caller: callerOf(req), who: auditWho(req) });
+
 export function createBrainRouter(deps: BrainReadDeps): Router {
   const router = Router();
   router.get("/webinar-operations", requireScope("sessions"), async (req: Request, res: Response) => {
@@ -215,12 +222,16 @@ export function createBrainRouter(deps: BrainReadDeps): Router {
   }
 
   router.get("/sessions", requireScope("sessions"), async (req: Request, res: Response) => {
-    const sessions = await deps.listSessions(req.auth!.tenantId);
-    res.status(200).json({ sessions });
+    try {
+      const sessions = await deps.listSessions(req.auth!.tenantId, readContext(req));
+      res.status(200).json({ sessions });
+    } catch { res.status(503).json({ error: "sessions_unavailable" }); }
   });
 
   router.get("/sessions/:id", requireScope("sessions"), async (req: Request, res: Response) => {
-    const detail = await deps.getSessionDetail(req.auth!.tenantId, req.params.id as string);
+    let detail: SessionDetail | null;
+    try { detail = await deps.getSessionDetail(req.auth!.tenantId, req.params.id as string, readContext(req)); }
+    catch { res.status(503).json({ error: "session_unavailable" }); return; } // e.g. the admin-read audit could not be written: nothing is returned
     if (!detail) {
       res.status(404).json({ error: "not_found", message: "no session with that id for this tenant" });
       return;
