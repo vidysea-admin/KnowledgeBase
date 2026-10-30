@@ -38,7 +38,7 @@ import { createSessionDecisionsRouter } from '../../session-decisions/router.js'
 import type { SessionDecisionsDeps } from '../../session-decisions/reader.js';
 import { createRegistrationApprovalRouter, REGISTRATION_APPROVE_SCOPE, type RegistrationApprovalRouterDeps } from '../../registration-approvals/router.js';
 import { createWhatsAppLinksRouter, type LinksRouterDeps } from '../../whatsapp/links/router.js';
-import { createWhatsAppSelectionRouter } from '../../whatsapp/selection/router.js';
+import { createWhatsAppSelectionRouter, type SelectionRouterDeps } from '../../whatsapp/selection/router.js';
 import { createWhatsAppEventsRouter, type EventsRouterDeps } from '../../whatsapp/links/events-router.js';
 
 export type IntegratedWorkflows = EvaluationIntegrations & AnswerIntegrations & TranscriptIntegrations
@@ -46,8 +46,26 @@ export type IntegratedWorkflows = EvaluationIntegrations & AnswerIntegrations & 
   & Pick<HostingIntegrations, 'hosting' | 'counsellorAccounts' | 'operationsSchedules' | 'retentionStatus'>
   & AutomationIntegrations & { botPrivacy?: BotPrivacyDeps; captureReadiness?: CaptureReadinessDeps; sessionDecisions?: SessionDecisionsDeps;
     answerReviewAuthority?: AnswerReviewAuthority; speakerRelations?: SpeakerRelationsRouterDeps; speakerRelationSource?: SpeakerRelationSourceRouterDeps;
-    nativeEvidence?: NativeEvidenceResolver; speakerAttributes?: SpeakerAttributesRouterDeps; registrationApprovals?: RegistrationApprovalRouterDeps; extractionReview?: Parameters<typeof createExtractionReviewRouter>[0]; labelReview?: Parameters<typeof createLabelReviewRouter>[0]; whatsappLinks?: LinksRouterDeps; whatsappEvents?: EventsRouterDeps };
+    nativeEvidence?: NativeEvidenceResolver; speakerAttributes?: SpeakerAttributesRouterDeps; registrationApprovals?: RegistrationApprovalRouterDeps; extractionReview?: Parameters<typeof createExtractionReviewRouter>[0]; labelReview?: Parameters<typeof createLabelReviewRouter>[0]; whatsappLinks?: LinksRouterDeps; whatsappSelection?: SelectionRouterDeps; whatsappEvents?: EventsRouterDeps };
 const unavailable: RequestHandler = (_req, res) => { res.status(503).json({ error: 'workflow_unavailable', message: 'Workflow is unavailable; configure its required runtime.' }); };
+
+const heldAny = (...scopes: string[]): RequestHandler => (req, res, next) => {
+  const held: unknown = req.auth?.scopes;
+  if (Array.isArray(held) && scopes.some(s => held.some(x => x === s))) { next(); return; }
+  res.status(403).json({ error: 'forbidden', message: 'this key is missing a required scope' });
+};
+/** Unconfigured multi-user WhatsApp (no archiver service API): each route keeps its real scope check, then answers 503 (never 404, never open). Specific routes first, then the any-of-link/admin catch-all. */
+function mountWhatsAppUnavailable(app: Express): void {
+  const L = '/whatsapp/links', ID = '[^/]+', G = `${L}/${ID}/groups/${ID}`;
+  const owner = requireScope('whatsapp-link'), admin = requireScope('whatsapp-admin');
+  app.get(new RegExp(`^${L}/notice/?$`, 'i'), owner, unavailable);
+  app.post(new RegExp(`^${L}/?$`, 'i'), owner, unavailable);
+  app.get(new RegExp(`^${L}/${ID}/connect/?$`, 'i'), owner, unavailable);
+  app.post(new RegExp(`^${L}/${ID}/(approve|reject|suspend|revoke|resume|bind)/?$`, 'i'), admin, unavailable);
+  app.put(new RegExp(`^${G}(/people)?/?$`, 'i'), owner, unavailable);
+  app.get(new RegExp(`^${G}/people/?$`, 'i'), owner, unavailable);
+  app.use(L, heldAny('whatsapp-link', 'whatsapp-admin'), unavailable); // list/get/unlink/groups list: owner or admin, as the real routers
+}
 
 /** Called strictly after the shared authentication/rate-limit perimeter. */
 export function mountIntegratedWorkflows(app: Express, deps: IntegratedWorkflows): void {
@@ -71,10 +89,10 @@ export function mountIntegratedWorkflows(app: Express, deps: IntegratedWorkflows
   else app.use('/connector-workflow', requireScope('sources'), notConfigured('connector-workflow')); // LKB_CONNECTOR_WORKFLOW off: 503 not_configured, not a raw 404 (G-A1)
   if (deps.whatsappReview) app.use(deps.whatsappReview);
   if (deps.whatsappLinks) app.use(createWhatsAppLinksRouter(deps.whatsappLinks)); // W5: own-link lifecycle + admin approval; shared requireAuth/CSRF ran before this mount
-  else app.use('/whatsapp/links', requireScope('whatsapp-link'), unavailable);
+  else mountWhatsAppUnavailable(app);
   if (deps.whatsappEvents) app.use(createWhatsAppEventsRouter(deps.whatsappEvents)); // W12 (R-40): read-only admin event feed, no push
   else app.use('/whatsapp/events', requireScope('whatsapp-admin'), unavailable);
-  app.use(createWhatsAppSelectionRouter()); // W6 fills this stub
+  if (deps.whatsappSelection) app.use(createWhatsAppSelectionRouter(deps.whatsappSelection)); // W6; when unwired, mountWhatsAppUnavailable above already covers /whatsapp/links/:id/groups
   if (deps.speakerRelationSource) app.use(createSpeakerRelationSourceRouter(deps.speakerRelationSource));
   if (deps.nativeEvidence) app.use(createNativeEvidenceRouter(deps.nativeEvidence));
   if (deps.speakerAttributes) app.use(createSpeakerAttributesRouter(deps.speakerAttributes));
