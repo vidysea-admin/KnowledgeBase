@@ -157,3 +157,10 @@ test("C3 no consumer registry, webhook, subscription or outbound call exists on 
   const everyEventRoute = sources("apps/api/src/", /\.ts$/).flatMap(([f, s]) => [...s.matchAll(/\.(get|post|put|patch|delete|all)\(\s*["'`]\/whatsapp\/events/g)].map(m => `${f}:${m[1]}`));
   assert.equal(everyEventRoute.length, 1); assert.match(everyEventRoute[0]!, /events-router\.ts:get$/);
 });
+
+test("C4 docs/whatsapp/events.md states the payload contract (R-39), the read contract (R-40), the R-41 hard line, and lists every closed data key and event type", () => {
+  const doc = readFileSync(new URL("docs/whatsapp/events.md", ROOT), "utf8");
+  for (const needle of ["R-41 hard line", "No hook may call WhatsApp", "No hook may export raw message text", "GET /whatsapp/events", "ids, counts and codes only", "At-least-once"]) assert.ok(doc.includes(needle), needle);
+  for (const key of EVENT_DATA_KEYS) assert.ok(doc.includes(`\`${key}\``), `doc lists data key ${key}`);
+  for (const type of ["link.needs_relink", "sync.completed", "sync.failed", "candidate.created", "candidate.approved", "candidate.rejected", "selection.changed", "admin.raw_read"]) assert.ok(doc.includes(type), type);
+});
