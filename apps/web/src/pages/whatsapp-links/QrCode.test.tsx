@@ -42,7 +42,7 @@ describe("QrCode", () => {
 });
 
 describe("dependency pin (H-9)", () => {
-  test("qrcode-generator is an exact version, MIT, with no ^ or ~", () => {
+  test("qrcode-generator is an exact version with no ^ or ~, and the lockfile pins its integrity hash", () => {
     expect((pkg.dependencies as Record<string, string>)["qrcode-generator"]).toBe("2.0.4");
     const lock = readFileSync(join(__dirname, "../../../../../pnpm-lock.yaml"), "utf8");
     expect(lock).toMatch(/qrcode-generator:\s+specifier: 2\.0\.4\s+version: 2\.0\.4/);
