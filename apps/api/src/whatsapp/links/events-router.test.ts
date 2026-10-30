@@ -1,6 +1,6 @@
 /**
  * W12 (R-40) GET /whatsapp/events over the REAL server (requireAuth, session guards and the integrated-workflow mount run), with the
- * in-memory EventsFeed double that mirrors the Mongo accessor (tenant-scoped, (at, _id) order, unknown cursor throws).
+ * in-memory EventsFeed double that mirrors the Mongo accessor (tenant-scoped, `_id` order, unknown cursor throws).
  */
 import { test, after } from "node:test";
 import assert from "node:assert/strict";
@@ -73,6 +73,18 @@ test("C2 cursor paging: pages chain without gap or overlap, only this tenant's e
     assert.deepEqual(ids(grown).slice(0, ids(first).length), ids(first), "new events only extend the tail");
     const t2 = await rig.call({ key: "k-t2" }, "GET", "/whatsapp/events");
     assert.deepEqual(t2.json!.events.map((e: any) => e.eventType), ["link.requested"]);
+  } finally { await rig.close(); }
+});
+
+test("C1 a second writer's event with an earlier `at` committed after the consumer read is still returned from its cursor (ISS-WAEF-001), and an unknown cursor is still 400", async () => {
+  const { rig, feed } = await setup(2); try {
+    const mine = feed.rows.filter(r => r.tenantId === "tenant-1").map(r => r._id);
+    const get = (q: string) => rig.call({ key: "k-admin" }, "GET", `/whatsapp/events${q}`);
+    const first = await get(`?limit=100`); assert.deepEqual(ids(first), mine); const cursor = first.json!.nextCursor as string;
+    const late = feed.add("tenant-1", { eventType: "sync.failed", linkId: L1, at: "2000-01-01T00:00:00.000Z", data: { errorCode: "unknown" } });
+    assert.deepEqual(ids(await get(`?after=${cursor}`)), [late._id], "delivered although its `at` is older than every event already read");
+    assert.deepEqual(ids(await get(`?after=${mine[0]}`)), [...mine.slice(1), late._id]);
+    assert.equal((await get(`?after=ffffffffffffffffffffffff`)).json!.error, "unknown_cursor");
   } finally { await rig.close(); }
 });
 

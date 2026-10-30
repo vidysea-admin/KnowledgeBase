@@ -164,3 +164,13 @@ test("C4 docs/whatsapp/events.md states the payload contract (R-39), the read co
   for (const key of EVENT_DATA_KEYS) assert.ok(doc.includes(`\`${key}\``), `doc lists data key ${key}`);
   for (const type of ["link.needs_relink", "sync.completed", "sync.failed", "candidate.created", "candidate.approved", "candidate.rejected", "selection.changed", "admin.raw_read"]) assert.ok(doc.includes(type), type);
 });
+
+test("C3 (wa-events-cursor) docs/whatsapp/events.md states the delivery guarantee the code provides: paged by event id not `at`, the dedupe rule, and the residual window with its mitigation", () => {
+  const doc = readFileSync(new URL("docs/whatsapp/events.md", ROOT), "utf8");
+  const src = readFileSync(new URL("packages/db/src/collections/whatsapp-links.ts", ROOT), "utf8");
+  assert.ok(/\.sort\(\{ _id: 1 \}\)/.test(src) && !/sort\(\{ at:/.test(src) && /filter\._id = \{ \$gt: cursor\._id \}/.test(src), "the code pages by _id only");
+  assert.ok(!/ordered by `\(at, id\)`/.test(doc) && !/\(at, id\)/.test(doc), "the stale (at, id) ordering claim is gone");
+  for (const needle of ["## Delivery guarantee", "ordered by `id`", "`at` is the writer's own timestamp", "not monotonic", "dedupe on `id`", "Residual window", "settle", "unknown_cursor"]) assert.ok(doc.includes(needle), needle);
+  assert.ok(/[Nn]ot exactly-once/.test(doc) && /in flight/.test(doc) && /clock/.test(doc), "the residual window (in-flight insert, host clocks) is named, not hidden");
+  assert.ok(!/never skip|cannot miss|guaranteed delivery|exactly once delivery/i.test(doc), "no over-claim");
+});
