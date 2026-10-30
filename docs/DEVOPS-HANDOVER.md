@@ -151,6 +151,30 @@ is `https://vidysea.com/knowledgebase/api`, and `CORS_ORIGINS` / `LKB_HOSTING_WE
 `https://vidysea.com`. `VITE_API_BASE_URL` stays empty (it is now only a build-time override).
 Details and smoke test: `docs/GO-LIVE-UBUNTU.md` section 4a.
 
+## 4b. User accounts: sign-in, cookie and proxy (plan A8)
+
+Staff sign in with email and password and get a browser session cookie (`__Secure-lkb_sid`,
+`HttpOnly`, `Secure`, `SameSite=Strict`, `Path=/knowledgebase/api`). API keys keep working unchanged.
+The feature is off until you set the variables below. Full procedure, the checklist with evidence
+slots and rollback: `docs/user-accounts/ops.md`. Names only here:
+
+| Name | Where | Note |
+|---|---|---|
+| `AUTH_CSRF_SECRET` | server `.env` only | random, 32+ bytes, generated on the server; short or missing keeps the feature off |
+| `USER_SIGNUP_TENANT` | `.env` | `toc` |
+| `APP_PUBLIC_ORIGIN` | `.env` | the vidysea.com origin, no path |
+| `APP_BASE_PATH` | `.env` | `/knowledgebase`, identical for api and web (it sets the cookie `Path`) |
+| `TRUST_PROXY_HOPS` | `.env` | proxies in front of the API; expected 2 (front proxy, web nginx); verify with the forged `X-Forwarded-For` check in `ops.md` section 4 |
+| `APP_USER_ACCOUNTS` | `.env`, web container | `1` shows the sign-in screens (`config.js` `userAccounts`); default off |
+
+The vidysea.com front proxy must forward `Cookie` and `Set-Cookie`, `Origin`, `X-Forwarded-For` and
+`X-Forwarded-Proto` for `/knowledgebase/api/*` (section 4a block, plus no caching of that path), and
+HTTPS must hold at the browser edge or the `Secure` cookie is dropped. The compose env forwards for these
+names are pending an `Approved-by` from Umesh (docker-compose.yml is an enforcement path), so do not
+expect the variables to reach the containers before that merge. First admin: `scripts/create-admin.mjs`
+(password on stdin, `ops.md` section 5). Rollback: unset `USER_SIGNUP_TENANT` and/or `AUTH_CSRF_SECRET`,
+set `APP_USER_ACCOUNTS=0`, `docker compose up -d api web`.
+
 ## 5. `.env` variable names by feature (names only)
 
 Source: `.env.example` and `docker-compose.yml`. Compose forwards only the names it lists to the

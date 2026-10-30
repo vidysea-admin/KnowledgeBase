@@ -2,7 +2,7 @@
 
 interface Window {
   /** Set by config.js, generated at container start from APP_BASE_PATH / APP_API_BASE. */
-  __LKB_CONFIG__?: { basePath?: string; apiBase?: string };
+  __LKB_CONFIG__?: { basePath?: string; apiBase?: string; userAccounts?: boolean };
 }
 
 interface ImportMetaEnv {

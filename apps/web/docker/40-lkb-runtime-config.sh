@@ -8,7 +8,15 @@ html="${LKB_HTML_DIR:-/usr/share/nginx/html}"
 base="${LKB_BASE_PATH-}"
 api="${LKB_APP_API_BASE-}"
 
-printf 'window.__LKB_CONFIG__ = { basePath: "%s", apiBase: "%s" };\n' "$base" "$api" > "$html/config.js"
+# APP_USER_ACCOUNTS turns on the account sign-in screens (user-accounts spec, ISS-UAWEB-004). Dark by default:
+# only the exact values 1 or true (any case) switch it on; anything else, including "yes", "on" or a typo, stays
+# false. The raw value is never written into config.js, only the literal true or false.
+case "$(printf '%s' "${APP_USER_ACCOUNTS-}" | tr 'A-Z' 'a-z')" in
+  1|true) accounts="true" ;;
+  *) accounts="false" ;;
+esac
+
+printf 'window.__LKB_CONFIG__ = { basePath: "%s", apiBase: "%s", userAccounts: %s };\n' "$base" "$api" "$accounts" > "$html/config.js"
 
 # <base href="..."> makes the relative ./assets/* and ./config.js URLs resolve against the base path on
 # deep links such as /knowledgebase/sessions/abc (a refresh there would otherwise ask for /knowledgebase/sessions/assets/*).
@@ -21,4 +29,4 @@ if ! grep -q "<base href=\"${base}/\"" "$tmp"; then
 fi
 cat "$tmp" > "$html/index.html"
 rm -f "$tmp"
-echo "lkb: web base path '${base:-/}', api base '${api:-${base}/api}'"
+echo "lkb: web base path '${base:-/}', api base '${api:-${base}/api}', user accounts ${accounts}"
