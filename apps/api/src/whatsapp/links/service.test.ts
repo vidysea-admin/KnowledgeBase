@@ -218,9 +218,12 @@ test("A6 bind: admin binds a LEGACY live link to an active member; refuses bound
 test("R-10 suspendForAccount suspends ACTIVE links only, by system actor, and never resumes", async () => {
   const r = rig();
   const act = seed(r.store, { tenantId: T1, state: "active", userId: "u-s", archiverOwnerId: OWNER_ID });
+  const waiting = seed(r.store, { tenantId: T1, state: "approved", userId: "u-s" });
   assert.equal(await r.svc.suspendForAccount(T1, "u-s", "account_disabled"), 1);
   assert.deepEqual([r.store.rows.get(act._id)!.state, r.store.rows.get(act._id)!.suspendedBy], ["suspended", "system:account"]);
   assert.equal(await r.svc.suspendForAccount(T1, "u-s", "account_disabled"), 0);
+  assert.equal(r.store.rows.get(waiting._id)!.state, "approved", "only ACTIVE links are suspended");
+  assert.equal(await r.svc.suspendForAccount(T1, "u-s", "Not A Code"), 0, "a free-text reason is refused");
   assert.equal(r.store.events.at(-1)!.actorKind, "system");
 });
 

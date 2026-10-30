@@ -162,6 +162,8 @@ test("adversarial (plan 6): id guessing, swapped tenant header, an all-scopes ke
       { const g = await rig.call(as("u-member2"), "GET", `/whatsapp/links/${guess}/connect`); assert.equal(g.status, 404, `${guess} -> ${g.status} ${g.text}`); }
     const swapped = await rig.call(as("t2-member"), "GET", `/whatsapp/links/${id}/connect`, undefined, { "x-tenant-id": "tenant-1", "x-lkb-tenant": "tenant-1" });
     assert.equal(swapped.status, 404, "a header cannot move a caller into another tenant " + swapped.text);
+    const swappedAdmin = await rig.call(as("t2-admin"), "GET", `/whatsapp/links/${id}`, undefined, { "x-tenant-id": "tenant-1", "x-lkb-tenant": "tenant-1" });
+    assert.equal(swappedAdmin.status, 404, "a tenant-2 admin with a tenant-1 header still sees only tenant 2 " + swappedAdmin.text);
     assert.equal((await rig.call({ key: "k-all" }, "GET", `/whatsapp/links/${id}/connect`)).status, 403);
     const kb = await rig.call({ key: "k-t2-admin" }, "GET", `/whatsapp/links/${id}`);
     assert.equal(kb.status, 404, "tenant-B key on a tenant-A id " + kb.text);
