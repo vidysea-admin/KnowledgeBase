@@ -8,6 +8,7 @@
 **Fix cycle:** 0
 **Dual check:** required
 dual-trigger: tenancy apps/api/src/whatsapp/owner-config.ts:184
+Round cap: SECURITY CLASS (D-014, never capped) -- tenancy / cross-tenant read: W7 gates which owner and tenant may read raw WhatsApp sources, sessions and review candidates (apps/api/src/whatsapp/owner-config.ts:184).
 **Persona walk:** skip (no screen; API and review-router authority only)
 **Issues addressed:** ISS-API-003, ISS-WAOWNER-002, ISS-WAOWNER-005
 **Executor:** claude-sonnet-5-5 (build subagent, worktree `.worktrees/wa-isolation-read-side`, branch `wave/wa-isolation-read-side`, base aa8ef31a)
