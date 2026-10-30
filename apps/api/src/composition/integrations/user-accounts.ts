@@ -3,18 +3,23 @@
  * user-accounts perimeter; every piece is injected, so absent `deps.userAccounts` leaves createServer unchanged.
  *  - `applyTrustProxy`: Express `trust proxy` ONLY as configured by TRUST_PROXY_HOPS (UA-23); logs the effective value.
  *  - `createMongoSessionStore`: the Mongo `SessionStore` (the one unscoped read is the hash lookup, ISS-415).
- *  - `buildUserAccounts`: env + db -> session service, cookie/CSRF config and the authenticator `requireAuth` takes.
- *  - `mountUserAccounts`: mounts `/auth` (public perimeter, soft principal) and `/admin` (authenticated) placeholders
- *    that unit A4 (auth-router) and A6 (admin-router) replace by passing `authRouter` / `adminRouter`.
+ *  - `createMongoAuthStore` (unit A4, ua-auth-api): the Mongo `AuthStore` behind the `/auth` service (users, tokens, throttles, audit).
+ *  - `buildUserAccounts`: env + db -> session service, auth service + router, cookie/CSRF config and the authenticator `requireAuth` takes.
+ *  - `mountUserAccounts`: mounts `/auth` (public perimeter, soft principal; A4's `authRouter`) and the `/admin` (authenticated) placeholder
+ *    that unit A6 (admin-router) replaces by passing `adminRouter`.
  */
+import { randomUUID } from "node:crypto";
 import type { UserSessions } from "@lkb/core";
-import { findUserById, insertSession, recordAuthEvent, revocationFields, revokeSession, revokeUserSessions, userSessions } from "@lkb/db";
+import { authThrottles, consumeToken as consumeTokenRow, findSessionById, findUserById, insertSession, insertToken as insertTokenRow, insertUser as insertUserRow, recordAuthEvent, revocationFields, revokeSession, revokeUserSessions, throttlePurgeAt, userSessions, userTokens, users } from "@lkb/db";
 import type { Db } from "mongodb";
 import { Router, type Express, type Request, type RequestHandler, type Response } from "express";
-import { requireAuth, type ApiKeyStore, type SessionAuthenticator } from "../../auth.js";
+import { isValidTenantId, requireAuth, type ApiKeyStore, type SessionAuthenticator } from "../../auth.js";
 import type { Logger } from "../logger.js";
+import { createAuthRouter } from "../../user-accounts/auth-router.js";
+import { createAuthService, DEFAULT_SIGNUP_DAILY_CAP, type AuthService, type AuthStore } from "../../user-accounts/auth-service.js";
 import { normalizeBasePath, type CookieConfig } from "../../user-accounts/cookie.js";
 import { assertCsrfSecret, type CsrfConfig } from "../../user-accounts/csrf.js";
+import * as password from "../../user-accounts/password.js";
 import { createSessionAuth } from "../../user-accounts/principal.js";
 import { createSessionService, ROTATION_GRACE_MS, type SessionService, type SessionStore } from "../../user-accounts/sessions.js";
 
@@ -58,14 +63,65 @@ export function createMongoSessionStore(db: Db): SessionStore {
   };
 }
 
+const isDuplicateKey = (err: unknown): boolean => (err as { code?: unknown } | null)?.code === 11000;
+
+/** The Mongo `AuthStore` (unit A4). Every access is tenant-scoped through the @lkb/db accessors; the only global constraint is the unique
+ * `users.emailNormalized` index, whose E11000 `insertUser` lets through for the service to map to the generic signup response (ISS-415). */
+export function createMongoAuthStore(db: Db): AuthStore {
+  return {
+    findUserByEmail: async (tenantId, email) => users(tenantId, db).findOne({ emailNormalized: email }),
+    findUserById: (tenantId, userId) => findUserById(tenantId, userId, db),
+    insertUser: async (tenantId, input, now) => ({ ...(await insertUserRow(tenantId, input, db, now)), tenantId }),
+    updateUser: async (tenantId, userId, set, expectStatus) =>
+      (await users(tenantId, db).updateOne({ _id: userId, ...(expectStatus !== undefined ? { status: expectStatus } : {}) }, { $set: set })).matchedCount === 1,
+    countUsersCreatedSince: (tenantId, since) => users(tenantId, db).countDocuments({ createdAt: { $gte: since.toISOString() } }),
+    deleteStaleUnverified: async (tenantId, olderThan) => (await users(tenantId, db).deleteMany({ status: "unverified", createdAt: { $lt: olderThan.toISOString() } })).deletedCount,
+    insertToken: async (tenantId, input, now) => { await insertTokenRow(tenantId, input, db, now); },
+    peekToken: async (tenantId, tokenHash, purpose, now) =>
+      (await userTokens(tenantId, db).findOne({ tokenHash, purpose, usedAt: { $exists: false }, expiresAt: { $gt: now.toISOString() } }))?.userId ?? null,
+    consumeToken: (tenantId, tokenHash, purpose, now) => consumeTokenRow(tenantId, tokenHash, purpose, db, now),
+    listSessions: (tenantId, userId) => userSessions(tenantId, db).find({ userId, revokedAt: { $exists: false } }).sort({ lastUsedAt: -1 }).limit(100).toArray(),
+    getSession: (tenantId, sessionId) => findSessionById(tenantId, sessionId, db),
+    throttle: {
+      get: async (tenantId, subjectHash) => {
+        const r = await authThrottles(tenantId, db).findOne({ subjectHash });
+        return r ? { failures: r.failures, lockCount: r.lockCount, windowStartedAt: r.windowStartedAt, lastFailureAt: r.lastFailureAt, ...(r.lockedUntil !== undefined ? { lockedUntil: r.lockedUntil } : {}) } : null;
+      },
+      // Compare-and-set (UA-24): parallel guesses on one address cannot overwrite each other's count. No row yet -> insert (E11000 = lost the race).
+      put: async (tenantId, subjectHash, next, prev) => {
+        const purgeAt = throttlePurgeAt(new Date(next.lastFailureAt), next.lockedUntil !== undefined ? new Date(next.lockedUntil) : undefined);
+        const fields = { failures: next.failures, lockCount: next.lockCount, windowStartedAt: next.windowStartedAt, lastFailureAt: next.lastFailureAt, purgeAt };
+        const coll = authThrottles(tenantId, db);
+        if (prev === null) {
+          try { await coll.insertOne({ _id: randomUUID(), subjectHash, ...fields, ...(next.lockedUntil !== undefined ? { lockedUntil: next.lockedUntil } : {}) }); return true; }
+          catch (err) { if (isDuplicateKey(err)) return false; throw err; }
+        }
+        const res = await coll.updateOne(
+          { subjectHash, failures: prev.failures, lockCount: prev.lockCount, lastFailureAt: prev.lastFailureAt, lockedUntil: prev.lockedUntil !== undefined ? prev.lockedUntil : { $exists: false } },
+          next.lockedUntil !== undefined ? { $set: { ...fields, lockedUntil: next.lockedUntil } } : { $set: fields, $unset: { lockedUntil: "" } });
+        return res.matchedCount === 1;
+      },
+      clear: async (tenantId, subjectHash) => { await authThrottles(tenantId, db).deleteMany({ subjectHash }); },
+    },
+    recordEvent: (tenantId, event, now) => recordAuthEvent(tenantId, event, db, now),
+  };
+}
+
 export interface UserAccountsDeps {
   session: SessionAuthenticator;
-  /** Public `/auth/*` routes (unit A4). Absent: a 503 placeholder. They receive `req.auth` from `session.attach`. */
+  /** Public `/auth/*` routes (unit A4, `createAuthRouter`). Absent: a 503 placeholder. They receive `req.auth` from `session.attach`. */
   authRouter?: RequestHandler;
   /** Authenticated `/admin/*` routes (unit A6). Absent: a 503 placeholder. Scope checks are the router's own job. */
   adminRouter?: RequestHandler;
 }
-export interface UserAccountsRuntime extends UserAccountsDeps { sessions: SessionService; cookie: CookieConfig; csrf: CsrfConfig }
+/** `auth` is the credential service A6 (admin-router) reuses: `issueToken`, `unlockEmail`, `revokeAllSessions`. */
+export interface UserAccountsRuntime extends UserAccountsDeps { sessions: SessionService; cookie: CookieConfig; csrf: CsrfConfig; auth: AuthService }
+
+/** USER_SIGNUP_DAILY_CAP: a positive integer, else the default (200 signups per rolling 24 h per tenant). */
+export function parseSignupCap(raw: string | undefined): number {
+  const v = (raw ?? "").trim();
+  return /^[1-9][0-9]{0,6}$/.test(v) ? Number(v) : DEFAULT_SIGNUP_DAILY_CAP;
+}
 
 /** undefined (session path OFF, API keys unaffected) unless AUTH_CSRF_SECRET is a usable secret. */
 export function buildUserAccounts(env: Record<string, string | undefined>, db: Db, log: Pick<Logger, "warn">): UserAccountsRuntime | undefined {
@@ -75,7 +131,12 @@ export function buildUserAccounts(env: Record<string, string | undefined>, db: D
   const csrf: CsrfConfig = { secret: env.AUTH_CSRF_SECRET, allowedOrigins };
   const sessions = createSessionService({ store: createMongoSessionStore(db), users: { getUser: (tenantId, userId) => findUserById(tenantId, userId, db) },
     audit: (tenantId, event) => recordAuthEvent(tenantId, event, db), log });
-  return { session: createSessionAuth({ sessions, cookie, csrf }), sessions, cookie, csrf };
+  const rawTenant = (env.USER_SIGNUP_TENANT ?? "").trim();
+  const signupTenant = isValidTenantId(rawTenant) ? rawTenant : undefined;
+  if (signupTenant === undefined) log.warn("user accounts: USER_SIGNUP_TENANT is unset or invalid, signup and sign-in answer 503");
+  const auth = createAuthService({ store: createMongoAuthStore(db), sessions, password, csrfSecret: env.AUTH_CSRF_SECRET, signupDailyCap: parseSignupCap(env.USER_SIGNUP_DAILY_CAP), log });
+  const authRouter = createAuthRouter({ service: auth, cookie, csrf, signupTenant, log });
+  return { session: createSessionAuth({ sessions, cookie, csrf }), authRouter, sessions, cookie, csrf, auth };
 }
 
 const placeholder = (what: string): RequestHandler => (_req: Request, res: Response) => { res.status(503).json({ error: "not_implemented", message: `${what} routes are not available yet` }); };
