@@ -15,3 +15,12 @@ No full suite. No push. No ledger rows written (dual coordinator; findings are P
 
 ## Resume note
 Re-check after fix: forward `read` in `withSessionArtifacts.getSessionDetail` (apps/api/src/routes/brain.ts:154-155), add a test through the production composition, then re-run the prodwire probe and the 7 mutations.
+
+# Checkpoint (coordinator A) — cycle 1 (repair re-check)
+
+Verdict: PASS (qa/verdicts/wa-isolation-read-side.md; cycle-0 FAIL archived at .r0-1.md). Head 7ab17ee6 (code 21dfc204), repair base bfc5350f, tier L.
+## Evidence identities
+- Copy: git archive 7ab17ee6 under scratchpad w7c1/base and w7c1/mut, junctions to main-tree node_modules (removed with cmd rmdir); bound tree untouched.
+- isolation-read-side 20/20, isolation-write-side 17/17, regression set 76/76 (node --test --import tsx), tsc --noEmit clean for product files.
+- Cycle-0 repros verbatim: prodwire 16/16 (events=6), real-Mongo duplicate probe pass. New probe w7chk-A2-marker (real replica set, throwaway mongod port 27391, PID 25180 started and killed by this check, db dropped) pass.
+- Mutants M1..M8 all red, restored, HEAD fidelity true. Evidence: qa/evidence/wa-isolation-read-side-A-c1/.
