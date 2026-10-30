@@ -1210,3 +1210,11 @@ Current source-table tracker verification: `node scripts/tracker-audit.mjs --jso
 - priority: security · ISS-UAADMIN-001 (medium, data write) admin change applied with no audit row when the audit write fails; retry 409.
 - priority: security · ISS-UAADMIN-002 (low, owner decision) an admin may issue a password-reset link for another admin (peer takeover).
 - low: ISS-UAAUTH-003..005, ISS-UAADMIN-003..004.
+
+## 2026-10-30 user-accounts A7 close-out (ua-web dual PASS cycle 1, merged locally 36ec91df, not pushed)
+- DONE `ua-web` (A7 web client: login/signup/verify/reset/pending/account pages, admin UI, cookie session + CSRF, viewer read-only scope). Cycle 0 A FAIL (fixture exit 1; viewer write controls) / B PASS; cycle 1 both PASS. Merged-head check: 19 files / 230 tests passed, tsc exit 0. Senior review Warning folded into cycle 1 (qa/evidence/review-ua-web/).
+- NEXT (plan): A8 `ua-deploy-cookie-proxy` (docs + runtime flag userAccounts in apps/web/docker/40-lkb-runtime-config.sh = ISS-UAWEB-004; compose env forwards need an Approved-by entry), then A9 live proof by a fresh checker.
+
+### Candidates (human picks) — from the A7 dual check
+- priority: S2 · ISS-UAWEB-001 (high) any 401 ends the web session: cookie users are signed out on /meeting-bot (capture-readiness requires keyId) and likely on ~20 keyId-guarded routers. Blocks a clean A9 live proof (qa/issues.uaweb.jsonl).
+- low: ISS-UAWEB-002..005 (WriteScope disables filters, console 401/403 lines, runtime flag -> A8, vite dev cross-origin).
