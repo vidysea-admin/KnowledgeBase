@@ -29,6 +29,8 @@ test("W5 real-Mongo: index-decided races, closed schemas, CAS winners, single pr
   const name = `lkb_test_wa_links_${randomBytes(4).toString("hex")}`;
   assert.match(name, /^lkb_test_wa_links_[0-9a-f]{8}$/);
   const client = await new MongoClient(url!).connect(), fake = await startFakeArchiver();
+  const saved = { w: process.env.MONGO_WORK_DB, u: process.env.MONGODB_URL, d: process.env.MONGODB_DB };
+  process.env.MONGO_WORK_DB = name; process.env.MONGODB_URL = url!; delete process.env.MONGODB_DB; // the migration's work-database guard (kept intact): point it at this test's throwaway database
   try {
     const db = client.db(name); await migration.up(db);
     const archiver = createArchiverClient(loadArchiverConfig({ WHATSAPP_ARCHIVER_API_URL: fake.url, WHATSAPP_ARCHIVER_API_TOKEN: fake.token, WHATSAPP_ARCHIVER_API_ALLOW_PRIVATE_HTTP: "1" })!);
@@ -63,5 +65,8 @@ test("W5 real-Mongo: index-decided races, closed schemas, CAS winners, single pr
     assert.equal((await svc.unlink(member("u-one"), id, {})).ok, true);
     assert.equal((await svc.request(member("u-one"), { label: "Again", noticeVersion: NOTICE.version })).ok, true, "an unlinked link frees the slot");
     assert.equal(JSON.stringify(await db.collection("whatsapp_events").find({}).toArray()).includes("awaiting_qr"), false);
-  } finally { await client.db(name).dropDatabase(); await client.close(); await fake.stop(); }
+  } finally {
+    for (const [k, v] of [["MONGO_WORK_DB", saved.w], ["MONGODB_URL", saved.u], ["MONGODB_DB", saved.d]] as const) { if (v === undefined) delete process.env[k]; else process.env[k] = v; }
+    await client.db(name).dropDatabase(); await client.close(); await fake.stop();
+  }
 });
