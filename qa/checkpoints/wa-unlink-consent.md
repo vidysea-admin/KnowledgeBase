@@ -1,7 +1,6 @@
-# Checkpoint — wa-unlink-consent (coordinator A, cycle 0)
-Head 26416d51 · base 74568a6c · env: node v24.13.1 win32, mongod 8.2.6 replSet (local, stopped) · deps: pnpm-lock at head
-- targeted tests (unlink, link-data, consent-cas, consent-race): 36/36 PASS at 26416d51 (archive copy, junction node_modules)
-- migrations/whatsapp-links.migration.test.mjs: 7 pass 1 skip; tsc apps/api exit 0
-- real-Mongo unlink.mongo.test.ts as committed: FAIL (migration env guard; conflict assertion); corrected copy 4 x 20 rounds PASS
-- falsification: 13 mutations, all criteria RED, 2 survivors named (W8-3 find filter equivalent, F-2 legacy shortcut vacuous test)
-- verdict: FAIL (W8-6). Remaining: none. Resume: n/a.
+# Checkpoint — wa-unlink-consent (coordinator A, cycle 1)
+Code head b7d4f0d7 (branch head 95ab9656 = manifest only) · base bf86b0b3 · env: node v24.13.1 win32, mongod 7.0.28 replSet 127.0.0.1:27851 (own, stopped) · deps: pnpm-lock at head
+- W8-4/W8-6 targeted incl. real-Mongo: 37/37 PASS, 0 skipped (archive copy, junction node_modules)
+- regression: 234 pass / 0 fail / 3 skipped; migration 8/8; tsc clean; lint-loc OK
+- falsification: 10 mutants, 8 RED, 2 survivors named (M8 non-active links = declared product choice, M10 redundant assertion); all restores HEAD-fidelity OK
+- verdict: PASS 12/12. Remaining: none. Resume: n/a.
