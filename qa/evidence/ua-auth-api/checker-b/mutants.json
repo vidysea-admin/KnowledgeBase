@@ -1,0 +1,477 @@
+[
+ {
+  "id": "A4-1",
+  "desc": "existing-email signup returns 409",
+  "file": "apps/api/src/user-accounts/auth-service.ts",
+  "green_before": [
+   [
+    "auth-service.test.ts",
+    0,
+    17,
+    17,
+    0,
+    []
+   ],
+   [
+    "auth-router.test.ts",
+    0,
+    15,
+    15,
+    0,
+    []
+   ]
+  ],
+  "red_after": [
+   [
+    "auth-service.test.ts",
+    1,
+    17,
+    15,
+    2,
+    [
+     "\u2716 A4 #1 signup: new and existing email give a byte-equal response; both hash; only one user exists; cross-tenant duplicate is the same response (10.1927ms)",
+     "\u2716 A4 #8 signup: global daily cap -> 429 signup_capacity (before any lookup); per-email limit 3/h -> 429 rate_limited (2.7529ms)",
+     "\u2716 failing tests:",
+     "\u2716 A4 #1 signup: new and existing email give a byte-equal response; both hash; only one user exists; cross-tenant duplicate is the same response (10.1927ms)"
+    ]
+   ],
+   [
+    "auth-router.test.ts",
+    1,
+    15,
+    14,
+    1,
+    [
+     "\u2716 A4 #1 signup over HTTP: new and existing email give a byte-equal body; unknown field and tenant-in-body are 400 and create nothing; no tenant configured is 503 (88.3322ms)",
+     "\u2716 failing tests:",
+     "\u2716 A4 #1 signup over HTTP: new and existing email give a byte-equal body; unknown field and tenant-in-body are 400 and create nothing; no tenant configured is 503 (88.3322ms)"
+    ]
+   ]
+  ],
+  "verdict": "KILLED"
+ },
+ {
+  "id": "A4-2",
+  "desc": "stale-unverified check removed from verify",
+  "file": "apps/api/src/user-accounts/auth-service.ts",
+  "green_before": [
+   [
+    "auth-service.test.ts",
+    0,
+    17,
+    17,
+    0,
+    []
+   ]
+  ],
+  "red_after": [
+   [
+    "auth-service.test.ts",
+    1,
+    17,
+    16,
+    1,
+    [
+     "\u2716 A4 #2 unverified accounts older than 7 days are swept and cannot verify (4.372ms)",
+     "\u2716 failing tests:",
+     "\u2716 A4 #2 unverified accounts older than 7 days are swept and cannot verify (4.372ms)"
+    ]
+   ]
+  ],
+  "verdict": "KILLED"
+ },
+ {
+  "id": "A4-3",
+  "desc": "unknown email skips the password verify",
+  "file": "apps/api/src/user-accounts/auth-service.ts",
+  "green_before": [
+   [
+    "auth-service.test.ts",
+    0,
+    17,
+    17,
+    0,
+    []
+   ]
+  ],
+  "red_after": [
+   [
+    "auth-service.test.ts",
+    1,
+    17,
+    16,
+    1,
+    [
+     "\u2716 A4 #3 login: unknown email and wrong password are the same 401 and both run a full verify; invalid email shape too (4.2322ms)",
+     "\u2716 failing tests:",
+     "\u2716 A4 #3 login: unknown email and wrong password are the same 401 and both run a full verify; invalid email shape too (4.2322ms)"
+    ]
+   ]
+  ],
+  "verdict": "KILLED"
+ },
+ {
+  "id": "A4-4",
+  "desc": "lock threshold 6",
+  "file": "apps/api/src/user-accounts/throttle.ts",
+  "green_before": [
+   [
+    "throttle.test.ts",
+    0,
+    7,
+    7,
+    0,
+    []
+   ],
+   [
+    "auth-service.test.ts",
+    0,
+    17,
+    17,
+    0,
+    []
+   ]
+  ],
+  "red_after": [
+   [
+    "throttle.test.ts",
+    1,
+    7,
+    6,
+    1,
+    [
+     "\u2716 4 failures do not lock, the 5th does, for exactly 15 min; the next lock is 30 min (A4 #4) (3.1548ms)",
+     "\u2716 failing tests:",
+     "\u2716 4 failures do not lock, the 5th does, for exactly 15 min; the next lock is 30 min (A4 #4) (3.1548ms)"
+    ]
+   ],
+   [
+    "auth-service.test.ts",
+    1,
+    17,
+    13,
+    4,
+    [
+     "\u2716 A4 #4 lockout: 5 failures lock the email 15 min, a never-registered one too; same 401 body; correct password refused while locked; success clears; admin unlock clears (8.5624ms)",
+     "\u2716 A4 #4 a lock does not end existing sessions; the second lock lasts 30 min (2.1399ms)",
+     "\u2716 A4 #6 change password: wrong current is refused and counted; success revokes OTHER sessions only (1.6899ms)",
+     "\u2716 A4 #9 every transition writes exactly one auth_events row with a closed-vocabulary detail; no row holds a password, token, cookie or raw email (2.5705ms)"
+    ]
+   ]
+  ],
+  "verdict": "KILLED"
+ },
+ {
+  "id": "A4-5",
+  "desc": "reset no longer revokes sessions",
+  "file": "apps/api/src/user-accounts/auth-service.ts",
+  "green_before": [
+   [
+    "auth-service.test.ts",
+    0,
+    17,
+    17,
+    0,
+    []
+   ],
+   [
+    "auth-router.test.ts",
+    0,
+    15,
+    15,
+    0,
+    []
+   ]
+  ],
+  "red_after": [
+   [
+    "auth-service.test.ts",
+    1,
+    17,
+    16,
+    1,
+    [
+     "\u2716 A4 #5 reset: forgot is always the same 202; an admin-issued token is single use; success revokes ALL sessions; rejected / disabled are refused generically (4.8048ms)",
+     "\u2716 failing tests:",
+     "\u2716 A4 #5 reset: forgot is always the same 202; an admin-issued token is single use; success revokes ALL sessions; rejected / disabled are refused generically (4.8048ms)"
+    ]
+   ],
+   [
+    "auth-router.test.ts",
+    1,
+    15,
+    14,
+    1,
+    [
+     "\u2716 A4 #5 reset over HTTP: forgot is a uniform 202; an admin-issued token resets once; a session that existed before gets 401 on its next request (59.7987ms)",
+     "\u2716 failing tests:",
+     "\u2716 A4 #5 reset over HTTP: forgot is a uniform 202; an admin-issued token resets once; a session that existed before gets 401 on its next request (59.7987ms)"
+    ]
+   ]
+  ],
+  "verdict": "KILLED"
+ },
+ {
+  "id": "A4-6",
+  "desc": "change password revokes current session too",
+  "file": "apps/api/src/user-accounts/auth-service.ts",
+  "green_before": [
+   [
+    "auth-service.test.ts",
+    0,
+    17,
+    17,
+    0,
+    []
+   ],
+   [
+    "auth-router.test.ts",
+    0,
+    15,
+    15,
+    0,
+    []
+   ]
+  ],
+  "red_after": [
+   [
+    "auth-service.test.ts",
+    1,
+    17,
+    16,
+    1,
+    [
+     "\u2716 A4 #6 change password: wrong current is refused and counted; success revokes OTHER sessions only (4.3718ms)",
+     "\u2716 failing tests:",
+     "\u2716 A4 #6 change password: wrong current is refused and counted; success revokes OTHER sessions only (4.3718ms)"
+    ]
+   ],
+   [
+    "auth-router.test.ts",
+    0,
+    15,
+    15,
+    0,
+    []
+   ]
+  ],
+  "verdict": "KILLED"
+ },
+ {
+  "id": "A4-7",
+  "desc": "logout-all revokes nothing",
+  "file": "apps/api/src/user-accounts/auth-service.ts",
+  "green_before": [
+   [
+    "auth-service.test.ts",
+    0,
+    17,
+    17,
+    0,
+    []
+   ],
+   [
+    "auth-router.test.ts",
+    0,
+    15,
+    15,
+    0,
+    []
+   ]
+  ],
+  "red_after": [
+   [
+    "auth-service.test.ts",
+    1,
+    17,
+    16,
+    1,
+    [
+     "\u2716 A4 #7 logout / logout-all / session list / revoke-own: the right rows are revoked, another user's session id is 404 (4.8472ms)",
+     "\u2716 failing tests:",
+     "\u2716 A4 #7 logout / logout-all / session list / revoke-own: the right rows are revoked, another user's session id is 404 (4.8472ms)"
+    ]
+   ],
+   [
+    "auth-router.test.ts",
+    1,
+    15,
+    14,
+    1,
+    [
+     "\u2716 A4 #7 logout needs CSRF; it revokes the session and clears the cookie on the exact path; the old cookie is then 401 session_revoked; logout-all revokes every session (53.8673ms)",
+     "\u2716 failing tests:",
+     "\u2716 A4 #7 logout needs CSRF; it revokes the session and clears the cookie on the exact path; the old cookie is then 401 session_revoked; logout-all revokes every session (53.8673ms)"
+    ]
+   ]
+  ],
+  "verdict": "KILLED"
+ },
+ {
+  "id": "A4-8",
+  "desc": "login route without per-IP limiter",
+  "file": "apps/api/src/user-accounts/auth-router.ts",
+  "green_before": [
+   [
+    "auth-router.test.ts",
+    0,
+    15,
+    15,
+    0,
+    []
+   ]
+  ],
+  "red_after": [
+   [
+    "auth-router.test.ts",
+    1,
+    15,
+    14,
+    1,
+    [
+     "\u2716 A4 #8 rate limits: per-IP login / signup / forgot / token respond 429 with the standard body and Retry-After; per-email forgot 429 too (18.5736ms)",
+     "\u2716 failing tests:",
+     "\u2716 A4 #8 rate limits: per-IP login / signup / forgot / token respond 429 with the standard body and Retry-After; per-email forgot 429 too (18.5736ms)"
+    ]
+   ]
+  ],
+  "verdict": "KILLED"
+ },
+ {
+  "id": "A4-9",
+  "desc": "password_reset ok writes no audit event",
+  "file": "apps/api/src/user-accounts/auth-service.ts",
+  "green_before": [
+   [
+    "auth-service.test.ts",
+    0,
+    17,
+    17,
+    0,
+    []
+   ]
+  ],
+  "red_after": [
+   [
+    "auth-service.test.ts",
+    1,
+    17,
+    16,
+    1,
+    [
+     "\u2716 A4 #9 every transition writes exactly one auth_events row with a closed-vocabulary detail; no row holds a password, token, cookie or raw email (5.3993ms)",
+     "\u2716 failing tests:",
+     "\u2716 A4 #9 every transition writes exactly one auth_events row with a closed-vocabulary detail; no row holds a password, token, cookie or raw email (5.3993ms)"
+    ]
+   ]
+  ],
+  "verdict": "KILLED"
+ },
+ {
+  "id": "A4-10",
+  "desc": "Authorization header check disabled",
+  "file": "apps/api/src/user-accounts/auth-router.ts",
+  "green_before": [
+   [
+    "auth-router.test.ts",
+    0,
+    15,
+    15,
+    0,
+    []
+   ]
+  ],
+  "red_after": [
+   [
+    "auth-router.test.ts",
+    1,
+    15,
+    14,
+    1,
+    [
+     "\u2716 A4 #10 no /auth route is reachable with a Bearer key (403 key_not_allowed), with or without a cookie; the key store is never consulted for /auth (23.6957ms)",
+     "\u2716 failing tests:",
+     "\u2716 A4 #10 no /auth route is reachable with a Bearer key (403 key_not_allowed), with or without a cookie; the key store is never consulted for /auth (23.6957ms)"
+    ]
+   ]
+  ],
+  "verdict": "KILLED"
+ },
+ {
+  "id": "X-lock-unreg",
+  "desc": "never-registered email is not counted toward lockout",
+  "file": "apps/api/src/user-accounts/auth-service.ts",
+  "green_before": [
+   [
+    "auth-service.test.ts",
+    0,
+    17,
+    17,
+    0,
+    []
+   ],
+   [
+    "auth-router.test.ts",
+    0,
+    15,
+    15,
+    0,
+    []
+   ]
+  ],
+  "red_after": [
+   [
+    "auth-service.test.ts",
+    1,
+    17,
+    15,
+    2,
+    [
+     "\u2716 A4 #4 lockout: 5 failures lock the email 15 min, a never-registered one too; same 401 body; correct password refused while locked; success clears; admin unlock clears (5.5641ms)",
+     "\u2716 A4 #9 every transition writes exactly one auth_events row with a closed-vocabulary detail; no row holds a password, token, cookie or raw email (1.4985ms)",
+     "\u2716 failing tests:",
+     "\u2716 A4 #4 lockout: 5 failures lock the email 15 min, a never-registered one too; same 401 body; correct password refused while locked; success clears; admin unlock clears (5.5641ms)"
+    ]
+   ],
+   [
+    "auth-router.test.ts",
+    0,
+    15,
+    15,
+    0,
+    []
+   ]
+  ],
+  "verdict": "KILLED"
+ },
+ {
+  "id": "X-reset-rejected",
+  "desc": "rejected/disabled reset allowed",
+  "file": "apps/api/src/user-accounts/auth-service.ts",
+  "green_before": [
+   [
+    "auth-service.test.ts",
+    0,
+    17,
+    17,
+    0,
+    []
+   ]
+  ],
+  "red_after": [
+   [
+    "auth-service.test.ts",
+    1,
+    17,
+    16,
+    1,
+    [
+     "\u2716 A4 #5 reset: forgot is always the same 202; an admin-issued token is single use; success revokes ALL sessions; rejected / disabled are refused generically (7.638ms)",
+     "\u2716 failing tests:",
+     "\u2716 A4 #5 reset: forgot is always the same 202; an admin-issued token is single use; success revokes ALL sessions; rejected / disabled are refused generically (7.638ms)"
+    ]
+   ]
+  ],
+  "verdict": "KILLED"
+ }
+]

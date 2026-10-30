@@ -1,0 +1,84 @@
+PROBE OK   A4-1 signup byte-equal new/existing/other-tenant (status+body+headers)
+PROBE OK   A4-1 signup created exactly 1 user in tA for new, none for existing
+PROBE OK   A4-1 other-tenant signup created nothing in tA
+PROBE OK   A4-1 tenant in body -> 400 and nothing created
+PROBE OK   A4-1 new signup is unverified, role null, stored hash is argon2id
+PROBE OK   A4-2 verify valid once -> pending
+PROBE OK   A4-2 reuse / junk / wrong-purpose all identical 400 invalid_token
+PROBE OK   A4-2 wrong-purpose token not consumed by the failed verify (still usable for reset)
+PROBE OK   A4-2 expired token -> same generic 400
+PROBE OK   A4-2 unverified older than 7d cannot verify
+PROBE FAIL A4-2 sweep removes stale unverified of tA :: undefined
+PROBE OK   A4-2 sweep in tA never touches tB's stale unverified
+PROBE OK   A4-3 pending user correct pw -> 200 state pending + cookie
+PROBE OK   A4-3 pending session: data routes 403 account_not_active
+PROBE OK   A4-3 /auth/session works for pending
+PROBE OK   A4-3 rej@example.org correct pw -> no cookie
+PROBE OK   A4-3 rej@example.org wrong pw -> 401 generic
+PROBE OK   A4-3 dis@example.org correct pw -> no cookie
+PROBE OK   A4-3 dis@example.org wrong pw -> 401 generic
+PROBE OK   A4-3 unknown vs wrong-password: identical status+body+headers
+PROBE OK   A4-4 never-registered email locks after 5 (case/space variants count together); row exists; raw email not stored
+PROBE OK   A4-4 lock does not change the 401 body
+PROBE OK   A4-4 locked registered: correct pw still 401, no cookie
+PROBE OK   A4-4 existing session survives the lock
+PROBE OK   A4-4 first lock ~15 min
+PROBE OK   A4-4 second lock ~30 min (doubling) and lockCount 2
+PROBE OK   A4-4 hammering while locked does not extend/alter the lock
+PROBE OK   A4-4 admin unlock clears; login works again
+PROBE OK   A4-4 success clears the failure counter (4+ok+4+ok never locks)
+PROBE OK   A4-4 20 parallel wrong guesses -> single row, locked once
+PROBE OK   A4-4 subject hash differs per tenant and is not the plain sha256 of the email
+PROBE OK   A4-5 forgot: registered vs unregistered identical 202
+PROBE OK   A4-5 forgot issues nothing in v1
+PROBE OK   A4-5 weak new password -> 400 and token NOT spent
+PROBE OK   A4-5 6 parallel redemptions of one reset token -> exactly one 200
+PROBE OK   A4-5 both pre-existing sessions dead after reset (401)
+PROBE OK   A4-5 old password refused, new works
+PROBE OK   A4-5 rejected/disabled reset -> same generic 400, no password change
+PROBE OK   A4-5 rejected user's password hash unchanged
+PROBE OK   A4-5 verify-purpose token on reset -> generic 400
+PROBE FAIL A4-8 per-address forgot limit identical for registered/unregistered (3 then 429) :: [[202,202,429,429],[202,202,202,429]]
+PROBE OK   A4-6 change without CSRF header -> 403 csrf (perimeter)
+PROBE OK   A4-6 wrong current password refused (403, not 401) and nothing changed
+PROBE OK   A4-6 success: current session stays, OTHER sessions revoked
+PROBE OK   A4-7 logout clears cookie on exact path (<base>/api), Max-Age=0
+PROBE OK   A4-7 logout revoked exactly that session
+PROBE OK   A4-7 logout without CSRF refused and session survives
+PROBE OK   A4-7 logout-all revokes every session of the user and clears cookie
+PROBE OK   A4-7 /auth/sessions never exposes token hashes/family ids
+PROBE OK   A4-7 revoke-own-session works; other user's session id -> 404
+PROBE OK   A4-7 cannot revoke another user's session (404)
+PROBE OK   A4-8 login per-IP: 20 pass then 429 standard body + Retry-After
+PROBE OK   A4-8 signup per-IP: 5 pass then 429
+PROBE OK   A4-8 verify token attempts per-IP: 20 then 429
+PROBE OK   A4-8 forgot per-IP: 5 then 429
+PROBE OK   A4-8 global signup cap -> 429 signup_capacity
+PROBE OK   A4-10 every /auth route (+unknown) with Bearer/Basic/junk/cookie+Bearer -> 403 key_not_allowed, no cookie
+PROBE OK   A4-10 bearer signup/login created nothing
+PROBE OK   A4-10 empty Authorization header + valid cookie is refused too
+PROBE OK   UA-28 member session cookie on /admin does not get through (401/403/503 placeholder, never 200)
+PROBE OK   Perimeter: foreign / null / look-alike Origin on every public POST -> 403
+PROBE OK   Perimeter: missing Origin (curl) allowed -> normal 401
+PROBE OK   Malformed bodies never 5xx and never leak a stack
+PROBE OK   Over-long (<=1024) password on login is a normal 401 (no 500/DoS)
+PROBE OK   Login while holding live cookie: needs CSRF (403 without), ends old session, exactly one Set-Cookie
+PROBE OK   Login with a stale/revoked cookie still works with one Set-Cookie
+PROBE OK   A4-9 auth_events (159 rows) hold no password/token/cookie/raw-email/hash substring
+PROBE INFO distinct type/outcome/detail: ["email_verified/failed/token_invalid","email_verified/ok/none","link_issued/ok/admin_action","locked/denied/locked","login_failed/denied/locked","login_failed/denied/not_active","login_failed/failed/invalid_credentials","login_failed/failed/unknown_account","login_ok/ok/none","logout/ok/none","logout/ok/self_action","password_changed/failed/invalid_credentials","password_changed/ok/self_action","password_reset/failed/token_invalid","password_reset/ok/none","session_revoked/ok/self_action","signup/denied/existing_account","signup/ok/new_account","unlocked/ok/admin_action"]
+PROBE OK   A4-9 stored sessions hold hashes only (no raw cookie token)
+PROBE OK   A4-9 users collection holds no plaintext password
+PROBE OK   A4-9 login_ok + logout + login_failed => exactly one row each (plus session audit rows)
+PROBE TIMING login ms median: unknown 52.2 wrongpw(registered) 48.4 locked-unregistered 46.8 locked-registered 43.7
+PROBE TIMING signup ms median: new 51.5 existing 48.7
+PROBE WARNS []
+PROBE SUMMARY 68/70 ok; failing: ["A4-2 sweep removes stale unverified of tA","A4-8 per-address forgot limit identical for registered/unregistered (3 then 429)"]
+✔ checker-b probe (9129.5718ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 1
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 11577.0744

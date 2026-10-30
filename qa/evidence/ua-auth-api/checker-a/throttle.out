@@ -1,0 +1,16 @@
+✔ lock duration doubles from 15 min and is capped at 24 h (UA-24) (4.0883ms)
+✔ 4 failures do not lock, the 5th does, for exactly 15 min; the next lock is 30 min (A4 #4) (3.7154ms)
+✔ failures outside the 15 min window do not accumulate (UA-24) (0.5494ms)
+✔ a failure while locked changes nothing: the lock is not extended by hammering (UA-24) (0.3408ms)
+✔ createThrottle: check / fail / clear over a store; clear removes the lock (success and admin unlock) (1.6712ms)
+✔ window limiter: allows max per window, then refuses; the window slides; keys are independent (0.744ms)
+✔ A4 #4 createThrottle: 12 PARALLEL wrong-password attempts still lock after exactly 5 counted failures (compare-and-set, no lost updates); exactly one attempt starts the lock (28.0156ms)
+ℹ tests 7
+ℹ suites 0
+ℹ pass 7
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 873.0814
+exit 0
