@@ -152,6 +152,16 @@ test("A4 #3 login success rehashes an old hash and stamps lastLoginAt", async ()
   assert.equal(row.passwordHash, fastHash(PW)); assert.ok(row.lastLoginAt);
 });
 
+test("A4 #4 a successful login clears the failure counter: 4 failures, a success, 4 more failures do not lock", async () => {
+  const r = rig(); await r.seed("tA", "clr@x.org");
+  const bad = () => r.service.login("tA", { email: "clr@x.org", password: "wrong wrong wrong" }, META);
+  for (let i = 0; i < 4; i++) await bad();
+  assert.equal((await r.service.login("tA", { email: "clr@x.org", password: PW }, META)).status, 200);
+  for (let i = 0; i < 4; i++) await bad();
+  assert.equal((await r.service.login("tA", { email: "clr@x.org", password: PW }, META)).status, 200, "8 failures in total, never 5 in a row without a success: no lock");
+  assert.equal(r.types().filter((t) => t === "locked").length, 0);
+});
+
 test("A4 #4 lockout: 5 failures lock the email 15 min, a never-registered one too; same 401 body; correct password refused while locked; success clears; admin unlock clears", async () => {
   const r = rig(); await r.seed("tA", "lock@x.org");
   const bad = (email: string) => r.service.login("tA", { email, password: "wrong wrong wrong" }, META);
