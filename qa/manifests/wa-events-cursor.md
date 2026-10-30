@@ -3,8 +3,8 @@
 **Goal task:** whatsapp-multiuser W12 follow-up (`wa-events-cursor`)
 **Date:** 2026-10-30
 **Policy-Version:** proportional-verification/2026-10-19.17
-**Status:** ready-for-check
-**Handshake status:** ready-for-check
+**Status:** checked-PASS (qa/verdicts/wa-events-cursor.md, 7db809e5)
+**Handshake status:** checked-PASS
 **Fix cycle:** 0
 **Dual check:** no (read-path ordering of an existing admin-scoped GET; no auth, tenancy or production-write change: the tenant pin still comes from `scopedCollection`, the router and its scope guard are untouched, no new write path, no schema or index change)
 **Persona walk:** skip (no screen; accessor, test double and docs)
