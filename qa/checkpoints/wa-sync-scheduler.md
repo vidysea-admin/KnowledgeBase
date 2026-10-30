@@ -13,3 +13,14 @@ Evidence identity for every check below: code = scripts/whatsapp/sync-links.mjs 
 | Prod refusal | requireScriptDatabase with lkb/lkb_prod/global_university_db | refused without the production flag |
 
 Remaining: none. Verdict FAIL on W9-7 (P1); a repair re-check needs only W9-7 and the criteria whose input files the repair touches.
+
+## Cycle 1 (repair re-check), head 7bbccd60, code cd9f3b03
+Evidence identity: sync-links.mjs blob ed8d21f0, sync-links.test.mjs blob a72b1ae2, sync-links.mongo.test.mjs blob 4c704c15, docs/whatsapp/sync.md blob 1b5e9ac8 (each equal to HEAD, checked in the copy and the bound tree); runtime = node + tsx from the main tree node_modules junctioned into a `git archive HEAD` copy (unlinked after); data = throwaway mongod 7.0 replica set w9chkA2 on 127.0.0.1:27399, stopped by me; attribution = checker A.
+
+| Check | Scope | Result |
+|---|---|---|
+| Unit + real Mongo | sync-links.test.mjs + sync-links.mongo.test.mjs with W9_TEST_MONGO_URL | 26 pass, 0 fail |
+| Cycle-0 probes verbatim | A-probe-p1-unlink-tenant, A-probe-run-rows, A-probe-seed | 3/3 pass (P1 fixed) |
+| Lock codes | A-c1-lock-codes.mjs.txt | held=locked, missing dir=lock-failed |
+| Falsification | A-c1-mutation-harness.mjs.txt / A-c1-mutation-run.txt, 10 mutants | 10/10 killed |
+Remaining: none. Verdict PASS.

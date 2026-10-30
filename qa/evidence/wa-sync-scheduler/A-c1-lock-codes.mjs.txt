@@ -1,0 +1,7 @@
+import { createFileLock } from "./sync-links.mjs";
+import { mkdtempSync } from "node:fs"; import { tmpdir } from "node:os"; import { join } from "node:path";
+const lock = await createFileLock(); const d = mkdtempSync(join(tmpdir(), "w9lk-")); const p = join(d, "link-x.lock");
+const t = lock.acquire(p);
+try { lock.acquire(p); console.log("second acquire: NO THROW"); } catch (e) { console.log("held ->", e.name, e.code); }
+lock.release(p, t);
+try { lock.acquire(join(d, "nodir", "x.lock")); console.log("missing dir: NO THROW"); } catch (e) { console.log("missing dir ->", e.name, e.code); }
