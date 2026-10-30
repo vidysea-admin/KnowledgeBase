@@ -3,8 +3,8 @@
 **Goal task:** whatsapp-multiuser W11 part B follow-up (`wa-route-link-staleness`)
 **Date:** 2026-10-30
 **Policy-Version:** proportional-verification/2026-10-19.17
-**Status:** ready-for-check
-**Handshake status:** ready-for-check
+**Status:** checked-PASS (dual A 5ff3a4dd + B ec12293a, cycle 0, 2026-10-30; defence in depth: leak not reachable via real sessionVisible at 461e341e)
+**Handshake status:** checked-PASS
 **Fix cycle:** 0
 **Dual check:** required
 dual-trigger: security apps/api/src/search-cache/search-cache.ts:70
