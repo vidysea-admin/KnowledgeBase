@@ -1227,3 +1227,4 @@ Current source-table tracker verification: `node scripts/tracker-audit.mjs --jso
 - W3 `wa-archiver-client`: checker A PASS, checker B and review pending/in (review Warning, lows).
 - DONE `wa-archiver-client` (W3): dual PASS cycle 0, review Warning (lows); merged locally 7b572ebc (76 tests: 57 pass, 0 fail, 19 skipped by design on merged head). Criterion 5 compose half HELD at HUMAN_GATE H-11 (ISS-WAARCH-001: compose forwards + keep/rename/drop WHATSAPP_ARCHIVER_API_ALLOW_PRIVATE_HTTP). ISS-WAARCH-002..003 low.
 - IN PROGRESS: W7 `wa-isolation-read-side` (carries ISS-WAOWNER-002), W9 `wa-sync-scheduler` (carries ISS-WAOWNER-001). W5 waits on HUMAN_GATE H-4 (self-approval rule when Umesh is the only admin).
+- DONE 2026-10-30: W9 `wa-sync-scheduler` dual PASS cycle 1, merged b1b135cc; ISS-WASYNC-001..004 (001 medium: unlink retry inert until W8 schema field). IN PROGRESS: W7 (A PASS c1, B pending), W5 `wa-links-api` building. Gates H-4, H-9 answered.
