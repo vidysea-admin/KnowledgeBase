@@ -13,7 +13,9 @@ import { MongoClient, type Db } from "mongodb";
 import { createArchiverClient } from "../archiver/client.js";
 import { loadArchiverConfig } from "../archiver/config.js";
 import { startFakeArchiver } from "../archiver/fake-archiver.js";
-import { createLinksService, createMongoLinksStore, type Principal } from "./service.js";
+import { createLinkDataPort } from "../review/store.js";
+import { createMongoLinksStore } from "./router.js";
+import { createLinksService, type Principal } from "./service.js";
 import { NOTICE } from "./links.testsupport.js";
 
 const url = process.env.WA_REVIEW_TEST_MONGO_URL;
@@ -31,7 +33,7 @@ test("W5 real-Mongo: index-decided races, closed schemas, CAS winners, single pr
     const db = client.db(name); await migration.up(db);
     const archiver = createArchiverClient(loadArchiverConfig({ WHATSAPP_ARCHIVER_API_URL: fake.url, WHATSAPP_ARCHIVER_API_TOKEN: fake.token, WHATSAPP_ARCHIVER_API_ALLOW_PRIVATE_HTTP: "1" })!);
     const store = createMongoLinksStore(db);
-    const svc = createLinksService({ store, archiver, notice: () => NOTICE, countActiveAdmins: async () => 2, userStatus: async () => ({ status: "active", role: "member" }) });
+    const svc = createLinksService({ store, archiver, data: createLinkDataPort(db), notice: () => NOTICE, countActiveAdmins: async () => 2, userStatus: async () => ({ status: "active", role: "member" }) });
     const ask = (p: Principal) => svc.request(p, { label: "Phone", noticeVersion: NOTICE.version });
 
     const race = await Promise.all(Array.from({ length: 6 }, () => ask(member("u-race"))));

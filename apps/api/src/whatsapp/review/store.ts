@@ -195,3 +195,43 @@ export function createMongoWhatsAppReviewRepository(db: Db, options: {
     },
   };
 }
+
+/** W8 (R-7): the whatsapp-batch sources a link owns - stamped `sourceMeta.whatsappLinkId` (W7), plus unstamped legacy rows whose consent was recorded by the link's
+ * archiver owner (`whatsapp-owner:<id>`). A source stamped with ANOTHER link is never returned. Tenant-scoped; read only. Lives here, not in quarantine.ts, so store.ts
+ * does not import quarantine.ts (that import closes a cycle through the materializer). */
+export async function whatsAppLinkSourceIds(db: Db, tenantId: string, linkId: string, archiverOwnerId?: string): Promise<string[]> {
+  assertValidTenantId(tenantId, "whatsapp.review.link-sources");
+  type Src = { _id: string; tenantId: string; sourceMeta?: { whatsappLinkId?: string } };
+  const coll = db.collection<Src>("sources");
+  const found = await coll.find(withTenant<Src>(tenantId, { kind: "whatsapp-batch", "sourceMeta.whatsappLinkId": linkId } as never)).toArray();
+  if (archiverOwnerId) found.push(...(await coll.find(withTenant<Src>(tenantId, { kind: "whatsapp-batch", "consent.recordedBy": `whatsapp-owner:${archiverOwnerId}` } as never)).toArray())
+    .filter(s => s.sourceMeta?.whatsappLinkId === undefined));
+  return [...new Set(found.filter(s => s.tenantId === tenantId).map(s => s._id))];
+}
+
+/** W8 (R-7/R-8): the link-scoped data steps of an unlink or revoke. Quarantine = every still-`needs-review` candidate of the link's sources becomes `rejected` by
+ * `system:wa-unlink` (compare-and-set on the status, so it loses cleanly to a racing approval, and the approval's own check then fails closed); the schema has no
+ * separate quarantined status. Consent is withdrawn per source through `withdrawWhatsAppSourceConsent` exactly as it is. Both steps are idempotent. */
+export function createLinkDataPort(db: Db, options: { now?: () => string } = {}) {
+  const now = options.now ?? (() => new Date().toISOString());
+  return {
+    async quarantineCandidates(tenantId: string, linkId: string, archiverOwnerId: string | undefined): Promise<number> {
+      const sourceIds = await whatsAppLinkSourceIds(db, tenantId, linkId, archiverOwnerId);
+      if (!sourceIds.length) return 0;
+      const coll = scopedCollection<WhatsAppReviewCandidate>(db, "whatsapp_candidates")(tenantId);
+      const pending = await coll.find({ status: "needs-review", sourceId: { $in: sourceIds } } as never).toArray();
+      let moved = 0;
+      for (const row of pending) {
+        if (row.tenantId !== tenantId || !sourceIds.includes(row.sourceId)) continue;
+        const r = await coll.updateOne({ _id: row._id, status: "needs-review" } as never, { $set: { status: "rejected", decision: { action: "rejected", actor: "system:wa-unlink", at: now() } } } as never);
+        moved += r.modifiedCount;
+      }
+      return moved;
+    },
+    async withdrawSources(tenantId: string, linkId: string, archiverOwnerId: string | undefined, recordedBy: string): Promise<number> {
+      const sourceIds = await whatsAppLinkSourceIds(db, tenantId, linkId, archiverOwnerId);
+      for (const id of sourceIds) await withdrawWhatsAppSourceConsent(db, tenantId, id, recordedBy, "link_unlinked");
+      return sourceIds.length;
+    },
+  };
+}

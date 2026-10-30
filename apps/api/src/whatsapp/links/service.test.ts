@@ -2,7 +2,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createLinksService, toLinkView, type ArchiverPort, type LinksServiceDeps, type Principal } from "./service.js";
 import { ArchiverError } from "../archiver/errors.js";
-import { memoryLinksStore, seed, NOTICE, T1, T2, type MemStore } from "./links.testsupport.js";
+import { memoryLinkData, memoryLinksStore, seed, NOTICE, T1, T2, type MemStore } from "./links.testsupport.js";
 
 const CANARY_QR = "CANARY-QR-0f1e2d3c4b5a69788796";
 const OWNER_ID = "b".repeat(24);
@@ -11,20 +11,21 @@ const admin = (userId = "u-admin", tenantId = T1): Principal => ({ tenantId, kin
 const key = (scopes: { link?: boolean; admin?: boolean }, tenantId = T1): Principal => ({ tenantId, kind: "key", userId: null, actor: "key-1", link: !!scopes.link, admin: !!scopes.admin });
 
 function archiverStub(start = "not_started") {
-  const c = { ensureOwner: 0, startSession: 0, getSession: 0, getQr: 0 }, st = { status: start, failOn: "" };
+  const c = { ensureOwner: 0, startSession: 0, getSession: 0, getQr: 0, unlinkSession: 0 }, st = { status: start, failOn: "" };
   const port: ArchiverPort = {
     async ensureOwner() { c.ensureOwner++; await new Promise(r => setImmediate(r)); if (st.failOn === "ensureOwner") throw new ArchiverError("archiver_api_unavailable", { reason: "network" }); return { ownerId: OWNER_ID, ownerRef: "x", created: true, state: "active" } as never; },
     async startSession() { c.startSession++; st.status = "awaiting_qr"; return { status: "awaiting_qr", updatedAt: "2026-11-01T00:00:00.000Z" } as never; },
     async getSession() { c.getSession++; await new Promise(r => setImmediate(r)); return { status: st.status, detail: null, updatedAt: "2026-11-01T00:00:00.000Z", accountHint: st.status === "connected" ? "47" : null } as never; },
+    async unlinkSession() { c.unlinkSession++; return { ownerId: OWNER_ID, state: "unlinked", status: "closed", captureDisabled: true, unlinkedAt: "2026-11-01T00:00:00.000Z" } as never; },
     async getQr() { c.getQr++; return { status: "awaiting_qr", qr: CANARY_QR, expiresAt: "2026-11-01T00:01:00.000Z" } as never; },
   };
   return { port, c, st };
 }
 function rig(over: Partial<LinksServiceDeps> = {}, admins = 1) {
-  const store = memoryLinksStore(), logs: unknown[] = [], a = archiverStub();
+  const store = memoryLinksStore(), data = memoryLinkData(), logs: unknown[] = [], a = archiverStub();
   const log = { warn: (m: string, f?: unknown) => { logs.push([m, f]); }, error: (m: string, f?: unknown) => { logs.push([m, f]); } };
-  const svc = createLinksService({ store, archiver: a.port, notice: () => NOTICE, countActiveAdmins: async () => admins, userStatus: async (_t, id) => (id === "u-gone" ? null : { status: "active", role: "member" }), log, ...over });
-  return { svc, store, a, logs };
+  const svc = createLinksService({ store, archiver: a.port, data, notice: () => NOTICE, countActiveAdmins: async () => admins, userStatus: async (_t, id) => (id === "u-gone" ? null : { status: "active", role: "member" }), log, ...over });
+  return { svc, store, data, a, logs };
 }
 const req = (svc: ReturnType<typeof rig>["svc"], p: Principal, label = "My phone") => svc.request(p, { label, noticeVersion: NOTICE.version });
 const val = <T>(r: { ok: boolean }): T => { assert.equal(r.ok, true, JSON.stringify(r)); return (r as unknown as { value: T }).value; };

@@ -19,16 +19,16 @@ import { loadArchiverConfig } from "../archiver/config.js";
 import { startFakeArchiver, type FakeArchiver } from "../archiver/fake-archiver.js";
 import { createWhatsAppLinksRouter } from "./router.js";
 import { createLinksService, type LinksServiceDeps } from "./service.js";
-import { memoryLinksStore, NOTICE } from "./links.testsupport.js";
+import { memoryLinkData, memoryLinksStore, NOTICE } from "./links.testsupport.js";
 
 export async function linksRig(opts: { users: Users[]; keys?: Record<string, VerifiedKey>; fake?: FakeArchiver; linkDeps?: Partial<LinksServiceDeps>; noLinks?: boolean }) {
-  const clock = fakeClock(), mem = memorySessionStore(), lookup = memoryUsers(opts.users), store = memoryLinksStore();
+  const clock = fakeClock(), mem = memorySessionStore(), lookup = memoryUsers(opts.users), store = memoryLinksStore(), data = memoryLinkData();
   const sessions = createSessionService({ store: mem.store, users: lookup, now: clock.now });
   const archiver = opts.fake ? createArchiverClient(loadArchiverConfig({ WHATSAPP_ARCHIVER_API_URL: opts.fake.url, WHATSAPP_ARCHIVER_API_TOKEN: opts.fake.token, WHATSAPP_ARCHIVER_API_ALLOW_PRIVATE_HTTP: "1" })!) : null;
   const logs: string[] = [];
   const log = { warn: (m: string, f?: unknown) => { logs.push(m + JSON.stringify(f ?? {})); }, error: (m: string, f?: unknown) => { logs.push(m + JSON.stringify(f ?? {})); } };
   const service = createLinksService({
-    store, archiver, notice: () => NOTICE, log, now: clock.now,
+    store, archiver, data, notice: () => NOTICE, log, now: clock.now,
     countActiveAdmins: async (t) => opts.users.filter(u => u.tenantId === t && u.status === "active" && u.role === "admin").length,
     userStatus: async (t, id) => { const u = opts.users.find(x => x._id === id && x.tenantId === t); return u ? { status: u.status, ...(u.role ? { role: u.role } : {}) } : null; },
     ...opts.linkDeps,
@@ -52,6 +52,6 @@ export async function linksRig(opts: { users: Users[]; keys?: Record<string, Ver
     try { json = JSON.parse(text) as Record<string, any>; } catch { /* not json */ }
     return { status: res.status, json, text, headers: res.headers };
   }
-  return { call, login, store, service, logs, clock, close: () => new Promise<void>(r => http.close(() => r())) };
+  return { call, login, store, data, service, logs, clock, close: () => new Promise<void>(r => http.close(() => r())) };
 }
 export { startFakeArchiver, NOTICE, createWhatsAppLinksRouter };
