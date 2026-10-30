@@ -137,7 +137,7 @@ grep -Eq '^# fail 0$' docker-evidence/transcript-mongo.tap
 timeout 150 docker run --rm --name "$automation" --network "$network" -e LKB_CONTAINER_MONGO_URL="$url" \
   -e LKB_CONTAINER_AUTOMATION_DB="lkb_work_automation_$db_suffix" "$build_image" \
   node --import tsx scripts/qa/container-workflows/mongo-proofs.mjs | tee docker-evidence/automation-mongo.json
-timeout 30 docker run -d --name "$web" -p 127.0.0.1:18080:80 "$web_image" >/dev/null
+timeout 30 docker run -d --name "$web" -p 127.0.0.1:18080:80 -e API_UPSTREAM=http://127.0.0.1:3300 "$web_image" >/dev/null
 ready=false
 for attempt in {1..30}; do
   if curl --fail --silent --connect-timeout 2 --max-time 5 http://127.0.0.1:18080/ -o docker-evidence/web-root.html; then ready=true; break; fi
