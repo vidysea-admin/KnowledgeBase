@@ -3,7 +3,7 @@
 **Goal task:** whatsapp-multiuser W11 part B (`wa-student-data-gate`)
 **Date:** 2026-10-30
 **Policy-Version:** proportional-verification/2026-10-19.17
-**Status:** ready-for-check
+**Status:** checked-PASS (dual: qa/verdicts/wa-student-data-gate.md PASS 3a657d49, qa/verdicts/wa-student-data-gate.b.md PASS 9c00df05; cycle 0)
 **Handshake status:** ready-for-check
 **Fix cycle:** 0
 **Dual check:** required
