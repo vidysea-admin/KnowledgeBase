@@ -4,7 +4,7 @@
 **Date:** 2026-10-30
 **Policy-Version:** proportional-verification/2026-10-19.17
 **Status:** checked-PASS (dual, cycle 1: qa/verdicts/wa-unlink-consent.md PASS fc8313f8, qa/verdicts/wa-unlink-consent.b.md PASS d419df81)
-**Handshake status:** ready-for-check
+**Handshake status:** checked-PASS
 **Fix cycle:** 1
 **Dual check:** required
 dual-trigger: security|tenancy apps/api/src/whatsapp/links/service.ts:259

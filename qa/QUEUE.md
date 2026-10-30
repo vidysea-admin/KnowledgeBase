@@ -1236,3 +1236,4 @@ Current source-table tracker verification: `node scripts/tracker-audit.mjs --jso
 - Push of these merges waits on a fresh 6c pre-push check.
 - W11B done: wa-student-data-gate dual PASS cycle 0 (verdicts 3a657d49, 9c00df05), merged locally, not pushed. Ledger qa/issues.wa-student-data-gate.jsonl ISS-WASDG-001..006 (001 medium perf: G1 prune Mongo fan-out; 002 medium: cache/answer replay after studentData flip). Gate H-14 asked: qa/gates/wa-revoked-link-eligibility.md.
 - W8 done: wa-unlink-consent dual PASS cycle 1 (verdicts fc8313f8, d419df81), merged locally ac60c0dc, not pushed. Ledger qa/issues.wa-unlink-consent.jsonl ISS-WAUNLINK-001..005 (001 medium: R-10 hook has no durable retry). 6c pre-push (full suite, .13-2a security units W8/W11B) dispatched on ac60c0dc.
+- QUEUE: wa-revoked-link-gate closed (dual PASS c0), merged 461e341e; ISS-WARLG-001 high security /route stale index next
