@@ -1234,3 +1234,4 @@ Current source-table tracker verification: `node scripts/tracker-audit.mjs --jso
 - W6 done: wa-selection-api dual PASS cycle 0, merged locally 886aeef7, not pushed. ISS-WASEL-001 (routers not mounted in production) stays open for the W5/W6 production-wiring unit.
 - W10 done: wa-web dual PASS cycle 0 (qa/verdicts/wa-web.md, wa-web.b.md), merged locally d35e4072, not pushed. Ledger rows ISS-WAWEB-001..005 in qa/issues.wa-web.jsonl (005 medium: restrictToPeople partial failure leaves the UI stale).
 - Push of these merges waits on a fresh 6c pre-push check.
+- W11B done: wa-student-data-gate dual PASS cycle 0 (verdicts 3a657d49, 9c00df05), merged locally, not pushed. Ledger qa/issues.wa-student-data-gate.jsonl ISS-WASDG-001..006 (001 medium perf: G1 prune Mongo fan-out; 002 medium: cache/answer replay after studentData flip). Gate H-14 asked: qa/gates/wa-revoked-link-eligibility.md.
