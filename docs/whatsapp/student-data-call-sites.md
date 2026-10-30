@@ -138,7 +138,7 @@ link, fail closed), true for `no` or non-WhatsApp sources. Then apply it at thes
 
 - **G1 Tree handed to Ask and Route (covers A1, A2, A4, A8, A10).** Filter excluded native-source branches out of
   the tree before `selectNodes` / `evaluator` see them (tree store `createMongoTreeStore(native.resolver)`,
-  `production.ts:177` and `:208`; `treeSearch`). One filter protects both vendors (ollama-cloud and Google). Excluded
+  `production.ts:177` and `:212`; `treeSearch`). One filter protects both vendors (ollama-cloud and Google). Excluded
   content is then invisible to external-model Ask/Route but stays available to non-model paths.
 - **G2 Source hydrators (covers A3, A5, A6).** `apps/api/src/ask/native-source-context.ts` (native message passages)
   and `apps/api/src/ask/source-context.ts` `createSourceHydrator` (transcript turns, `whatsapp-batch` rows). Drop an
