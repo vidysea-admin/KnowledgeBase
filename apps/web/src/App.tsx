@@ -32,6 +32,11 @@ import { IngestPage } from "./pages/IngestPage.js";
 import { MeetingBotPage } from "./pages/MeetingBotPage.js";
 import { WhatsAppPage } from "./pages/WhatsAppPage.js";
 import ReviewSourcePage from './pages/whatsapp-review/ReviewSourcePage.js';
+import { LinksPage } from "./pages/whatsapp-links/LinksPage.js";
+import { NewLinkPage } from "./pages/whatsapp-links/NewLinkPage.js";
+import { LinkDetailPage } from "./pages/whatsapp-links/LinkDetailPage.js";
+import { ConnectPage } from "./pages/whatsapp-links/ConnectPage.js";
+import { ChoosePage } from "./pages/whatsapp-links/ChoosePage.js";
 import { WatchPage } from "./pages/WatchPage.js";
 import { JobsPage } from "./pages/jobs/JobsPage.js";
 import { ClaimsPage } from "./pages/claims/ClaimsPage.js";
@@ -122,6 +127,11 @@ function Shell(): React.ReactElement {
               <Route path="/ingest" element={<WriteScope><IngestPage /></WriteScope>} />
               <Route path="/meeting-bot" element={<MeetingBotPage />} />
               <Route path="/whatsapp" element={<WhatsAppPage />} />
+              <Route path="/whatsapp/links" element={<LinksPage />} />
+              <Route path="/whatsapp/links/new" element={<NewLinkPage />} />
+              <Route path="/whatsapp/links/:id" element={<LinkDetailPage />} />
+              <Route path="/whatsapp/links/:id/connect" element={<ConnectPage />} />
+              <Route path="/whatsapp/links/:id/choose" element={<ChoosePage />} />
               <Route path="/whatsapp/review/:id/source" element={<ReviewSourcePage />} />
               <Route path="/account" element={<AccountPage />} />
               <Route path="/admin/users" element={<UsersAdminPage />} />
