@@ -1,0 +1,70 @@
+// Checker B probes (throwaway copy only). Real local Mongo on 127.0.0.1:27018, throwaway db, dropped at the end.
+import test from "node:test";
+import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
+import { MongoClient } from "mongodb";
+import Ajv2020 from "ajv/dist/2020.js";
+import addFormats from "ajv-formats";
+import { createDbBackedWhatsAppOwners, WhatsAppNotConfiguredError } from "./owner-config.js";
+import { createMongoWhatsAppDeps } from "./store.js";
+
+const A = "a".repeat(24), B = "b".repeat(24);
+const quiet = () => { const lines: string[] = []; return { lines, log: { info: (m: string) => { lines.push("info:" + m); }, warn: (m: string) => { lines.push("warn:" + m); } } }; };
+
+test("real Mongo: seed once, idempotent across instances, concurrent instances do not double-seed, doc passes the W1 JSON schema", async () => {
+  const client = new MongoClient("mongodb://127.0.0.1:27018", { serverSelectionTimeoutMS: 3000 });
+  await client.connect();
+  const dbName = "w4chkb_" + Date.now(); const db = client.db(dbName);
+  try {
+    const coll = db.collection("whatsapp_links");
+    await coll.createIndex({ tenantId: 1, _id: 1 }, { unique: true });
+    await coll.createIndex({ archiverOwnerId: 1 }, { unique: true, partialFilterExpression: { archiverOwnerId: { $type: "string" } } });
+    await coll.createIndex({ tenantId: 1, userId: 1 }, { unique: true, partialFilterExpression: { live: true, userId: { $type: "string" } } });
+    const map = JSON.stringify([{ tenantId: "t1", ownerUserId: A }, { tenantId: "t2", ownerUserId: B }]);
+    const s1 = quiet(), s2 = quiet();
+    const r1 = createDbBackedWhatsAppOwners({ rawMap: map, db, log: s1.log });
+    const r2 = createDbBackedWhatsAppOwners({ rawMap: map, db, log: s2.log });
+    // two resolvers racing on first use (production.ts store + knowledge.ts review wiring)
+    const [g1, g2] = await Promise.all([r1("t1", { kind: "key", admin: false }), r2("t1", { kind: "key", admin: false })]);
+    assert.deepEqual(g1.map(g => g.ownerUserId), [A]); assert.deepEqual(g2.map(g => g.ownerUserId), [A]);
+    const rows = await coll.find({}).toArray();
+    console.log("rows after race:", rows.length, "warn lines:", [...s1.lines, ...s2.lines].filter(l => l.startsWith("warn:")).length);
+    assert.equal(rows.length, 2);
+    for (const row of rows) assert.equal(row.userId, null);
+    // third boot: nothing created
+    await createDbBackedWhatsAppOwners({ rawMap: map, db, log: quiet().log })("t2", { kind: "key", admin: false });
+    assert.equal((await coll.countDocuments({})), 2);
+    // schema validation of the real inserted doc
+    const ajv = new Ajv2020({ strict: false, allErrors: true }); addFormats.default ? (addFormats as any).default(ajv) : (addFormats as any)(ajv);
+    const schema = JSON.parse(readFileSync(new URL("../../../../schema/whatsapp_links.schema.json", import.meta.url), "utf8"));
+    const validate = ajv.compile(schema);
+    for (const row of rows) { const ok = validate(row); assert.ok(ok, JSON.stringify(validate.errors)); }
+    // tenant isolation on the real accessor: t3 has nothing
+    await assert.rejects(() => createDbBackedWhatsAppOwners({ rawMap: undefined, db, log: quiet().log })("t3", { kind: "key", admin: true }), WhatsAppNotConfiguredError);
+    // lazy: constructing does not insert before first use
+    const db2 = client.db(dbName + "_lazy");
+    createDbBackedWhatsAppOwners({ rawMap: map, db: db2, log: quiet().log });
+    assert.equal(await db2.collection("whatsapp_links").countDocuments({}), 0, "no boot-time insert: seed happens only at first resolver call");
+    await db2.dropDatabase();
+  } finally { await db.dropDatabase(); await client.close(); }
+});
+
+test("probe: member naming another member's linkId, or an admin's ghost linkId, never reaches the other owner's archive", async () => {
+  const queried: string[] = []; const fetched: string[] = [];
+  const grants = { u1: [{ linkId: "1".repeat(24), ownerUserId: A }], admin: [{ linkId: "1".repeat(24), ownerUserId: A }, { linkId: "2".repeat(24), ownerUserId: B }] } as const;
+  const deps = createMongoWhatsAppDeps(undefined, {
+    resolveOwners: async (_t, caller) => (caller?.kind === "session" && caller.admin ? grants.admin : grants.u1),
+    listGroups: async (o) => { queried.push(o); return [{ groupJid: "g@g.us", ownerUserId: o, subject: "s", trackedPersonCount: 1 }]; },
+    fetchMessages: async (_j, o) => { fetched.push(o); throw new Error("stop"); },
+    appDb: () => { throw new Error("no app db"); },
+  });
+  await assert.rejects(() => deps.ingestGroup("t1", "g@g.us", { caller: { kind: "session", userId: "u1", admin: false }, linkId: "2".repeat(24) }), /no tracked WhatsApp group/);
+  assert.deepEqual(queried, [], "member's foreign linkId must not even trigger an archive query for the foreign owner");
+  await assert.rejects(() => deps.ingestGroup("t1", "g@g.us", { caller: { kind: "session", userId: "u1", admin: false } }), /stop|app db/);
+  assert.ok(!queried.includes(B) && !fetched.includes(B));
+  // injected prototype-ish linkId values are treated as absent, not as "no narrowing"
+  for (const bad of [null, 0, {}, [], "", "__proto__"] as unknown[]) {
+    await assert.rejects(() => deps.ingestGroup("t1", "g@g.us", { caller: { kind: "session", userId: "admin", admin: true }, linkId: bad as string }), /no tracked WhatsApp group/);
+  }
+  assert.ok(!fetched.includes(B));
+});
