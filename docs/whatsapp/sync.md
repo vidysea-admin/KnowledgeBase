@@ -11,7 +11,8 @@ node --import tsx scripts/whatsapp/sync-links.mjs               # service: repea
 ```
 
 - Database: `MONGODB_URL` plus `MONGO_WORK_DB` (or `MONGODB_DB`). `lkb` and `lkb_prod` are refused unless
-  `--i-know-this-is-production=true` is also passed, which is a human-approved step (D-196). `global_university_db` is always refused.
+  `--i-know-this-is-production` (the bare flag, exactly this spelling; `=true` is not recognised) is also passed together with an explicit
+  `MONGODB_DB=lkb` or `lkb_prod`, which is a human-approved step (D-196). `global_university_db` is always refused.
 - `WHATSAPP_SYNC_INTERVAL_MIN`: minutes between cycles, clamped to 5..1440, default 15 (R-31).
 - Data plane (read-only archiver Mongo): `WHATSAPP_MONGO_URL`, `WHATSAPP_MONGO_DB`. Control plane (status, unlink retry):
   `WHATSAPP_ARCHIVER_API_URL`, `WHATSAPP_ARCHIVER_API_TOKEN`. With neither set, liveness is simply unknown and the sync still runs.
@@ -20,7 +21,9 @@ node --import tsx scripts/whatsapp/sync-links.mjs               # service: repea
 
 ## What one cycle does
 
-1. Seeds the legacy owner map, then lists the tenants that have an active link.
+1. Seeds the legacy owner map (a failed seed is logged by code and retried when the tenant's links are resolved in the same cycle),
+   then lists the tenants to visit: those with an active link, the env-map tenants, and tenants whose terminal (`unlinked`/`revoked`)
+   links still carry `archiverUnlinkPending: true`, so a user's last link is still retried after it ends.
 2. Per tenant, asks the owner resolver for the active links. Requested, approved, suspended, unlinked, revoked and rejected links are never returned.
 3. Per link, under a lock `data/whatsapp-sync/link-<linkId>.lock` (T-038 token-owned protocol, `docs/t038-scheduler-service.md`):
    re-reads the link (must still be `active`), polls the archiver session status, lists that owner's marked groups, ingests each
@@ -28,7 +31,10 @@ node --import tsx scripts/whatsapp/sync-links.mjs               # service: repea
    and the link's `health.*`. Ownership of the lock is re-checked before every write; a lost lock refuses all further writes.
 4. Retries pending archiver unlinks (below).
 
-A second instance that finds the lock held writes a `skipped` run row and moves on. A stale lock is taken over only by the
+**Run exactly one scheduler instance per database.** The file lock only protects a link between processes on one host, and the
+in-flight guard for timed-out ingests is per process. A second instance that finds a link's lock held writes a `skipped` run row
+and moves on; any other lock failure (for example an unwritable `data/whatsapp-sync`) is recorded as `failed` with `errorCode: unknown`
+and logged by code, so a broken lock directory is never mistaken for healthy skipping. A stale lock is taken over only by the
 T-038 rule (same host, holder pid dead, older than the stale window); anything else leaves it alone and needs a human.
 
 ## Run record and health
@@ -39,7 +45,8 @@ T-038 rule (same host, holder pid dead, older than the stale window); anything e
 - Caps (spec section 10): 120 s per group and 20,000 messages per group. A cap hit makes the run `partial` with `errorCode: unknown`
   (the closed list has no cap code). A timed-out ingest is detached; its late finish is an idempotent upsert, and the script skips
   that group until it settles.
-- `health.lastStatus/lastStatusAt` from the archiver status; `lastRunAt`; `lastSuccessAt` only for an `ok` run.
+- `health.lastStatus/lastStatusAt` from the archiver status; `lastRunAt`; `lastSuccessAt` only for an `ok` run. `health.flags` is changed
+  with `$addToSet` / `$pull` (never replaced), so a flag another writer sets is not overwritten by a run.
 - Flags: `needs-relink` (status `logged_out`, sync skipped, cleared when status is no longer `logged_out`), `error` (run `failed`),
   `stale` (no success for 3 cycles). `quiet` is not computed here. `needs-relink` and `error` raise one alert on each new
   transition (not on each cycle). The alert is a `console.error` line with ids only; wiring it to the Telegram channel is plan H-13.
@@ -49,6 +56,10 @@ T-038 rule (same host, holder pid dead, older than the stale window); anything e
 A terminal link (`unlinked` or `revoked`) with `archiverUnlinkPending: true` gets `unlinkSession` on every cycle until it
 succeeds (an archiver answer of "owner not found/already unlinked" counts as success), then the flag is unset. W8 owns setting
 the flag and adding it to the `whatsapp_links` schema; until then there is nothing to retry.
+
+W8 dependency, not built here: the unlink retry trusts `archiverOwnerId` on the terminal row. W8 must make sure a retried
+`unlinkSession` can never hit an archiver owner that a newer link has since reused (the schema says `archiverOwnerId` is unique and
+never reused, W8 should assert that before it sets the flag).
 
 ## Not here
 

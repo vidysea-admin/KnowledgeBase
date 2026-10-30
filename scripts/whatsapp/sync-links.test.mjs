@@ -39,7 +39,9 @@ async function harness(over = {}) {
     footprint: async (_t, g, jid) => { const sid = `s:${jid}:${g.ownerUserId}`; return { turns: new Set(world.turns[sid] ?? []), candidates: new Set(world.candidates[sid] ?? []) }; },
     getStatus: async (o) => world.statuses[o] ?? null,
     recordRun: async (_t, run) => { world.runs.push(structuredClone(run)); },
-    updateHealth: async (_t, id, patch) => { world.health[id] = { ...world.health[id], ...patch }; },
+    updateHealth: async (_t, id, { flagsAdd = [], flagsRemove = [], ...rest }) => { // mirrors the wired $set + $addToSet + $pull
+      const h = { ...world.health[id], ...rest }; h.flags = [...new Set([...(h.flags ?? []), ...flagsAdd])].filter((f) => !flagsRemove.includes(f)); world.health[id] = h;
+    },
     alert: (a) => world.alerts.push(a), pendingUnlinks: async () => world.pending, unlinkArchiver: async (o) => { world.unlinked.push(o); }, confirmUnlink: async (_t, id) => { world.pending = world.pending.filter((p) => p.linkId !== id); },
     ...over,
   };
@@ -228,15 +230,19 @@ test("W9-7 pending archiver unlinks are retried each cycle until confirmed, then
 });
 
 // ---- the real wiring over an in-memory Db and the in-repo fake archiver (W3) ----
-function fakeDb() {
-  const tables = {}; const t = (n) => (tables[n] ??= []);
+function fakeDb({ failInserts = 0 } = {}) {
+  const tables = {}; const t = (n) => (tables[n] ??= []); let failing = failInserts;
+  const leaf = (r, path) => { const p = path.split("."); let o = r; for (const s of p.slice(0, -1)) o = o[s] ??= {}; return [o, p.at(-1)]; };
   const match = (r, f) => Object.entries(f).every(([k, v]) => (v && typeof v === "object" && "$in" in v ? v.$in.includes(r[k]) : r[k] === v));
   const cursor = (rows) => ({ toArray: async () => rows, project: () => cursor(rows) });
   const db = { collection: (n) => ({
     find: (f) => cursor(t(n).filter((r) => match(r, f))), findOne: async (f) => t(n).find((r) => match(r, f)) ?? null,
     distinct: async (k, f) => [...new Set(t(n).filter((r) => match(r, f)).map((r) => r[k]))],
-    insertOne: async (d) => { if (n === "whatsapp_links" && t(n).some((r) => r.archiverOwnerId === d.archiverOwnerId)) throw Object.assign(new Error("dup"), { code: 11000 }); t(n).push(structuredClone(d)); return { acknowledged: true }; },
-    updateOne: async (f, u) => { const r = t(n).find((x) => match(x, f)); if (!r) return { matchedCount: 0 }; for (const [k, v] of Object.entries(u.$set ?? {})) { const p = k.split("."); let o = r; for (const s of p.slice(0, -1)) o = o[s] ??= {}; o[p.at(-1)] = v; } for (const k of Object.keys(u.$unset ?? {})) delete r[k]; return { matchedCount: 1 }; },
+    insertOne: async (d) => { if (n === "whatsapp_links" && failing > 0) { failing--; throw Object.assign(new Error("store down SECRET-INSERT"), { name: "MongoNetworkError" }); } if (n === "whatsapp_links" && t(n).some((r) => r.archiverOwnerId === d.archiverOwnerId)) throw Object.assign(new Error("dup"), { code: 11000 }); t(n).push(structuredClone(d)); return { acknowledged: true }; },
+    updateOne: async (f, u) => { const r = t(n).find((x) => match(x, f)); if (!r) return { matchedCount: 0 }; for (const [k, v] of Object.entries(u.$set ?? {})) { const [o, last] = leaf(r, k); o[last] = v; }
+      for (const [k, v] of Object.entries(u.$addToSet ?? {})) { const [o, last] = leaf(r, k); o[last] ??= []; for (const x of v.$each) if (!o[last].includes(x)) o[last].push(x); }
+      for (const [k, v] of Object.entries(u.$pull ?? {})) { const [o, last] = leaf(r, k); if (Array.isArray(o[last])) o[last] = o[last].filter((x) => !v.$in.includes(x)); }
+      for (const k of Object.keys(u.$unset ?? {})) delete r[k]; return { matchedCount: 1 }; },
   }) };
   return { db, tables };
 }
@@ -299,4 +305,80 @@ test("W3 fake archiver: the real client drives the status poll and the unlink re
   assert.equal(tables.whatsapp_links[1].archiverUnlinkPending, undefined, "confirmed unlink clears the pending flag");
   assert.equal(fake.control.owner(owner.ownerId).state, "unlinked");
   const again = await runCycle(deps); assert.equal(again.length, 1);
+});
+
+// ---- fix cycle 1 ----
+test("W9-7 wired: a tenant whose ONLY link is a pending terminal link is listed (no faked listTenantIds); the unlink is retried until confirmed, then never again", async () => {
+  const { db, tables } = fakeDb();
+  const OC = "3".repeat(24), OD = "4".repeat(24);
+  tables.whatsapp_links = [
+    { _id: LA, tenantId: "solo", state: "unlinked", archiverOwnerId: OA, archiverUnlinkPending: true },
+    { _id: LB, tenantId: "solo-revoked", state: "revoked", archiverOwnerId: OB, archiverUnlinkPending: true },
+    { _id: "c".repeat(24), tenantId: "confirmed", state: "unlinked", archiverOwnerId: OC },
+    { _id: "d".repeat(24), tenantId: "still-live", state: "suspended", archiverOwnerId: OD, archiverUnlinkPending: true }, // not terminal: no retry
+  ];
+  const calls = []; let fail = true;
+  const archiver = { getSession: async () => null, unlinkSession: async (o) => { calls.push(o); if (fail && o === OA) throw Object.assign(new Error("SECRET"), { name: "ArchiverError", code: "archiver_api_unavailable" }); return {}; } };
+  const deps = await createWiredDeps({ db, env: {}, root: scratch(), log: quiet, archiver, storeOptions: { listGroups: async () => [], fetchMessages: async () => [] } });
+  assert.deepEqual((await deps.listTenantIds()).sort(), ["solo", "solo-revoked"]);
+  assert.deepEqual(await runCycle(deps), [], "no active link anywhere: nothing to sync, but unlinks are still driven");
+  assert.deepEqual(calls.sort(), [OA, OB].sort());
+  assert.equal(tables.whatsapp_links[0].archiverUnlinkPending, true, "a failed unlink keeps the flag");
+  assert.equal(tables.whatsapp_links[1].archiverUnlinkPending, undefined, "a confirmed unlink clears it");
+  assert.equal(tables.whatsapp_links[3].archiverUnlinkPending, true);
+  fail = false; calls.length = 0; await runCycle(deps);
+  assert.deepEqual(calls, [OA]); assert.equal(tables.whatsapp_links[0].archiverUnlinkPending, undefined);
+  calls.length = 0; await runCycle(deps); assert.deepEqual(calls, [], "confirmed: no more retries");
+  assert.deepEqual(await deps.listTenantIds(), [], "and the tenant stops being listed");
+});
+
+test("W9-8 wired: an env-map tenant whose seed fails once is still listed, so the seed is retried in the same cycle and the link syncs (kills the env-tenant union mutant)", async () => {
+  const { db, tables } = fakeDb({ failInserts: 1 });
+  const logs = [];
+  const env = { WHATSAPP_TENANT_OWNER_MAP: JSON.stringify([{ tenantId: "legacy-t", ownerUserId: OA }]) };
+  const deps = await createWiredDeps({ db, env, root: scratch(), log: (l) => logs.push(l), archiver: null, storeOptions: { listGroups: async (o) => [{ groupJid: JA, ownerUserId: o, subject: "S", trackedPersonCount: 1 }], fetchMessages: async () => [] } });
+  deps.ingestGroup = async () => ({ sessionId: "s", sourceId: "x", turnCount: 0 }); deps.footprint = async () => ({ turns: new Set(), candidates: new Set() });
+  const runs = await runCycle(deps);
+  assert.ok(logs.some((l) => /legacy seed failed/.test(l)) && !logs.join().includes("SECRET-INSERT"), "the seed failure is logged by code only");
+  assert.equal(runs.length, 1); assert.equal(runs[0].status, "ok"); assert.equal(tables.whatsapp_links.length, 1);
+});
+
+test("W9-1 a link suspended between two groups of one run: the second group is never ingested, run is partial/link_inactive", async () => {
+  const { deps, world } = await harness();
+  world.groups[OA] = [JA, "333333-3@g.us"]; world.messages["333333-3@g.us"] = ["x"];
+  const ingest = deps.ingestGroup;
+  deps.ingestGroup = async (...a) => { const r = await ingest(...a); world.links[LA].state = "suspended"; return r; }; // admin suspends right after group 1
+  const row = await syncLink(deps, T, { linkId: LA, ownerUserId: OA });
+  assert.deepEqual(world.ingests, [`${LA}:${JA}`]);
+  assert.deepEqual([row.status, row.errorCode, row.groups.length], ["partial", "link_inactive", 1]);
+});
+
+test("W9-2 a held lock is skipped (errorCode null, quiet); any other acquire failure is recorded failed/unknown and logged by code, never as healthy skipping", async () => {
+  const { deps, world, lockDir } = await harness();
+  const lockThrowing = (code) => ({ acquire: () => { throw Object.assign(new Error("EACCES /secret/path"), { name: "LockFailure", code }); }, owned: () => false, release() {} });
+  const held = await syncLink({ ...deps, lock: lockThrowing("locked") }, T, { linkId: LA, ownerUserId: OA });
+  assert.deepEqual([held.status, held.errorCode], ["skipped", null]); assert.equal(world.logs.length, 0);
+  const fault = await syncLink({ ...deps, lock: lockThrowing("lock-failed") }, T, { linkId: LA, ownerUserId: OA });
+  assert.deepEqual([fault.status, fault.errorCode], ["failed", "unknown"]);
+  assert.ok(world.logs.some((l) => /lock acquire failed \(lock-failed\)/.test(l)) && !world.logs.join().includes("secret/path"));
+  const real = await syncLink({ ...deps, lockDir: join(lockDir, "no", "such", "dir") }, T, { linkId: LB, ownerUserId: OB }); // a real lock-dir fault
+  assert.deepEqual([real.status, real.errorCode], ["failed", "unknown"]);
+  assert.equal(world.ingests.length, 0); assert.deepEqual(runOf(world, LA).map((r) => r.status), ["skipped", "failed"]);
+});
+
+test("health flags are written with $addToSet/$pull: a flag another writer sets during the run survives, and a clean run clears only ours", async () => {
+  const { db, tables } = fakeDb();
+  tables.whatsapp_links = [{ _id: LA, tenantId: T, state: "active", archiverOwnerId: OA, activatedAt: new Date().toISOString() }];
+  const deps = await createWiredDeps({ db, env: {}, root: scratch(), log: quiet, archiver: null, storeOptions: { listGroups: async (o) => [{ groupJid: JA, ownerUserId: o, subject: "S", trackedPersonCount: 1 }], fetchMessages: async () => [] } });
+  deps.footprint = async () => ({ turns: new Set(), candidates: new Set() });
+  let failing = true;
+  deps.ingestGroup = async () => {
+    const h = (tables.whatsapp_links[0].health ??= {}); if (!(h.flags ?? []).includes("quiet")) h.flags = [...(h.flags ?? []), "quiet"]; // a concurrent writer
+    if (failing) throw Object.assign(new Error("x"), { name: "WhatsAppUnavailableError" });
+    return { sessionId: "s", sourceId: "x", turnCount: 0 };
+  };
+  await runCycle(deps);
+  assert.deepEqual([...tables.whatsapp_links[0].health.flags].sort(), ["error", "quiet"]);
+  failing = false; await runCycle(deps);
+  assert.deepEqual(tables.whatsapp_links[0].health.flags, ["quiet"], "our error flag is pulled, the other writer's flag is kept");
 });

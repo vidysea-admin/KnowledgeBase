@@ -3,7 +3,7 @@
  * scripts/whatsapp/sync-links.mjs - whatsapp-multiuser W9 (R-31, R-33..R-35, R-37). Scheduled sync of every `active`
  * whatsapp_links row: one lock per link, the same reviewed ingest composition the route uses, one whatsapp_sync_runs
  * row per link run, archiver liveness into `health.*`. Operator notes: docs/whatsapp/sync.md.
- *   node --import tsx scripts/whatsapp/sync-links.mjs [--once] [--i-know-this-is-production=true]
+ *   node --import tsx scripts/whatsapp/sync-links.mjs [--once] [--i-know-this-is-production]
  * Everything outside this file is a PORT (`deps`), so the cycle is testable with fakes and a fake clock. The lock is the
  * T-038 token-owned protocol (docs/t038-scheduler-service.md). Never logs a jid, owner id, message text or upstream text.
  */
@@ -50,14 +50,21 @@ export async function syncLink(deps, tenantId, grant) {
   const row = { linkId, startedAt, status: "ok", errorCode: null, groups: [] };
   const persist = async () => { row.endedAt = deps.now().toISOString(); await deps.recordRun(tenantId, row); return row; };
   let token;
-  try { token = deps.lock.acquire(lockPath); } catch { row.status = "skipped"; return persist(); } // another instance holds it (T-038)
+  try { token = deps.lock.acquire(lockPath); } catch (e) {
+    if (e?.code === "locked") { row.status = "skipped"; return persist(); } // another instance holds it (T-038 LockFailure "locked")
+    deps.log(`link ${linkId}: lock acquire failed (${e?.code ?? e?.name ?? "error"})`); // a lock-dir fault is not healthy skipping: record it, by code only
+    row.status = "failed"; row.errorCode = "unknown"; return persist();
+  }
   const owned = () => { if (!deps.lock.owned(lockPath, token)) throw capError("LockLostError"); };
   const end = async (status, errorCode = null) => { row.status = status; row.errorCode = errorCode; owned(); return persist(); };
   try {
     const link = await deps.getLink(tenantId, linkId);
     if (!link || link.state !== "active" || link.archiverOwnerId !== ownerUserId) return await end("skipped", "link_inactive");
-    const flags = new Set(link.health?.flags ?? []), patch = { lastRunAt: startedAt }, raised = [];
-    const flag = (name, on) => { if (on && !flags.has(name)) raised.push(name); on ? flags.add(name) : flags.delete(name); };
+    const flags = new Set(link.health?.flags ?? []), patch = { lastRunAt: startedAt }, raised = [], flagsAdd = new Set(), flagsRemove = new Set();
+    const flag = (name, on) => { // flagsAdd/flagsRemove become $addToSet/$pull, so a concurrent writer's other flags are never overwritten
+      if (on && !flags.has(name)) raised.push(name);
+      on ? flags.add(name) : flags.delete(name); (on ? flagsAdd : flagsRemove).add(name); (on ? flagsRemove : flagsAdd).delete(name);
+    };
     // R-34 liveness. An unreachable control plane never stops the data-plane sync of already marked groups (section 10).
     const live = await deps.getStatus(ownerUserId).catch(() => null);
     if (live?.status && STATUS_ENUM.includes(live.status)) { patch.lastStatus = live.status; patch.lastStatusAt = startedAt; }
@@ -100,7 +107,7 @@ export async function syncLink(deps, tenantId, grant) {
     const base = Date.parse(link.health?.lastSuccessAt ?? link.activatedAt ?? startedAt);
     flag("error", row.status === "failed");
     flag("stale", !ok && Date.parse(startedAt) - base > 3 * deps.intervalMs);
-    patch.flags = [...flags];
+    patch.flagsAdd = [...flagsAdd]; patch.flagsRemove = [...flagsRemove];
     owned();
     await persist();
     await deps.updateHealth(tenantId, linkId, patch);
@@ -192,8 +199,12 @@ export async function createWiredDeps({ db, env = process.env, root, log = conso
     groupTimeoutMs: limits.groupTimeoutMs ?? DEFAULT_GROUP_TIMEOUT_MS,
     // ISS-WAOWNER-001: the legacy seed runs (through the resolver) before whatsapp_links is read to find tenants or links.
     async listTenantIds() {
-      for (const { tenantId } of entries) await resolver(tenantId, ADMIN_KEY).catch(() => {});
-      return [...new Set([...entries.map((e) => e.tenantId), ...await db.collection("whatsapp_links").distinct("tenantId", { state: "active" })])];
+      for (const { tenantId } of entries) await resolver(tenantId, ADMIN_KEY).catch((e) => { if (classifyError(e) !== "not_configured") log(`tenant ${tenantId}: legacy seed failed (${classifyError(e)})`); });
+      const links = db.collection("whatsapp_links");
+      // Tenants with an active link, plus tenants whose only links are terminal but still owe the archiver an unlink (W9-7 / R-7 retry).
+      const active = await links.distinct("tenantId", { state: "active" });
+      const owing = await links.distinct("tenantId", { state: { $in: ["unlinked", "revoked"] }, archiverUnlinkPending: true });
+      return [...new Set([...entries.map((e) => e.tenantId), ...active, ...owing])];
     },
     activeLinks: async (tenantId) => (await resolver(tenantId, ADMIN_KEY)).map(({ linkId, ownerUserId }) => ({ linkId, ownerUserId })),
     getLink: (tenantId, linkId) => stores.getLink(tenantId, linkId),
@@ -205,7 +216,12 @@ export async function createWiredDeps({ db, env = process.env, root, log = conso
     },
     getStatus: async (ownerUserId) => (client ? client.getSession(ownerUserId) : null),
     recordRun: (tenantId, run) => stores.syncRuns(tenantId).insertOne({ _id: newWhatsAppId(), ...run }),
-    updateHealth: (tenantId, linkId, patch) => stores.links(tenantId).updateOne({ _id: linkId }, { $set: Object.fromEntries(Object.entries(patch).map(([k, v]) => [`health.${k}`, v])) }),
+    async updateHealth(tenantId, linkId, { flagsAdd = [], flagsRemove = [], ...scalars }) {
+      const links = stores.links(tenantId);
+      // $addToSet with an empty $each still creates `health.flags: []`, so a clean run leaves an explicit empty list.
+      await links.updateOne({ _id: linkId }, { $set: Object.fromEntries(Object.entries(scalars).map(([k, v]) => [`health.${k}`, v])), $addToSet: { "health.flags": { $each: flagsAdd } } });
+      if (flagsRemove.length) await links.updateOne({ _id: linkId }, { $pull: { "health.flags": { $in: flagsRemove } } }); // Mongo forbids $addToSet and $pull on one path in one update
+    },
     alert: ({ kind, tenantId, linkId }) => console.error(`ALERT whatsapp-sync: link ${linkId} ${kind} (tenant ${tenantId})`), // Telegram channel is plan H-13
     // W8 contract: a terminal link with `archiverUnlinkPending: true` still owes the archiver an unlink.
     pendingUnlinks: async (tenantId) => client ? (await stores.links(tenantId).find({ state: { $in: ["unlinked", "revoked"] }, archiverUnlinkPending: true }).toArray())
