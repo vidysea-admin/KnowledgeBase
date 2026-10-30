@@ -2,8 +2,8 @@
 **Contract:** none specific; criteria A4-1..A4-10 below (D-206; docs/features/user-accounts/plan.md row A4 "ua-auth-api" acceptance items 1-10; spec.md UA-1, UA-4, UA-5, UA-11, UA-12, UA-18, UA-20..UA-25; no qa/contracts file, the maker never edits qa/contracts/)
 **Goal task:** none
 **Date:** 2026-10-30
-**Status:** ready-for-check
-**Handshake status:** ready-for-check
+**Status:** checked-PASS (dual: A 7773f672, B 63d5265d/fb9cd6a9, cycle 0)
+**Handshake status:** checked-PASS
 **Fix cycle:** 0
 **Dual check:** required
 dual-trigger: auth apps/api/src/user-accounts/auth-service.ts:184
