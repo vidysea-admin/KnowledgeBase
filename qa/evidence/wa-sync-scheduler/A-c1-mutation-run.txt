@@ -1,0 +1,12 @@
+W9-1 mid-run recheck removed (L80): green-before {"exit":0,"pass":0,"fail":0,"cancelled":0} | after {"exit":1,"pass":0,"fail":0,"cancelled":0} => KILLED red: ["W9-1 a link suspended between two groups of one run: the second group is never i"]
+W9-2 any acquire error = skipped: green-before {"exit":0,"pass":0,"fail":0,"cancelled":0} | after {"exit":1,"pass":0,"fail":0,"cancelled":0} => KILLED red: ["W9-2 a held lock is skipped"]
+W9-3a $pull removed: green-before {"exit":0,"pass":0,"fail":0,"cancelled":0} | after {"exit":1,"pass":0,"fail":0,"cancelled":0} => KILLED red: ["health flags are written with $addToSet/$pull: a flag another writer sets during"]
+W9-3b never add flags: green-before {"exit":0,"pass":0,"fail":0,"cancelled":0} | after {"exit":1,"pass":0,"fail":0,"cancelled":0} => KILLED red: ["W3 fake archiver: the real client drives the status poll and the unlink retry th","health flags are written with $addToSet/$pull: a flag another writer sets during"]
+W9-7 owing union dropped: green-before {"exit":0,"pass":0,"fail":0,"cancelled":0} | after {"exit":1,"pass":0,"fail":0,"cancelled":0} => KILLED red: ["W9-7 wired: a tenant whose ONLY link is a pending terminal link is listed"]
+W9-7x revoked dropped from owing: PATTERN MATCHES 0x
+W9-7y owing ignores the pending flag: PATTERN MATCHES 0x
+W9-8 env-map tenant union dropped: green-before {"exit":0,"pass":0,"fail":0,"cancelled":0} | after {"exit":1,"pass":0,"fail":0,"cancelled":0} => KILLED red: ["W9-8 wired: an env-map tenant whose seed fails once is still listed, so the seed"]
+W9-8b seed failure no longer logged: green-before {"exit":0,"pass":0,"fail":0,"cancelled":0} | after {"exit":1,"pass":0,"fail":0,"cancelled":0} => KILLED red: ["W9-8 wired: an env-map tenant whose seed fails once is still listed, so the seed"]
+W9-2b lock fault not logged: green-before {"exit":0,"pass":0,"fail":0,"cancelled":0} | after {"exit":1,"pass":0,"fail":0,"cancelled":0} => KILLED red: ["W9-2 a held lock is skipped"]
+W9-7x revoked dropped from owing: green-before {"exit":0,"pass":0,"fail":0,"cancelled":0} | after {"exit":1,"pass":0,"fail":0,"cancelled":0} => KILLED red: ["W9-7 wired: a tenant whose ONLY link is a pending terminal link is listed"]
+W9-7y owing ignores the pending flag: green-before {"exit":0,"pass":0,"fail":0,"cancelled":0} | after {"exit":1,"pass":0,"fail":0,"cancelled":0} => KILLED red: ["W9-7 wired: a tenant whose ONLY link is a pending terminal link is listed"]

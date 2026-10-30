@@ -1,0 +1,27 @@
+import { test, after } from "node:test";
+import assert from "node:assert/strict";
+import { mkdtempSync, rmSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+import { MongoClient } from "mongodb";
+import { runCycle, createWiredDeps } from "./sync-links.mjs";
+import { startFakeArchiver } from "../../apps/api/src/whatsapp/archiver/fake-archiver.ts";
+import { createArchiverClient } from "../../apps/api/src/whatsapp/archiver/client.ts";
+import { loadArchiverConfig } from "../../apps/api/src/whatsapp/archiver/config.ts";
+const url = process.env.W9_TEST_MONGO_URL;
+test("P7: a tenant whose ONLY link is unlinked+pending still gets its archiver unlink retried by runCycle", async () => {
+  const fake = await startFakeArchiver(); after(() => fake.stop());
+  const client = createArchiverClient(loadArchiverConfig({ WHATSAPP_ARCHIVER_API_URL: fake.url, WHATSAPP_ARCHIVER_API_TOKEN: fake.token, WHATSAPP_ARCHIVER_API_ALLOW_PRIVATE_HTTP: "1" }));
+  const owner = await client.ensureOwner("d".repeat(24)); await client.startSession(owner.ownerId);
+  const mc = await new MongoClient(url).connect(), name = `lkb_test_w9chkA_${Date.now()}`, db = mc.db(name), root = mkdtempSync(join(tmpdir(), "w9chkA-"));
+  try {
+    const at = "2026-10-30T10:00:00.000Z";
+    await db.collection("whatsapp_links").insertOne({ tenantId: "tenant-solo", _id: "e".repeat(24), userId: "u1", label: "t", state: "unlinked", live: false, studentData: "no", archiverOwnerId: owner.ownerId, archiverUnlinkPending: true, createdAt: at, updatedAt: at });
+    const deps = await createWiredDeps({ db, env: {}, root, log: () => {}, archiver: client, storeOptions: { listGroups: async () => [], fetchMessages: async () => [] } });
+    console.log("tenants:", JSON.stringify(await deps.listTenantIds()));
+    await runCycle(deps);
+    const row = await db.collection("whatsapp_links").findOne({ _id: "e".repeat(24) });
+    console.log("pending flag after cycle:", row.archiverUnlinkPending, "archiver owner state:", fake.control.owner(owner.ownerId).state);
+    assert.equal(row.archiverUnlinkPending, undefined, "pending unlink must be driven and cleared");
+  } finally { await db.dropDatabase(); await mc.close(); rmSync(root, { recursive: true, force: true }); }
+});

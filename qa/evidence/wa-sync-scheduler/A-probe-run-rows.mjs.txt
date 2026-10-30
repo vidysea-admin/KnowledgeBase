@@ -1,0 +1,33 @@
+import { test } from "node:test";
+import assert from "node:assert/strict";
+import { createRequire } from "node:module";
+import { mkdtempSync, rmSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+import { MongoClient } from "mongodb";
+import { syncLink, createWiredDeps } from "./sync-links.mjs";
+const { applyWhatsappLinks } = createRequire(import.meta.url)("../../migrations/20261029120000-whatsapp-links.cjs");
+const url = process.env.W9_TEST_MONGO_URL;
+test("P-rows: skipped (lock held), link_inactive, logged_out, failed and partial rows all pass the real validators", async () => {
+  const mc = await new MongoClient(url).connect(), db = mc.db(`lkb_test_w9chkA_${Date.now()}`), root = mkdtempSync(join(tmpdir(), "w9chkA-"));
+  try {
+    await applyWhatsappLinks(db);
+    const at = "2026-10-30T10:00:00.000Z", L = "a".repeat(24), O = "1".repeat(24), J = "111111-1@g.us";
+    await db.collection("whatsapp_links").insertOne({ tenantId: "t1", _id: L, userId: "u1", label: "t", state: "active", live: true, studentData: "no", archiverOwnerId: O, approvedBy: "admin", approvedAt: at, activatedAt: at, createdAt: at, updatedAt: at });
+    const out = [];
+    const mk = async (over, statusFn, ingest) => { const d = await createWiredDeps({ db, env: {}, root, log: () => {}, archiver: null, storeOptions: { listGroups: async () => [{ groupJid: J, ownerUserId: O, subject: "S", trackedPersonCount: 1 }], fetchMessages: async () => [] } }); return Object.assign(d, { alert: () => {} }, over); };
+    // 1 skipped: hold the lock first
+    const d1 = await mk({}); const lp = join(d1.lockDir, `link-${L}.lock`); const tok = d1.lock.acquire(lp);
+    out.push((await syncLink(d1, "t1", { linkId: L, ownerUserId: O })).status); d1.lock.release(lp, tok);
+    // 2 logged_out
+    out.push((await syncLink(await mk({ getStatus: async () => ({ status: "logged_out" }) }), "t1", { linkId: L, ownerUserId: O })).status);
+    // 3 failed: listing failure
+    out.push((await syncLink(await mk({ listGroups: async () => { throw Object.assign(new Error("x"), { name: "WhatsAppUnavailableError" }); } }), "t1", { linkId: L, ownerUserId: O })).status);
+    // 4 partial via size cap / ingest error with group errorCode
+    out.push((await syncLink(await mk({ ingestGroup: async () => { throw Object.assign(new Error("x"), { name: "GroupSizeCapError" }); }, listGroups: async () => [{ groupJid: J }] }), "t1", { linkId: L, ownerUserId: O })).status);
+    console.log("statuses:", out.join(","), "rows:", await db.collection("whatsapp_sync_runs").countDocuments());
+    assert.deepEqual(out, ["skipped", "skipped", "failed", "partial"]);
+    assert.equal(await db.collection("whatsapp_sync_runs").countDocuments(), 4);
+    console.log("health:", JSON.stringify((await db.collection("whatsapp_links").findOne({ _id: L })).health));
+  } finally { await db.dropDatabase(); await mc.close(); rmSync(root, { recursive: true, force: true }); }
+});
