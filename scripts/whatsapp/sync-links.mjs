@@ -6,6 +6,9 @@
  *   node --import tsx scripts/whatsapp/sync-links.mjs [--once] [--i-know-this-is-production]
  * Everything outside this file is a PORT (`deps`), so the cycle is testable with fakes and a fake clock. The lock is the
  * T-038 token-owned protocol (docs/t038-scheduler-service.md). Never logs a jid, owner id, message text or upstream text.
+ * W12 (R-38, D-211, gate H-13): each recorded run writes one `sync.completed` / `sync.failed` event and a raised needs-relink alert writes one
+ * `link.needs_relink` event (ids, counts, codes only; docs/whatsapp/events.md). Admin alerts go to the in-app feed through the small sink below; no
+ * email or Telegram sender exists, and a later channel is one more function in `channels`.
  */
 import { join, resolve, dirname } from "node:path";
 import { mkdirSync } from "node:fs";
@@ -41,6 +44,23 @@ function withTimeout(promise, ms, onLate) {
   return Promise.race([promise, cap]).catch((e) => { if (isCap(e)) promise.then(onLate, onLate); throw e; }).finally(() => clearTimeout(timer));
 }
 const diff = (after, before) => [...after].filter((id) => !before.has(id)).length;
+const RUN_ID = /^[0-9a-f]{24}$/, count = (n) => (Number.isInteger(n) && n >= 0 ? n : 0);
+/** R-38 event for one recorded run, or null (a skipped run is not a sync result). Counts and the closed error code only. */
+function runEvent(row, runId) {
+  if (row.status !== "ok" && row.status !== "failed" && row.status !== "partial") return null;
+  const sum = (k) => row.groups.reduce((n, g) => n + count(g[k]), 0);
+  const data = { groupCount: row.groups.length, fetched: sum("fetched"), newTurns: sum("newTurns"), candidatesCreated: sum("candidatesCreated"), ...(typeof runId === "string" && RUN_ID.test(runId) ? { runId } : {}) };
+  return row.status === "ok" ? { eventType: "sync.completed", actorKind: "system", linkId: row.linkId, data }
+    : { eventType: "sync.failed", actorKind: "system", linkId: row.linkId, data: { errorCode: ERROR_CODES.includes(row.errorCode) ? row.errorCode : "unknown", ...data } };
+}
+/** H-13 admin-notification sink: `notify({kind, tenantId, linkId})` fans out to channels; one failing channel never stops another or the run. */
+export function createAdminAlertSink({ channels, log }) {
+  return { async notify(alert) { for (const channel of channels) { try { await channel(alert); } catch (e) { log(`alert channel failed (${classifyError(e)})`); } } } };
+}
+/** The in-app channel: the events feed IS the admin notification list (admin-only, tenant-scoped). An "error" alert needs no row of its own: the failed run already wrote `sync.failed`. */
+export const feedChannel = (appendEvent) => async ({ kind, tenantId, linkId }) => {
+  if (kind === "needs-relink") await appendEvent(tenantId, { eventType: "link.needs_relink", actorKind: "system", linkId, data: { reason: "logged_out" } });
+};
 
 /** One link, one cycle. Returns the run row (also persisted). A lock that is lost mid-run refuses every further write. */
 export async function syncLink(deps, tenantId, grant) {
@@ -48,7 +68,12 @@ export async function syncLink(deps, tenantId, grant) {
   const lockPath = join(deps.lockDir, `link-${linkId}.lock`);
   if (!LINK_ID.test(linkId)) throw new Error("syncLink: invalid link id");
   const row = { linkId, startedAt, status: "ok", errorCode: null, groups: [] };
-  const persist = async () => { row.endedAt = deps.now().toISOString(); await deps.recordRun(tenantId, row); return row; };
+  const persist = async () => {
+    row.endedAt = deps.now().toISOString();
+    const runId = await deps.recordRun(tenantId, row), event = runEvent(row, runId);
+    if (event && deps.appendEvent) await deps.appendEvent(tenantId, event).catch(() => deps.log(`link ${linkId}: event write failed (event_write_failed)`)); // state is authoritative; by code only
+    return row;
+  };
   let token;
   try { token = deps.lock.acquire(lockPath); } catch (e) {
     if (e?.code === "locked") { row.status = "skipped"; return persist(); } // another instance holds it (T-038 LockFailure "locked")
@@ -111,7 +136,7 @@ export async function syncLink(deps, tenantId, grant) {
     owned();
     await persist();
     await deps.updateHealth(tenantId, linkId, patch);
-    for (const kind of raised.filter((k) => k === "needs-relink" || k === "error")) deps.alert({ kind, tenantId, linkId }); // R-35, admins only, once per transition
+    for (const kind of raised.filter((k) => k === "needs-relink" || k === "error")) await Promise.resolve(deps.alert({ kind, tenantId, linkId })).catch(() => deps.log(`link ${linkId}: alert failed (alert_failed)`)); // R-35, admins only, once per transition
     return row;
   } catch (e) {
     if (e?.name === "LockLostError") { deps.log(`link ${linkId}: lock ownership lost; writes refused`); return row; }
@@ -194,8 +219,10 @@ export async function createWiredDeps({ db, env = process.env, root, log = conso
     } }).whatsapp;
   const lockDir = join(root, "data", "whatsapp-sync");
   mkdirSync(lockDir, { recursive: true });
+  const appendEvent = async (tenantId, event) => { await stores.events(tenantId).insert(event); };
+  const alerts = createAdminAlertSink({ channels: [feedChannel(appendEvent)], log });
   return {
-    now, log, lockDir, lock: await createFileLock(lockOptions), inflight: new Set(), intervalMs: clampIntervalMinutes(env.WHATSAPP_SYNC_INTERVAL_MIN) * 60_000,
+    now, log, lockDir, appendEvent, lock: await createFileLock(lockOptions), inflight: new Set(), intervalMs: clampIntervalMinutes(env.WHATSAPP_SYNC_INTERVAL_MIN) * 60_000,
     groupTimeoutMs: limits.groupTimeoutMs ?? DEFAULT_GROUP_TIMEOUT_MS,
     // ISS-WAOWNER-001: the legacy seed runs (through the resolver) before whatsapp_links is read to find tenants or links.
     async listTenantIds() {
@@ -215,14 +242,14 @@ export async function createWiredDeps({ db, env = process.env, root, log = conso
       return { turns: await ids("turns", { sessionId }), candidates: await ids("whatsapp_candidates", { sessionId }) };
     },
     getStatus: async (ownerUserId) => (client ? client.getSession(ownerUserId) : null),
-    recordRun: (tenantId, run) => stores.syncRuns(tenantId).insertOne({ _id: newWhatsAppId(), ...run }),
+    recordRun: async (tenantId, run) => { const _id = newWhatsAppId(); await stores.syncRuns(tenantId).insertOne({ _id, ...run }); return _id; },
     async updateHealth(tenantId, linkId, { flagsAdd = [], flagsRemove = [], ...scalars }) {
       const links = stores.links(tenantId);
       // $addToSet with an empty $each still creates `health.flags: []`, so a clean run leaves an explicit empty list.
       await links.updateOne({ _id: linkId }, { $set: Object.fromEntries(Object.entries(scalars).map(([k, v]) => [`health.${k}`, v])), $addToSet: { "health.flags": { $each: flagsAdd } } });
       if (flagsRemove.length) await links.updateOne({ _id: linkId }, { $pull: { "health.flags": { $in: flagsRemove } } }); // Mongo forbids $addToSet and $pull on one path in one update
     },
-    alert: ({ kind, tenantId, linkId }) => console.error(`ALERT whatsapp-sync: link ${linkId} ${kind} (tenant ${tenantId})`), // Telegram channel is plan H-13
+    alert: (alert) => alerts.notify(alert), // H-13: in-app admin notifications (the events feed); no Telegram, no email
     // W8 contract: a terminal link with `archiverUnlinkPending: true` still owes the archiver an unlink.
     pendingUnlinks: async (tenantId) => client ? (await stores.links(tenantId).find({ state: { $in: ["unlinked", "revoked"] }, archiverUnlinkPending: true }).toArray())
       .filter((l) => typeof l.archiverOwnerId === "string").map((l) => ({ linkId: l._id, ownerUserId: l.archiverOwnerId })) : [],

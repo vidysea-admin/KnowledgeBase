@@ -5,7 +5,7 @@ import assert from "node:assert/strict";
 import { mkdtempSync, rmSync, readdirSync, writeFileSync, unlinkSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { clampIntervalMinutes, classifyError, runCycle, startScheduler, syncLink, createFileLock, createWiredDeps, ERROR_CODES } from "./sync-links.mjs";
+import { clampIntervalMinutes, classifyError, runCycle, startScheduler, syncLink, createFileLock, createWiredDeps, ERROR_CODES, createAdminAlertSink, feedChannel } from "./sync-links.mjs";
 import { startFakeArchiver } from "../../apps/api/src/whatsapp/archiver/fake-archiver.ts";
 import { createArchiverClient } from "../../apps/api/src/whatsapp/archiver/client.ts";
 import { loadArchiverConfig } from "../../apps/api/src/whatsapp/archiver/config.ts";
@@ -21,7 +21,7 @@ const T0 = Date.parse("2026-10-30T10:00:00.000Z");
 async function harness(over = {}) {
   const lockDir = scratch(), clock = { t: T0 };
   const world = { links: { [LA]: { _id: LA, tenantId: T, state: "active", archiverOwnerId: OA, activatedAt: "2026-10-30T09:55:00.000Z" }, [LB]: { _id: LB, tenantId: T, state: "active", archiverOwnerId: OB, activatedAt: "2026-10-30T09:55:00.000Z" } },
-    groups: { [OA]: [JA], [OB]: [JB] }, messages: { [JA]: ["m1", "m2"], [JB]: ["m1"] }, turns: {}, candidates: {}, runs: [], health: {}, alerts: [], ingests: [], statuses: {}, unlinked: [], pending: [], logs: [], failIngest: {} };
+    groups: { [OA]: [JA], [OB]: [JB] }, messages: { [JA]: ["m1", "m2"], [JB]: ["m1"] }, turns: {}, candidates: {}, runs: [], health: {}, alerts: [], events: [], ingests: [], statuses: {}, unlinked: [], pending: [], logs: [], failIngest: {} };
   const deps = {
     now: () => new Date(clock.t), log: (l) => world.logs.push(l), lockDir, lock: await createFileLock(), inflight: new Set(), intervalMs: 15 * 60_000, groupTimeoutMs: 200,
     listTenantIds: async () => [T], activeLinks: async () => Object.values(world.links).filter((l) => l.state === "active").map((l) => ({ linkId: l._id, ownerUserId: l.archiverOwnerId })),
@@ -38,7 +38,8 @@ async function harness(over = {}) {
     },
     footprint: async (_t, g, jid) => { const sid = `s:${jid}:${g.ownerUserId}`; return { turns: new Set(world.turns[sid] ?? []), candidates: new Set(world.candidates[sid] ?? []) }; },
     getStatus: async (o) => world.statuses[o] ?? null,
-    recordRun: async (_t, run) => { world.runs.push(structuredClone(run)); },
+    recordRun: async (_t, run) => { world.runs.push(structuredClone(run)); return world.runs.length.toString(16).padStart(24, "0"); },
+    appendEvent: async (t, e) => { if (world.eventsFail) throw new Error("SECRET-EVENT-TEXT"); world.events.push({ tenantId: t, ...structuredClone(e) }); },
     updateHealth: async (_t, id, { flagsAdd = [], flagsRemove = [], ...rest }) => { // mirrors the wired $set + $addToSet + $pull
       const h = { ...world.health[id], ...rest }; h.flags = [...new Set([...(h.flags ?? []), ...flagsAdd])].filter((f) => !flagsRemove.includes(f)); world.health[id] = h;
     },
@@ -381,4 +382,30 @@ test("health flags are written with $addToSet/$pull: a flag another writer sets 
   assert.deepEqual([...tables.whatsapp_links[0].health.flags].sort(), ["error", "quiet"]);
   failing = false; await runCycle(deps);
   assert.deepEqual(tables.whatsapp_links[0].health.flags, ["quiet"], "our error flag is pulled, the other writer's flag is kept");
+});
+
+test("W12 sync.completed / sync.failed: one event per recorded run (ids, counts, codes); skipped runs emit none; a failing event write never fails the run", async () => {
+  const { deps, world } = await harness();
+  await runCycle(deps);
+  const a = world.events.filter((e) => e.linkId === LA);
+  assert.deepEqual(a.map((e) => [e.eventType, e.actorKind]), [["sync.completed", "system"]]);
+  assert.deepEqual(a[0].data, { groupCount: 1, fetched: 2, newTurns: 2, candidatesCreated: 2, runId: "1".padStart(24, "0") });
+  world.failIngest[LA] = "WhatsAppUnavailableError"; world.events.length = 0; await runCycle(deps);
+  assert.deepEqual(world.events.filter((e) => e.linkId === LA).map((e) => [e.eventType, e.data.errorCode]), [["sync.failed", "archive_unreachable"]]);
+  assert.equal(world.events.length, 2, "link B completed once, link A failed once");
+  world.statuses[OA] = { status: "logged_out", updatedAt: "x" }; world.events.length = 0; await runCycle(deps);
+  assert.deepEqual(world.events.map((e) => e.linkId), [LB], "A's run is skipped (logged out): no sync event");
+  world.eventsFail = true; world.runs.length = 0; assert.equal((await syncLink(deps, T, { linkId: LB, ownerUserId: OB })).status, "ok");
+  assert.equal(runOf(world, LB).length, 1); assert.ok(world.logs.some((l) => l.includes("event_write_failed")) && !world.logs.join("\n").includes("SECRET-EVENT-TEXT"));
+});
+
+test("W12/H-13 the admin alert sink writes link.needs_relink once per transition (not per cycle); an error alert is the run's own sync.failed; a broken channel never stops another", async () => {
+  const { deps, world } = await harness();
+  const bad = async () => { throw new Error("SECRET-MAIL-TEXT"); }, sink = createAdminAlertSink({ channels: [bad, feedChannel(deps.appendEvent)], log: deps.log });
+  deps.alert = sink.notify; world.statuses[OA] = { status: "logged_out", updatedAt: "x" };
+  await runCycle(deps); await runCycle(deps);
+  assert.deepEqual(world.events.filter((e) => e.eventType === "link.needs_relink"), [{ tenantId: T, eventType: "link.needs_relink", actorKind: "system", linkId: LA, data: { reason: "logged_out" } }]);
+  world.statuses[OA] = { status: "connected", updatedAt: "x" }; world.failIngest[LA] = "WhatsAppUnavailableError"; world.events.length = 0; await runCycle(deps);
+  assert.deepEqual(world.events.filter((e) => e.linkId === LA).map((e) => e.eventType), ["sync.failed"], "the error flag raises an alert whose feed entry is the sync.failed above");
+  assert.ok(!world.logs.join("\n").includes("SECRET-MAIL-TEXT")); assert.ok(!JSON.stringify(world.events).match(/@g\.us|SECRET|11111/), "no jid, owner id or text in any event");
 });
