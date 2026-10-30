@@ -3,7 +3,7 @@
 **Goal task:** whatsapp-multiuser W10 `wa-links-web` (manifest slug `wa-web`)
 **Date:** 2026-10-30
 **Policy-Version:** proportional-verification/2026-10-19.17
-**Status:** ready-for-check
+**Status:** checked-PASS (dual: qa/verdicts/wa-web.md PASS 1cef3dd9, qa/verdicts/wa-web.b.md PASS f6999773; cycle 0)
 **Handshake status:** ready-for-check
 **Fix cycle:** 0
 **Dual check:** required
