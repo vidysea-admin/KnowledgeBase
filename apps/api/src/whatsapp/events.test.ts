@@ -170,7 +170,7 @@ test("C3 (wa-events-cursor) docs/whatsapp/events.md states the delivery guarante
   const src = readFileSync(new URL("packages/db/src/collections/whatsapp-links.ts", ROOT), "utf8");
   assert.ok(/\.sort\(\{ _id: 1 \}\)/.test(src) && !/sort\(\{ at:/.test(src) && /filter\._id = \{ \$gt: cursor\._id \}/.test(src), "the code pages by _id only");
   assert.ok(!/ordered by `\(at, id\)`/.test(doc) && !/\(at, id\)/.test(doc), "the stale (at, id) ordering claim is gone");
-  for (const needle of ["## Delivery guarantee", "ordered by `id`", "`at` is the writer's own timestamp", "not monotonic", "dedupe on `id`", "settle", "unknown_cursor"]) assert.ok(doc.includes(needle), needle);
+  for (const needle of ["## Delivery guarantee", "ordered by `id`", "`at` is the writer's own timestamp", "not monotonic", "dedupe on `id`", "Residual window", "settle", "unknown_cursor"]) assert.ok(doc.includes(needle), needle);
   assert.ok(/[Nn]ot exactly-once/.test(doc) && /in flight/.test(doc) && /clock/.test(doc), "the residual window (in-flight insert, host clocks) is named, not hidden");
   assert.ok(!/never skip|cannot miss|guaranteed delivery|exactly once delivery/i.test(doc), "no over-claim");
 });

@@ -149,6 +149,7 @@ test("C2 paging is tenant-scoped and an unknown cursor (absent, or another tenan
   assert.deepEqual((await a.list()).map((e) => e._id), [a1._id, a2._id]); assert.deepEqual((await b.list()).map((e) => e._id), [b1._id, b2._id]);
   assert.deepEqual((await a.list({ afterId: a1._id })).map((e) => e._id), [a2._id], "tenant-b rows interleaved by id never appear");
   assert.deepEqual((await a.list({ linkId: "6a8d0c692fcc75f0e911b802", afterId: a1._id })).map((e) => e._id), [a2._id]);
+  assert.deepEqual((await a.list({ linkId: "6a8d0c692fcc75f0e911b801" })).map((e) => e._id), [a1._id], "the link filter still applies beside the cursor key");
   await assert.rejects(() => b.list({ afterId: a1._id }), /unknown cursor/); await assert.rejects(() => a.list({ afterId: b1._id }), /unknown cursor/);
   await assert.rejects(() => a.list({ afterId: "ffffffffffffffffffffffff" }), /unknown cursor/);
 });
