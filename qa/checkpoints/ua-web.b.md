@@ -15,3 +15,11 @@ env = Windows 11, Node, Chromium via Playwright, mongod 7.0 (local, db lkb_chk_u
 | Diff scope | `git diff 146f23da..HEAD` | 23 files, in scope, no deletions |
 
 Reuse: none of this is reusable by the other coordinator (blind). Leftovers owned by this checker: mongod, API :3399 and :3398, stand-in web :8099 and :8098 (stopped at close).
+
+## Cycle 1 (repair check, coordinator B) - 2026-10-30
+- Head 1aa2dd93, fix diff 7d5eef2f..HEAD, code 2074f299. Verdict: PASS (qa/verdicts/ua-web.b.md). Prior-cycle B verdict kept as qa/verdicts/ua-web.b.r0-1.md.
+- A7 verify commands: 14 files, 161 passed, exit 0, no Unhandled Errors; tsc exit 0.
+- Live walk on local mongod + API from a git-archive copy (root mount and /knowledgebase mount): signup, verify, approve, login, persistence, logout, viewer scoping, revoke all pass; zero JS page errors.
+- Falsification floor 5/5 green-before/red-after, restored to HEAD hashes.
+- PROPOSED-ISSUE P1 (high): /meeting-bot signs the user out (capture-readiness router needs req.auth.keyId -> 401, client treats any 401 as session end). P2, P3 low.
+- All started PIDs stopped; bound tree untouched apart from this commit.

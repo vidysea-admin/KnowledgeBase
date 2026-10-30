@@ -1,48 +1,43 @@
-# Verdict: ua-web (coordinator B, blind dual check)
-
-**Cycle checked:** 0
-**Unit:** A7 ua-web · **Base:** 146f23da · **Head:** 7d5eef2f · **Tier:** L (auth, apps/web/src/api/client.ts:42)
-**Policy-Version:** proportional-verification/2026-10-19.17
-**Checkpoint:** qa/checkpoints/ua-web.b.md
-**VERDICT: PASS**
+# Verdict — ua-web (coordinator B, cycle 1, repair check)
+Date: 2026-10-30 · Bound root: D:/KnowledgeBase/.worktrees/ua-web · Base 146f23da · Head 1aa2dd93 (fix diff 7d5eef2f..HEAD, code 2074f299) · Policy-Version: proportional-verification/2026-10-19.17 · Cycle checked: 1
+(The prior-cycle B verdict is kept as qa/verdicts/ua-web.b.r0-1.md and was not consulted.)
 
 ## Check plan (step 0)
-Contract: docs/features/user-accounts/plan.md A7 items 1-7 + spec.md (no qa/contracts file). Evidence rebuilt on a pristine `git archive` of HEAD
-(junctioned node_modules; the bound worktree was never written). Real browser (Playwright/Chromium) against a vite production build served by a
-stand-in for the nginx routing, a real API (A3 routes, `AUTH_CSRF_SECRET`, `USER_SIGNUP_TENANT=toc`) and a throwaway local mongod 7.0. SERIAL: own
-execution, because delegation of sub-checkers was refused by the handoff adapter (unknown Claude agent schema); no work was skipped for it.
+Tier L (dual trigger apps/web/src/api/client.ts:42). UI changed -> live browser walk on a local stack (mongod 7.0 on 127.0.0.1:27555, db uacheck_work; API started with a clean environment from a git-archive copy outside the bound root; production never touched). Logic -> re-run the A7 verify commands + falsification floor. Security read of the repair diff (client.ts, AuthContext.tsx, WriteScope.tsx, LoginPage safeFrom). Everything ran in a copy under the session scratchpad; the bound tree stayed clean before this verdict. All PIDs I started (mongod, 2 API, 2 static/proxy servers) were stopped.
 
-## Per-criterion
-- A7-1 PASS. Live T1..T5 on the work stack: signup -> check-email (DB `unverified`) -> admin issue-link (csrf present) -> `/verify#token` strips the fragment,
-  no API call before the click, then verify 200 (`pending`) -> pending login lands on `/pending`, `/ask` bounces back -> admin approve role member (DB active,
-  `approved` auth_event) -> member uses app, nav has no admin entries -> reopen restores via `GET /auth/session` -> sign out `POST /auth/logout` 200 -> `/api/sessions` 401.
-  Zero uncaught JS or React errors on any page. Browser-logged resource errors exist (see P2); that is the literal "console error count 0" wording.
-- A7-2 PASS. Live viewer: read-only banner shown, no admin nav; forced `POST /sessions`, `POST /keys`, `PUT /answer-policies`, `DELETE /sessions/x` with a valid CSRF proof all 403 `read_only_role`; reads 200.
-- A7-3 PASS. Live under `/knowledgebase` (API `APP_BASE_PATH=/knowledgebase`): `/` redirects to `/knowledgebase/login`, all 46 anchors carry the prefix (0 root-absolute), cookie `lkb_sid` Path=/knowledgebase/api HttpOnly SameSite=Strict, deep link reload works, protected route signed out goes to login; `noRootAbsoluteHrefs` green (suite 126/126).
-- A7-4 PASS. localStorage and sessionStorage empty after login, restore and logout; `document.cookie` empty; CSRF proof re-fetched from `GET /auth/session` after reload (write without header 403 `csrf`).
-- A7-5 PASS. Admin `revoke-sessions` while the viewer was signed in: next call 401 -> login page with "this session has ended; sign in again", exactly 1 request, no loop after a further 2.5 s. Stale-401 fence killed by mutant 5b.
-- A7-6 PASS. LoginGate/AuthContext/client/sessions suites green, `/login/key` path and flag-off path covered (mutant 6 killed 5 tests).
-- A7-7 PASS. Failure states render under test (cookies blocked, 429, 503 not configured and unavailable, locked looks like wrong password, `signup_not_configured`, rejected). Live: 502 from a dead API shows a clear message.
+## Evidence
+- A7 verify commands, one combined run of 14 files (App.accounts, App.readonly, AccountPages, AuthContext.session, client.session, AuthContext.ordering, AuthContext.replay, LoginGate, AuthContext, client, sessions, noRootAbsoluteHrefs, App.routes, App.wiring): 161 passed, 0 failed, exit 0, no "Unhandled Errors" block (FAIL-1 exit is fixed). `tsc --noEmit` exit 0.
+- LIVE, root mount (one origin): T1 signed-out `/` -> `/login`; "Create an account" -> `/signup` -> `/signup/check-email`; users row `unverified`. T2 admin issues the link (shown once); a private window opens `/verify#token=..`, address bar becomes `/verify`, Confirm -> row `pending`. T3 sign-in -> `/pending`; `/ask` -> `/pending`. T4 admin Approve with role member -> row `active`/`member`, `approved` auth_event. T5 member: `/ask` works, no banner, no Users nav; localStorage and sessionStorage empty after login; cookie `lkb_sid` httpOnly, SameSite Strict, persistent; a new context holding only persistent cookies is still signed in on `/ask`; Sign out -> `/login`; `fetch('/api/sessions')` 200 before, 401 after. Zero JS pageerrors on every page walked.
+- LIVE A7-2: a viewer (approved by the admin through the UI) sees the read-only banner everywhere. On the 16 whole-page write routes (/ingest /settings /connectors /knowledge-outputs /accounts /automation /automation/forms /championship /calibration-review /extraction-review /label-review /answer-review /answer-policy /answer-policies /knowledge/collections /whatsapp) a `fieldset.write-scope[disabled]` is present and no enabled control sits outside the sidebar and search box; `/ask` stays usable. Devtools `POST /api/ingest` and `POST /api/keys` with a valid CSRF proof -> 403 `read_only_role`; without the proof -> 403 `csrf`.
+- LIVE A7-3, mount `/knowledgebase` (API APP_BASE_PATH=/knowledgebase): `/knowledgebase/` -> `/knowledgebase/login`; auth links `/knowledgebase/signup|forgot|login/key`; no root-absolute href after login; cookie `Path=/knowledgebase/api`; `/knowledgebase/ask` works; Sign out -> `/knowledgebase/login`, API 401.
+- LIVE A7-5: admin "Sign out all sessions" on a logged-in member; the member's next call -> 401 `session_revoked`, UI on `/login` showing "this session has ended; sign in again", exactly one 401, no loop after 2.5 s, re-login returns to `/sessions`.
+- A7-6 / A7-7: existing LoginGate / AuthContext / client suites are green in the run above; A7-7 failure states (cookies blocked, 429, 503, locked) were checked by component tests only, not live.
 
-## Falsification (floor; per-mutation copy, green-before, red-after, restore, hash equals pristine)
-M2 readOnly=false: killed (2 tests). M3 `<a href="/login">`: killed (guard). M4 csrf to localStorage: killed (3). M4b unsafe-method set minus POST: killed (7).
-M5a revoked clears no session: killed (1). M5b stale-401 fence removed: killed (3). M6 `Token` for `Bearer`: killed (5). M7 signup_not_configured message removed: killed (1).
-**M1 SURVIVED**: deleting `if (accountState === "pending") return <Navigate to="/pending" />` (App.tsx:140) leaves 14/14 green. Live walk shows the guard works (T3), so product behaviour holds; the test gap is P3.
+## Falsification floor (throwaway copy, per-mutation byte backup, `git hash-object` == `rev-parse HEAD:` after each)
+| Crit | Mutation | Result |
+|---|---|---|
+| A7-1 | fixture catch-all `sources/keys/gaps` removed (App.accounts.test.tsx) | 19 pass, but exit 1 with Unhandled Errors (FAIL-1 reproduced) |
+| A7-2 | `WriteScope` made inert (WriteScope.tsx) | 20 failed / 4 passed in App.readonly |
+| A7-5 | signOut not-confirmed branch removed (AuthContext.tsx:175) | 3 failed |
+| A7-5 | stale-401 guard `sentSession !== authSession` removed (client.ts:61) | 2 failed |
+| A7-4 | CSRF token mirrored to localStorage (client.ts:39) | 3 failed |
+All five restored with hashes equal to HEAD. Mutants beyond the floor: 0.
 
-## Diff scope (4c)
-23 files, all inside A7 (apps/web/src/api, auth, layout, pages/user-accounts, App.tsx, styles.css, tests), 1702 insertions, no deletions, LoginGate.tsx and config/ untouched. Bound worktree clean.
+## Criteria
+A7-1 MET (live T1..T5 asserted by state change; console count see P2) · A7-2 MET as "disabled inside a read-only scope" (builder open point 3 accepted: control present but inert, server 403 proven live) · A7-3 MET live + guard test · A7-4 MET · A7-5 MET live + unit · A7-6 MET · A7-7 MET (tests).
+FAIL-1 (test exit) fixed. FAIL-2 (viewer write controls) fixed on every route reachable live; /meeting-bot is covered by tests only because of P1.
 
-## Proposed issues (dual check: no ledger writes)
-PROPOSED-ISSUE: {"id":"P1","sev":"medium","criterion":"A7-6","title":"App.accounts.test.tsx exits 1: 14/14 pass but 3 unhandled errors","detail":"Test 'API key path still works (item 6)' renders the real DashboardPage against a fake returning {}; DashboardPage.tsx:53/54/60 throw 'Cannot read properties of undefined (reading filter/length)'. `vitest run src/App.accounts.test.tsx` exits 1 (reproduced twice); manifest said '0 failed'.","fix_direction":"make the fake return arrays for /sources /keys /gaps (or stub the page)"}
-PROPOSED-ISSUE: {"id":"P2","sev":"medium","criterion":"A7-1","title":"Browser console shows resource-load errors on normal pages","detail":"Every signed-out load logs 'Failed to load resource: 401' from the restore probe GET /auth/session; Dashboard fires GET /keys which 403s for every cookie principal (also admin); /answer-policies 403 for member on /ask. No JS errors. Literal 'console error count 0 per page' is unattainable without a server non-401 probe response or the dashboard skipping /keys for cookie sessions.","fix_direction":"amend A7-1 wording to 'no uncaught JS errors' or add a quiet probe route and gate /keys on API-key principals"}
-PROPOSED-ISSUE: {"id":"P3","sev":"low","criterion":"A7-1","title":"No test kills removal of the AccountGate pending redirect","detail":"App.tsx:140 survives mutation (14/14 green); the T3 test only covers the redirect made by LoginPage after sign-in, not a pending session navigating directly to a gated URL.","fix_direction":"add a test: pending session, visit /ask, expect /pending"}
-PROPOSED-ISSUE: {"id":"P4","sev":"low","criterion":"A7-5","title":"Login redirect state `from` survives sign-out and is honoured by the next user","detail":"After sign-out the redirect to /login carries state from=<page>; a different account signing in on that history entry lands on the previous user's page (a member landed on an admin user-detail URL, 403 only). Mostly an info-leak of a URL; no data shown.","fix_direction":"clear `from` on sign-out or ignore it when the signed-in user differs"}
+PROPOSED-ISSUE: {"id":"P1","sev":"high","type":"integration","title":"Opening /meeting-bot signs every account user out","evidence":"live: member and viewer session, GET /api/meeting-bot/capture-readiness -> 401 {error:unauthorized} (apps/api/src/capture-readiness/router.ts:14 requires req.auth.keyId, a cookie session principal has none); apps/web/src/api/client.ts:164 treats every 401 on the session credential as session end, so the UI shows the login page 'You were signed out'. Only /meeting-bot among 40 routes did this. About 20 other routers read auth.keyId (hosting, automation, counsellor-accounts, label-review, ...) and may do the same for data-gated calls.","fix_direction":"server: keyless session principals get 403 (or resolve to a principal) on keyId-guarded routers; optionally web: sign out only on 401 session_revoked/session_expired or a 401 from /auth/session, not on a route-level 401","owner":"api integration (A4/A6 principal) plus web"}
+PROPOSED-ISSUE: {"id":"P2","sev":"low","type":"console","title":"Browser console error lines on normal account use","evidence":"live: 401 GET /auth/session on every signed-out first load (restore probe); 403 GET /api/keys from DashboardPage for every account user; 403 GET /api/answer-policies on /ask for a member. No JS exceptions. The criterion text says console error count 0; the brief put 401/403 console wording out of scope, so not blocking.","fix_direction":"skip listKeys for session principals; accept the session probe 401 or answer it 200 anonymous"}
+PROPOSED-ISSUE: {"id":"P3","sev":"low","type":"ux","title":"Whole-page WriteScope also disables read-only interactions on those pages","evidence":"the fieldset disables every button/select inside the wrapped route (filters and tabs on /automation, /championship, ...), so a viewer cannot browse them. Also POST /api/ask returned 429 for a viewer after one earlier call in the run (rate limiter, not investigated).","fix_direction":"scope only the write sections where a page mixes reads and writes"}
 
-## Not defects (builder-declared)
-`userAccounts` runtime flag missing from docker/40-lkb-runtime-config.sh; viewer controls not hidden per page (server 403 proven live); dev mode cross-origin; KnowledgeSpeakerProfilePage.test.tsx pre-existing red.
-
-LIVE-BROWSER: Playwright/Chromium, local stack http://localhost:8099 (base "") and http://localhost:8098/knowledgebase; screenshots only in the checker scratchpad.
-CAPABILITY-COVERAGE: not-applicable (no capability rows in the A7 contract)
-ISSUES-WRITTEN: none (dual check; findings are PROPOSED-ISSUE P1..P4)
-EXECUTOR: claude-sonnet-subagent
-Metrics: start=2026-10-30T06:05:00Z end=2026-10-30T06:48:00Z wall_min=43 agent_min=unavailable blocked_min=0 suite_runs=3 repeat_runs=2 mutations=9 cycle=0 resumes=0 tokens=unavailable policy=proportional-verification/2026-10-19.17 check_s=2580 mutants=9 defects_unit=0 defects_6c=0
+VERDICT: PASS
+SCOREBOARD: 7/7 criteria met, 3/3 invariants hold (storage clean, stale-401 guard, base path)
+TIER: L (client session/CSRF handling, dual-trigger apps/web/src/api/client.ts:42)
+FAILURES: none (P1..P3 are proposed issues, non-blocking under reviewer scope; read P1 first)
+CAPABILITY-COVERAGE: not-applicable (web client)
+LIVE-BROWSER: performed on a local stack with Playwright, no BLOCKED-CAPABILITY
+ISSUES-WRITTEN: none (dual check, PROPOSED-ISSUE lines only)
+EXECUTOR: claude-sonnet (maker-delegate) (checker: claude-sonnet-subagent)
+EXPLANATION: All seven A7 criteria hold on HEAD 1aa2dd93, both cycle-0 failures are fixed and falsifiable, and the signup-verify-approve-login-persist-logout walk plus viewer, base-path and revoke cases work live with no JS errors. One real defect surfaced live outside the changed lines: an API router that rejects cookie principals with 401 makes the web client sign the user out on /meeting-bot (P1); it is a proposed issue, not a FAIL, because the root cause is unchanged server code and the client rule matches the A7 plan text.
+Metrics: start=2026-10-30T12:48:00+05:30 end=2026-10-30T13:12:00+05:30 wall_min=24 agent_min=unavailable blocked_min=0 suite_runs=0 repeat_runs=0 mutations=5 cycle=1 resumes=0 tokens=unavailable policy=proportional-verification/2026-10-19.17 check_s=1440 mutants=0 defects_unit=0 defects_6c=0
