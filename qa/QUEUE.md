@@ -1218,3 +1218,5 @@ Current source-table tracker verification: `node scripts/tracker-audit.mjs --jso
 ### Candidates (human picks) — from the A7 dual check
 - priority: S2 · ISS-UAWEB-001 (high) any 401 ends the web session: cookie users are signed out on /meeting-bot (capture-readiness requires keyId) and likely on ~20 keyId-guarded routers. Blocks a clean A9 live proof (qa/issues.uaweb.jsonl).
 - low: ISS-UAWEB-002..005 (WriteScope disables filters, console 401/403 lines, runtime flag -> A8, vite dev cross-origin).
+- DONE 2026-10-30 `ua-deploy-cookie-proxy` (A8): PASS cycle 0 (one checker), merged locally 84fe76f7. APP_USER_ACCOUNTS runtime flag (closes ISS-UAWEB-004), docs/user-accounts/ops.md, DEVOPS-HANDOVER 4b, .env.example names. ISS-UADEPLOY-001..002 fixed at close-out.
+- HUMAN_GATE (A9 prerequisite): docker-compose.yml forwards need an Approved-by entry: api `AUTH_CSRF_SECRET USER_SIGNUP_TENANT USER_SIGNUP_DAILY_CAP APP_PUBLIC_ORIGIN APP_BASE_PATH TRUST_PROXY_HOPS`, web `APP_USER_ACCOUNTS`. APP_BASE_PATH is web-only today, so the api cookie Path is wrong behind /knowledgebase.
