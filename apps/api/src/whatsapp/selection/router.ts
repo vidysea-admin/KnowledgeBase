@@ -19,8 +19,8 @@ import { requireScope } from "../../auth.js";
 import type { Logger } from "../../composition/logger.js";
 import { createArchiverClient } from "../archiver/client.js";
 import { loadArchiverConfig } from "../archiver/config.js";
-import { principalOf } from "../links/router.js";
-import { createMongoLinksStore, type Principal, type Result } from "../links/service.js";
+import { createMongoLinksStore, principalOf } from "../links/router.js";
+import type { Principal, Result } from "../links/service.js";
 import { createSelectionService, type SelectionDeps, type SelectionService } from "./service.js";
 
 export interface SelectionRouterDeps { service: SelectionService }
