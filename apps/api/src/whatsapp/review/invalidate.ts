@@ -17,6 +17,7 @@ export const REDACTED_TEXT = "[redacted: message deleted upstream]";
 export class SnapshotShrinkError extends Error {
   constructor(readonly stored: number, readonly absent: number, readonly snapshotSize: number) {
     super(`WhatsApp review: upstream snapshot would delete ${absent} of ${stored} stored messages (snapshot has ${snapshotSize}); refusing without an explicit force`);
+    this.name = "SnapshotShrinkError"; // the ingest route maps this name to its closed 502 code without importing the class (ISS-API-003)
   }
 }
 export interface InvalidationResult { removedPending: number; revokedDecided: number; deletedTurns: number }

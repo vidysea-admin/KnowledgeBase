@@ -1,0 +1,39 @@
+import { test } from "node:test";
+import assert from "node:assert/strict";
+import express from "express";
+import { MongoNetworkError, MongoServerError, MongoServerSelectionError } from "mongodb";
+import { createWhatsAppRouter } from "../routes/whatsapp.js";
+import { createMongoWhatsAppDeps } from "./store.js";
+const OA = "1".repeat(24), LA = "a".repeat(24);
+const SECRET = "10.0.0.5:27017";
+test("ISS-API-003 verbatim + corpus through the REAL store and router", async () => {
+  const errs: Array<[string, () => unknown]> = [
+    ["recorded#1 plain Error", () => new Error("whatsapp_msg Mongo unreachable")],
+    ["recorded#2 MongoServerError host:port", () => new MongoServerError({ message: `connect ${SECRET} auth failed user:pw`, code: 13 })],
+    ["MongoNetworkError host", () => new MongoNetworkError(`getaddrinfo ENOTFOUND ${SECRET}`)],
+    ["MongoServerSelectionError host", () => new MongoServerSelectionError(`Server selection timed out ${SECRET}`, new Map() as never)],
+    ["forged name", () => Object.assign(new Error(`leak ${SECRET}`), { name: "SnapshotShrinkError" })],
+    ["non-error string", () => `leak ${SECRET}`],
+    ["object with message", () => ({ message: `leak ${SECRET}`, name: "MongoNetworkError" })],
+    ["error with cause", () => new Error("x", { cause: new Error(SECRET) })],
+    ["txn msg", () => Object.assign(new MongoServerError({ message: `Transaction numbers are only allowed on a replica set member ${SECRET}`, code: 20 }), {})],
+  ];
+  for (const [label, make] of errs) {
+    for (const where of ["fetch", "list"] as const) {
+      const deps = createMongoWhatsAppDeps(undefined, { resolveOwners: async () => [{ linkId: LA, ownerUserId: OA }],
+        listGroups: async owner => { if (where === "list") throw make(); return [{ groupJid: "g@g.us", ownerUserId: owner, subject: "G", trackedPersonCount: 1 }]; },
+        fetchMessages: async () => { throw make(); }, appDb: (() => { throw new Error("no db"); }) as never });
+      const app = express(); app.use(express.json()); app.use((req, _r, n) => { req.auth = { tenantId: "tenant-a", principal: "session", userId: "uA", scopes: ["whatsapp"] } as never; n(); }); app.use(createWhatsAppRouter(deps));
+      app.use((err: unknown, _q: unknown, res: express.Response, _n: unknown) => { res.status(500).json({ error: "internal_error", message: "internal error" }); });
+      const server = app.listen(0, "127.0.0.1"); await new Promise<void>(r => server.once("listening", r));
+      const port = (server.address() as { port: number }).port;
+      try {
+        const res = where === "fetch" ? await fetch(`http://127.0.0.1:${port}/whatsapp/ingest`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ groupJid: "g@g.us" }) })
+          : await fetch(`http://127.0.0.1:${port}/whatsapp/groups`);
+        const text = await res.text();
+        console.log(label.padEnd(36), where, res.status, text.slice(0, 140));
+        assert.ok(!text.includes(SECRET) && !text.includes("pw"), label + " leaked: " + text);
+      } finally { server.closeAllConnections(); await new Promise<void>(r => server.close(() => r())); }
+    }
+  }
+});

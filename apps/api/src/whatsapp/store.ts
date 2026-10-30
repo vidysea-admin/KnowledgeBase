@@ -7,11 +7,11 @@
  * its documented collection shapes (`src/db/types.ts` there: `PersonDoc`/`MessageDoc`/`GroupDoc`).
  */
 import { MongoClient, MongoNetworkError, MongoParseError, MongoServerSelectionError, ObjectId, type Db } from "mongodb";
-import { WhatsAppAmbiguousLinkError, WhatsAppNotConfiguredError, WhatsAppUnavailableError, type WhatsAppOwnerGrant, type WhatsAppOwnersResolver, type WhatsAppResolveScope } from "./owner-config.js";
+import { WhatsAppAmbiguousLinkError, WhatsAppGroupNotFoundError, WhatsAppNotConfiguredError, WhatsAppUnavailableError, type WhatsAppOwnerGrant, type WhatsAppOwnersResolver, type WhatsAppResolveScope } from "./owner-config.js";
 import { getDb as getAppDb, assertValidTenantId, scopedCollection } from "@lkb/db";
 import type { Sources, Sessions, Turns } from "@lkb/core";
 import { createWhatsAppSource, type WhatsAppFetcher, type WhatsAppMessage, type ConsentContext, type Turn } from "@lkb/ingest";
-import type { WhatsAppRouteDeps, WhatsAppGroup, WhatsAppIngestResult } from "../routes/whatsapp.js";
+import type { WhatsAppRouteDeps, WhatsAppIngestResult } from "../routes/whatsapp.js";
 import { sha256Hex } from "../hash.js";
 import type { BoundIndexer } from "../indexing/session.js";
 
@@ -108,25 +108,24 @@ export interface WhatsAppStoreOptions {
   listGroups?: typeof listTrackableGroups;
   fetchMessages?: WhatsAppFetcher;
 }
-/** `WhatsAppRouteDeps` plus the optional caller/link scope the route layer passes once it narrows per person (R-25). */
-export interface ScopedWhatsAppRouteDeps extends WhatsAppRouteDeps {
-  listGroups(tenantId: string, scope?: WhatsAppResolveScope): Promise<WhatsAppGroup[]>;
-  ingestGroup(tenantId: string, groupJid: string, scope?: WhatsAppResolveScope): Promise<WhatsAppIngestResult>;
-}
+/** Since W7 `WhatsAppRouteDeps` itself carries the optional caller/link scope the route layer passes (R-25); kept as a named alias. */
+export type ScopedWhatsAppRouteDeps = WhatsAppRouteDeps;
 const OWNER_HEX = /^[0-9a-fA-F]{24}$/;
 /** Trusted server-only resolver; omitted mappings fail before upstream/app database access. */
 export function createMongoWhatsAppDeps(indexSession?: BoundIndexer, options: WhatsAppStoreOptions = {}): ScopedWhatsAppRouteDeps {
-  async function listGroups(owner: string): Promise<TrackableGroup[]> {
-    try { return await (options.listGroups ?? listTrackableGroups)(owner); }
-    catch (error) {
-      if (error instanceof MongoNetworkError || error instanceof MongoServerSelectionError || error instanceof MongoParseError) {
-        // No archive URL configured: the default localhost archive is not there, which is a configuration gap, not an outage (G-A1).
-        throw process.env.WHATSAPP_MONGO_URL ? new WhatsAppUnavailableError() : new WhatsAppNotConfiguredError();
-      }
-      throw error;
+  /** A driver-level failure to reach the archive is an availability problem with a fixed message, never raw driver text (ISS-API-003). */
+  function archiveFailure(error: unknown): never {
+    if (error instanceof MongoNetworkError || error instanceof MongoServerSelectionError || error instanceof MongoParseError) {
+      // No archive URL configured: the default localhost archive is not there, which is a configuration gap, not an outage (G-A1).
+      throw process.env.WHATSAPP_MONGO_URL ? new WhatsAppUnavailableError() : new WhatsAppNotConfiguredError();
     }
+    throw error;
   }
-  const fetchMessages = options.fetchMessages ?? fetchWhatsAppMessages;
+  async function listGroups(owner: string): Promise<TrackableGroup[]> {
+    try { return await (options.listGroups ?? listTrackableGroups)(owner); } catch (error) { return archiveFailure(error); }
+  }
+  const rawFetchMessages = options.fetchMessages ?? fetchWhatsAppMessages;
+  const fetchMessages: WhatsAppFetcher = async (groupJid, owner) => { try { return await rawFetchMessages(groupJid, owner); } catch (error) { return archiveFailure(error); } };
   const appDb = options.appDb ?? getAppDb;
   /** The permitted owner set. Malformed owner ids are dropped; an empty set is refused (never widened to "all owners"). */
   async function ownersFor(tenantId: string, scope?: WhatsAppResolveScope): Promise<WhatsAppOwnerGrant[]> {
@@ -141,9 +140,13 @@ export function createMongoWhatsAppDeps(indexSession?: BoundIndexer, options: Wh
 
   return {
     async listGroups(tenantId, scope) {
-      const found: TrackableGroup[] = [];
+      const found: Array<TrackableGroup & { linkId: string | null }> = [];
       // A group row is kept only under the owner it was queried for, so a poisoned archive answer cannot smuggle in another owner's group.
-      for (const { ownerUserId } of await ownersFor(tenantId, scope)) found.push(...(await listGroups(ownerUserId)).filter(g => g.ownerUserId === ownerUserId));
+      // `linkId` is attached so a caller can name the link when a jid is marked under more than one (R-25).
+      for (const grant of await ownersFor(tenantId, scope)) {
+        if (scope?.linkId !== undefined && (typeof scope.linkId !== "string" || grant.linkId !== scope.linkId)) continue; // linkId can only narrow
+        found.push(...(await listGroups(grant.ownerUserId)).filter(g => g.ownerUserId === grant.ownerUserId).map(g => ({ ...g, linkId: grant.linkId })));
+      }
       return found;
     },
 
@@ -154,15 +157,15 @@ export function createMongoWhatsAppDeps(indexSession?: BoundIndexer, options: Wh
       // groups list, by the groupJid the caller actually asked to ingest -- never client-supplied.
       assertValidTenantId(tenantId, "whatsapp.ingestGroup"); // before owner resolution; the scoped accessor re-asserts it on every write (ISS-AUTHTENANT-002)
       const wanted = scope?.linkId;
-      const matches: Array<{ ownerUserId: string; group: TrackableGroup }> = [];
+      const matches: Array<{ ownerUserId: string; linkId: string | null; group: TrackableGroup }> = [];
       for (const grant of await ownersFor(tenantId, scope)) {
         if (wanted !== undefined && (typeof wanted !== "string" || grant.linkId !== wanted)) continue; // a linkId outside the permitted set is simply absent
         const group = (await listGroups(grant.ownerUserId)).find((g) => g.groupJid === groupJid && g.ownerUserId === grant.ownerUserId);
-        if (group) matches.push({ ownerUserId: grant.ownerUserId, group });
+        if (group) matches.push({ ownerUserId: grant.ownerUserId, linkId: grant.linkId, group });
       }
-      if (matches.length === 0) throw new Error(`no tracked WhatsApp group with jid "${groupJid}"`);
+      if (matches.length === 0) throw new WhatsAppGroupNotFoundError(groupJid);
       if (matches.length > 1) throw new WhatsAppAmbiguousLinkError(); // same jid marked by two permitted links: never merged, never guessed
-      const { ownerUserId, group } = matches[0]!;
+      const { ownerUserId, linkId, group } = matches[0]!;
       // Owner is bound to the authenticated tenant and the caller's permitted set, never selected from an unscoped group.
 
       // The archiver only captures a sender the account owner explicitly selected for tracking
@@ -190,6 +193,9 @@ export function createMongoWhatsAppDeps(indexSession?: BoundIndexer, options: Wh
       // atomically; an existing row (including a concurrent withdrawal) must retain
       // its consent and any future authorization metadata unchanged.
       await sourcesColl.updateOne({ _id: storedSource._id }, { $setOnInsert: storedSource }, { upsert: true });
+      // W7 (R-26): stamp the owning link on the source, once. A link's archiver owner is never reused, so the stamp is stable; a row that
+      // already carries one is left alone, and only this sub-path is written (consent, revision and every other field stay as they were).
+      if (typeof linkId === "string") await sourcesColl.updateOne({ _id: storedSource._id, "sourceMeta.whatsappLinkId": { $exists: false } } as never, { $set: { "sourceMeta.whatsappLinkId": linkId } } as never);
 
       // IDs, session date and turns consume the same frozen authorized message snapshot.
       const turns = await whatsAppSource.toTurns(source);

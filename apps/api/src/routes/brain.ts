@@ -13,6 +13,7 @@ import { existsSync, readFileSync, realpathSync, statSync } from "node:fs";
 import path from "node:path";
 import type { Claims, Gaps, SkipReason, Sessions, SessionPages, Sources, Turns } from "@lkb/core";
 import { requireScope } from "../auth.js";
+import { auditWho, callerOf, type WhatsAppCaller } from "../whatsapp/owner-config.js";
 
 export interface SessionDetail {
   session: Sessions;
@@ -62,9 +63,13 @@ export function projectWebinarOperations(input: unknown): WebinarOperations {
   return {operations: operations.slice(0, 200), omitted: Number(value.omitted ?? 0) + Math.max(0, operations.length - 200)};
 }
 
+/** W7 (R-26): who is reading. Passed by the routes only; internal callers that omit it keep the trusted (approved-content-only) view. A WhatsApp session is returned
+ * to its link owner or an admin and is invisible (404 / absent from the list) to everyone else. `who` is the verified audit identity, or null when none exists. */
+export interface SessionReadContext { caller: WhatsAppCaller; who: { actorKind: "user" | "key"; actorId: string } | null }
+
 export interface BrainReadDeps {
-  listSessions(tenantId: string): Promise<Sessions[]>;
-  getSessionDetail(tenantId: string, sessionId: string): Promise<SessionDetail | null>;
+  listSessions(tenantId: string, read?: SessionReadContext): Promise<Sessions[]>;
+  getSessionDetail(tenantId: string, sessionId: string, read?: SessionReadContext): Promise<SessionDetail | null>;
   listSources(tenantId: string): Promise<Sources[]>;
   listGaps(tenantId: string): Promise<Gaps[]>;
   getSessionAsset?(tenantId: string, sessionId: string, frameId?: string): Promise<SessionAsset | null>;
@@ -79,9 +84,10 @@ export function withSessionArtifacts(deps: BrainReadDeps, root: string): BrainRe
     if (!relative || relative.startsWith("..") || path.isAbsolute(relative)) throw new Error("outside artifact root");
     return actual;
   }
-  async function artifacts(tenantId: string, id: string) {
+  /** `known` is a detail already read (and, for a WhatsApp session, authorized and audited) under the caller's read context; it is reused so the audit event is written once. */
+  async function artifacts(tenantId: string, id: string, known?: SessionDetail) {
     if (!/^[a-zA-Z0-9][a-zA-Z0-9._-]{0,149}$/.test(id)) return null;
-    const detail = await deps.getSessionDetail(tenantId, id);
+    const detail = known ?? await deps.getSessionDetail(tenantId, id);
     if (!detail || detail.session.tenantId !== tenantId || detail.session._id !== id) return null;
     const source = (await deps.listSources(tenantId)).find((s) => s._id === detail.session.sourceId && s.tenantId === tenantId);
     if (!source) return null;
@@ -146,12 +152,13 @@ export function withSessionArtifacts(deps: BrainReadDeps, root: string): BrainRe
       });
       return {...projectWebinarOperations({operations, omitted: 0}), discovery};
     },
-    async getSessionDetail(tenantId, id) {
-      const original = await deps.getSessionDetail(tenantId, id);
+    async getSessionDetail(tenantId, id, read) {
+      // W7: forward the read context. Dropping it here turned the owner/admin raw read (and its admin.raw_read audit) into a 404 in production.
+      const original = await deps.getSessionDetail(tenantId, id, read);
       if (!original || original.session.tenantId !== tenantId || original.session._id !== id) return null;
       const detail: SessionDetail = { ...original, media: undefined, notes: undefined, frames: undefined };
       try {
-        const a = await artifacts(tenantId, id);
+        const a = await artifacts(tenantId, id, original);
         if (!a) return detail;
         const media = mediaAsset(a.source);
         if (media) detail.media = { available: true, bytes: media.bytes, mime: media.mime };
@@ -195,6 +202,8 @@ export function publicSourceView(row: Sources): Record<string, unknown> {
   return out;
 }
 
+const readContext = (req: Request): SessionReadContext => ({ caller: callerOf(req), who: auditWho(req) });
+
 export function createBrainRouter(deps: BrainReadDeps): Router {
   const router = Router();
   router.get("/webinar-operations", requireScope("sessions"), async (req: Request, res: Response) => {
@@ -215,12 +224,16 @@ export function createBrainRouter(deps: BrainReadDeps): Router {
   }
 
   router.get("/sessions", requireScope("sessions"), async (req: Request, res: Response) => {
-    const sessions = await deps.listSessions(req.auth!.tenantId);
-    res.status(200).json({ sessions });
+    try {
+      const sessions = await deps.listSessions(req.auth!.tenantId, readContext(req));
+      res.status(200).json({ sessions });
+    } catch { res.status(503).json({ error: "sessions_unavailable" }); }
   });
 
   router.get("/sessions/:id", requireScope("sessions"), async (req: Request, res: Response) => {
-    const detail = await deps.getSessionDetail(req.auth!.tenantId, req.params.id as string);
+    let detail: SessionDetail | null;
+    try { detail = await deps.getSessionDetail(req.auth!.tenantId, req.params.id as string, readContext(req)); }
+    catch { res.status(503).json({ error: "session_unavailable" }); return; } // e.g. the admin-read audit could not be written: nothing is returned
     if (!detail) {
       res.status(404).json({ error: "not_found", message: "no session with that id for this tenant" });
       return;

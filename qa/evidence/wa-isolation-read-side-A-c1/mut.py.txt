@@ -1,0 +1,43 @@
+import subprocess, os, json, signal
+COPY=r"C:/Users/Lenovo/AppData/Local/Temp/claude/D--KnowledgeBase/e7be82aa-d0d7-4247-9d84-e121aa4badfc/scratchpad/w7c1/mut"
+BOUND=r"D:/KnowledgeBase/.worktrees/wa-isolation-read-side"
+HEAD="7ab17ee6"
+RD="apps/api/src/whatsapp/isolation-read-side.test.ts"; WR="apps/api/src/whatsapp/isolation-write-side.test.ts"
+PW="apps/api/src/whatsapp/w7chk-A-prodwire.test.ts"
+M=[
+ ("M1-C1-read-forward","apps/api/src/routes/brain.ts","const original = await deps.getSessionDetail(tenantId, id, read);","const original = await deps.getSessionDetail(tenantId, id);",[RD,PW]),
+ ("M2-C6-marker-before-authz","apps/api/src/whatsapp/review/ingest.ts","      if (found.size === 0) throw new WhatsAppGroupNotFoundError(groupJid);\n      if (found.size > 1) throw new WhatsAppAmbiguousLinkError();\n      const resolved = [...found.values()][0]!.linkId;","      const resolved = [...found.values()][0]?.linkId;",[WR]),
+ ("M3-gate-active","apps/api/src/whatsapp/owner-config.ts","link !== null && link.state === \"active\" && typeof link.userId","link !== null && typeof link.userId",[RD]),
+ ("M4-gate-fallback-active","apps/api/src/whatsapp/owner-config.ts","{ archiverOwnerId: sourceOwner, state: \"active\" }","{ archiverOwnerId: sourceOwner }",[RD]),
+ ("M5-gate-unique","apps/api/src/whatsapp/owner-config.ts","candidates.length === 1 ?","candidates.length >= 1 ?",[RD]),
+ ("M6-marker-key-per-link","apps/api/src/whatsapp/review/ingest.ts","whatsAppLogId(tenantId, \"pending-invalidation\", groupJid, ...(resolvedLinkId ? [resolvedLinkId] : []))","whatsAppLogId(tenantId, \"pending-invalidation\", groupJid)",[WR]),
+ ("M7-repair-notfound-catch","apps/api/src/whatsapp/review/compose.ts","          if (error instanceof WhatsAppGroupNotFoundError) { await skip(\"not_found\"); continue; }\n","",[WR]),
+]
+def sh(cmd,cwd=None,timeout=240):
+    return subprocess.run(cmd,cwd=cwd,capture_output=True,text=True,encoding="utf-8",errors="replace",shell=True,timeout=timeout)
+def summ(o):
+    return [l.encode("ascii","replace").decode() for l in o.splitlines() if l.startswith("ℹ pass") or l.startswith("ℹ fail")]
+def run(tests):
+    return sh("node --test --import tsx "+" ".join(tests),COPY)
+out={}
+for name,tests in (("green-read+prodwire",[RD,PW]),("green-write",[WR])):
+    g=run(tests); out[name]=summ(g.stdout); print(name,out[name],flush=True)
+for cid,f,old,new,tests in M:
+    p=os.path.join(COPY,f)
+    orig=open(p,encoding="utf8",newline="").read()
+    cnt=orig.count(old)
+    if cnt!=1: print(cid,"PATTERN COUNT",cnt,flush=True); continue
+    backup=orig  # per-mutation byte backup
+    try:
+        open(p,"w",encoding="utf8",newline="").write(orig.replace(old,new))
+        r=sh("node --test --import tsx "+" ".join(tests),COPY)
+        red=sorted(set(l.strip() for l in r.stdout.splitlines() if l.startswith("✖") and "failing tests" not in l))
+        rp=summ(r.stdout)
+    except BaseException as e:
+        red=["EXC "+repr(e)]; rp=[]
+    finally:
+        open(p,"w",encoding="utf8",newline="").write(backup)
+    h1=sh(f"git hash-object {f}",COPY).stdout.strip(); h2=sh(f"git -C {BOUND} rev-parse {HEAD}:{f}").stdout.strip()
+    out[cid]={"mut":rp,"red":red[:6],"head_fidelity":h1==h2}
+    print(cid,json.dumps(out[cid],ensure_ascii=True),flush=True)
+json.dump(out,open(os.path.join(COPY,"..","mut-out.json"),"w"),indent=1)

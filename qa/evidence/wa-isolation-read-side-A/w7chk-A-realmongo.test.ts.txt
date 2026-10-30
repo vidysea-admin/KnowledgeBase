@@ -1,0 +1,66 @@
+import { test } from "node:test";
+import assert from "node:assert/strict";
+import { MongoClient } from "mongodb";
+import { createWhatsAppReviewWiring } from "./compose.js";
+import { createWhatsAppRawAccess, WhatsAppAmbiguousLinkError } from "../owner-config.js";
+
+const url = process.env.WA_REVIEW_TEST_MONGO_URL;
+const OA = "6a8d0c692fcc75f0e911b878", OB = "6a8d0c692fcc75f0e911b879";
+const LA = "a".repeat(24), LB = "b".repeat(24);
+test("w7chk-A real Mongo: two owners, same message, same jid", { skip: !url }, async () => {
+  const name = `lkb_test_wa_review_${Date.now()}`;
+  const client = await new MongoClient(url!).connect();
+  try {
+    const db = client.db(name);
+    await db.collection("whatsapp_candidates").createIndex({ tenantId: 1, _id: 1 });
+    await db.collection("whatsapp_links").insertMany([
+      { _id: LA, tenantId: "tenant-a", userId: "uA", state: "active", live: true, archiverOwnerId: OA },
+      { _id: LB, tenantId: "tenant-a", userId: "uB", state: "active", live: true, archiverOwnerId: OB }] as never);
+    const wire = createWhatsAppReviewWiring({
+      appDb: () => db,
+      resolveOwners: async (_t, caller) => {
+        const all = [{ linkId: LA, ownerUserId: OA }, { linkId: LB, ownerUserId: OB }];
+        if (caller?.admin) return all;
+        if (caller?.kind === "session") return all.filter(g => (g.linkId === LA ? "uA" : "uB") === caller.userId);
+        return [];
+      },
+      listGroups: async (owner: string) => [{ groupJid: "same@g.us", ownerUserId: owner, subject: "G", trackedPersonCount: 1 }],
+      fetchMessages: async () => [{ messageId: "m1", personId: "p1", displayName: "Expert", text: "Scholarship closes Friday.", ts: "2026-10-14T10:00:00.000Z" }],
+    } as never);
+    const A = { caller: { kind: "session", userId: "uA", admin: false } as const };
+    const B = { caller: { kind: "session", userId: "uB", admin: false } as const };
+    const admin = { caller: { kind: "key", admin: true } as const };
+    await wire.whatsapp.ingestGroup("tenant-a", "same@g.us", A);
+    await wire.whatsapp.ingestGroup("tenant-a", "same@g.us", B);
+    // admin without linkId: ambiguous
+    await assert.rejects(wire.whatsapp.ingestGroup("tenant-a", "same@g.us", admin), WhatsAppAmbiguousLinkError);
+    const sources = await db.collection("sources").find({ tenantId: "tenant-a" } as never).toArray() as any[];
+    assert.equal(sources.length, 2);
+    const byOwner = Object.fromEntries(sources.map(s => [s.ownerUserId, s]));
+    assert.equal(byOwner[OA].sourceMeta.whatsappLinkId, LA); assert.equal(byOwner[OB].sourceMeta.whatsappLinkId, LB);
+    const cands = await db.collection("whatsapp_candidates").find({ tenantId: "tenant-a" } as never).toArray() as any[];
+    assert.equal(cands.length, 2, "neither merged nor dropped");
+    const cA = cands.find(c => c.sourceId === byOwner[OA]._id), cB = cands.find(c => c.sourceId === byOwner[OB]._id);
+    assert.ok(!cA.flags?.some((f: any) => f.kind === "duplicate"), "first capture not flagged");
+    const dup = cB.flags.find((f: any) => f.kind === "duplicate"); assert.ok(dup); assert.equal(dup.duplicateOf, cA._id);
+    // re-ingest A after B: A's candidate untouched (setOnInsert), B still flagged, still 2 candidates
+    await wire.whatsapp.ingestGroup("tenant-a", "same@g.us", A);
+    const again = await db.collection("whatsapp_candidates").find({ tenantId: "tenant-a" } as never).toArray() as any[];
+    assert.equal(again.length, 2); assert.ok(!again.find(c => c._id === cA._id).flags?.some((f: any) => f.kind === "duplicate"));
+    // marker linkId after member ingest without explicit linkId
+    const marker = await db.collection("whatsapp_review_log").find({ kind: "pending-invalidation" } as never).toArray() as any[];
+    console.log("MARKERS", JSON.stringify(marker.map(m => ({ jid: m.groupJid, linkId: m.linkId ?? null }))));
+    const access = createWhatsAppRawAccess(db);
+    const ca = (u: string, adm = false) => ({ kind: "session", userId: u, admin: adm } as const);
+    assert.equal((await access.forCandidate("tenant-a", cA._id, ca("uA"))).allowed, true);
+    assert.equal((await access.forCandidate("tenant-a", cA._id, ca("uB"))).allowed, false);
+    assert.equal((await access.forCandidate("tenant-a", cB._id, ca("uA"))).allowed, false);
+    const adm = await access.forCandidate("tenant-a", cB._id, ca("boss", true));
+    assert.equal(adm.allowed && adm.ownerView, false);
+    assert.equal((await access.forCandidate("tenant-b", cA._id, ca("boss", true))).allowed, false, "cross-tenant admin");
+    assert.equal((await access.forCandidate("tenant-a", cA._id, { kind: "key", admin: false })).allowed, false);
+    await access.auditAdminRead("tenant-a", { actorKind: "user", actorId: "user:boss" }, { linkId: LB, candidateId: cB._id });
+    const ev = await db.collection("whatsapp_events").find({ eventType: "admin.raw_read" } as never).toArray() as any[];
+    assert.equal(ev.length, 1); console.log("EVENT", JSON.stringify(ev[0]));
+  } finally { await client.db(name).dropDatabase(); await client.close(); }
+});

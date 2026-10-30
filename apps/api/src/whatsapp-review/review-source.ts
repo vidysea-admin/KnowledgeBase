@@ -10,6 +10,7 @@ import { WHATSAPP_REVIEW_LOG } from "../whatsapp/review/invalidate.js";
 import { whatsAppClaimId } from "../whatsapp/review/materializer.js";
 import { readEffectiveTurns } from "../transcript-review/effective-reader.js";
 import { headId, type ReviewHead } from "../transcript-review/store.js";
+import { auditWho, callerOf, type WhatsAppRawAccess } from "../whatsapp/owner-config.js";
 import { createKnowledgeVisibility } from "../visibility/knowledge.js";
 import { withKnowledgeReadSnapshot } from "../visibility/read-snapshot.js";
 
@@ -107,7 +108,9 @@ function currentCandidateReader(db: ReadDb): { get(tenantId: string, candidateId
   };
 }
 
-export function createWhatsAppReviewSourceRouter(reader: WhatsAppReviewSourceReader): Router {
+/** W7 (R-26, R-29, R-30): owner-or-admin. Authority is decided from the candidate's source link BEFORE the reader touches any evidence, a non-owner gets the
+ * same 404 as an absent candidate, and an admin reading another person's source writes an `admin.raw_read` event first (fail closed). */
+export function createWhatsAppReviewSourceRouter(reader: WhatsAppReviewSourceReader, access: WhatsAppRawAccess): Router {
   const router = Router();
   router.get("/whatsapp/review/:id/source", (req, res, next) => {
     res.setHeader("Cache-Control", "private, no-store");
@@ -118,6 +121,13 @@ export function createWhatsAppReviewSourceRouter(reader: WhatsAppReviewSourceRea
     const id = req.params.id;
     if (!isWhatsAppReviewId(id) || Object.keys(req.query).length) { res.status(404).json({ error: "not_found" }); return; }
     try {
+      const decision = await access.forCandidate(req.auth.tenantId, id, callerOf(req));
+      if (!decision.allowed) { res.status(404).json({ error: "not_found" }); return; }
+      if (!decision.ownerView) {
+        const who = auditWho(req);
+        if (!who) { res.status(404).json({ error: "not_found" }); return; }
+        await access.auditAdminRead(req.auth.tenantId, who, { linkId: decision.linkId, candidateId: id });
+      }
       const source = await reader.get(req.auth.tenantId, id);
       if (!source) { res.status(404).json({ error: "not_found" }); return; }
       res.status(200).json({ source });

@@ -23,7 +23,8 @@ test("key-authenticated group listing resolves the legacy owner only; member lin
  try{
   const get=(k:string)=>fetch(`${server.baseUrl}/whatsapp/groups?ownerUserId=${OM}`,{headers:{authorization:`Bearer ${k}`}});
   const r1=await get("k1");assert.equal(r1.status,200);
-  assert.deepEqual(((await r1.json()) as {groups:{ownerUserId:string}[]}).groups.map(g=>g.ownerUserId),[OL]);
+  // W7 (R-30): a non-admin caller never receives the archiver owner id; it sees the link id instead.
+  assert.deepEqual(((await r1.json()) as {groups:{ownerUserId?:string;linkId:string|null}[]}).groups,[{groupJid:"g",subject:"s",trackedPersonCount:1,linkId:"1".repeat(24)}]);
   for(const k of ["k2","k3"]){const r=await get(k);assert.equal(r.status,503);assert.deepEqual(await r.json(),{error:"not_configured",feature:"whatsapp"})}
   assert.deepEqual(queried,[OL]);
  }finally{await server.close()}

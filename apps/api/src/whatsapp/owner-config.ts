@@ -1,7 +1,10 @@
 /** Owner resolution for WhatsApp archive reads (whatsapp-multiuser W4, R-24/R-25). Grants come from active `whatsapp_links` rows; `WHATSAPP_TENANT_OWNER_MAP` is only a boot seed. Never client input. */
 import type { Db } from "mongodb";
-import { whatsAppLinkStores } from "@lkb/db";
-import type { VerifiedKey } from "../auth.js";
+import { assertValidTenantId, whatsAppLinkStores, withTenant } from "@lkb/db";
+import type { Sessions, Sources, WhatsappCandidates } from "@lkb/core";
+import type { Request } from "express";
+import { actorId, type VerifiedKey } from "../auth.js";
+import { sha256Hex } from "../hash.js";
 
 /** Expected missing owner/source availability. Never carries private provider diagnostics. */
 export class WhatsAppUnavailableError extends Error {
@@ -19,6 +22,12 @@ export class WhatsAppAmbiguousLinkError extends Error {
   constructor() { super("ambiguous_link: group is marked by more than one permitted link; linkId is required"); this.name = "WhatsAppAmbiguousLinkError"; }
 }
 
+/** The named group is absent from the caller's permitted owners (never marked, other owner, other tenant): one outcome for all, so existence is not revealed. HTTP 404. */
+export class WhatsAppGroupNotFoundError extends Error {
+  readonly status = 404; readonly code = "not_found";
+  constructor(groupJid: string) { super(`no tracked WhatsApp group with jid "${groupJid}"`); this.name = "WhatsAppGroupNotFoundError"; }
+}
+
 /** Who is asking, derived from the verified principal only (never from request data). */
 export type WhatsAppCaller = { kind: "session"; userId: string; admin: boolean } | { kind: "key"; admin: boolean };
 /** Optional narrowing passed by the route layer; `linkId` selects one of several permitted links. */
@@ -33,6 +42,21 @@ export function whatsAppCallerFromAuth(auth: VerifiedKey | undefined): WhatsAppC
   if (auth?.principal === "session" && typeof auth.userId === "string" && auth.userId.length > 0) return { kind: "session", userId: auth.userId, admin };
   return { kind: "key", admin: admin && auth?.principal !== "session" };
 }
+
+/** Verified actor string for the audit trail and review decisions: the stored principal id (UA-29), else (key fixtures without one) a fingerprint of the presented bearer. Never the bearer itself. */
+function actorBase(req: Request): string | null {
+  const id = actorId(req.auth);
+  if (id) return id;
+  const match = /^Bearer\s+(.+)$/iu.exec(req.header("authorization") ?? "");
+  return match ? `api-key-sha256:${sha256Hex(match[1]!)}` : null;
+}
+export { actorBase };
+/** Identity written into `admin.raw_read` (R-29): kind plus verified actor id, or null when no stable identity exists (the read is then refused). */
+export function auditWho(req: Request): { actorKind: "user" | "key"; actorId: string } | null {
+  const base = actorBase(req);
+  return base ? { actorKind: req.auth?.principal === "session" ? "user" : "key", actorId: base } : null;
+}
+export const callerOf = (req: Request): WhatsAppCaller => whatsAppCallerFromAuth(req.auth);
 
 export interface ActiveLinkRow { _id?: unknown; tenantId?: unknown; userId?: unknown; state?: unknown; archiverOwnerId?: unknown }
 const OWNER_ID = /^[0-9a-f]{24}$/;
@@ -138,4 +162,85 @@ export function createDbBackedWhatsAppOwners(options: { rawMap: string | undefin
       throw new WhatsAppUnavailableError();
     }
   });
+}
+
+
+/** W7 / R-26, R-27, R-29: who may read or act on a WhatsApp source's RAW content. Owner = the session whose userId equals the source's link userId;
+ * admin (whatsapp-admin session or key) = every link in the tenant; a plain key, a viewer, another member, a legacy link (no owner) or an unresolvable
+ * link = denied. Fails closed: any doubt (missing source, tenant mismatch, link/owner disagreement) is `allowed: false`. */
+export type WhatsAppRawDecision = { allowed: false } | { allowed: true; linkId: string | null; sourceId: string; ownerView: boolean };
+export interface WhatsAppRawAccess {
+  forSource(tenantId: string, sourceId: string, caller: WhatsAppCaller): Promise<WhatsAppRawDecision>;
+  /** Reads only the candidate row's sourceId (no evidence validation), so a probe of someone else's candidate id costs and reveals nothing. */
+  forCandidate(tenantId: string, candidateId: string, caller: WhatsAppCaller): Promise<WhatsAppRawDecision>;
+  /** Session read path: tells a WhatsApp session (decision = owner-or-admin) apart from any other session (`whatsapp: false`, the existing trusted path decides).
+   * A session whose source cannot be classified is treated as WhatsApp and denied. */
+  forSession(tenantId: string, sessionId: string, caller: WhatsAppCaller): Promise<{ whatsapp: false } | { whatsapp: true; decision: WhatsAppRawDecision }>;
+  /** R-29: an admin reading content that is not theirs writes an append-only `admin.raw_read` event (ids and counts only). Throws on failure so the caller can refuse the read. */
+  auditAdminRead(tenantId: string, who: { actorKind: "user" | "key"; actorId: string }, read: { linkId: string | null; candidateId?: string; count?: number }): Promise<void>;
+}
+const LINK_ID = /^[0-9a-f]{24}$/;
+
+export function createWhatsAppRawAccess(db: Pick<Db, "collection">): WhatsAppRawAccess {
+  const deny: WhatsAppRawDecision = { allowed: false };
+  async function forSource(tenantId: string, sourceId: string, caller: WhatsAppCaller): Promise<WhatsAppRawDecision> {
+    try {
+      assertValidTenantId(tenantId, "whatsapp.rawAccess");
+      if (typeof sourceId !== "string" || sourceId.length === 0) return deny;
+      const source = await db.collection<Sources>("sources").findOne(withTenant<Sources>(tenantId, { _id: sourceId }));
+      if (!source || source.tenantId !== tenantId || source._id !== sourceId || source.kind !== "whatsapp-batch") return deny;
+      const stores = whatsAppLinkStores(db);
+      const stamped = (source.sourceMeta as Record<string, unknown> | undefined)?.whatsappLinkId;
+      const sourceOwner: unknown = (source as unknown as { ownerUserId?: unknown }).ownerUserId; // set by the WhatsApp source adapter
+      let link: ActiveLinkRow | null = null;
+      if (typeof stamped === "string" && LINK_ID.test(stamped)) link = await stores.getLink(tenantId, stamped);
+      else if (typeof sourceOwner === "string" && OWNER_ID.test(sourceOwner)) {
+        // Unstamped source: the link is found by archiver owner among ACTIVE links only, and exactly one must match (duplicates: nobody is the owner).
+        const candidates = await stores.links(tenantId).find({ archiverOwnerId: sourceOwner, state: "active" }).toArray();
+        link = candidates.length === 1 ? candidates[0]! : null;
+      }
+      // A stamp that disagrees with the source's own archiver owner is a broken binding: nobody is the owner.
+      if (link && typeof sourceOwner === "string" && link.archiverOwnerId !== sourceOwner) link = null;
+      if (link && link.tenantId !== tenantId) link = null;
+      const linkId = link && typeof link._id === "string" ? link._id : null;
+      // Gate answer 2026-10-30 (W7 revoked-link read access): an owner reads raw content only through an ACTIVE link; a revoked or suspended link
+      // stops the owner (admin still passes, and is audited as any non-owner admin read).
+      const ownerView = caller.kind === "session" && link !== null && link.state === "active" && typeof link.userId === "string" && link.userId.length > 0 && link.userId === caller.userId;
+      if (ownerView || caller.admin === true) return { allowed: true, linkId, sourceId, ownerView };
+      return deny;
+    } catch { return deny; }
+  }
+  return {
+    forSource,
+    async forSession(tenantId, sessionId, caller) {
+      try {
+        assertValidTenantId(tenantId, "whatsapp.rawAccess");
+        if (typeof sessionId !== "string" || sessionId.length === 0) return { whatsapp: false };
+        const session = await db.collection<Sessions>("sessions").findOne(withTenant<Sessions>(tenantId, { _id: sessionId }));
+        if (!session || session.tenantId !== tenantId || session._id !== sessionId) return { whatsapp: false }; // nothing to protect; the trusted path answers 404
+        const source = await db.collection<Sources>("sources").findOne(withTenant<Sources>(tenantId, { _id: session.sourceId }));
+        if (source && source.tenantId === tenantId && source._id === session.sourceId && source.kind !== "whatsapp-batch") return { whatsapp: false };
+        if (!source) return { whatsapp: true, decision: deny };
+        // A source whose capture consent was withdrawn is not shown raw to anyone (fail closed; the consent machinery itself is untouched).
+        if (source.consent?.given === false) return { whatsapp: true, decision: deny };
+        return { whatsapp: true, decision: await forSource(tenantId, session.sourceId, caller) };
+      } catch { return { whatsapp: true, decision: deny }; }
+    },
+    async forCandidate(tenantId, candidateId, caller) {
+      try {
+        assertValidTenantId(tenantId, "whatsapp.rawAccess");
+        if (typeof candidateId !== "string") return deny;
+        const row = await db.collection<WhatsappCandidates>("whatsapp_candidates").findOne(withTenant<WhatsappCandidates>(tenantId, { _id: candidateId }));
+        if (!row || row.tenantId !== tenantId || row._id !== candidateId || typeof row.sourceId !== "string") return deny;
+        return await forSource(tenantId, row.sourceId, caller);
+      } catch { return deny; }
+    },
+    async auditAdminRead(tenantId, who, read) {
+      await whatsAppLinkStores(db).events(tenantId).insert({
+        eventType: "admin.raw_read", actorKind: who.actorKind, actorId: who.actorId,
+        ...(read.linkId && LINK_ID.test(read.linkId) ? { linkId: read.linkId } : {}),
+        ...(read.candidateId !== undefined || read.count !== undefined ? { data: { ...(read.candidateId !== undefined ? { candidateId: read.candidateId } : {}), ...(read.count !== undefined ? { count: read.count } : {}) } } : {}),
+      });
+    },
+  };
 }
