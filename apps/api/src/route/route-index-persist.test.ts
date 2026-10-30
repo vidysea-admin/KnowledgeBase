@@ -9,7 +9,9 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createRouteDeps, type PersistEvent } from "./route-store.js";
 import { buildRouteIndex, routeIndexFromDoc, routeIndexToDoc, routeStepA } from "./bm25-router.js";
-import { NATURAL_QUESTIONS, fakeRouteDb, syntheticTree } from "./route.testsupport.js";
+import { NATURAL_QUESTIONS, WA_DEAD_LINKS, fakeRouteDb, sessionIdOf, setWaLink, syntheticTree } from "./route.testsupport.js";
+import { createKnowledgeVisibility } from "../visibility/knowledge.js";
+import type { Job } from "@lkb/ai";
 
 const far = () => ({ deadlineAt: Date.now() + 60_000 });
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
@@ -249,3 +251,26 @@ test("an oversize index is not written (BSON 16 MB cap) and the request is unaff
   await until(() => f.events.includes("skipped-oversize"), "the oversize skip");
   assert.equal(writes(f).length, 0);
 });
+
+// ISS-WARLG-001 C1 (persisted path): the stamp (visibility fingerprint + tree revision) never reads whatsapp_links, so an index persisted while the
+// link was live stays a persisted-hit after the link goes away. Step B must still withhold the WhatsApp node: eligibility is re-read per request.
+for (const dead of WA_DEAD_LINKS) {
+  test(`ISS-WARLG-001 C1: a route_index persisted while the link was live does not leak after the link is ${dead}`, async () => {
+    const WA = sessionIdOf(4), waNode = `toc/year:2026/month:03/session:${WA}`, jobs: Job[] = [];
+    const f = setup({}, { complete: async (j) => { jobs.push(j); return { text: "", json: { node_ids: [] }, usage: { inputTokens: 1, outputTokens: 1 }, provider: "fake", model: "fake" }; } });
+    setWaLink(f.data as never, WA, "live");
+    const boot = () => f.boot({ visibility: (() => { const real = createKnowledgeVisibility(f.db); return { ...real, sessionVisible: async (t: string, id: string) => id === WA || real.sessionVisible(t, id) }; })() });
+    const inJob = (i: number) => JSON.stringify(jobs[i]!.messages).includes(waNode);
+    await boot().route("toc", "campus orientation panel", 5, far());
+    await until(() => f.events.includes("written"), "the write");
+    assert.ok(inJob(0), "precondition: the live link reaches step B");
+    assert.ok(JSON.stringify(rows(f)[0]).includes(waNode), "the persisted document holds the WhatsApp node");
+    setWaLink(f.data as never, WA, dead);
+    f.events.length = 0;
+    const loadsBefore = f.loads.length;
+    await boot().route("toc", "campus orientation panel", 5, far());
+    assert.ok(f.events.includes("persisted-hit") && f.loads.length === loadsBefore, "the second request was served from the persisted index, not a rebuild");
+    assert.equal(jobs.length, 2);
+    assert.ok(!inJob(1), `persisted index, link ${dead}: node must not reach step B`);
+  });
+}
