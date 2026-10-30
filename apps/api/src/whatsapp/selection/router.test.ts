@@ -324,20 +324,17 @@ test("an unlinked archiver owner maps to 409 archiver_owner_unavailable (no upst
   } finally { await r.close(); }
 });
 
-test("unwired router (no deps) answers a stable 503 selection_unavailable after the scope check and never reaches an archiver", async () => {
+test("unwired router (no deps) is the empty router W5 mounted: no route, so nothing can reach an archiver", async () => {
+  assert.equal(createWhatsAppSelectionRouter().stack.length, 0);
   const app = express(); app.use(express.json());
-  app.use((req, _res, next) => { const k = req.header("x-test-scopes"); (req as any).auth = { tenantId: T1, principal: "key", scopes: k ? k.split(",") : [] }; next(); });
+  app.use((req, _res, next) => { (req as any).auth = { tenantId: T1, principal: "key", scopes: ["whatsapp-link", "whatsapp-admin"] }; next(); });
   app.use(createWhatsAppSelectionRouter());
   const http = app.listen(0, "127.0.0.1"); await new Promise(r => http.once("listening", r));
   const base = `http://127.0.0.1:${(http.address() as AddressInfo).port}`;
   try {
     const id = "a".repeat(24);
-    const go = (m: string, p: string, scopes: string) => fetch(base + p, { method: m, headers: { "x-test-scopes": scopes, "content-type": "application/json" }, body: m === "GET" ? undefined : "{}" });
-    for (const [m, p] of [["GET", `/whatsapp/links/${id}/groups`], ["PUT", put(id, JID_A)], ["GET", `${put(id, JID_A)}/people`], ["PUT", `${put(id, JID_A)}/people`]] as const) {
-      const ok = await go(m, p, "whatsapp-link");
-      assert.deepEqual([ok.status, ((await ok.json()) as any).error], [503, "selection_unavailable"], `${m} ${p}`);
-      assert.equal((await go(m, p, "sessions")).status, 403);
-    }
+    for (const [m, p] of [["GET", `/whatsapp/links/${id}/groups`], ["PUT", put(id, JID_A)], ["GET", `${put(id, JID_A)}/people`]] as const)
+      assert.equal((await fetch(base + p, { method: m, headers: { "content-type": "application/json" }, body: m === "GET" ? undefined : "{}" })).status, 404, `${m} ${p}`);
   } finally { await new Promise<void>(r => http.close(() => r())); }
 });
 

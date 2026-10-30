@@ -40,14 +40,10 @@ const param = (req: Request, name: string): string => { const v: unknown = req.p
 export function createWhatsAppSelectionRouter(deps?: SelectionRouterDeps, log?: Pick<Logger, "warn">): Router {
   const router = Router();
   const PREFIX = "/whatsapp/links/:id/groups";
-  router.use(PREFIX, (_req, res, next) => { res.set({ "Cache-Control": "no-store", Pragma: "no-cache" }); next(); });
   const READ = anyScope("whatsapp-link", "whatsapp-admin"), OWNER = requireScope("whatsapp-link");
 
-  if (!deps) { // fail closed and stable until the composition wires the service
-    router.get(PREFIX, READ, (_req, res) => { res.status(503).json({ error: "selection_unavailable", message: "WhatsApp selection is not configured" }); });
-    router.all([`${PREFIX}/:jid`, `${PREFIX}/:jid/people`], OWNER, (_req, res) => { res.status(503).json({ error: "selection_unavailable", message: "WhatsApp selection is not configured" }); });
-    return router;
-  }
+  if (!deps) return router; // not wired: an empty router (W5 pins this); no route exists, so no archiver can be reached
+  router.use(PREFIX, (_req, res, next) => { res.set({ "Cache-Control": "no-store", Pragma: "no-cache" }); next(); });
   const { service } = deps;
   const send = (res: Response, r: Result<unknown>): void => {
     if (r.ok) { res.status(200).json(r.value); return; }
