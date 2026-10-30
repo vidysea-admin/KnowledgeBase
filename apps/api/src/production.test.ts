@@ -16,6 +16,8 @@ import assert from "node:assert/strict";
 import { buildProductionDeps, buildIndexer } from "./composition/production.js";
 import { routedFixture, turns, session, source } from "./grounded-postprocessing/fixture.testsupport.js";
 import { transactionalFixture } from "./transcript-review/refresh-testkit.js";
+import { buildTestDeps, fakeKeyStore } from "./fixtures.js";
+import { startTestServer } from "./testUtils.js";
 
 test("ISS-274: buildProductionDeps wires tavilySearchFn into askDeps even with no TAVILY_API_KEY set", () => {
   const prev = process.env.TAVILY_API_KEY;
@@ -66,4 +68,47 @@ test("production buildIndexer forwards trusted callback after acknowledged outer
   const result = await index("t", "s1");
   assert.equal(result.completion?.complete, true);
   assert.equal(notified, 1);
+});
+
+/** ua-production-enable P-1: production composes `userAccounts` (usable AUTH_CSRF_SECRET only) and createServer then mounts /auth + /admin. */
+async function withSecret<T>(secret: string | undefined, run: () => Promise<T>): Promise<T> {
+  const prev = process.env.AUTH_CSRF_SECRET;
+  if (secret === undefined) delete process.env.AUTH_CSRF_SECRET; else process.env.AUTH_CSRF_SECRET = secret;
+  try { return await run(); } finally { if (prev === undefined) delete process.env.AUTH_CSRF_SECRET; else process.env.AUTH_CSRF_SECRET = prev; }
+}
+async function probe(userAccounts: ReturnType<typeof buildProductionDeps>["userAccounts"]) {
+  const server = await startTestServer(buildTestDeps({ keyStore: fakeKeyStore({ "key-ask": { tenantId: "t", scopes: ["ask"] } }), userAccounts }));
+  const status = async (path: string, bearer?: string) =>
+    (await fetch(server.baseUrl + path, { headers: { connection: "close", ...(bearer ? { authorization: `Bearer ${bearer}` } : {}) } })).status;
+  return { status, close: server.close };
+}
+
+test("P-1: a usable AUTH_CSRF_SECRET makes buildProductionDeps set userAccounts and the server mounts /auth and /admin", async () => {
+  await withSecret("s".repeat(48), async () => {
+    const deps = buildProductionDeps();
+    assert.ok(deps.userAccounts, "userAccounts is composed");
+    assert.equal(typeof deps.userAccounts.session.attach, "function");
+    assert.equal(typeof deps.userAccounts.authRouter, "function", "A4 router, not the 503 placeholder");
+    assert.equal(typeof deps.userAccounts.adminRouter, "function", "A6 router, not the 503 placeholder");
+    const s = await probe(deps.userAccounts);
+    try {
+      assert.equal(await s.status("/auth/no-such-route"), 404, "/auth is mounted: terminal 404, not the shared 401");
+      assert.equal(await s.status("/admin/users"), 401, "/admin is mounted behind requireAuth: anonymous is 401");
+      assert.equal(await s.status("/admin/users", "key-ask"), 403, "/admin is mounted: a key without user-admin is refused by the router scope check");
+    } finally { await s.close(); }
+  });
+});
+
+test("P-1: without a usable AUTH_CSRF_SECRET userAccounts is undefined and API-key behaviour is unchanged", async () => {
+  for (const secret of [undefined, "short-secret"]) await withSecret(secret, async () => {
+    const deps = buildProductionDeps();
+    assert.equal(deps.userAccounts, undefined, `secret=${String(secret)}`);
+    assert.ok(deps.keyStore, "API key store still composed");
+    const s = await probe(deps.userAccounts);
+    try {
+      assert.equal(await s.status("/auth/no-such-route"), 401, "/auth is NOT mounted: the shared perimeter answers");
+      assert.equal(await s.status("/system/status", "key-ask") === 401, false, "a valid API key still authenticates");
+      assert.equal(await s.status("/system/status"), 401, "anonymous is still 401");
+    } finally { await s.close(); }
+  });
 });
