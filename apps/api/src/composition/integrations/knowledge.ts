@@ -18,7 +18,7 @@ import { createDocxRenderer } from "../../knowledge/document-reader.js";
 import { buildConnectorWorkflowDeps } from "../../connector-workflow/wiring.js";
 import { inspectSourceMediaRuntime } from "../../source-intake/media-runtime.js";
 import { createWhatsAppReviewWiring } from "../../whatsapp/review/compose.js";
-import { createConfiguredWhatsAppOwnerResolver } from "../../whatsapp/owner-config.js";
+import { createDbBackedWhatsAppOwners } from "../../whatsapp/owner-config.js";
 import { createMongoWhatsAppReviewSourceReader, createWhatsAppReviewSourceRouter } from "../../whatsapp-review/review-source.js";
 
 export interface KnowledgeIntegrations {
@@ -65,7 +65,7 @@ export function buildKnowledgeIntegrations(input: {
   const connectorWorkflow = buildConnectorWorkflowDeps(input.env, input.index, input.sourceIntake, capabilities, input.sourceJobs);
   const reviewedWhatsApp = createWhatsAppReviewWiring({
     appDb: () => input.db,
-    resolveOwner: createConfiguredWhatsAppOwnerResolver(input.env.WHATSAPP_TENANT_OWNER_MAP),
+    resolveOwners: createDbBackedWhatsAppOwners({ rawMap: input.env.WHATSAPP_TENANT_OWNER_MAP, db: input.db }),
   });
   const whatsappReview = Router();
   whatsappReview.use(createWhatsAppReviewSourceRouter(createMongoWhatsAppReviewSourceReader(input.db)));

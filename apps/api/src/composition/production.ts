@@ -16,7 +16,7 @@ import { createRouteDeps } from "../route/route-store.js";
 import { createSessionDecisionsDeps } from '../session-decisions/reader.js';
 import { buildCalendarWorkerIntegrations, buildCapturePolicyIntegrations } from './integrations/capture-policy.js';
 import { createMongoWhatsAppDeps } from "../whatsapp/store.js";
-import { createConfiguredWhatsAppOwnerResolver } from "../whatsapp/owner-config.js";
+import { createDbBackedWhatsAppOwners } from "../whatsapp/owner-config.js";
 import { realTransport } from "../ai-transport.js";
 import { createLlmScorer } from "../score.js";
 import { createGeminiWebSearchFn } from "../ask/ask-web-fallback.js";
@@ -180,7 +180,7 @@ export function buildProductionDeps(options: { onIndexCommitted?: IndexCommitted
     graph: createMongoGraphReadDeps(),
     calendar: worker?.calendar ?? createGwsCalendarReadDeps(),
     meetingCandidates: { ...createMeetingCandidatesDeps(undefined, undefined, undefined, undefined, worker?.listGmailCandidates, worker || process.env.LKB_JOIN_RULES_ENABLED === "1" ? {joinRules: capturePolicy.joinRules, ownedDomains: worker?.ownedDomains, gmailSummary: worker?.gmailSummary} : undefined), ...(publicWebinars.configured ? { discoverPublicWebinars: publicWebinars.discover } : {}) },
-    whatsapp: createMongoWhatsAppDeps(boundIndexer, { resolveOwner: createConfiguredWhatsAppOwnerResolver(process.env.WHATSAPP_TENANT_OWNER_MAP) }),
+    whatsapp: createMongoWhatsAppDeps(boundIndexer, { resolveOwners: createDbBackedWhatsAppOwners({ rawMap: process.env.WHATSAPP_TENANT_OWNER_MAP, db }) }) /* W4: links are authoritative; the env map only seeds legacy links */,
     keys: createMongoKeysDeps(),
     ingest: createMongoIngestDeps(boundIndexer),
     // T-045: OFF unless LKB_SOURCE_INTAKE=1 (route absent otherwise); see source-intake-wiring.ts.
