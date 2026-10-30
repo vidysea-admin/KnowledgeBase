@@ -4,7 +4,7 @@
 **Date:** 2026-10-30
 **Policy-Version:** proportional-verification/2026-10-19.17
 **Status:** checked-PASS
-**Handshake status:** ready-for-check
+**Handshake status:** checked-PASS
 **Fix cycle:** 1
 **Dual check:** required
 dual-trigger: auth apps/web/src/api/client.ts:42

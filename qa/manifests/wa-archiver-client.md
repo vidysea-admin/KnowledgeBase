@@ -4,7 +4,7 @@
 **Date:** 2026-10-30
 **Policy-Version:** proportional-verification/2026-10-19.17
 **Status:** checked-PASS
-**Handshake status:** ready-for-check
+**Handshake status:** checked-PASS
 **Fix cycle:** 0
 **Dual check:** required
 dual-trigger: security apps/api/src/whatsapp/archiver/client.ts:104

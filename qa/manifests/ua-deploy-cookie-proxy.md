@@ -4,7 +4,7 @@
 **Date:** 2026-10-30
 **Policy-Version:** proportional-verification/2026-10-19.17
 **Status:** checked-PASS
-**Handshake status:** ready-for-check
+**Handshake status:** checked-PASS
 **Fix cycle:** 0
 **Dual check:** no (docs plus a runtime config flag that only writes the literal `true` or `false` into the public `config.js`; no auth, tenancy, session or data-write code changed; the cookie behaviour itself is proven in A3 and A9)
 **Persona walk:** skip (no new screen, flow or user type; the flag only reveals screens A7 already built)
