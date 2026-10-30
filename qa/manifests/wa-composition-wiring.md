@@ -3,8 +3,8 @@
 **Goal task:** whatsapp-multiuser composition wiring (before W10/W14)
 **Date:** 2026-10-30
 **Policy-Version:** proportional-verification/2026-10-19.17
-**Status:** ready-for-check
-**Handshake status:** ready-for-check
+**Status:** checked-PASS (qa/verdicts/wa-composition-wiring.md ea501a13 + .b.md ce222d15, dual)
+**Handshake status:** checked-PASS
 **Fix cycle:** 0
 **Dual check:** required
 dual-trigger: auth apps/api/src/composition/integrations/routes.ts:91
