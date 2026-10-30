@@ -88,6 +88,7 @@ Read next: `docs/HLD.md` (pipeline stage status, deployment) and `docs/LLD.md` (
   - `scripts/watch/`
   - `scripts/watched-sources/`
   - `scripts/webinar/`
+  - `scripts/whatsapp/`
 - `skills/`
   - `skills/checker/`
   - `skills/maker/`
