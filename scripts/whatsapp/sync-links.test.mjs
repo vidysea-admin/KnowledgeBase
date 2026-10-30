@@ -139,6 +139,17 @@ test("W9-3 link A failing does not stop link B; both have a run row with a close
   assert.deepEqual(world.health[LA].flags, [], "a good run clears error");
 });
 
+test("W9-3 a store failure while recording link A's run does not stop link B (runCycle isolates each link)", async () => {
+  const { deps, world } = await harness();
+  const real = deps.recordRun;
+  deps.recordRun = async (t, run) => { if (run.linkId === LA) throw Object.assign(new Error("SECRET-STORE-TEXT"), { name: "MongoServerError" }); return real(t, run); };
+  const runs = await runCycle(deps);
+  assert.deepEqual(runs.map((r) => r.linkId), [LB]);
+  assert.equal(runOf(world, LB)[0].status, "ok");
+  assert.ok(world.logs.some((l) => l.includes(LA) && l.includes("run not recorded")) && !world.logs.join(String.fromCharCode(10)).includes("SECRET-STORE-TEXT"));
+  deps.recordRun = real; assert.equal((await syncLink(deps, T, { linkId: LA, ownerUserId: OA })).status, "ok", "A's lock was released, so a later run can take it");
+});
+
 test("W9-3 classifyError maps to the closed list and never reads message text", () => {
   const e = (name, extra = {}) => Object.assign(new Error("SECRET"), { name, ...extra });
   assert.deepEqual([e("WhatsAppNotConfiguredError"), e("WhatsAppUnavailableError"), e("SnapshotShrinkError"), e("ArchiverError", { code: "archiver_api_unavailable" }), e("ArchiverError", { code: "rate_limited" }), e("MongoServerError", { code: 20 }), e("Error")].map(classifyError),
@@ -261,6 +272,17 @@ test("wired deps: only requested/suspended/other-tenant rows exist -> nothing to
   tables.whatsapp_links[0].state = "suspended";
   await assert.rejects(() => deps.listGroups(T, { linkId: LA, ownerUserId: OA }), { name: "WhatsAppNotConfiguredError" }); // pinned resolver re-reads the row
   await assert.rejects(() => deps.ingestGroup(T, { linkId: LA, ownerUserId: OA }, JA), { name: "WhatsAppNotConfiguredError" });
+});
+
+test("W9-5 wired size cap: a group over limits.maxMessages is refused before anything is written, within the cap it is not", async () => {
+  const { db, tables } = fakeDb();
+  tables.whatsapp_links = [{ _id: LA, tenantId: T, state: "active", archiverOwnerId: OA }];
+  const msgs = (n) => Array.from({ length: n }, (_, i) => ({ messageId: `m${i}`, personId: "p", displayName: "E", text: "Scholarship closes Friday.", ts: "2026-10-14T10:00:00.000Z" }));
+  const mk = (n) => createWiredDeps({ db, env: {}, root: scratch(), log: quiet, archiver: null, limits: { maxMessages: 2 },
+    storeOptions: { listGroups: async () => [{ groupJid: JA, ownerUserId: OA, subject: "S", trackedPersonCount: 1 }], fetchMessages: async () => msgs(n) } });
+  await assert.rejects(async () => (await mk(3)).ingestGroup(T, { linkId: LA, ownerUserId: OA }, JA), { name: "GroupSizeCapError" });
+  assert.equal((tables.turns ?? []).length, 0, "nothing written for the refused group");
+  await assert.rejects(async () => (await mk(2)).ingestGroup(T, { linkId: LA, ownerUserId: OA }, JA), (e) => e?.name !== "GroupSizeCapError"); // within the cap it proceeds, then fails on the in-memory db (no transactions)
 });
 
 test("W3 fake archiver: the real client drives the status poll and the unlink retry through createWiredDeps", async () => {
