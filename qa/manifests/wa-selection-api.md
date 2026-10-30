@@ -3,8 +3,8 @@
 **Goal task:** whatsapp-multiuser W6 `wa-selection-api`
 **Date:** 2026-10-30
 **Policy-Version:** proportional-verification/2026-10-19.17
-**Status:** ready-for-check
-**Handshake status:** ready-for-check
+**Status:** checked-PASS
+**Handshake status:** checked-PASS
 **Fix cycle:** 0
 **Dual check:** required
 dual-trigger: tenancy apps/api/src/whatsapp/selection/service.ts:54
