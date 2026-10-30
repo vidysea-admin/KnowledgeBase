@@ -3,8 +3,8 @@
 **Goal task:** ua-web follow-up (`ua-web-401-signout`, fixes ISS-UAWEB-001)
 **Date:** 2026-10-30
 **Policy-Version:** proportional-verification/2026-10-19.17
-**Status:** ready-for-check
-**Handshake status:** ready-for-check
+**Status:** checked-PASS (qa/verdicts/ua-web-401-signout.md 039744ee + .b.md 1d8408fd, dual)
+**Handshake status:** checked-PASS
 **Fix cycle:** 0
 **Dual check:** required
 dual-trigger: auth apps/web/src/api/client.ts:165
