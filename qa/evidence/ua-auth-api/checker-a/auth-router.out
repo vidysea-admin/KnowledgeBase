@@ -1,0 +1,24 @@
+✔ A4 #1 signup over HTTP: new and existing email give a byte-equal body; unknown field and tenant-in-body are 400 and create nothing; no tenant configured is 503 (480.3309ms)
+✔ A4 public POSTs refuse a foreign Origin (403 csrf) but accept the app origin and a missing Origin (non-browser) (60.5725ms)
+✔ A4 #3 login over HTTP: unknown email and wrong password are byte-equal 401s with no cookie; success sets the exact cookie; responses are no-store (43.5475ms)
+✔ A4 #3 a pending user gets a session with ZERO scopes: /auth works, every data route is 403 account_not_active; rejected / disabled get no cookie (73.8328ms)
+✔ A4 #7 logout needs CSRF; it revokes the session and clears the cookie on the exact path; the old cookie is then 401 session_revoked; logout-all revokes every session (78.9189ms)
+✔ A4 UA-20 sessions list and revoke-own over HTTP; revoking the current session clears the cookie; another session id is 404 (48.6999ms)
+✔ A4 #5 reset over HTTP: forgot is a uniform 202; an admin-issued token resets once; a session that existed before gets 401 on its next request (62.7549ms)
+✔ A4 verify over HTTP: an admin-issued link moves unverified -> pending; the same link again is the generic 400 (21.3729ms)
+✔ A4 #6 change password over HTTP: needs the session + CSRF; wrong current is 403 (not 401, the web client must not sign out) (41.2866ms)
+✔ A4 #8 rate limits: per-IP login / signup / forgot / token respond 429 with the standard body and Retry-After; per-email forgot 429 too (98.2172ms)
+✔ A4 #10 no /auth route is reachable with a Bearer key (403 key_not_allowed), with or without a cookie; the key store is never consulted for /auth (173.2627ms)
+✔ A4 login while holding a session revokes that old session (one cookie, one live session) (34.3881ms)
+✔ a storage failure is 503 auth_unavailable with no internal detail (never 500, never logged in) (16.3772ms)
+✔ end to end with the REAL argon2id module: signup, admin link, verify, approve, login, wrong password, change, reset (458.7687ms)
+✔ sessionCookie import is the same builder the router uses (cookie string pinned above) (0.3354ms)
+ℹ tests 15
+ℹ suites 0
+ℹ pass 15
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 13359.0773
+exit 0
