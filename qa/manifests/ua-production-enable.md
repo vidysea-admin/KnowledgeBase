@@ -3,8 +3,8 @@
 **Goal task:** user-accounts production enablement (integration of A4 + A6 + ua-admin-mount)
 **Date:** 2026-10-30
 **Policy-Version:** proportional-verification/2026-10-19.17
-**Status:** ready-for-check
-**Handshake status:** ready-for-check
+**Status:** checked-PASS (dual: A dfbf170f, B f9b2bf60, cycle 0)
+**Handshake status:** checked-PASS
 **Fix cycle:** 0
 **Dual check:** required
 dual-trigger: auth apps/api/src/composition/production.ts:265
