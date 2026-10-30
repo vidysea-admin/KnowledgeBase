@@ -3,7 +3,7 @@
 **Goal task:** whatsapp-multiuser W4 `wa-owner-resolver` (deps W1 wa-links-schema merged, A3 merged)
 **Date:** 2026-10-30
 **Policy-Version:** proportional-verification/2026-10-19.17
-**Status:** ready-for-check
+**Status:** checked-PASS
 **Handshake status:** ready-for-check
 **Fix cycle:** 0
 **Dual check:** required
