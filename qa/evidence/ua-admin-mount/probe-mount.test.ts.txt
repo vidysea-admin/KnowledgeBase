@@ -1,0 +1,48 @@
+import test from "node:test";
+import assert from "node:assert/strict";
+import express from "express";
+import type { AddressInfo } from "node:net";
+import { buildUserAccounts } from "../composition/integrations/user-accounts.js";
+
+const calls: Array<{ coll: string; op: string; filter?: unknown }> = [];
+const users: Record<string, Record<string, unknown>> = {
+  adm1: { _id: "adm1", tenantId: "toc", emailNormalized: "admin@x.org", status: "active", role: "admin", displayName: "A", createdAt: "2026-01-01T00:00:00.000Z" },
+  mem1: { _id: "mem1", tenantId: "toc", emailNormalized: "member@x.org", status: "active", role: "member", displayName: "M", createdAt: "2026-01-01T00:00:00.000Z" },
+};
+const chain = (arr: unknown[]) => { const c: any = { sort: () => c, limit: () => c, toArray: async () => arr }; return c; };
+const fakeDb = { collection: (name: string) => ({
+  findOne: async (f: any) => { calls.push({ coll: name, op: "findOne", filter: f }); return name === "users" ? (users[f._id] ?? null) : null; },
+  find: (f: any) => { calls.push({ coll: name, op: "find", filter: f }); return chain([]); },
+  deleteMany: async (f: any) => { calls.push({ coll: name, op: "deleteMany", filter: f }); return { deletedCount: 1 }; },
+  insertOne: async (d: any) => { calls.push({ coll: name, op: "insertOne", filter: d }); return { insertedId: d._id }; },
+  countDocuments: async () => 2,
+  updateOne: async () => ({ modifiedCount: 1, matchedCount: 1 }),
+  bulkWrite: async () => ({ modifiedCount: 0 }),
+}) } as any;
+
+test("probe: admin unlock deletes the same throttle row key A4 would", async () => {
+  const ua = buildUserAccounts({ AUTH_CSRF_SECRET: "s".repeat(40), USER_SIGNUP_TENANT: "toc", APP_PUBLIC_ORIGIN: "https://kb.example.org", APP_BASE_PATH: "/knowledgebase" }, fakeDb, { warn: () => {} })!;
+  const app = express();
+  app.use(express.json());
+  app.use((req: any, _res, next) => { req.auth = { principal: "session", userId: "adm1", userRole: "admin", tenantId: "toc", scopes: ["user-admin"] }; next(); });
+  app.use("/admin", ua.adminRouter!);
+  const srv = app.listen(0, "127.0.0.1"); await new Promise((r) => srv.once("listening", r));
+  const base = `http://127.0.0.1:${(srv.address() as AddressInfo).port}`;
+  try {
+    const r = await fetch(`${base}/admin/users/mem1/unlock`, { method: "POST", headers: { "content-type": "application/json" }, body: "{}" });
+    const body = await r.json();
+    const adminDel = calls.find((c) => c.coll === "auth_throttles" && c.op === "deleteMany");
+    calls.length = 0;
+    await ua.auth.unlockEmail("toc", " Member@X.org ", "adm1");
+    const a4Del = calls.find((c) => c.coll === "auth_throttles" && c.op === "deleteMany");
+    console.log("PROBE status", r.status, JSON.stringify(body), "admin", JSON.stringify(adminDel), "a4", JSON.stringify(a4Del));
+    assert.equal(r.status, 200);
+    assert.ok(adminDel && a4Del);
+    assert.deepEqual(adminDel!.filter, a4Del!.filter, "admin unlock and A4 unlockEmail delete the identical throttle key");
+    // issue-link uses publicOrigin + basePath
+    const l = await fetch(`${base}/admin/users/mem1/issue-link`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ purpose: "password_reset" }) });
+    const lb: any = await l.json();
+    console.log("PROBE link", l.status, typeof lb.link === "string" ? lb.link.replace(/#.*/, "#<redacted>") : JSON.stringify(lb));
+    assert.match(String(lb.link), /^https:\/\/kb\.example\.org\/knowledgebase\//);
+  } finally { srv.close(); }
+});
