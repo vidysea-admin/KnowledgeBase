@@ -1,0 +1,9 @@
+W9-7 owing-tenant union removed: green-before pass=1 fail=0 | after pass=0 fail=1 cancelled=0 reds=["W9-7 wired: a tenant whose ONLY link is a pending terminal link is lis"] | restore=HEAD-OK
+W9-8a env-map tenant union removed: green-before pass=1 fail=0 | after pass=0 fail=1 cancelled=0 reds=["W9-8 wired: an env-map tenant whose seed fails once is still listed, s"] | restore=HEAD-OK
+W9-8b seed failure no longer logged: green-before pass=1 fail=0 | after pass=0 fail=1 cancelled=0 reds=["W9-8 wired: an env-map tenant whose seed fails once is still listed, s"] | restore=HEAD-OK
+W9-8c seed removed entirely: green-before pass=2 fail=0 | after pass=1 fail=1 cancelled=0 reds=["ISS-WAOWNER-001: a tenant with ONLY the env map"] | restore=HEAD-OK
+W9-2 any acquire error => skipped: green-before pass=1 fail=0 | after pass=0 fail=1 cancelled=0 reds=["W9-2 a held lock is skipped"] | restore=HEAD-OK
+W9-3a removed flags never pulled: green-before pass=1 fail=0 | after pass=0 fail=1 cancelled=0 reds=["health flags are written with $addToSet/$pull: a flag another writer s"] | restore=HEAD-OK
+W9-3b flags never added: green-before pass=1 fail=0 | after pass=0 fail=1 cancelled=0 reds=["health flags are written with $addToSet/$pull: a flag another writer s"] | restore=HEAD-OK
+W9-3c whole-array $set again: green-before pass=1 fail=0 | after pass=0 fail=1 cancelled=0 reds=["health flags are written with $addToSet/$pull: a flag another writer s"] | restore=HEAD-OK
+W9-1 mid-run active recheck removed: green-before pass=1 fail=0 | after pass=0 fail=1 cancelled=0 reds=["W9-1 a link suspended between two groups of one run: the second group "] | restore=HEAD-OK
