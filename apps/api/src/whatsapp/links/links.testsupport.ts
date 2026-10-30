@@ -6,6 +6,7 @@
 import { randomBytes } from "node:crypto";
 import { LIVE_STATES, LiveLinkExistsError, type LinkDataPort, type LinkRow, type LinksStore, type NewEvent, type Transition } from "./service.js";
 import { parseNotice } from "./notice.js";
+import type { EventsFeed } from "./events-router.js";
 
 export const NOTICE = parseNotice("# Notice\n\n- You are linking your own WhatsApp.\n- The KB archives groups you pick.\n");
 export const T1 = "tenant-1", T2 = "tenant-2";
@@ -83,4 +84,21 @@ export function memoryLinkData(): MemData {
     async withdrawSources(tenantId, linkId, ownerId, recordedBy) { d.calls.push({ op: "withdraw", tenantId, linkId, ownerId, recordedBy }); if (d.fail.withdraw) throw new Error("mongo down"); return 0; },
   };
   return d;
+}
+
+type FeedRow = { _id: string; tenantId: string; at: string } & Record<string, unknown>;
+/** EventsFeed double with the Mongo accessor's semantics (whatsAppLinkStores().events().list): tenant-scoped, (at, _id) order, an unknown cursor throws. `add` takes a stored row as is (a test may plant extra fields). */
+export function memoryEventsFeed(): EventsFeed & { rows: FeedRow[]; add(tenantId: string, e: Record<string, unknown>): FeedRow } {
+  const rows: FeedRow[] = []; let n = 0;
+  const key = (r: FeedRow): string => `${r.at}|${r._id}`;
+  return {
+    rows,
+    add(tenantId, e) { n++; const row = { _id: n.toString(16).padStart(24, "0"), tenantId, at: new Date(Date.parse(NOW) + n * 1000).toISOString(), actorKind: "system", ...e } as FeedRow; rows.push(row); return structuredClone(row); },
+    async list(tenantId, o = {}) {
+      const mine = rows.filter(r => r.tenantId === tenantId).sort((a, b) => (key(a) < key(b) ? -1 : 1));
+      let from = 0;
+      if (o.afterId) { const i = mine.findIndex(r => r._id === o.afterId); if (i < 0) throw new Error("whatsapp_events: unknown cursor"); from = i + 1; }
+      return structuredClone(mine.slice(from, from + Math.min(Math.max(Math.trunc(o.limit ?? 100), 1), 500))) as never;
+    },
+  };
 }
