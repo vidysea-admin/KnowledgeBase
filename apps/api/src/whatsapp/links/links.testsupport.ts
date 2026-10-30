@@ -4,7 +4,7 @@
  * a recording archiver port. No real-Mongo claim: see links.mongo.test.ts for the gated real-database run.
  */
 import { randomBytes } from "node:crypto";
-import { LIVE_STATES, LiveLinkExistsError, type LinkRow, type LinksStore, type NewEvent, type Transition } from "./service.js";
+import { LIVE_STATES, LiveLinkExistsError, type LinkDataPort, type LinkRow, type LinksStore, type NewEvent, type Transition } from "./service.js";
 import { parseNotice } from "./notice.js";
 
 export const NOTICE = parseNotice("# Notice\n\n- You are linking your own WhatsApp.\n- The KB archives groups you pick.\n");
@@ -54,6 +54,8 @@ export function memoryLinksStore(): MemStore {
       if (r.archiverOwnerId) return r.archiverOwnerId === ownerId ? "same" : "conflict";
       r.archiverOwnerId = ownerId; return "set";
     },
+    async touch(t, id, from) { const r = mine(t, id); if (!r || !from.includes(r.state)) return false; r.updatedAt = NOW; return true; },
+    async ownerInUseByOther(t, ownerId, except) { return [...rows.values()].some(r => r.tenantId === t && r._id !== except && r.archiverOwnerId === ownerId); },
     async appendEvent(t, e) {
       if (store.failEvents) throw new Error("mongo down");
       for (const v of Object.values(e.data ?? {})) if (typeof v !== "string" && typeof v !== "number") throw new Error("closed event data: scalars only");
@@ -67,4 +69,18 @@ export function memoryLinksStore(): MemStore {
 export function seed(store: MemStore, over: Partial<LinkRow> & Pick<LinkRow, "tenantId" | "state">): LinkRow {
   const row = { _id: randomBytes(12).toString("hex"), userId: "u-member", label: "Mine", live: LIVE_STATES.includes(over.state), studentData: "no", createdAt: NOW, updatedAt: NOW, ...over } as LinkRow;
   store.rows.set(row._id, row); return row;
+}
+
+export interface MemData extends LinkDataPort {
+  calls: Array<{ op: "quarantine" | "withdraw"; tenantId: string; linkId: string; ownerId: string | undefined; recordedBy?: string }>;
+  fail: { quarantine: boolean; withdraw: boolean };
+}
+/** Recording LinkDataPort double: the real Mongo port is exercised in review/link-data.test.ts (fixture db) and unlink.mongo.test.ts (real Mongo, gated). */
+export function memoryLinkData(): MemData {
+  const d: MemData = {
+    calls: [], fail: { quarantine: false, withdraw: false },
+    async quarantineCandidates(tenantId, linkId, ownerId) { d.calls.push({ op: "quarantine", tenantId, linkId, ownerId }); if (d.fail.quarantine) throw new Error("mongo down"); return 0; },
+    async withdrawSources(tenantId, linkId, ownerId, recordedBy) { d.calls.push({ op: "withdraw", tenantId, linkId, ownerId, recordedBy }); if (d.fail.withdraw) throw new Error("mongo down"); return 0; },
+  };
+  return d;
 }

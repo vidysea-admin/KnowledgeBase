@@ -386,7 +386,7 @@ test("helpers: ipPrefixOf truncates to /24 and /48 and rejects junk", () => {
 test("[A6 wiring] buildUserAccounts builds the /admin router, so the production mount is no longer the 503 placeholder", async () => {
   const { buildUserAccounts } = await import("../composition/integrations/user-accounts.js");
   const fakeDb = { collection: () => ({}) } as unknown as import("mongodb").Db;
-  const ua = buildUserAccounts({ AUTH_CSRF_SECRET: "x".repeat(40), USER_SIGNUP_TENANT: "toc", APP_PUBLIC_ORIGIN: ORIGIN }, fakeDb, { warn: () => {} });
+  const ua = buildUserAccounts({ AUTH_CSRF_SECRET: "x".repeat(40), USER_SIGNUP_TENANT: "toc", APP_PUBLIC_ORIGIN: ORIGIN }, fakeDb, { warn: () => {}, error: () => {} });
   assert.ok(ua, "a usable AUTH_CSRF_SECRET enables user accounts");
   assert.equal(typeof ua.adminRouter, "function", "adminRouter is built, not left to the placeholder");
 });

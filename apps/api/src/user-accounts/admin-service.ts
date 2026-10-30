@@ -105,6 +105,8 @@ export interface AdminServiceDeps {
   basePath?: string;
   now?: () => Date;
   log?: AdminLog;
+  /** R-10 (WhatsApp links), injected at composition: called AFTER a disable / reject / role change committed, with the post-change status and role. Best effort: a failure is logged and never fails or undoes the action. */
+  onAccountChange?: (tenantId: string, userId: string, to: { status: UserStatus; role?: Role }) => Promise<unknown>;
 }
 
 /** "https://kb.example.org" only: scheme + host + optional port; no path, query, fragment or credentials. */
@@ -149,8 +151,10 @@ export function createAdminService(deps: AdminServiceDeps) {
     return run;
   }
 
-  function event(actor: Actor, targetUserId: string, type: AuthEventInput["type"], detail: AuthEventInput["detail"]): Promise<void> {
-    return store.audit(actor.tenantId, { type, outcome: "ok", detail, actorUserId: actor.userId, targetUserId, ...(actor.ipPrefix ? { ipPrefix: actor.ipPrefix } : {}) }, clock());
+  /** One audit row; with `to` (the post-change account) it then tells the injected hook, whose failure never reaches the caller. */
+  async function event(actor: Actor, targetUserId: string, type: AuthEventInput["type"], detail: AuthEventInput["detail"], to?: { status: UserStatus; role?: Role }): Promise<void> {
+    await store.audit(actor.tenantId, { type, outcome: "ok", detail, actorUserId: actor.userId, targetUserId, ...(actor.ipPrefix ? { ipPrefix: actor.ipPrefix } : {}) }, clock());
+    if (to && deps.onAccountChange) try { await deps.onAccountChange(actor.tenantId, targetUserId, to); } catch (e) { deps.log?.warn("account_change_hook_failed", { error: e instanceof Error ? e.name : "unknown" }); }
   }
   const stamp = (actor: Actor, now: Date) => ({ statusChangedAt: now.toISOString(), statusChangedBy: actor.userId, updatedAt: now.toISOString() });
   const lastAdmin = () => fail(409, "last_admin", "this would leave the tenant without an active admin");
@@ -169,11 +173,7 @@ export function createAdminService(deps: AdminServiceDeps) {
     });
   }
 
-  async function reload(tenantId: string, id: string): Promise<UserView> {
-    const u = await store.get(tenantId, id);
-    if (!u) throw new Error("user vanished after write");
-    return userView(u);
-  }
+  const reload = async (tenantId: string, id: string): Promise<UserView> => userView((await store.get(tenantId, id)) ?? (() => { throw new Error("user vanished after write"); })());
 
   /** Demote/disable of an ACTIVE ADMIN target: pre-check, caller's CAS, post-check. Returns a Fail when the write was refused or reverted. */
   async function guardAdminChange(actor: Actor, target: Users, write: () => Promise<boolean>, revert: () => Promise<boolean>): Promise<Fail | null> {
@@ -213,7 +213,7 @@ export function createAdminService(deps: AdminServiceDeps) {
       if (target.status !== "pending") return badState("only a pending account can be rejected");
       const now = clock();
       if (!(await store.cas(actor.tenantId, id, { status: "pending" }, { status: "rejected", ...stamp(actor, now) }))) return fail(409, "conflict", "the user changed while this request ran; reload and retry");
-      await event(actor, id, "rejected", "admin_action");
+      await event(actor, id, "rejected", "admin_action", { status: "rejected" });
       return ok({ user: await reload(actor.tenantId, id) });
     }),
 
@@ -234,7 +234,7 @@ export function createAdminService(deps: AdminServiceDeps) {
         if (actor.userId === id) return selfAction();
         if (!(await store.cas(actor.tenantId, id, { status: "active", role: from }, patch(input.role)))) return fail(409, "conflict", "the user changed while this request ran; reload and retry");
       }
-      await event(actor, id, "role_changed", "admin_action");
+      await event(actor, id, "role_changed", "admin_action", { status: "active", role: input.role });
       return ok({ user: await reload(actor.tenantId, id), changed: true });
     }),
 
@@ -252,7 +252,7 @@ export function createAdminService(deps: AdminServiceDeps) {
         if (!(await store.cas(actor.tenantId, id, { status: "active" }, to))) return fail(409, "conflict", "the user changed while this request ran; reload and retry");
       }
       const revoked = await store.revokeSessions(actor.tenantId, id, "disabled", now);
-      await event(actor, id, "disabled", "admin_action");
+      await event(actor, id, "disabled", "admin_action", { status: "disabled" });
       return ok({ user: await reload(actor.tenantId, id), revokedSessions: revoked });
     }),
 
