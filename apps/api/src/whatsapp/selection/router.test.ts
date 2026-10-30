@@ -340,3 +340,30 @@ test("unwired router (no deps) answers a stable 503 selection_unavailable after 
     }
   } finally { await new Promise<void>(r => http.close(() => r())); }
 });
+
+test("C1 an admin who OWNS a non-active link is still refused a write (the owner gate applies to admins too), but may read", async () => {
+  const r = await rig(); try {
+    const { row } = await r.link({ state: "suspended", userId: "u-admin" });
+    const w = await r.call(as("u-admin"), "PUT", put(row._id, JID_A), { marked: true });
+    assert.deepEqual([w.status, w.json!.error, r.spy.writes.length], [409, "link_not_active", 0]);
+    const g = await r.call(as("u-admin"), "GET", `/whatsapp/links/${row._id}/groups`);
+    assert.deepEqual([g.status, g.json!.view, g.json!.canEdit], [200, "admin", false]);
+  } finally { await r.close(); }
+});
+
+test("C4 service: a write the archiver reports as unchanged (a race with another change) writes no event", async () => {
+  const store = memoryLinksStore(); const row = seed(store, { tenantId: T1, state: "active", userId: "u-member", archiverOwnerId: "a".repeat(24) });
+  const events: unknown[] = [];
+  const g = { jid: JID_A, subject: "s", participantCount: 1, isTracked: false, trackAllSenders: false, membersSyncedAt: null };
+  const service = createSelectionService({
+    links: { get: (t, id) => store.get(t, id) }, appendEvent: async (_t, e) => { events.push(e); },
+    archiver: {
+      listGroups: async () => ({ source: "cache", refreshedAt: null, truncated: false, groups: [g] }),
+      setGroupTracking: async () => ({ jid: JID_A, isTracked: true, trackAllSenders: true, capture: "all", changed: false }),
+      listPeople: async () => ({ source: "cache", people: [] }), setPeople: async () => ({ jid: JID_A, count: 0, capture: "none", changed: false }),
+    },
+  });
+  const p = { tenantId: T1, kind: "session" as const, userId: "u-member", actor: "user:u-member", link: true, admin: false };
+  const res = await service.setGroup(p, row._id, JID_A, { marked: true });
+  assert.deepEqual([res.ok, (res as any).value.changed, events.length], [true, false, 0]);
+});
