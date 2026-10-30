@@ -46,7 +46,7 @@ function withTimeout(promise, ms, onLate) {
 const diff = (after, before) => [...after].filter((id) => !before.has(id)).length;
 const RUN_ID = /^[0-9a-f]{24}$/, count = (n) => (Number.isInteger(n) && n >= 0 ? n : 0);
 /** R-38 event for one recorded run, or null (a skipped run is not a sync result). Counts and the closed error code only. */
-function runEvent(row, runId) {
+export function runEvent(row, runId) {
   if (row.status !== "ok" && row.status !== "failed" && row.status !== "partial") return null;
   const sum = (k) => row.groups.reduce((n, g) => n + count(g[k]), 0);
   const data = { groupCount: row.groups.length, fetched: sum("fetched"), newTurns: sum("newTurns"), candidatesCreated: sum("candidatesCreated"), ...(typeof runId === "string" && RUN_ID.test(runId) ? { runId } : {}) };

@@ -5,7 +5,7 @@ import assert from "node:assert/strict";
 import { mkdtempSync, rmSync, readdirSync, writeFileSync, unlinkSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { clampIntervalMinutes, classifyError, runCycle, startScheduler, syncLink, createFileLock, createWiredDeps, ERROR_CODES, createAdminAlertSink, feedChannel } from "./sync-links.mjs";
+import { clampIntervalMinutes, classifyError, runCycle, startScheduler, syncLink, createFileLock, createWiredDeps, ERROR_CODES, createAdminAlertSink, feedChannel, runEvent } from "./sync-links.mjs";
 import { startFakeArchiver } from "../../apps/api/src/whatsapp/archiver/fake-archiver.ts";
 import { createArchiverClient } from "../../apps/api/src/whatsapp/archiver/client.ts";
 import { loadArchiverConfig } from "../../apps/api/src/whatsapp/archiver/config.ts";
@@ -397,6 +397,13 @@ test("W12 sync.completed / sync.failed: one event per recorded run (ids, counts,
   assert.deepEqual(world.events.map((e) => e.linkId), [LB], "A's run is skipped (logged out): no sync event");
   world.eventsFail = true; world.runs.length = 0; assert.equal((await syncLink(deps, T, { linkId: LB, ownerUserId: OB })).status, "ok");
   assert.equal(runOf(world, LB).length, 1); assert.ok(world.logs.some((l) => l.includes("event_write_failed")) && !world.logs.join("\n").includes("SECRET-EVENT-TEXT"));
+});
+
+test("W12 runEvent closes the error code: a code outside the list (or upstream text) becomes unknown; a skipped run and a bad run id add nothing", () => {
+  const g = [{ fetched: 2, newTurns: 1, candidatesCreated: 1 }], row = (status, errorCode) => ({ linkId: LA, status, errorCode, groups: g });
+  assert.equal(runEvent(row("failed", "raw upstream text SECRET-BODY"), "x").data.errorCode, "unknown");
+  assert.equal(runEvent(row("failed", "archive_unreachable"), "x").data.errorCode, "archive_unreachable"); assert.equal(runEvent(row("skipped", "link_inactive")), null);
+  assert.deepEqual(runEvent(row("ok", null), "not-an-id").data, { groupCount: 1, fetched: 2, newTurns: 1, candidatesCreated: 1 });
 });
 
 test("W12/H-13 the admin alert sink writes link.needs_relink once per transition (not per cycle); an error alert is the run's own sync.failed; a broken channel never stops another", async () => {
