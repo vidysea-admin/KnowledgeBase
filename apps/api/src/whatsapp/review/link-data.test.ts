@@ -3,6 +3,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createLinkDataPort, createMongoWhatsAppReviewRepository, whatsAppLinkSourceIds } from "./store.js";
 import { detectWhatsAppReviewCandidates, type WhatsAppReviewInput } from "./detection.js";
+import type { Db } from "mongodb";
 import { reviewInput, reviewMongoFixture, REVIEW_TIME } from "./test-fixtures.js";
 
 const A = "a".repeat(24), B = "b".repeat(24), OWNER_A = "c".repeat(24);
@@ -69,4 +70,61 @@ test("W8 withdraw + approve race: a candidate approved after the unlink withdrew
   const row = f.rows("whatsapp_candidates").find(r => r["sourceId"] === "src-a1") as never;
   await assert.rejects(createMongoWhatsAppReviewRepository(f.db, { materialize: publish }).decide("tenant-a", (row as Record<string, any>)["_id"], "approved", "reviewer"));
   assert.equal(f.rows("published").length, 0);
+});
+
+/** Deterministic interleaving sweep (fixture Mongo isolation model; the native replica-set proof is links/unlink.mongo.test.ts, gated): the unlink's quarantine + consent
+ * withdrawal against an approval, released at every point of the approval transaction. Mirrors consent-race.test.ts for the withdrawal-only path. */
+function gate(db: Db, at: { candidates: number; sources: number }, reach: (n: number) => Promise<void>): Db {
+  const fired = new Set<string>();
+  return new Proxy(db, { get(target, key) {
+    if (key !== "collection") return Reflect.get(target, key, target);
+    return (name: string) => {
+      const collection = target.collection(name);
+      const point = name === "whatsapp_candidates" ? at.candidates : name === "sources" ? at.sources : -1;
+      if (point < 0) return collection;
+      return new Proxy(collection, { get(coll, member) {
+        if (member === "updateOne" || member === "findOne") return async (...args: unknown[]) => {
+          if (member === "updateOne" || name === "sources") { const k = `${name}.${String(member)}`; if (!fired.has(k)) { fired.add(k); await reach(point); } }
+          return (coll[member] as (...a: unknown[]) => unknown)(...args);
+        };
+        const value = Reflect.get(coll, member, coll); return typeof value === "function" ? value.bind(coll) : value;
+      } });
+    };
+  } }) as Db;
+}
+test("W8 interleaving sweep: unlink (quarantine then consent withdrawal) vs approval at every point of the approval transaction", async t => {
+  const probe = input("p", "tenant-a", { linkId: A }), pf = reviewMongoFixture([probe], {});
+  const prow = detectWhatsAppReviewCandidates("tenant-a", probe, REVIEW_TIME)[0]!, prepo = createMongoWhatsAppReviewRepository(pf.db, { materialize: c => pf.publish(c.candidate, c.session) });
+  await prepo.insert("tenant-a", [prow]);
+  const p0 = pf.isolationStats().sessionOps; await prepo.decide("tenant-a", prow._id, "approved", "reviewer");
+  const ops = pf.isolationStats().sessionOps - p0;
+  assert.ok(ops >= 6);
+  const tally = { approvalFirst: 0, unlinkFirst: 0 }; let runs = 0;
+  for (let readAt = 0; readAt <= ops + 1; readAt++) for (const lag of [0, 2, 5]) {
+    let done = 0, finished = false; const waiters: Array<{ at: number; go: () => void }> = [];
+    const settle = () => { for (const w of waiters.splice(0)) if (finished || w.at <= done) w.go(); else waiters.push(w); };
+    const tick = () => new Promise<void>(r => setImmediate(r));
+    const inp = input("s", "tenant-a", { linkId: A }), f = reviewMongoFixture([inp], { beforeSessionOp: async (n: number) => { done = n; settle(); await tick(); await tick(); } });
+    const row = detectWhatsAppReviewCandidates("tenant-a", inp, REVIEW_TIME)[0]!;
+    const repo = createMongoWhatsAppReviewRepository(f.db, { materialize: c => f.publish(c.candidate, c.session) });
+    await repo.insert("tenant-a", [row]);
+    const base = f.isolationStats().sessionOps, label = `readAt=${readAt} lag=${lag}`;
+    const reach = (n: number) => (n <= done || finished ? Promise.resolve() : new Promise<void>(go => { waiters.push({ at: n, go }); }));
+    const port = createLinkDataPort(gate(f.db, { candidates: base + readAt, sources: base + readAt + lag }, reach), { now: () => REVIEW_TIME });
+    const unlink = (async () => { await port.quarantineCandidates("tenant-a", A, undefined); await port.withdrawSources("tenant-a", A, undefined, "user:u-member"); })();
+    const approval = repo.decide("tenant-a", row._id, "approved", "reviewer").finally(() => { finished = true; settle(); });
+    const [a, u] = await Promise.allSettled([approval, unlink]);
+    runs++;
+    assert.equal(u.status, "fulfilled", `${label}: the unlink always lands (${String((u as PromiseRejectedResult).reason)})`);
+    const src = f.rows("sources")[0] as { consent: { given: boolean }; sourceMeta?: { authorizationRevision?: number } };
+    const status = f.rows("whatsapp_candidates")[0]!["status"], published = f.rows("published").length;
+    assert.equal(src.consent.given, false, `${label}: consent ends withdrawn`);
+    assert.ok(status === "approved" || status === "rejected", `${label}: ends decided (${String(status)})`);
+    assert.equal(published, status === "approved" ? 1 : 0, `${label}: approved <=> published (never a claim over a quarantined candidate)`);
+    if (status === "approved") { tally.approvalFirst++; assert.equal(a.status, "fulfilled", label); assert.equal(src.sourceMeta?.authorizationRevision, 2, `${label}: fence + withdrawal`); }
+    else { tally.unlinkFirst++; assert.equal(src.sourceMeta?.authorizationRevision, 1, `${label}: only the withdrawal bumped`); }
+  }
+  t.diagnostic(`interleavings=${runs} approvalOps=${ops} outcomes=${JSON.stringify(tally)}`);
+  assert.equal(runs, (ops + 2) * 3);
+  assert.ok(tally.approvalFirst > 0 && tally.unlinkFirst > 0, `both linearizations must occur: ${JSON.stringify(tally)}`);
 });
