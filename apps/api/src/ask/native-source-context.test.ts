@@ -22,7 +22,7 @@ function resolver(resolve: NativeEvidenceResolver["resolve"]): NativeEvidenceRes
 test("native document and message hydration uses exact resolver passages without audio fields", async () => {
   for (const locator of [document, message]) {
     const calls: unknown[] = [], original = node();
-    const result = await createNativeSourceHydrator("tenant", {
+    const result = await createNativeSourceHydrator("tenant", { externalEligible: async () => true,
       listLocators: async (tenantId, source) => { calls.push([tenantId, source]); return [locator]; },
       resolver: resolver(async (tenantId, sourceLocator) => { calls.push([tenantId, sourceLocator]); return { sourceLocator, quote: text }; }),
     })("visa आवेदन", [original]);
@@ -40,7 +40,7 @@ test("native document and message hydration uses exact resolver passages without
 
 test("exact admitted locator still goes through authority and never enumerates unrelated passages", async () => {
   let calls = 0;
-  const result = await createNativeSourceHydrator("tenant", {
+  const result = await createNativeSourceHydrator("tenant", { externalEligible: async () => true,
     listLocators: async () => { throw new Error("must not enumerate"); },
     resolver: resolver(async (tenantId, sourceLocator) => { assert.equal(tenantId, "tenant"); calls++; return { sourceLocator, quote: text }; }),
   })("October", [node(document)]);
@@ -51,26 +51,26 @@ test("exact admitted locator still goes through authority and never enumerates u
 test("wrong-source or wrong-revision inventory refuses before source text is loaded", async () => {
   for (const locator of [{ ...document, sourceId: "foreign" }, { ...document, revisionHash: sha("old") }]) {
     let calls = 0;
-    await assert.rejects(createNativeSourceHydrator("tenant", { listLocators: async () => [locator],
+    await assert.rejects(createNativeSourceHydrator("tenant", { externalEligible: async () => true, listLocators: async () => [locator],
       resolver: resolver(async () => { calls++; return null; }) })("visa", [node()]), /outside admitted/);
     assert.equal(calls, 0);
   }
 });
 
 test("changed, withdrawn or unavailable native authority cannot fall back to retrieval text", async () => {
-  await assert.rejects(createNativeSourceHydrator("tenant", { listLocators: async () => [document], resolver: resolver(async () => null) })("visa", [node()]), /changed or is unavailable/);
-  await assert.rejects(createNativeSourceHydrator("tenant", { listLocators: async () => [document],
+  await assert.rejects(createNativeSourceHydrator("tenant", { externalEligible: async () => true, listLocators: async () => [document], resolver: resolver(async () => null) })("visa", [node()]), /changed or is unavailable/);
+  await assert.rejects(createNativeSourceHydrator("tenant", { externalEligible: async () => true, listLocators: async () => [document],
     resolver: resolver(async () => { throw new Error("authority offline"); }) })("visa", [node()]), /authority offline/);
 });
 
 test("duplicate native locators and duplicate node identities refuse", async () => {
-  const deps = { listLocators: async () => [document, document], resolver: resolver(async (_tenantId, sourceLocator) => ({ sourceLocator, quote: text })) };
+  const deps = { externalEligible: async () => true, listLocators: async () => [document, document], resolver: resolver(async (_tenantId, sourceLocator) => ({ sourceLocator, quote: text })) };
   await assert.rejects(createNativeSourceHydrator("tenant", deps)("visa", [node()]), /duplicate native passage/);
   await assert.rejects(createNativeSourceHydrator("tenant", { ...deps, listLocators: async () => [document] })("visa", [node(), node()]), /ambiguous native source/);
 });
 
 test("native lexical ranking uses canonical text and emits no fabricated match", async () => {
-  const deps = { listLocators: async () => [document], resolver: resolver(async (_tenantId, sourceLocator) => ({ sourceLocator, quote: text })) };
+  const deps = { externalEligible: async () => true, listLocators: async () => [document], resolver: resolver(async (_tenantId, sourceLocator) => ({ sourceLocator, quote: text })) };
   assert.equal((await createNativeSourceHydrator("tenant", deps)("आवेदन", [node()])).nodes.length, 1);
   assert.equal((await createNativeSourceHydrator("tenant", deps)("unmatchedword", [node()])).nodes.length, 0);
 });
@@ -82,7 +82,7 @@ test("real shared resolver hydration cannot release immutable old page after sam
     return { tenantId, kind: "document-page", documentId: "doc", sourceId: "source", documentSourceId: "immutable-doc-source", headRevision, pageNumber: 3,
       revisionHash: document.revisionHash, currentRevisionHash: document.revisionHash, eligible: true, text };
   } });
-  const result = await createNativeSourceHydrator("tenant", { resolver: authority, listLocators: async () => [document] })("visa", [node()]);
+  const result = await createNativeSourceHydrator("tenant", { externalEligible: async () => true, resolver: authority, listLocators: async () => [document] })("visa", [node()]);
   const selected = validateHydration(result, [node()]);
   const revalidate = createNativeSourceRevalidator("tenant", authority);
   await revalidate(selected);

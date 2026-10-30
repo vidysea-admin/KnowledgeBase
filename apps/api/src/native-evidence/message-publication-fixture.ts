@@ -27,6 +27,10 @@ export async function messagePublicationFixture(texts = ["Scholarship closes Fri
     listGroups: async () => [{ groupJid: "group@g.us", ownerUserId: "111111111111111111111111", subject: "Private group title", trackedPersonCount: 1 }],
     fetchMessages: async () => messages });
   const result = await wiring.whatsapp.ingestGroup("tenant-a", "group@g.us");
+  // W11 (R-32): a real link stamps `sourceMeta.whatsappLinkId`; the default studentData "no" (D-206, gate H-10) keeps the source eligible for external models.
+  const ingested = fx.rows("sources").find(row => row._id === result.sourceId)!;
+  await fx.db.collection("sources").updateOne({ _id: result.sourceId, tenantId: "tenant-a" } as never, { $set: { sourceMeta: { ...(ingested.sourceMeta as object | undefined), whatsappLinkId: "link-w" } } });
+  fx.put("whatsapp_links", { _id: "link-w", tenantId: "tenant-a", studentData: "no", state: "active", live: true });
   operations.length = 0;
   return { fx, db, wiring, result, operations, failTree: () => { failTree = true; },
     /** Test hook: runs synchronously before each repository operation (e.g. to withdraw consent mid-transaction). */
