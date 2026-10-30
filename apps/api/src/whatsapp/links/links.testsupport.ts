@@ -87,15 +87,14 @@ export function memoryLinkData(): MemData {
 }
 
 type FeedRow = { _id: string; tenantId: string; at: string } & Record<string, unknown>;
-/** EventsFeed double with the Mongo accessor's semantics (whatsAppLinkStores().events().list): tenant-scoped, (at, _id) order, an unknown cursor throws. `add` takes a stored row as is (a test may plant extra fields). */
+/** EventsFeed double with the Mongo accessor's semantics (whatsAppLinkStores().events().list): tenant-scoped, `_id` order (never `at`: ISS-WAEF-001), an unknown cursor throws. `add` takes a stored row as is (a test may plant extra fields). */
 export function memoryEventsFeed(): EventsFeed & { rows: FeedRow[]; add(tenantId: string, e: Record<string, unknown>): FeedRow } {
   const rows: FeedRow[] = []; let n = 0;
-  const key = (r: FeedRow): string => `${r.at}|${r._id}`;
   return {
     rows,
     add(tenantId, e) { n++; const row = { _id: n.toString(16).padStart(24, "0"), tenantId, at: new Date(Date.parse(NOW) + n * 1000).toISOString(), actorKind: "system", ...e } as FeedRow; rows.push(row); return structuredClone(row); },
     async list(tenantId, o = {}) {
-      const mine = rows.filter(r => r.tenantId === tenantId).sort((a, b) => (key(a) < key(b) ? -1 : 1));
+      const mine = rows.filter(r => r.tenantId === tenantId).sort((a, b) => (a._id < b._id ? -1 : 1));
       let from = 0;
       if (o.afterId) { const i = mine.findIndex(r => r._id === o.afterId); if (i < 0) throw new Error("whatsapp_events: unknown cursor"); from = i + 1; }
       return structuredClone(mine.slice(from, from + Math.min(Math.max(Math.trunc(o.limit ?? 100), 1), 500))) as never;

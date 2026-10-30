@@ -22,12 +22,38 @@ The event feed is the whole extension surface of the multi-user WhatsApp feature
 - `after`: the `id` of the last event the consumer processed (24 hex). Omit it to start from the beginning. A malformed value
   is `400 invalid_cursor`; a well-formed id that is not an event of this tenant is `400 unknown_cursor`.
 - `limit`: integer 1..500, default 100; anything else is `400 invalid_limit`.
-- Response: `{ "events": [ ... ], "nextCursor": "<id of the last event>" | null }`, oldest first, ordered by `(at, id)`.
-  `nextCursor` is `null` on an empty page; keep your own cursor and poll again.
-- At-least-once: replaying from a cursor returns the same ids in the same order, plus anything appended since. Consumers
-  dedupe on `id`. Responses are `Cache-Control: no-store`.
+- Response: `{ "events": [ ... ], "nextCursor": "<id of the last event>" | null }`, oldest first, ordered by `id` (not by `at`;
+  see Delivery guarantee). `nextCursor` is `null` on an empty page; keep your own cursor and poll again.
+- At-least-once, within the bound under Delivery guarantee: replaying from a cursor returns the same ids in the same order, plus
+  anything committed since (a late-committing event can land inside the replayed range). Consumers dedupe on `id`.
+  Responses are `Cache-Control: no-store`.
 - Each event: `{ id, eventType, at, actorKind, actorId?, linkId?, data }`. The projection is an allowlist; the stored tenant id
   never leaves the service.
+
+## Delivery guarantee
+
+What the code does (`packages/db/src/collections/whatsapp-links.ts`, `events().list`): it finds the cursor event in this tenant (none: `unknown_cursor`),
+then returns the events of this tenant whose `id` sorts after it, ordered by `id`, up to `limit`. Nothing else is compared.
+
+- **Order is by event `id`.** An `id` is 24 hex characters taken by the writer just before its insert: epoch seconds (4 bytes), millisecond
+  within the second (2 bytes), a per-process random part and a counter. Ids from one process strictly increase; ids from different
+  processes order by their millisecond and, inside one millisecond, by the random part. Rows written before this change carry plain
+  ObjectId ids, which order by their second.
+- **`at` is the writer's own timestamp** and is not monotonic across the feed. The API and `scripts/whatsapp/sync-links.mjs` both write,
+  so an event can carry an earlier `at` than one you already read and still be appended after it. Use `at` for display only: never as a
+  cursor, a sort key or a "since" filter. (Paging by `at` used to skip such an event for good; paging by `id` delivers it, because its
+  `id` is newer than your cursor.)
+- **What you get:** an event that committed before your read, or after it, and whose `id` sorts after your cursor is returned by a read from that
+  cursor, however old its `at`. Cursors are tenant-scoped; another tenant's event id, or an id that is no event, is `unknown_cursor`.
+- **Residual window.** The `id` is taken before the insert commits, so the order is generation order, not commit order. An event whose insert
+  is still in flight (a slow database, a stalled writer) when you read a later `id` can commit behind your cursor and be passed over from it.
+  Host clocks that disagree (a writer whose clock is behind issues smaller ids) widen the same window by the size of the disagreement.
+  Not exactly-once, and not a strict global order. An event whose write fails after its transition committed is logged and never appears
+  (state is authoritative; see Event types).
+- **Consumer rule (closes the window).** Always dedupe on `id`. Keep a settled resume point: after each poll, resume from the newest event
+  whose `id` time (first 8 hex characters, epoch seconds) is at least a settle period old (60 seconds is a safe default: longer than any
+  insert should stay in flight or any clock should drift), and drop ids you have already processed. The feed then re-delivers the last settle
+  period on each poll and misses nothing unless an insert stays in flight, or a clock is off, by more than the settle period.
 
 ## Payload rule (R-39)
 
