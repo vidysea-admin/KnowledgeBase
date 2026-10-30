@@ -5,10 +5,8 @@ import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { complete as routeComplete, parseRoutingYaml, GeminiProvider, ClaudeCodeProvider, OllamaProvider, createOllamaCloudProviders, type Provider } from "@lkb/ai";
 import { treeSearch } from "@lkb/index";
-import { getDb, listHeartbeats, scopedCollection } from "@lkb/db";
-import { createTelegramAlertSink } from "@lkb/core";
+import { getDb, listHeartbeats } from "@lkb/db";
 import type { ServerDeps } from "../server.js";
-import type { WatchSilenceDeps } from "../routes/health.js";
 import { createMongoApiKeyStore, createMongoEvalRunStore, createMongoJobWriter, createMongoTreeStore, createMongoBrainReadDeps,
   createMongoWatchedSourceDeps, createMongoCitationsDeps, createMongoHealthDeps, createMongoGraphReadDeps, createGwsCalendarReadDeps, createMeetingCandidatesDeps, createMongoKeysDeps } from "../store.js";
 import { createMongoIngestDeps } from "../ingest-store.js";
@@ -16,7 +14,6 @@ import { buildSourceIntakeDeps } from "../source-intake/wiring.js";
 import { createMongoSearchDeps } from "../search-store.js";
 import { createRouteDeps } from "../route/route-store.js";
 import { createSessionDecisionsDeps } from '../session-decisions/reader.js';
-import type { WatchState } from "@lkb/core";
 import { buildCalendarWorkerIntegrations, buildCapturePolicyIntegrations } from './integrations/capture-policy.js';
 import { createMongoWhatsAppDeps } from "../whatsapp/store.js";
 import { createConfiguredWhatsAppOwnerResolver } from "../whatsapp/owner-config.js";
@@ -46,53 +43,16 @@ import { createMongoSpeakerSuggestionDeps } from "../speaker-suggestions/store.j
 import { buildNativeProductionIntegrations } from "./integrations/native-production.js";
 import { buildReviewIntegrations } from "./integrations/reviews.js";
 import { createConfiguredPublicWebinarDiscovery } from "../gws/public-webinar-config.js";
-import { createMongoWatchRunsDeps } from "../activity-health/watch-runs.js";
+import { createMongoWatchRunsDeps, createMongoWatchSilenceDeps, createMongoWatchStateReadDeps } from "../activity-health/watch-runs.js";
 import { createMongoClaimsListDeps } from "../claims/store.js";
 import { createConfiguredActivityHealthDeps } from "../activity-health/queue-reader.js";
 import { createLazyDatabase, defineLazyProperties } from "./lazy-database.js";
 import { resolveTileSuggest } from "./tile-suggest.js";
+import { buildUserAccounts } from "./integrations/user-accounts.js";
+import { logger } from "./logger.js";
 
 const ROUTING_CONFIG_PATH = fileURLToPath(new URL("../../../../config/ai-routing.yaml", import.meta.url));
 
-/** D-048/D-053: health reads only configured WATCH_HEARTBEAT_TENANTS through tenant-scoped
- * DB accessors. The permitted core Telegram sink binds lazily; API cannot import meeting-bot. */
-/** U4d (D-047/D-048): the ONE place `WATCH_HEARTBEAT_INTERVAL_MS` is parsed with its 1-hour
- * fallback — extracted out of `createMongoWatchSilenceDeps` (which used to inline this) so
- * `createMongoWatchStateReadDeps` below reads the exact same number instead of re-declaring the
- * fallback a third time (the first two are this file's former inline copy and
- * scripts/watch/lib/heartbeat.mjs's `watchHeartbeatIntervalMs`, pinned equal by
- * `health.test.ts`'s drift test). Writer, detector and now the page must all agree on one number,
- * or a watcher can look alive to one reader and dead to another. */
-function watchHeartbeatIntervalMs(): number {
-  const parsed = process.env.WATCH_HEARTBEAT_INTERVAL_MS ? Number(process.env.WATCH_HEARTBEAT_INTERVAL_MS) : NaN;
-  return Number.isFinite(parsed) && parsed > 0 ? parsed : 60 * 60 * 1000;
-}
-
-export function createMongoWatchSilenceDeps(): WatchSilenceDeps {
-  const tenantIds = (process.env.WATCH_HEARTBEAT_TENANTS ?? "toc").split(",").map((t) => t.trim()).filter(Boolean);
-  // U4b/R2 (D-053): a real alert transport, not a console sink. Construction reads env only
-  // (token/chatId), matching this factory's lazy-binding style and production.test.ts's
-  // "constructs without throwing or requiring a live network connection" guarantee -- the
-  // actual HTTPS call happens only if/when notifyWatchSilent is invoked.
-  const alertSink = createTelegramAlertSink();
-  return {
-    tenantIds,
-    intervalMs: watchHeartbeatIntervalMs(),
-    listHeartbeats: (tenantId) => listHeartbeats(tenantId),
-    notifyWatchSilent: (tenantId, sourceType, lastHeartbeatAt, intervalMs) =>
-      alertSink.notifyWatchSilent(tenantId, sourceType, lastHeartbeatAt, intervalMs),
-  };
-}
-
-/** Public watcher metadata excludes private staging before the bounded query.
- * The interval stays shared with the watcher-silence detector. */
-function createMongoWatchStateReadDeps() {
-  return {
-    listWatchState: (tenantId: string) => scopedCollection<WatchState>(getDb(), "watch_state")(tenantId).find({workerSnapshot: {$exists: false}, workerReceipt: {$exists: false}}).sort({seenAt: -1}).limit(200).toArray(),
-    listHeartbeats: (tenantId: string) => listHeartbeats(tenantId),
-    heartbeatIntervalMs: watchHeartbeatIntervalMs(),
-  };
-}
 /** `write` for the router's own per-attempt ledger entries — a tenant isn't known until a
  * request resolves one, so router-level attempts (as opposed to askV2's own writes, which do
  * carry the real per-request tenantId) are logged under this fixed system id. */
@@ -301,6 +261,8 @@ export function buildProductionDeps(options: { onIndexCommitted?: IndexCommitted
   const captureReadiness = hosting.hosting && input.env.LKB_CAPTURE_SLOTS && input.env.LKB_TENANT_ID && options.captureReadinessHost
     ? createHostCaptureReadinessDeps({ root: input.root, env: input.env, hosting: hosting.hosting.service, host: options.captureReadinessHost }) : undefined;
   const result: ServerDeps = { ...deps, ...knowledge, ...hosting, ...automation, ...capturePolicy, ...reviews, botPrivacy, captureReadiness, sourceJobs, nativeEvidence: native.resolver,
+    // D-206: undefined (API keys unchanged) unless AUTH_CSRF_SECRET is usable; else mounts /auth and /admin.
+    userAccounts: buildUserAccounts(process.env, db, logger),
     sessionDecisions: createSessionDecisionsDeps(deps.brain, db),
     ask: { ...deps.ask, get answerWorkflow() { return answers().answerWorkflow; } } };
   return defineLazyProperties(result, {
