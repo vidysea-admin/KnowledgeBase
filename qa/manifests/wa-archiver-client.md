@@ -3,7 +3,7 @@
 **Goal task:** whatsapp-multiuser W3 `wa-archiver-client`
 **Date:** 2026-10-30
 **Policy-Version:** proportional-verification/2026-10-19.17
-**Status:** ready-for-check
+**Status:** checked-PASS
 **Handshake status:** ready-for-check
 **Fix cycle:** 0
 **Dual check:** required
