@@ -1,0 +1,38 @@
+{
+ "unit": "wa-web",
+ "coordinator": "b",
+ "date": "2026-10-30",
+ "head_checked": "c772be75",
+ "instrument": "Browser pane (mcp Claude_Browser) against the Vite dev server (port 5237) from a git-archive copy of c772be75 outside the bound root; API replaced by a local stub on 127.0.0.1:3391 (config.js apiBase, userAccounts true, GET /auth/session). Not the real API: ISS-WASEL-001 means the links and selection routers are not mounted in production composition.",
+ "personas": {
+  "T1_member": [
+   "request via notice screen (posts only label+noticeVersion; stub rejects any other key)",
+   "connect after approval: starting, then QR, QR replaced on later polls",
+   "scan -> connected: poll stopped, QR cleared",
+   "mark group, choose people: wire order PUT {marked:true,trackAllSenders:false}, PUT people, GET people (ISS-WASEL-002)",
+   "health / failure states (injected 503, needs-relink, expired approval)",
+   "two-step unlink"
+  ],
+  "T2_admin": [
+   "approve with student-data class (default no)"
+  ],
+  "T5_viewer": [
+   "list shows read-only note, no /whatsapp/links request",
+   "/new refused with a sentence",
+   "/connect shows not-found sentence, no /connect request, no QR in the DOM"
+  ]
+ },
+ "poll_cadence": "measured from stub server-side timestamps: successive /connect hits >= 3 s apart (browser pane hidden, timers throttled upward only)",
+ "qr_checks": "QR is an inline SVG path from the module matrix with a fixed aria-label (code read at QrCode.tsx); QR cleared from the DOM once connected and absent for the viewer. Storage/URL/log absence of the payload is evidenced by the unit tests and code read, not by a live storage dump.",
+ "console": "console errors recorded: only the 503 and 404 responses injected by the stub on purpose",
+ "named_gaps": [
+  "real-API walk (ISS-WASEL-001)",
+  "non-root base path not exercised live (covered by noRootAbsoluteHrefs.test.ts, mutation W10-3 red)",
+  "student-data select not drivable with form_input; approved with the default class"
+ ],
+ "not_walked_live": [
+  "T3 isolation",
+  "admin-on-other's-link connect refusal",
+  "admin read-only group view (covered by unit tests W10-2 and mutation W10-2 red)"
+ ]
+}
