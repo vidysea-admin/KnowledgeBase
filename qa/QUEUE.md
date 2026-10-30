@@ -1220,3 +1220,8 @@ Current source-table tracker verification: `node scripts/tracker-audit.mjs --jso
 - low: ISS-UAWEB-002..005 (WriteScope disables filters, console 401/403 lines, runtime flag -> A8, vite dev cross-origin).
 - DONE 2026-10-30 `ua-deploy-cookie-proxy` (A8): PASS cycle 0 (one checker), merged locally 84fe76f7. APP_USER_ACCOUNTS runtime flag (closes ISS-UAWEB-004), docs/user-accounts/ops.md, DEVOPS-HANDOVER 4b, .env.example names. ISS-UADEPLOY-001..002 fixed at close-out.
 - HUMAN_GATE (A9 prerequisite): docker-compose.yml forwards need an Approved-by entry: api `AUTH_CSRF_SECRET USER_SIGNUP_TENANT USER_SIGNUP_DAILY_CAP APP_PUBLIC_ORIGIN APP_BASE_PATH TRUST_PROXY_HOPS`, web `APP_USER_ACCOUNTS`. APP_BASE_PATH is web-only today, so the api cookie Path is wrong behind /knowledgebase.
+
+## 2026-10-30 whatsapp-multiuser W4 close-out
+- DONE `wa-owner-resolver` (W4): dual PASS cycle 0, senior review Approve; merged locally ebc4ef8f. Ledger qa/issues.waowner.jsonl ISS-WAOWNER-001..005 (2 medium, 3 low).
+- W7 brief MUST include ISS-WAOWNER-002 (route 409 ambiguous_link / 404 absent group, caller + linkId threading, repair path scope); W5/W9 briefs must include ISS-WAOWNER-001 (seed before reading whatsapp_links).
+- W3 `wa-archiver-client`: checker A PASS, checker B and review pending/in (review Warning, lows).
