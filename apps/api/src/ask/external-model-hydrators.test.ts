@@ -1,10 +1,13 @@
 /** W11 part B G2 (R-32): both source hydrators refuse a WhatsApp source whose link is not studentData "no" before reading or quoting any of its text. */
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import type { NativeSourceLocator, TreeIndexNode } from "@lkb/core";
+import type { NativeSourceLocator, TreeIndexNode, TreeIndexRootDocument } from "@lkb/core";
 import { createSourceHydrator } from "./source-context.js";
 import { createNativeSourceHydrator } from "./native-source-context.js";
 import { createKnowledgeVisibility } from "../visibility/knowledge.js";
+import { buildNativeIntegrations } from "../composition/integrations/native.js";
+import { messagePublicationFixture } from "../native-evidence/message-publication-fixture.js";
+import { createWhatsAppNativeAuthority } from "../native-evidence/whatsapp-authority.js";
 import { leaks, PUB_SESSION, PUB_SOURCE, TENANT, WA_SESSION, WA_SOURCE, waWorld } from "../visibility/wa-quarantine.testsupport.js";
 import { EXCLUDED, linkCase, type LinkCase } from "../visibility/external-model.testsupport.js";
 
@@ -55,3 +58,19 @@ test("G2 native: the gate dependency is required (a caller cannot omit it)", asy
   const hydrate = createNativeSourceHydrator(TENANT, { listLocators: async () => [], resolver: {} as never } as never);
   await assert.rejects(() => hydrate("q", [nativeNode(WA_SOURCE)]));
 });
+
+// G2 wiring: the production `nativeSources` factory carries the gate to the real native hydrator, resolving the link live per request.
+for (const flip of [undefined, "yes", "unknown"] as const) {
+  test(`G2 wiring: buildNativeIntegrations.nativeSources hydrates an approved native message ${flip ? `only until its link flips to ${flip}` : "with a studentData no link"}`, async () => {
+    const f = await messagePublicationFixture(); const candidate = (await f.wiring.repository.list("tenant-a")).find(row => row.text.startsWith("Scholarship"))!;
+    assert.equal((await f.wiring.repository.decide("tenant-a", candidate._id, "approved", "reviewer")).result, "ok");
+    const node = (await f.db.collection<TreeIndexRootDocument>("tree_index").findOne({ tenantId: "tenant-a", level: "tenant" }))!.children[0]!;
+    const authority = createWhatsAppNativeAuthority(f.db);
+    const native = buildNativeIntegrations({ db: f.db, knowledgeStore: { getDocument: async () => null }, messageAuthority: {
+      loadCurrent: (tenant, locator) => locator.kind === "message" ? authority.loadCurrent(tenant, locator) : Promise.resolve(null),
+      listLocators: (tenant, identity) => authority.listCurrent(tenant, identity) } });
+    if (!flip) return assert.equal((await native.nativeSources("tenant-a").hydrate("Scholarship Friday", [node])).nodes.length, 1);
+    await f.db.collection("whatsapp_links").updateOne({ _id: "link-w", tenantId: "tenant-a" } as never, { $set: { studentData: flip } });
+    await assert.rejects(() => native.nativeSources("tenant-a").hydrate("Scholarship Friday", [node]), refused);
+  });
+}
