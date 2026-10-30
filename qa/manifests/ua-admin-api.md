@@ -2,8 +2,8 @@
 **Contract:** none specific; scope is `docs/features/user-accounts/plan.md` row A6 and section "A6 ua-admin-api" (spec UA-5, UA-6, UA-7, UA-8, UA-19, UA-25, UA-28). Authorization: D-206.
 **Goal task:** user-accounts A6 (wave 2, tier 3 roadmap feature; depends on A1 stores, A2 credentials, A3 session core; independent of A4/A5)
 **Date:** 2026-10-30
-**Status:** ready-for-check
-**Handshake status:** ready-for-check
+**Status:** checked-PASS (dual: A 6a65a3c3, B dd8571a3, cycle 0; merge waits on A4 + /admin mount CORE-REQUEST)
+**Handshake status:** checked-PASS
 **Fix cycle:** 0
 **Dual check:** required
 dual-trigger: auth apps/api/src/user-accounts/admin-router.ts:54
