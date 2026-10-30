@@ -7,7 +7,7 @@ import type { AddressInfo } from "node:net";
 import type { Users } from "@lkb/core";
 import { buildTestDeps, fakeKeyStore } from "../../fixtures.js";
 import type { VerifiedKey } from "../../auth.js";
-import { createServer } from "../../server.js";
+import { createServer, type ServerDeps } from "../../server.js";
 import { COOKIE_NAME_SECURE } from "../../user-accounts/cookie.js";
 import { csrfTokenFor } from "../../user-accounts/csrf.js";
 import { createSessionAuth } from "../../user-accounts/principal.js";
@@ -22,7 +22,7 @@ import { createWhatsAppLinksRouter } from "./router.js";
 import { createLinksService, type LinksServiceDeps } from "./service.js";
 import { memoryLinkData, memoryLinksStore, NOTICE } from "./links.testsupport.js";
 
-export async function linksRig(opts: { users: Users[]; keys?: Record<string, VerifiedKey>; fake?: FakeArchiver; linkDeps?: Partial<LinksServiceDeps>; noLinks?: boolean; events?: EventsFeed }) {
+export async function linksRig(opts: { users: Users[]; keys?: Record<string, VerifiedKey>; fake?: FakeArchiver; linkDeps?: Partial<LinksServiceDeps>; noLinks?: boolean; events?: EventsFeed; deps?: Partial<ServerDeps> }) {
   const clock = fakeClock(), mem = memorySessionStore(), lookup = memoryUsers(opts.users), store = memoryLinksStore(), data = memoryLinkData();
   const sessions = createSessionService({ store: mem.store, users: lookup, now: clock.now });
   const archiver = opts.fake ? createArchiverClient(loadArchiverConfig({ WHATSAPP_ARCHIVER_API_URL: opts.fake.url, WHATSAPP_ARCHIVER_API_TOKEN: opts.fake.token, WHATSAPP_ARCHIVER_API_ALLOW_PRIVATE_HTTP: "1" })!) : null;
@@ -35,7 +35,7 @@ export async function linksRig(opts: { users: Users[]; keys?: Record<string, Ver
     ...opts.linkDeps,
   });
   const userAccounts = { session: createSessionAuth({ sessions, cookie: { basePath: "", production: true }, csrf: { secret: SECRET, allowedOrigins: [ORIGIN] } }) };
-  const app = createServer(buildTestDeps({ keyStore: fakeKeyStore(opts.keys ?? {}), userAccounts, ...(opts.noLinks ? {} : { whatsappLinks: { service, notice: () => NOTICE } }), ...(opts.events ? { whatsappEvents: { feed: opts.events } } : {}) }));
+  const app = createServer(buildTestDeps({ keyStore: fakeKeyStore(opts.keys ?? {}), userAccounts, ...(opts.noLinks ? {} : { whatsappLinks: { service, notice: () => NOTICE } }), ...(opts.events ? { whatsappEvents: { feed: opts.events } } : {}), ...opts.deps }));
   const http = app.listen(0, "127.0.0.1"); await new Promise(r => http.once("listening", r));
   const base = `http://127.0.0.1:${(http.address() as AddressInfo).port}`;
   const live = new Map<string, { token: string; sessionId: string }>();
