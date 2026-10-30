@@ -25,6 +25,27 @@ export const API_BASE_URL = resolveApiBaseUrl();
 export const AUTH_INVALIDATED_EVENT = "lkb:auth-invalidated";
 export const AUTH_KEY_STORAGE_KEY = "lkbApiKey";
 
+/**
+ * UA-30. The "credential" every page already threads through `apiFetch(path, apiKey)` when the person signed in with an
+ * account: not a secret and never stored, only the marker that the httpOnly session cookie authenticates the request
+ * (`credentials: "same-origin"`, no Authorization header, `X-LKB-CSRF` on unsafe methods). The cookie itself is unreadable here.
+ */
+export const SESSION_CREDENTIAL = "@@lkb-cookie-session@@";
+export const CSRF_HEADER = "X-LKB-CSRF";
+const UNSAFE_METHODS = new Set(["POST", "PUT", "PATCH", "DELETE"]);
+
+// The CSRF proof lives in this module variable only: never localStorage, sessionStorage, a cookie or a URL (UA-16, A7 item 4).
+let csrfToken: string | null = null;
+export function setCsrfToken(token: string | null): void { csrfToken = token; }
+
+/** The auth part of a request for `credential`: a Bearer key, or the cookie session (+ CSRF proof on unsafe methods). */
+export function credentialInit(credential: string, method: string = "GET"): { headers: Record<string, string>; credentials?: RequestCredentials } {
+  if (credential !== SESSION_CREDENTIAL) return { headers: { authorization: `Bearer ${credential}` } };
+  const headers: Record<string, string> = {};
+  if (csrfToken !== null && UNSAFE_METHODS.has(method.toUpperCase())) headers[CSRF_HEADER] = csrfToken;
+  return { headers, credentials: "same-origin" };
+}
+
 export interface AuthInvalidationEventDetail {
   apiKey: string;
   /** The server's own 401 message, when the response body carried one. */
@@ -62,11 +83,14 @@ export class ApiError extends Error {
   code?: string;
   /** `Retry-After` in whole seconds (delta-seconds form only), when the response carried a valid one. */
   retryAfterSeconds?: number;
-  constructor(status: number, message: string, extra: { code?: string; retryAfterSeconds?: number } = {}) {
+  /** Closed-vocabulary `reasons` (e.g. password policy codes) from a 400 body, when present. */
+  reasons?: string[];
+  constructor(status: number, message: string, extra: { code?: string; retryAfterSeconds?: number; reasons?: string[] } = {}) {
     super(message);
     this.status = status;
     if (extra.code !== undefined) this.code = extra.code;
     if (extra.retryAfterSeconds !== undefined) this.retryAfterSeconds = extra.retryAfterSeconds;
+    if (extra.reasons !== undefined) this.reasons = extra.reasons;
     this.name = "ApiError";
   }
 }
@@ -79,7 +103,7 @@ function parseRetryAfter(raw: string | null | undefined): number | undefined {
 export interface ApiFetchOptions {
   method?: "GET" | "POST" | "PUT" | "DELETE";
   body?: unknown;
-  /** Extra request headers (e.g. If-Match). Never overrides authorization or content-type. */
+  /** Extra request headers (e.g. If-Match). Never overrides authorization, content-type or the CSRF proof. */
   headers?: HeadersInit;
   /** Called with the response headers of a 2xx response, before the body is parsed. Lets a caller read ETag without the wrapper changing its return type. */
   onResponseHeaders?: (headers: Headers) => void;
@@ -89,23 +113,30 @@ export interface ApiFetchOptions {
 function callerHeaders(extra: HeadersInit | undefined): Record<string, string> {
   // Entries keep the caller's own key casing (existing consumers assert on it); only the two protected names go, in any case.
   const entries: [string, string][] = extra === undefined ? [] : extra instanceof Headers ? [...extra.entries()] : Array.isArray(extra) ? extra.map(([k, v]) => [k, v] as [string, string]) : Object.entries(extra);
-  return Object.fromEntries(entries.filter(([k]) => { const n = k.toLowerCase(); return n !== "authorization" && n !== "content-type"; }));
+  return Object.fromEntries(entries.filter(([k]) => { const n = k.toLowerCase(); return n !== "authorization" && n !== "content-type" && n !== CSRF_HEADER.toLowerCase(); }));
 }
 
 export async function apiFetch<T>(path: string, apiKey: string | null, options: ApiFetchOptions = {}): Promise<T> {
   if (!apiKey) throw new ApiError(401, "no API key set");
+  return send<T>(path, apiKey, options, true);
+}
+
+async function send<T>(path: string, apiKey: string, options: ApiFetchOptions, mayRefreshCsrf: boolean): Promise<T> {
   const sentSession = authSession;
+  const method = options.method ?? "GET";
+  const auth = credentialInit(apiKey, method);
 
   let res: Response;
   try {
     res = await fetch(`${API_BASE_URL}${path}`, {
-      method: options.method ?? "GET",
+      method,
       headers: {
         ...callerHeaders(options.headers),
-        authorization: `Bearer ${apiKey}`,
+        ...auth.headers,
         ...(options.body !== undefined ? { "content-type": "application/json" } : {}),
       },
       body: options.body !== undefined ? JSON.stringify(options.body) : undefined,
+      ...(auth.credentials ? { credentials: auth.credentials } : {}),
     });
   } catch (err) {
     const target = API_BASE_URL || "same origin";
@@ -117,16 +148,37 @@ export async function apiFetch<T>(path: string, apiKey: string | null, options: 
     let message = `HTTP ${res.status}`;
     let serverMessage: string | undefined;
     let code: string | undefined;
+    let reasons: string[] | undefined;
     try {
-      const body = (await res.json()) as { message?: string; error?: unknown };
+      const body = (await res.json()) as { message?: string; error?: unknown; reasons?: unknown };
       if (body.message) { message = body.message; serverMessage = body.message; }
       if (typeof body.error === "string") code = body.error;
+      if (Array.isArray(body.reasons)) reasons = body.reasons.filter((r): r is string => typeof r === "string");
     } catch {
       // response wasn't JSON; keep the generic message
     }
+    // A stale CSRF proof (the server rotated its secret or restarted with a new one): fetch a fresh one once and replay.
+    // The session's own 401 handling below is untouched; a second 403 csrf is surfaced as is.
+    if (res.status === 403 && code === "csrf" && apiKey === SESSION_CREDENTIAL && mayRefreshCsrf && sentSession === authSession && await refreshCsrfToken()) {
+      return send<T>(path, apiKey, options, false);
+    }
     if (res.status === 401) invalidateAuth(apiKey, sentSession, serverMessage);
-    throw new ApiError(res.status, message, { code, retryAfterSeconds: parseRetryAfter(res.headers?.get?.("retry-after")) });
+    throw new ApiError(res.status, message, { code, retryAfterSeconds: parseRetryAfter(res.headers?.get?.("retry-after")), reasons });
   }
   options.onResponseHeaders?.(res.headers);
   return res.json() as Promise<T>;
+}
+
+/** GET /auth/session for a fresh CSRF proof. True only when one was obtained; never throws, never invalidates auth. */
+async function refreshCsrfToken(): Promise<boolean> {
+  try {
+    const res = await fetch(`${API_BASE_URL}/auth/session`, { credentials: "same-origin" });
+    if (!res.ok) return false;
+    const body = (await res.json()) as { csrfToken?: unknown };
+    if (typeof body.csrfToken !== "string" || body.csrfToken === "") return false;
+    csrfToken = body.csrfToken;
+    return true;
+  } catch {
+    return false;
+  }
 }

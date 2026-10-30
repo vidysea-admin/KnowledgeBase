@@ -1,4 +1,4 @@
-import { apiFetch, API_BASE_URL, ApiError } from "./client.js";
+import { apiFetch, API_BASE_URL, ApiError, credentialInit } from "./client.js";
 import type { SessionDetail, SessionSummary, WebinarOperation, WebinarDiscoveryHealth } from "./types.js";
 
 function normalizeSessionPathParam(value: string): string {
@@ -26,7 +26,7 @@ export async function getSessionMedia(apiKey: string | null, id: string, frameId
   if (!apiKey) throw new ApiError(401, "no API key set");
   const suffix = frameId ? `frames/${encodeURIComponent(frameId)}` : "media";
   const response = await fetch(`${API_BASE_URL}/sessions/${normalizeSessionPathParam(id)}/${suffix}`,
-    { headers: { authorization: `Bearer ${apiKey}` } });
+    credentialInit(apiKey));
   if (!response.ok) throw new ApiError(response.status, response.status === 413 ? "Browser playback limit is 200 MB" : "Recording unavailable");
   if (Number(response.headers.get("content-length")) > 200 * 1024 * 1024) {
     await response.body?.cancel(); throw new ApiError(413, "Browser playback limit is 200 MB");
@@ -40,7 +40,7 @@ export function streamSessionMedia(apiKey: string | null, id: string, mime: stri
   const candidates = mime === "video/webm" ? ['video/webm; codecs="vp8,opus"', 'video/webm; codecs="vp9,opus"'] : [];
   const codec = typeof MediaSource !== "undefined" ? candidates.find((c) => MediaSource.isTypeSupported(c)) : undefined;
   if (!apiKey || !codec) return null;
-  const selectedCodec: string = codec;
+  const selectedCodec: string = codec, credential: string = apiKey;
   let stopped = false, generation = 0, pendingTarget: number | null = null;
   let disposeGeneration = () => {}, activeBuffer: SourceBuffer | undefined;
   const contains = (buffer: SourceBuffer, seconds: number) => Array.from({ length: buffer.buffered.length }, (_, i) => i)
@@ -62,7 +62,7 @@ export function streamSessionMedia(apiKey: string | null, id: string, mime: stri
     source.addEventListener("sourceopen", () => { void (async () => {
     if (controller.signal.aborted) return;
     const response = await fetch(`${API_BASE_URL}/sessions/${normalizeSessionPathParam(id)}/media`,
-      { headers: { authorization: `Bearer ${apiKey}` }, signal: controller.signal });
+      { ...credentialInit(credential), signal: controller.signal });
     if (!response.ok || !response.body) throw new Error("Recording unavailable");
     reader = response.body.getReader();
     const buffer = source.addSourceBuffer(selectedCodec);

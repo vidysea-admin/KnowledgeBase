@@ -1,6 +1,8 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { useEffect, type ReactNode } from "react";
+import { BrowserRouter, Navigate, Routes, Route, useLocation } from "react-router-dom";
 import { routerBasename } from "./config/runtime.js";
-import { AuthProvider } from "./auth/AuthContext.js";
+import { AuthProvider, useAuth } from "./auth/AuthContext.js";
+import { accountsEnabled } from "./api/user-accounts.js";
 import { LoginGate } from "./auth/LoginGate.js";
 import { AppShell } from "./layout/AppShell.js";
 import { DashboardPage } from "./pages/DashboardPage.js";
@@ -50,14 +52,23 @@ import { ExtractionReviewPage } from "./pages/extraction-review/ExtractionReview
 import { LabelReviewPage } from "./pages/label-review/LabelReviewPage.js";
 import { ChampionshipPage } from "./pages/championship/ChampionshipPage.js";
 import { ConnectorsPage } from "./pages/ConnectorsPage.js";
+import { LoginPage } from "./pages/user-accounts/LoginPage.js";
+import { SignupPage } from "./pages/user-accounts/SignupPage.js";
+import { CheckEmailPage } from "./pages/user-accounts/CheckEmailPage.js";
+import { VerifyPage } from "./pages/user-accounts/VerifyPage.js";
+import { ForgotPage } from "./pages/user-accounts/ForgotPage.js";
+import { ResetPage } from "./pages/user-accounts/ResetPage.js";
+import { PendingPage } from "./pages/user-accounts/PendingPage.js";
+import { AccountPage } from "./pages/user-accounts/AccountPage.js";
+import { UsersAdminPage } from "./pages/user-accounts/UsersAdminPage.js";
+import { UserDetailPage } from "./pages/user-accounts/UserDetailPage.js";
+import { AuditPage } from "./pages/user-accounts/AuditPage.js";
 
-export function App(): React.ReactElement {
+/** The signed-in app: shell + every page route (unchanged API-key pages plus the account pages). */
+function Shell(): React.ReactElement {
   return (
-    <AuthProvider>
-      <LoginGate>
-        <BrowserRouter basename={routerBasename}>
-          <AppShell>
-            <Routes>
+    <AppShell>
+      <Routes>
               <Route path="/" element={<DashboardPage />} />
               <Route path="/operations" element={<OperationsPage />} />
               <Route path="/counsellor" element={<CounsellorPage />} />
@@ -111,10 +122,50 @@ export function App(): React.ReactElement {
               <Route path="/meeting-bot" element={<MeetingBotPage />} />
               <Route path="/whatsapp" element={<WhatsAppPage />} />
               <Route path="/whatsapp/review/:id/source" element={<ReviewSourcePage />} />
+              <Route path="/account" element={<AccountPage />} />
+              <Route path="/admin/users" element={<UsersAdminPage />} />
+              <Route path="/admin/users/:id" element={<UserDetailPage />} />
+              <Route path="/admin/audit" element={<AuditPage />} />
             </Routes>
-          </AppShell>
-        </BrowserRouter>
-      </LoginGate>
+    </AppShell>
+  );
+}
+
+/** Signed-out visitors go to /login (remembering where they were); a pending account waits on /pending. */
+function AccountGate({ children }: { children: ReactNode }): ReactNode {
+  const { apiKey, accountState, restoring } = useAuth();
+  const location = useLocation();
+  if (restoring) return <p className="empty-note" role="status">Checking your session…</p>;
+  if (apiKey === null) return <Navigate to="/login" replace state={{ from: `${location.pathname}${location.search}` }} />;
+  if (accountState === "pending") return <Navigate to="/pending" replace />;
+  return children;
+}
+
+/** Account sign-in on (config.js `userAccounts: true`): public auth pages, then the gated app. The cookie session is restored once per page load. */
+function AccountRoutes(): React.ReactElement {
+  const { restoreSession } = useAuth();
+  useEffect(() => { void restoreSession(); }, [restoreSession]);
+  return (
+    <Routes>
+      <Route path="/login/key" element={<LoginGate><Navigate to="/" replace /></LoginGate>} />
+      <Route path="/login" element={<LoginPage />} />
+      <Route path="/signup" element={<SignupPage />} />
+      <Route path="/signup/check-email" element={<CheckEmailPage />} />
+      <Route path="/verify" element={<VerifyPage />} />
+      <Route path="/forgot" element={<ForgotPage />} />
+      <Route path="/reset" element={<ResetPage />} />
+      <Route path="/pending" element={<PendingPage />} />
+      <Route path="*" element={<AccountGate><Shell /></AccountGate>} />
+    </Routes>
+  );
+}
+
+export function App(): React.ReactElement {
+  return (
+    <AuthProvider>
+      <BrowserRouter basename={routerBasename}>
+        {accountsEnabled() ? <AccountRoutes /> : <LoginGate><Shell /></LoginGate>}
+      </BrowserRouter>
     </AuthProvider>
   );
 }
