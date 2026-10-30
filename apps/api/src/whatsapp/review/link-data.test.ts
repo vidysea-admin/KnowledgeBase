@@ -18,7 +18,7 @@ function input(tag: string, tenantId: string, meta: { linkId?: string; recordedB
 }
 const inputs = [
   input("a1", "tenant-a", { linkId: A }), input("a2", "tenant-a", { linkId: A }), input("b1", "tenant-a", { linkId: B }),
-  input("leg", "tenant-a", { recordedBy: `whatsapp-owner:${OWNER_A}` }), input("t2", "tenant-b", { linkId: A }),
+  input("leg", "tenant-a", { recordedBy: `whatsapp-owner:${OWNER_A}` }), input("x", "tenant-a", { linkId: B, recordedBy: `whatsapp-owner:${OWNER_A}` }), input("t2", "tenant-b", { linkId: A }),
 ];
 async function seeded() {
   const f = reviewMongoFixture(inputs);
@@ -32,8 +32,8 @@ const consentOf = (f: Awaited<ReturnType<typeof seeded>>, id: string) => (f.rows
 test("W8 link sources: stamped sources of THIS link in THIS tenant, plus unstamped legacy ones recorded by its archiver owner; never another link's or tenant's", async () => {
   const f = await seeded();
   assert.deepEqual((await whatsAppLinkSourceIds(f.db, "tenant-a", A)).sort(), ["src-a1", "src-a2"], "no owner id: only the stamped sources");
-  assert.deepEqual((await whatsAppLinkSourceIds(f.db, "tenant-a", A, OWNER_A)).sort(), ["src-a1", "src-a2", "src-leg"], "a legacy source recorded by the owner joins");
-  assert.deepEqual((await whatsAppLinkSourceIds(f.db, "tenant-a", B, OWNER_A)).sort(), ["src-b1", "src-leg"], "link B's own source; the legacy one follows the owner id the caller passes");
+  assert.deepEqual((await whatsAppLinkSourceIds(f.db, "tenant-a", A, OWNER_A)).sort(), ["src-a1", "src-a2", "src-leg"], "a legacy source recorded by the owner joins; src-x (recorded by the same owner but stamped with link B) does not");
+  assert.deepEqual((await whatsAppLinkSourceIds(f.db, "tenant-a", B, OWNER_A)).sort(), ["src-b1", "src-leg", "src-x"], "link B's own sources; the unstamped legacy one follows the owner id the caller passes");
   assert.deepEqual(await whatsAppLinkSourceIds(f.db, "tenant-b", A), ["src-t2"], "tenant-b sees only its own");
   assert.deepEqual(await whatsAppLinkSourceIds(f.db, "tenant-a", "d".repeat(24), "e".repeat(24)), []);
 });
@@ -43,7 +43,7 @@ test("W8 quarantine: only this link's still-pending candidates become rejected b
   const port = createLinkDataPort(f.db, { now: () => REVIEW_TIME });
   await f.db.collection("whatsapp_candidates").updateOne({ sourceId: "src-a2" }, { $set: { status: "approved" } });
   assert.equal(await port.quarantineCandidates("tenant-a", A, undefined), 1, "src-a2 was already approved: a decided row is not re-decided");
-  assert.deepEqual(statusBySource(f), { "src-a1": "rejected", "src-a2": "approved", "src-b1": "needs-review", "src-leg": "needs-review", "src-t2": "needs-review" });
+  assert.deepEqual(statusBySource(f), { "src-a1": "rejected", "src-a2": "approved", "src-b1": "needs-review", "src-leg": "needs-review", "src-x": "needs-review", "src-t2": "needs-review" });
   const moved = f.rows("whatsapp_candidates").find(r => r["sourceId"] === "src-a1") as Record<string, any>;
   assert.deepEqual(moved.decision, { action: "rejected", actor: "system:wa-unlink", at: REVIEW_TIME });
   assert.equal(await port.quarantineCandidates("tenant-a", A, undefined), 0, "idempotent");
@@ -56,7 +56,7 @@ test("W8 withdraw: each owned source goes through the consent CAS (revision bump
   const port = createLinkDataPort(f.db);
   assert.equal(await port.withdrawSources("tenant-a", A, OWNER_A, "user:u-member"), 3);
   for (const id of ["src-a1", "src-a2", "src-leg"]) assert.deepEqual(consentOf(f, id), { given: false, recordedBy: "user:u-member", note: "link_unlinked" }, id);
-  for (const id of ["src-b1", "src-t2"]) assert.equal(consentOf(f, id).given, true, `${id} untouched`);
+  for (const id of ["src-b1", "src-x", "src-t2"]) assert.equal(consentOf(f, id).given, true, `${id} untouched`);
   const rev = () => (f.rows("sources").find(s => s["_id"] === "src-a1") as Record<string, any>).sourceMeta.authorizationRevision;
   const before = rev(); await port.withdrawSources("tenant-a", A, OWNER_A, "user:u-member");
   assert.equal(rev(), before, "idempotent: an already withdrawn source is not re-written");
