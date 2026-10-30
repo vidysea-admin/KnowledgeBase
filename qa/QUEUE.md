@@ -1201,8 +1201,8 @@ Remaining acceptance is explicitly split:
 Current source-table tracker verification: `node scripts/tracker-audit.mjs --json --gate g1` -> exit 0, `ok: true`, `findings: []`, after canonical source-state and acceptance-gate notes were updated.
 
 ## 2026-10-30 user-accounts wave 3 close-out (A4 + A6 dual PASS, merged locally 33670a8e / cdc61b36, not pushed)
-- TODO `ua-production-enable` (plan gap, needed before A9): `composition/production.ts` never sets `ServerDeps.userAccounts`, so `/auth` and `/admin` are unmounted in production even with `AUTH_CSRF_SECRET`. One-line enablement `userAccounts: buildUserAccounts(process.env, db, logger)`; production.ts sits at exactly its 300-line budget, so first move a self-contained helper (e.g. the watch-silence deps) out. Tier L (auth), dual-trigger. In scope of the approved user-accounts plan (gate plan-approved-user-accounts.md).
-- IN CHECK `ua-admin-mount` (the A6 CORE-REQUEST, be587455): qa/manifests/ua-admin-mount.md.
+- TODO `ua-production-enable` (plan gap, needed before A9; include a request-level /admin mount test: anon 401, key POST 403, admin session POST 200 - review of ua-admin-mount; and close ISS-UAADMIN-005: unlock through the built router clears the A4 throttle row, issue-link origin asserted): `composition/production.ts` never sets `ServerDeps.userAccounts`, so `/auth` and `/admin` are unmounted in production even with `AUTH_CSRF_SECRET`. One-line enablement `userAccounts: buildUserAccounts(process.env, db, logger)`; production.ts sits at exactly its 300-line budget, so first move a self-contained helper (e.g. the watch-silence deps) out. Tier L (auth), dual-trigger. In scope of the approved user-accounts plan (gate plan-approved-user-accounts.md).
+- DONE `ua-admin-mount` (the A6 CORE-REQUEST, be587455): dual PASS cycle 0; ISS-UAADMIN-005 (wiring test gap) folded into ua-production-enable.
 
 ### Candidates (human picks) — from the A4/A6 dual checks
 - priority: security · ISS-UAAUTH-001 (medium) lockout TOCTOU: concurrent wrong-password burst bypasses the 5-failure lock (qa/issues.uaauth.jsonl).

@@ -3,8 +3,8 @@
 **Goal task:** user-accounts A6 follow-through (integration of A4 + A6 after both dual PASS)
 **Date:** 2026-10-30
 **Policy-Version:** proportional-verification/2026-10-19.17
-**Status:** ready-for-check
-**Handshake status:** ready-for-check
+**Status:** checked-PASS (dual: A + B ca7449fb, cycle 0)
+**Handshake status:** checked-PASS
 **Fix cycle:** 0
 **Dual check:** required
 dual-trigger: auth apps/api/src/composition/integrations/user-accounts.ts:141
