@@ -1,0 +1,6 @@
+# Checkpoint B — ua-production-enable (cycle 0)
+Environment: node v24.13.1, git archive of 2ae928e5 in scratchpad copy, root node_modules + packages linked from D:/KnowledgeBase (packages identical to base: `git diff HEAD 2ae928e5 -- packages` empty); lock hash pnpm-lock.yaml b390e1eb030d. Checker agent: claude-sonnet-subagent (coordinator B).
+- P-1/P-2/P-3: `node --test --import tsx apps/api/src/production.test.ts apps/api/src/composition/integrations/mounted-routes.test.ts` -> 12 pass / 0 fail (collected 12).
+- P-4: `node --test --import tsx apps/api/src/activity-health/watch-runs.test.ts apps/api/src/routes/health/watch-silence.test.ts apps/api/src/routes/health/health.test.ts apps/api/src/routes/watched-sources.test.ts` -> 49 pass / 0 fail.
+- tsc --noEmit apps/api -> exit 0. lint:structure bound tree: 9 stages OK, dependencies env-fail (no node_modules); depcruise subset: no no-circular.
+- Mutants (copy, restored, HEAD-fidelity OK): m1 delete userAccounts line -> P-1 red 5/1; m2 force usable secret -> unset test red 5/1; m3 drop requireAuth on /admin -> P-2+P-3 red 4/2; m4 subjectHash -> P-3 red 5/1; m5 basePath "" -> P-3 red 5/1; m6/m7 interval fallback 1234 -> survives (49 and 16 pass).
