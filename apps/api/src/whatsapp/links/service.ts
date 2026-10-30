@@ -172,7 +172,7 @@ export function createLinksService(deps: LinksServiceDeps) {
       const self = p.kind === "session" && l.userId !== null && l.userId === p.userId;
       if (self && (await deps.countActiveAdmins(p.tenantId)) !== 1) return fail(403, "self_approval_forbidden", "only the sole administrator may approve their own request"); // H-4 / R-4
       const at = iso();
-      const next = await store.transition(p.tenantId, l._id, { from: ["requested"], to: "approved", set: { approvedBy: by(p), approvedAt: at, approvalExpiresAt: new Date(now().getTime() + APPROVAL_TTL_MS).toISOString(), studentData: input.studentData ?? l.studentData } });
+      const next = await store.transition(p.tenantId, l._id, { from: ["requested"], to: "approved", set: { approvedBy: by(p), approvedAt: at, approvalExpiresAt: new Date(Date.parse(at) + APPROVAL_TTL_MS).toISOString(), studentData: input.studentData ?? l.studentData } });
       if (!next) return INVALID_STATE;
       const approver = idOf(p.kind === "session" ? p.userId : p.actor), requester = idOf(l.userId);
       await emit(p, p.tenantId, { eventType: "link.approved", linkId: l._id, data: { fromState: "requested", toState: "approved", ...(requester ? { requesterId: requester } : {}), ...(approver ? { approverId: approver } : {}), ...(self ? { reason: "self_approved" } : {}) } });
