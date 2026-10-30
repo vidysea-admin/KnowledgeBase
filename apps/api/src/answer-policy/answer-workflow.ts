@@ -1,11 +1,11 @@
 /** Real Ask execution, durable history/review and source-bound conflict handling. */
 import { randomUUID } from "node:crypto";
-import { askV2, type AskV2Deps, type AskV2Result } from "@lkb/ask";
+import type { AskV2Deps, AskV2Result } from "@lkb/ask";
 import type { TreeIndexNode } from "@lkb/core";
 import { isValidTenantId } from "../auth.js";
 import { evaluatePolicy } from "./evaluate.js";
-import { lookupEffectivePolicy, policyAskDeps } from "./application.js";
-import { answerEvidence, digest } from "./answer-evidence.js";
+import { askForMode, lookupEffectivePolicy, policyAskDeps } from "./application.js";
+import { answerEvidence, digest, whyUnverified } from "./answer-evidence.js";
 import { PolicyServiceError, type AnswerPolicyService } from "./service.js";
 import { normalizeQuestionClass, parseNote, validPolicyId } from "./rules.js";
 import type { AnswerFilters, AnswerRecordStore, AnswerRun, SourceConflict, VerifyEvidence } from "./answer-records.js";
@@ -15,7 +15,9 @@ export class AnswerWorkflowError extends Error {
   constructor(readonly code: "bad_request" | "not_found" | "stale_answer" | "invalid_state" | "evidence_unavailable" | "policy_conflict", message: string) { super(message); }
 }
 export interface AnswerInput { query: string; questionClass: string; policyId?: string; policyVersion?: number;
-  evidenceMode: boolean; filters: AnswerFilters; resolutionId?: string }
+  evidenceMode: boolean; filters: AnswerFilters; resolutionId?: string;
+  /** "deep" runs the multi-step graph; absent = the default single-call RAG path. A request knob only, never stored in `filters`. */
+  mode?: "deep" }
 export type AppliedPolicy = Pick<PolicyRevision, "policyId" | "version" | "questionClass" | "mode" | "style" | "onInsufficient" | "citations">;
 export interface PublishedAnswer extends AskV2Result {
   runId: string; state: AnswerRun["state"] | "stale"; policy: AppliedPolicy | null;
@@ -57,8 +59,9 @@ export function parseAnswerInput(raw: unknown): AnswerInput {
     return failure("bad_request", "Select the current saved policy version.");
   if (o.evidenceMode !== undefined && typeof o.evidenceMode !== "boolean") return failure("bad_request", "Invalid evidence mode.");
   const f = (o.filters ?? {}) as Record<string, unknown>;
-  if (!f || typeof f !== "object" || Array.isArray(f) || Object.keys(f).some((k) => !["sessionIds", "sources", "speakerRefs", "topicRefs"].includes(k)))
+  if (!f || typeof f !== "object" || Array.isArray(f) || Object.keys(f).some((k) => !["sessionIds", "sources", "speakerRefs", "topicRefs", "mode"].includes(k)))
     return failure("bad_request", "Invalid source filters.");
+  if (f.mode !== undefined && f.mode !== "fast" && f.mode !== "deep") return failure("bad_request", "Invalid ask mode.");
   const ids = f.sessionIds ?? [];
   if (!Array.isArray(ids) || ids.length > 20 || ids.some((id) => typeof id !== "string" || !id.trim() || id.length > 200))
     return failure("bad_request", "Select at most 20 session IDs.");
@@ -70,7 +73,7 @@ export function parseAnswerInput(raw: unknown): AnswerInput {
   return { query: o.query.trim(), questionClass, ...(o.policyId ? { policyId: o.policyId as string, policyVersion: o.policyVersion as number } : {}),
     evidenceMode: o.evidenceMode === true, filters: { sessionIds: [...new Set(ids as string[])] as AnswerFilters["sessionIds"], sources: f.sources === "internal" ? "internal" : "all",
       ...(speakerRefs !== undefined ? { speakerRefs } : {}), ...(topicRefs !== undefined ? { topicRefs } : {}) },
-    ...(o.resolutionId ? { resolutionId: o.resolutionId as string } : {}) };
+    ...(o.resolutionId ? { resolutionId: o.resolutionId as string } : {}), ...(f.mode === "deep" ? { mode: "deep" as const } : {}) };
 }
 
 function filteredTree(tree: TreeIndexNode, ids: string[], excludedIds = new Set<string>(), excludedSessions = new Set<string>()): TreeIndexNode {
@@ -136,12 +139,16 @@ export function createAnswerWorkflow(policies: AnswerPolicyService, store: Answe
         failure("invalid_state", "A reviewed source preference changed; generate a new answer after resolving conflicts.");
     }
   };
-  const published = async (t: string, run: AnswerRun): Promise<PublishedAnswer> => {
+  const published = async (t: string, run: AnswerRun, fresh = false): Promise<PublishedAnswer> => {
     const conflicts = await store.conflicts(t, run.id);
     // A saved answer is a release of the same candidate under the same policy,
     // not a permanent authorization to bypass later policy/evidence revisions.
-    let current = true, inheritedConflict = false;
-    try { await snapshotFreshness(t, run); } catch { current = false; }
+    let current = true, inheritedConflict = false, whyNot: string | undefined;
+    try { await snapshotFreshness(t, run); } catch {
+      current = false;
+      // The diagnosis re-runs the verifier; if it throws too, degrade to the generic stale wording (as deep does), never a 500 after the run is persisted.
+      if (fresh) try { whyNot = await whyUnverified(t, run.evidence, verify); } catch { whyNot = undefined; }
+    }
     if (run.parentRunId && run.resolutionId) {
       try {
         const original = await runOf(t, run.parentRunId); await freshness(t, original);
@@ -154,7 +161,7 @@ export function createAnswerWorkflow(policies: AnswerPolicyService, store: Answe
     }
     const state = !current ? "stale" : conflicts.length || inheritedConflict ? "conflicted" : run.state;
     const scores = run.candidate.scored.map((s) => s.score).filter((s): s is number => typeof s === "number" && Number.isFinite(s));
-    return { ...run.candidate, ...(!current ? { sources: { internal: [], web: [] }, scored: [], auditLog: [], reason: "Stored candidate, policy or source evidence changed, was withdrawn, or cannot be verified." } : {}),
+    return { ...run.candidate, ...(!current ? { sources: { internal: [], web: [] }, scored: [], auditLog: [], reason: whyNot ?? "Stored candidate, policy or source evidence changed, was withdrawn, or cannot be verified." } : {}),
       answer: state === "allowed" || state === "approved" ? run.candidate.answer : "", runId: run.id, state,
       policy: run.policy ? { policyId: run.policy.policyId, version: run.policy.version, questionClass: run.policy.questionClass,
         mode: run.policy.mode, style: run.policy.style, onInsufficient: run.policy.onInsufficient, citations: run.policy.citations } : null,
@@ -192,7 +199,7 @@ export function createAnswerWorkflow(policies: AnswerPolicyService, store: Answe
       }
       // Persist the exact JSON wire value. Optional undefined audit/provider metadata must not
       // become BSON null after restart and falsely change the reviewed candidate digest.
-      const candidate = JSON.parse(JSON.stringify(await askV2(input.query, filteredTree(tree, input.filters.sessionIds, plan?.ids, plan?.sessions), deps))) as AskV2Result;
+      const candidate = JSON.parse(JSON.stringify(await askForMode(input.mode, input.query, filteredTree(tree, input.filters.sessionIds, plan?.ids, plan?.sessions), deps))) as AskV2Result;
       if (resolutionOriginal) {
         await freshness(t, resolutionOriginal);
         if ((await resolutionPlan(t, resolutionOriginal, input.resolutionId!)).snapshot !== plan!.snapshot)
@@ -205,7 +212,7 @@ export function createAnswerWorkflow(policies: AnswerPolicyService, store: Answe
         reason: evaluation.reason, candidate, candidateDigest: digest(candidate), evidenceDigest: digest(evidence), evidence, policy: selected, feedback: [],
         ...(parentRunId ? { parentRunId, resolutionId: input.resolutionId } : {}) };
       // History is part of a successful request: storage failure must not advertise a saved answer.
-      await store.create(t, run); return published(t, run);
+      await store.create(t, run); return published(t, run, input.mode !== "deep");
     },
     async history(t: string) { tenant(t); const runs = await store.list(t, 100); return Promise.all(runs.map(async (run) => ({ id: run.id, query: run.query, createdAt: run.createdAt, questionClass: run.questionClass, filters: run.filters, evidenceMode: run.evidenceMode, reason: run.reason, result: await published(t, run) }))); },
     async get(t: string, id: string) {

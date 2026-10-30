@@ -21,8 +21,8 @@ export async function loadProbes(apiKey: string): Promise<SetupProbes> {
     probe(async () => {
       const r = await apiFetch<unknown>("/setup/status", apiKey);
       const c = isObj(r) ? r.configured : null;
-      return isObj(c) && typeof c.gemini === "boolean" && typeof c.tavily === "boolean" && typeof c.langfuse === "boolean"
-        ? { gemini: c.gemini, tavily: c.tavily, langfuse: c.langfuse } : null;
+      return isObj(c) && typeof c.gemini === "boolean" && typeof c.webSearch === "boolean" && typeof c.langfuse === "boolean"
+        ? { gemini: c.gemini, webSearch: c.webSearch, langfuse: c.langfuse } : null;
     }),
     probe(async () => parseView(await apiFetch<unknown>("/calendar/join-rules", apiKey))),
     probe(async () => { const r = await apiFetch<unknown>("/watched-sources", apiKey); return isObj(r) && Array.isArray(r.sources) ? r.sources.length : null; }),

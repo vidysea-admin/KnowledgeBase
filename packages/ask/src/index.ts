@@ -12,7 +12,8 @@ export { refine, decompose, parseKeep } from "./refine.js";
 export type { RefinableDoc } from "./refine.js";
 export { answer } from "./answer.js";
 export type { AnswerResult } from "./answer.js";
-export { askV2 } from "./ask-v2.js";
+export { askV2, askFastV2, FAST_DEADLINE_MS } from "./ask-v2.js";
+export type { AskFastOptions } from "./ask-v2.js";
 export type { AskV2Deps, AskV2Result, AuditEntry } from "./ask-shared.js";
 
 // T-022 — evaluator calibration harness (MAE against an injected ScoreFn, no I/O).

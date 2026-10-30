@@ -4,6 +4,7 @@ import type { Claims, SessionPages, Sessions, Turns, TreeIndexRootDocument, Grap
 import { assertValidTenantId, scopedCollection } from '@lkb/db';
 import { buildKnowledgeGraph, treeIndexRootFilter } from '@lkb/index';
 import type { BrainReadDeps } from '../../routes/brain.js';
+import { createWhatsAppRawAccess, type WhatsAppRawAccess } from '../../whatsapp/owner-config.js';
 import type { CitationsDeps, CitationEvidence } from '../../routes/citations.js';
 import type { GraphReadDeps } from '../../routes/graph.js';
 import type { TreeStore } from '../../routes/ask/ask.js';
@@ -31,12 +32,24 @@ function publicPage(page: SessionPages | null): SessionPages | null {
   return metadata;
 }
 
-export function trustedBrainReads(base: BrainReadDeps, database: () => Db): BrainReadDeps {
+/** `rawAccess` (default: built from the database) decides who may read a WhatsApp session raw (W7 / R-26); it applies only when the route passes a read context. */
+export function trustedBrainReads(base: BrainReadDeps, database: () => Db, rawAccess?: WhatsAppRawAccess): BrainReadDeps {
+  const access = (): WhatsAppRawAccess => rawAccess ?? createWhatsAppRawAccess(database());
   return {
     ...base,
-    async listSessions(tenant) {
+    async listSessions(tenant, read) {
       const visibility = createKnowledgeVisibility(database());
       const rows = await base.listSessions(tenant);
+      if (read) {
+        const out: Sessions[] = [];
+        for (const row of rows) {
+          const kind = await access().forSession(tenant, row._id, read.caller);
+          if (kind.whatsapp) { if (kind.decision.allowed) out.push(publicSession(row)); continue; } // metadata only; raw text is read through the detail route
+          const safeRow = await visibility.safeCitationSession(tenant, row._id);
+          if (safeRow) out.push(publicSession(safeRow));
+        }
+        return out;
+      }
       const safe = await Promise.all(rows.map(row => visibility.safeCitationSession(tenant, row._id)));
       return safe.filter((row): row is Sessions => row !== null).map(publicSession);
     },
@@ -51,8 +64,24 @@ export function trustedBrainReads(base: BrainReadDeps, database: () => Db): Brai
         return { ...publicSource, consent: { given: row.consent.given, recordedBy: row.consent.recordedBy } };
       });
     },
-    async getSessionDetail(tenant, sessionId) {
+    async getSessionDetail(tenant, sessionId, read) {
       const db = database(), visibility = createKnowledgeVisibility(db);
+      if (read) {
+        const kind = await access().forSession(tenant, sessionId, read.caller);
+        if (kind.whatsapp) {
+          // R-26: the owner or an admin gets the session's effective (edited, un-redacted-by-review) turns; everyone else gets exactly what an absent session gets.
+          if (!kind.decision.allowed) return null;
+          const raw = await base.getSessionDetail(tenant, sessionId);
+          if (!raw || raw.session.tenantId !== tenant || raw.session._id !== sessionId) return null;
+          const turns = await readEffectiveTurns(db, tenant, raw.turns, sessionId);
+          if (!kind.decision.ownerView) { // R-29: audit first; if it cannot be written (or no stable identity exists) nothing is returned
+            if (!read.who) return null;
+            await access().auditAdminRead(tenant, read.who, { linkId: kind.decision.linkId, count: turns.length });
+          }
+          const claimOk = await Promise.all(raw.claims.map(row => visibility.claimVisible(tenant, row)));
+          return { ...raw, session: publicSession(raw.session), page: publicPage(raw.page), claims: raw.claims.filter((_, i) => claimOk[i]).map(publicClaim), turns };
+        }
+      }
       // Aggregate pages, participants and media contain unreviewed siblings in chat sessions.
       const aggregateVisible = await visibility.sessionVisible(tenant, sessionId);
       const safeSession = await visibility.safeCitationSession(tenant, sessionId);

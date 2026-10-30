@@ -168,8 +168,8 @@ async function fixture(testSignal?: AbortSignal) {
     onInsufficient: "review", citations: "required", note: "Synthetic native message policy" }, { actor: "synthetic-owner" });
   const workflow = createAnswerWorkflow(policies, createInMemoryAnswerRecordStore(),
     createMongoEvidenceVerifier(f.db, undefined, createKnowledgeVisibility(f.db).eligibleTurn, native.resolver));
-  const deps = buildTestDeps({ keyStore: fakeKeyStore({ owner: { tenantId: TENANT, keyId: "synthetic-owner", scopes: ["whatsapp", "search", "citations", "ask"] },
-    foreign: { tenantId: "tenant-b", keyId: "synthetic-foreign", scopes: ["whatsapp", "search", "citations", "ask"] },
+  const deps = buildTestDeps({ keyStore: fakeKeyStore({ owner: { tenantId: TENANT, keyId: "synthetic-owner", scopes: ["whatsapp", "whatsapp-admin", "search", "citations", "ask"] },
+    foreign: { tenantId: "tenant-b", keyId: "synthetic-foreign", scopes: ["whatsapp", "whatsapp-admin", "search", "citations", "ask"] },
     limited: { tenantId: TENANT, keyId: "synthetic-limited", scopes: ["search"] } }),
     whatsapp: wiring.whatsapp, whatsappReview: wiring.reviewRouter, nativeEvidence: native.resolver,
     search: createMongoSearchDeps({ db: f.db, nativeEvidence: native.resolver }),

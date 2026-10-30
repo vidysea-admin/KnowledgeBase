@@ -1,0 +1,19 @@
+{
+  "_id": "6a8d0c692fcc75f0e911b8a1",
+  "tenantId": "toc",
+  "linkId": "6a8d0c692fcc75f0e911b801",
+  "startedAt": "2026-10-29T10:00:00.000Z",
+  "endedAt": "2026-10-29T10:00:00.000Z",
+  "status": "ok",
+  "errorCode": null,
+  "groups": [
+    {
+      "groupJid": "120363000000000001@g.us",
+      "fetched": -1,
+      "newTurns": 4,
+      "candidatesCreated": 1,
+      "skippedDeleted": 0,
+      "errorCode": null
+    }
+  ]
+}

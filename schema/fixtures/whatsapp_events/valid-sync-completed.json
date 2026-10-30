@@ -1,0 +1,14 @@
+{
+  "_id": "6a8d0c692fcc75f0e911b8b1",
+  "tenantId": "toc",
+  "eventType": "sync.completed",
+  "at": "2026-10-29T10:00:00.000Z",
+  "linkId": "6a8d0c692fcc75f0e911b801",
+  "actorKind": "system",
+  "data": {
+    "runId": "6a8d0c692fcc75f0e911b8a1",
+    "fetched": 4,
+    "newTurns": 4,
+    "candidatesCreated": 1
+  }
+}

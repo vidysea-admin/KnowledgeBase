@@ -1,0 +1,383 @@
+/**
+ * whatsapp-multiuser W7 (R-26..R-30): raw WhatsApp content is readable by its link owner or an admin and by nobody else.
+ * Covers the review list/get/decide routes, the candidate source route and the GET /sessions[/:id] read path, over one in-memory Mongo:
+ *   A and B are two owners (links LA, LB) in tenant-a, L is a legacy link (no person), X is another tenant's capture.
+ * Principals are injected at the request boundary (the same `req.auth` shape the real guard produces); nothing here trusts a client field.
+ */
+import { test } from "node:test";
+import assert from "node:assert/strict";
+import express from "express";
+import type { Db } from "mongodb";
+import type { Server } from "node:http";
+import type { VerifiedKey } from "../auth.js";
+import { createBrainRouter, withSessionArtifacts, type BrainReadDeps } from "../routes/brain.js";
+import { trustedBrainReads } from "../composition/integrations/trusted-readers.js";
+import { createMongoWhatsAppReviewSourceReader, createWhatsAppReviewSourceRouter } from "../whatsapp-review/review-source.js";
+import { createWhatsAppRawAccess, whatsAppCallerFromAuth, type WhatsAppRawAccess } from "./owner-config.js";
+import { detectWhatsAppReviewCandidates, type WhatsAppReviewInput } from "./review/detection.js";
+import { createWhatsAppReviewRouter } from "./review/router.js";
+import { createMongoWhatsAppReviewRepository } from "./review/store.js";
+import { reviewMongoFixture, REVIEW_TIME } from "./review/test-fixtures.js";
+
+const LA = "a".repeat(24), LB = "b".repeat(24), LL = "c".repeat(24), LX = "d".repeat(24);
+const OA = "1".repeat(24), OB = "2".repeat(24), OL = "3".repeat(24), OX = "4".repeat(24);
+const TEXT = { a: "Topic: Alpha scholarship deadline", b: "Topic: Bravo visa interview", l: "Topic: Legacy hostel note", x: "Topic: Xray other tenant" };
+
+function waInput(tenantId: string, tag: string, text: string, linkId: string | undefined, owner: string): WhatsAppReviewInput {
+  return {
+    source: { _id: `src-${tag}`, tenantId, kind: "whatsapp-batch", path: `group-${tag}@g.us`, ownerUserId: owner,
+      ...(linkId ? { sourceMeta: { whatsappLinkId: linkId } } : {}), consent: { given: true, recordedBy: "test" } } as unknown as WhatsAppReviewInput["source"],
+    session: { _id: `sess-${tag}`, tenantId, sourceId: `src-${tag}` },
+    turns: [{ _id: `turn-${tag}`, tenantId, sessionId: `sess-${tag}`, speakerRef: "person-1", speakerLabel: "Expert", text, tStart: 0, tEnd: 0, occurredAt: "2026-10-14T10:00:00.000Z" }],
+  };
+}
+const link = (id: string, userId: string | null, owner: string, tenantId = "tenant-a") => ({ _id: id, tenantId, userId, state: "active", live: true, archiverOwnerId: owner });
+
+const PRINCIPALS: Record<string, VerifiedKey> = {
+  uA: { tenantId: "tenant-a", principal: "session", userId: "uA", scopes: ["whatsapp", "sessions"] },
+  uB: { tenantId: "tenant-a", principal: "session", userId: "uB", scopes: ["whatsapp", "sessions"] },
+  member: { tenantId: "tenant-a", principal: "session", userId: "uM", scopes: ["whatsapp", "sessions"] },
+  viewer: { tenantId: "tenant-a", principal: "session", userId: "uV", scopes: ["sessions"] },
+  admin: { tenantId: "tenant-a", principal: "session", userId: "boss", scopes: ["whatsapp", "whatsapp-admin", "sessions"] },
+  plainKey: { tenantId: "tenant-a", keyId: "key-plain", scopes: ["whatsapp", "sessions"] },
+  adminKey: { tenantId: "tenant-a", keyId: "key-admin", scopes: ["whatsapp", "whatsapp-admin", "sessions"] },
+  adminX: { tenantId: "tenant-b", principal: "session", userId: "bossX", scopes: ["whatsapp", "whatsapp-admin", "sessions"] },
+};
+
+async function world(options: { access?: (real: WhatsAppRawAccess) => WhatsAppRawAccess; production?: boolean } = {}) {
+  const inputs = [waInput("tenant-a", "a", TEXT.a, LA, OA), waInput("tenant-a", "b", TEXT.b, LB, OB), waInput("tenant-a", "l", TEXT.l, LL, OL), waInput("tenant-b", "x", TEXT.x, LX, OX)];
+  const f = reviewMongoFixture(inputs);
+  f.seed("whatsapp_links", link(LA, "uA", OA), link(LB, "uB", OB), link(LL, null, OL), link(LX, "uX", OX, "tenant-b"));
+  f.seed("sources", { _id: "src-doc", tenantId: "tenant-a", kind: "url", path: "https://example.org/doc", consent: { given: true, recordedBy: "test" } });
+  f.seed("sessions", { _id: "sess-doc", tenantId: "tenant-a", sourceId: "src-doc", title: "Public document" });
+  f.seed("turns", { _id: "turn-doc", tenantId: "tenant-a", sessionId: "sess-doc", speakerRef: "p", text: "Open document text", tStart: 0, tEnd: 1 });
+  const repository = createMongoWhatsAppReviewRepository(f.db, { now: () => REVIEW_TIME, materialize: async context => { await f.publish(context.candidate, context.session); } });
+  const ids: Record<string, string[]> = {};
+  for (const input of inputs) {
+    const proposals = detectWhatsAppReviewCandidates(input.source.tenantId, input, REVIEW_TIME);
+    await repository.insert(input.source.tenantId, proposals);
+    ids[input.source._id.replace("src-", "")] = proposals.map(p => p._id);
+  }
+  const real = createWhatsAppRawAccess(f.db);
+  const access = options.access ? options.access(real) : real;
+  let sourceReads = 0;
+  const reader = createMongoWhatsAppReviewSourceReader(f.db);
+  const base: BrainReadDeps = {
+    async listSessions(tenantId) { return await f.db.collection("sessions").find({ tenantId } as never).toArray() as never; },
+    async getSessionDetail(tenantId, sessionId) {
+      const session = await f.db.collection("sessions").findOne({ tenantId, _id: sessionId } as never);
+      if (!session) return null;
+      return { session: session as never, page: null, claims: [], turns: await f.db.collection("turns").find({ tenantId, sessionId } as never).toArray() as never };
+    },
+    listSources: async () => [], listGaps: async () => [],
+  };
+  const app = express(); app.use(express.json());
+  app.use((req, res, next) => {
+    const principal = PRINCIPALS[String(req.header("x-p"))];
+    if (!principal) { res.status(401).json({ error: "unauthorized" }); return; }
+    req.auth = structuredClone(principal); next();
+  });
+  app.use(createWhatsAppReviewSourceRouter({ get: async (...args) => { sourceReads++; return reader.get(...args); } }, access));
+  app.use(createWhatsAppReviewRouter(repository, access));
+  // `production` builds the brain deps exactly as composition/production.ts does: the session-artifact wrapper around the trusted readers (A-P1).
+  const trusted = trustedBrainReads(base, () => f.db, access);
+  app.use(createBrainRouter(options.production ? withSessionArtifacts(trusted, process.cwd()) : trusted));
+  const server: Server = app.listen(0, "127.0.0.1"); await new Promise<void>(resolve => server.once("listening", resolve));
+  const address = server.address(); assert.ok(address && typeof address === "object");
+  const url = `http://127.0.0.1:${address.port}`;
+  const send = (principal: string, path: string, init: { method?: string; body?: unknown; headers?: Record<string, string> } = {}) =>
+    fetch(url + path, { method: init.method ?? "GET", headers: { "x-p": principal, "content-type": "application/json", ...(init.headers ?? {}) },
+      ...(init.body !== undefined ? { body: JSON.stringify(init.body) } : {}) });
+  const json = async (response: Response) => response.json() as Promise<any>;
+  return { f, ids, send, json, sourceReads: () => sourceReads, repository, events: () => f.rows("whatsapp_events"),
+    close: async () => { server.closeAllConnections(); await new Promise<void>(resolve => server.close(() => resolve())); } };
+}
+const listed = async (w: Awaited<ReturnType<typeof world>>, principal: string) => {
+  const response = await w.send(principal, "/whatsapp/review"); assert.equal(response.status, 200);
+  return ((await w.json(response)).candidates as { _id: string }[]).map(c => c._id).sort();
+};
+const sorted = (...lists: string[][]) => lists.flat().sort();
+
+// ---- acceptance 1: two owners in one tenant ----
+test("W7-1 review queue: an owner sees exactly their own link's candidates; an admin sees every link in the tenant", async () => {
+  const w = await world();
+  try {
+    assert.deepEqual(await listed(w, "uA"), sorted(w.ids.a!));
+    assert.deepEqual(await listed(w, "uB"), sorted(w.ids.b!));
+    assert.deepEqual(await listed(w, "admin"), sorted(w.ids.a!, w.ids.b!, w.ids.l!));
+    assert.deepEqual(await listed(w, "adminKey"), sorted(w.ids.a!, w.ids.b!, w.ids.l!));
+    assert.deepEqual(await listed(w, "adminX"), sorted(w.ids.x!), "another tenant's admin sees only their own tenant");
+  } finally { await w.close(); }
+});
+
+test("W7-1 candidate get/approve: A reaches A's candidate and gets the same 404 for B's as for one that does not exist", async () => {
+  const w = await world();
+  try {
+    const own = await w.send("uA", `/whatsapp/review/${w.ids.a![0]}`); assert.equal(own.status, 200);
+    const foreign = await w.send("uA", `/whatsapp/review/${w.ids.b![0]}`); const missing = await w.send("uA", "/whatsapp/review/wa-review:" + "0".repeat(64));
+    assert.equal(foreign.status, 404); assert.equal(missing.status, 404);
+    assert.deepEqual(await w.json(foreign), await w.json(missing), "R-30: unauthorized and nonexistent are indistinguishable");
+    const approveForeign = await w.send("uA", `/whatsapp/review/${w.ids.b![0]}/approve`, { method: "POST", body: {} });
+    assert.equal(approveForeign.status, 404);
+    assert.equal(w.f.rows("published").length, 0, "no side effect");
+    assert.equal((await w.repository.get("tenant-a", w.ids.b![0]!))!.status, "needs-review");
+  } finally { await w.close(); }
+});
+
+test("W7-1 the recorded decision actor is actorId plus the link id (UA-29, R-27)", async () => {
+  const w = await world();
+  try {
+    const owner = await w.send("uA", `/whatsapp/review/${w.ids.a![0]}/approve`, { method: "POST", body: {} });
+    assert.equal(owner.status, 200); assert.equal((await w.json(owner)).candidate.decision.actor, `user:uA@link:${LA}`);
+    const admin = await w.send("admin", `/whatsapp/review/${w.ids.b![0]}/reject`, { method: "POST", body: {} });
+    assert.equal(admin.status, 200); assert.equal((await w.json(admin)).candidate.decision.actor, `user:boss@link:${LB}`);
+    const key = await w.send("adminKey", `/whatsapp/review/${w.ids.l![0]}/reject`, { method: "POST", body: {} });
+    assert.equal(key.status, 200); assert.equal((await w.json(key)).candidate.decision.actor, `key-admin@link:${LL}`);
+  } finally { await w.close(); }
+});
+
+test("W7-1 an admin read of B's raw content writes one admin.raw_read event (ids and counts only); an owner's own read writes none", async () => {
+  const w = await world();
+  try {
+    assert.equal((await w.send("uA", `/whatsapp/review/${w.ids.a![0]}`)).status, 200);
+    assert.equal(w.events().length, 0, "reading your own content is not an admin read");
+    assert.equal((await w.send("admin", `/whatsapp/review/${w.ids.b![0]}`)).status, 200);
+    const [event, ...rest] = w.events(); assert.equal(rest.length, 0);
+    assert.deepEqual({ type: event!.eventType, kind: event!.actorKind, actor: event!.actorId, link: event!.linkId, tenant: event!.tenantId },
+      { type: "admin.raw_read", kind: "user", actor: "user:boss", link: LB, tenant: "tenant-a" });
+    assert.deepEqual(event!.data, { candidateId: w.ids.b![0] });
+    assert.ok(!JSON.stringify(event).includes(TEXT.b), "no message text in the audit trail");
+    // the queue read records one event per foreign link with a count
+    assert.equal((await w.send("adminKey", "/whatsapp/review")).status, 200);
+    const counts = w.events().slice(1).map(e => ({ link: e.linkId, count: (e.data as { count: number }).count, actor: e.actorId })).sort((x, y) => String(x.link).localeCompare(String(y.link)));
+    assert.deepEqual(counts, [{ link: LA, count: 2, actor: "key-admin" }, { link: LB, count: 2, actor: "key-admin" }, { link: LL, count: 2, actor: "key-admin" }]);
+  } finally { await w.close(); }
+});
+
+test("W7-1 fail closed: an admin read whose audit event cannot be written returns nothing", async () => {
+  const w = await world({ access: real => ({ ...real, auditAdminRead: async () => { throw new Error("events collection down"); } }) });
+  try {
+    const detail = await w.send("admin", `/whatsapp/review/${w.ids.b![0]}`); assert.equal(detail.status, 502);
+    assert.ok(!(await detail.text()).includes(TEXT.b));
+    assert.equal((await w.send("admin", "/whatsapp/review")).status, 502);
+    const source = await w.send("admin", `/whatsapp/review/${w.ids.b![0]}/source`); assert.equal(source.status, 503);
+    const session = await w.send("admin", "/sessions/sess-b"); assert.equal(session.status, 503);
+    assert.equal((await w.send("uB", `/whatsapp/review/${w.ids.b![0]}`)).status, 200, "the owner's own read does not depend on the audit");
+  } finally { await w.close(); }
+});
+
+// ---- acceptance 2 and 5: viewers, non-owner members, plain keys, legacy links ----
+test("W7-2/5 a viewer, a non-owner member and a plain key reach no raw candidate; a legacy link is admin-only", async () => {
+  const w = await world();
+  try {
+    const all = sorted(w.ids.a!, w.ids.b!, w.ids.l!);
+    for (const who of ["member", "plainKey"]) {
+      assert.deepEqual(await listed(w, who), [], who);
+      for (const id of all) assert.equal((await w.send(who, `/whatsapp/review/${id}`)).status, 404, `${who} ${id}`);
+    }
+    assert.equal((await w.send("viewer", "/whatsapp/review")).status, 403, "a viewer lacks the whatsapp scope entirely");
+    assert.equal((await w.send("uA", `/whatsapp/review/${w.ids.l![0]}`)).status, 404, "a member never owns a legacy link");
+    assert.equal((await w.send("uB", `/whatsapp/review/${w.ids.l![0]}/approve`, { method: "POST", body: {} })).status, 404);
+    assert.equal((await w.send("admin", `/whatsapp/review/${w.ids.l![0]}`)).status, 200);
+    assert.equal(w.f.rows("published").length, 0);
+  } finally { await w.close(); }
+});
+
+test("W7-2 source route: owner or admin only, decided before the reader touches any evidence", async () => {
+  const w = await world();
+  try {
+    assert.equal((await w.send("uA", `/whatsapp/review/${w.ids.a![0]}/source`)).status, 200);
+    const reads = w.sourceReads();
+    for (const who of ["uB", "member", "plainKey"]) assert.equal((await w.send(who, `/whatsapp/review/${w.ids.a![0]}/source`)).status, 404, who);
+    assert.equal(w.sourceReads(), reads, "a refused caller never reaches the evidence reader");
+    assert.equal(w.events().length, 0);
+    assert.equal((await w.send("admin", `/whatsapp/review/${w.ids.a![0]}/source`)).status, 200);
+    assert.equal(w.events().length, 1); assert.equal(w.events()[0]!.eventType, "admin.raw_read");
+  } finally { await w.close(); }
+});
+
+test("W7-2 sessions: the owner and an admin read a WhatsApp session raw; a viewer, a non-owner member and a plain key get exactly the 404 of an absent session", async () => {
+  const w = await world();
+  try {
+    const own = await w.send("uA", "/sessions/sess-a"); assert.equal(own.status, 200);
+    const body = await w.json(own); assert.equal(body.turns[0].text, TEXT.a); assert.equal(body.session._id, "sess-a");
+    const missing = await w.json(await w.send("uA", "/sessions/sess-nope"));
+    for (const who of ["uB", "member", "viewer", "plainKey"]) {
+      const response = await w.send(who, "/sessions/sess-a");
+      assert.equal(response.status, 404, who); assert.deepEqual(await w.json(response), missing, who);
+    }
+    assert.equal(w.events().length, 0, "no event for owners or refused callers");
+    const admin = await w.send("admin", "/sessions/sess-b"); assert.equal(admin.status, 200); assert.equal((await w.json(admin)).turns[0].text, TEXT.b);
+    assert.equal(w.events().length, 1); assert.deepEqual({ t: w.events()[0]!.eventType, l: w.events()[0]!.linkId, d: w.events()[0]!.data }, { t: "admin.raw_read", l: LB, d: { count: 1 } });
+    // legacy link: admin-only
+    assert.equal((await w.send("uA", "/sessions/sess-l")).status, 404); assert.equal((await w.send("plainKey", "/sessions/sess-l")).status, 404);
+    assert.equal((await w.send("adminKey", "/sessions/sess-l")).status, 200);
+  } finally { await w.close(); }
+});
+
+test("W7-2 sessions list: WhatsApp sessions are listed only to their owner or an admin; other sessions are unaffected", async () => {
+  const w = await world();
+  try {
+    const ids = async (who: string) => ((await w.json(await w.send(who, "/sessions"))).sessions as { _id: string }[]).map(s => s._id).sort();
+    assert.deepEqual(await ids("uA"), ["sess-a", "sess-doc"].sort());
+    assert.deepEqual(await ids("uB"), ["sess-b", "sess-doc"].sort());
+    assert.deepEqual(await ids("viewer"), ["sess-doc"]);
+    assert.deepEqual(await ids("plainKey"), ["sess-doc"]);
+    assert.deepEqual(await ids("admin"), ["sess-a", "sess-b", "sess-doc", "sess-l"].sort());
+    assert.equal(w.events().length, 0, "listing metadata is not a raw-content read");
+    const doc = await w.send("viewer", "/sessions/sess-doc"); assert.equal(doc.status, 200, "a non-WhatsApp session still reads as before");
+  } finally { await w.close(); }
+});
+
+test("W7-2 a source whose consent was withdrawn is shown raw to nobody, not even its owner", async () => {
+  const w = await world();
+  try {
+    await w.f.db.collection("sources").updateOne({ _id: "src-a" } as never, { $set: { consent: { given: false, recordedBy: "test" } } } as never);
+    assert.equal((await w.send("uA", "/sessions/sess-a")).status, 404);
+    assert.equal((await w.send("admin", "/sessions/sess-a")).status, 404);
+  } finally { await w.close(); }
+});
+
+// ---- acceptance 6: adversarial ----
+test("W7-6 adversarial: another tenant's admin, a swapped tenant header, a forged body and a query tenant change nothing", async () => {
+  const w = await world();
+  try {
+    const target = `/whatsapp/review/${w.ids.a![0]}`;
+    assert.equal((await w.send("adminX", target)).status, 404);
+    assert.equal((await w.send("adminX", `${target}/approve`, { method: "POST", body: {} })).status, 404);
+    assert.equal((await w.send("adminX", `${target}?tenantId=tenant-a`, { headers: { "x-tenant-id": "tenant-a", "x-lkb-tenant": "tenant-a" } })).status, 404);
+    assert.equal((await w.send("adminX", "/sessions/sess-a")).status, 404);
+    assert.equal((await w.send("adminX", `${target}/source`)).status, 404);
+    assert.equal((await w.send("uB", `${target}/approve`, { method: "POST", body: { tenantId: "tenant-a", actor: "user:uA", linkId: LA } })).status, 400, "non-empty body refused before authority");
+    assert.equal((await w.send("uB", `${target}/approve`, { method: "POST", body: {}, headers: { "x-actor": "user:uA" } })).status, 404);
+    assert.equal(w.f.rows("published").length, 0); assert.equal((await w.repository.get("tenant-a", w.ids.a![0]!))!.status, "needs-review");
+    assert.equal(w.events().length, 0);
+  } finally { await w.close(); }
+});
+
+test("W7-6 an id that is not a review id, or a candidate whose source cannot be resolved, is a 404 for everyone below admin and never an error", async () => {
+  const w = await world();
+  try {
+    assert.equal((await w.send("uA", "/whatsapp/review/not-an-id")).status, 404);
+    // break the source of A's candidates: the binding is gone, so even the former owner is refused (fail closed)
+    await w.f.db.collection("sources").updateOne({ _id: "src-a" } as never, { $set: { kind: "document" } } as never);
+    assert.equal((await w.send("uA", `/whatsapp/review/${w.ids.a![0]}`)).status, 404);
+    // a stamp that disagrees with the source's own archiver owner is a broken binding: nobody owns it
+    await w.f.db.collection("sources").updateOne({ _id: "src-a" } as never, { $set: { kind: "whatsapp-batch", ownerUserId: OB } } as never);
+    assert.equal((await w.send("uA", `/whatsapp/review/${w.ids.a![0]}`)).status, 404);
+  } finally { await w.close(); }
+});
+
+// ---- ISS-WAOWNER-005 pins ----
+test("ISS-WAOWNER-005: a session principal with an empty userId is a plain non-admin key caller, even with the admin scope", () => {
+  assert.deepEqual(whatsAppCallerFromAuth({ tenantId: "t", principal: "session", userId: "", scopes: ["whatsapp", "whatsapp-admin"] }), { kind: "key", admin: false });
+  assert.deepEqual(whatsAppCallerFromAuth({ tenantId: "t", principal: "session", scopes: ["whatsapp", "whatsapp-admin"] }), { kind: "key", admin: false });
+  assert.deepEqual(whatsAppCallerFromAuth({ tenantId: "t", principal: "session", userId: "u", scopes: ["whatsapp-admin"] }), { kind: "session", userId: "u", admin: true });
+  assert.deepEqual(whatsAppCallerFromAuth(undefined), { kind: "key", admin: false });
+});
+
+test("ISS-WAOWNER-005: the authority itself refuses an empty-userId session against an empty-userId link (defence in depth behind the caller derivation)", async () => {
+  const w = await world();
+  try {
+    const OE = "e".repeat(24); const LE = "f".repeat(24);
+    w.f.seed("whatsapp_links", link(LE, "", OE));
+    w.f.seed("sources", { _id: "src-e", tenantId: "tenant-a", kind: "whatsapp-batch", path: "wa/e", consent: { given: true, recordedBy: "test" }, sourceMeta: { ownerUserId: OE, whatsappLinkId: LE } });
+    const access = createWhatsAppRawAccess(w.f.db);
+    assert.deepEqual(await access.forSource("tenant-a", "src-e", { kind: "session", userId: "", admin: false }), { allowed: false });
+    assert.deepEqual(await access.forSource("tenant-a", "src-e", { kind: "key", admin: false }), { allowed: false });
+  } finally { await w.close(); }
+});
+
+test("W7: the raw-access authority is itself fail-closed (bad tenant, empty ids, throwing database)", async () => {
+  const w = await world();
+  try {
+    const access = createWhatsAppRawAccess(w.f.db);
+    const caller = whatsAppCallerFromAuth(PRINCIPALS.admin);
+    assert.deepEqual(await access.forSource("bad tenant\n", "src-a", caller), { allowed: false });
+    assert.deepEqual(await access.forSource("tenant-a", "", caller), { allowed: false });
+    assert.deepEqual(await access.forCandidate("tenant-a", "wa-review:nothing", caller), { allowed: false });
+    const broken = createWhatsAppRawAccess({ collection: () => { throw new Error("down"); } } as unknown as Pick<Db, "collection">);
+    assert.deepEqual(await broken.forSource("tenant-a", "src-a", caller), { allowed: false });
+    assert.deepEqual(await broken.forSession("tenant-a", "sess-a", caller), { whatsapp: true, decision: { allowed: false } });
+    assert.deepEqual(await access.forSession("tenant-a", "sess-doc", caller), { whatsapp: false });
+    const decision = await access.forSource("tenant-a", "src-a", whatsAppCallerFromAuth(PRINCIPALS.uA));
+    assert.deepEqual(decision, { allowed: true, linkId: LA, sourceId: "src-a", ownerView: true });
+  } finally { await w.close(); }
+});
+
+// ---- fix cycle 1: A-P1 the production composition must keep the read context ----
+test("W7 A-P1 production wiring (withSessionArtifacts around the trusted readers): owner and admin read raw; everyone else gets 404; a non-owner admin read is audited once", async () => {
+  const w = await world({ production: true });
+  try {
+    const own = await w.send("uA", "/sessions/sess-a"); assert.equal(own.status, 200);
+    assert.equal((await w.json(own)).turns[0].text, TEXT.a);
+    assert.equal((await w.send("uB", "/sessions/sess-b")).status, 200);
+    assert.equal(w.events().length, 0, "an owner's own read writes no admin event");
+    const missing = await w.json(await w.send("uA", "/sessions/sess-nope"));
+    for (const who of ["uB", "member", "viewer", "plainKey"]) {
+      const response = await w.send(who, "/sessions/sess-a");
+      assert.equal(response.status, 404, who); assert.deepEqual(await w.json(response), missing, who);
+    }
+    assert.equal(w.events().length, 0, "refused callers write nothing");
+    const admin = await w.send("admin", "/sessions/sess-b"); assert.equal(admin.status, 200); assert.equal((await w.json(admin)).turns[0].text, TEXT.b);
+    assert.equal(w.events().length, 1, "exactly one admin.raw_read, not one per wrapper layer");
+    assert.deepEqual({ t: w.events()[0]!.eventType, l: w.events()[0]!.linkId, d: w.events()[0]!.data }, { t: "admin.raw_read", l: LB, d: { count: 1 } });
+    assert.equal((await w.send("adminKey", "/sessions/sess-l")).status, 200);
+    assert.equal((await w.send("viewer", "/sessions/sess-doc")).status, 200, "a non-WhatsApp session reads as before");
+    assert.deepEqual(((await w.json(await w.send("uA", "/sessions"))).sessions as { _id: string }[]).map(x => x._id).sort(), ["sess-a", "sess-doc"]);
+  } finally { await w.close(); }
+});
+
+test("W7 A-P1 production wiring: an admin read whose audit event cannot be written is a 503 and returns nothing", async () => {
+  const w = await world({ production: true, access: real => ({ ...real, auditAdminRead: async () => { throw new Error("events collection down"); } }) });
+  try {
+    const session = await w.send("admin", "/sessions/sess-b"); assert.equal(session.status, 503);
+    assert.ok(!(await session.text()).includes(TEXT.b));
+    assert.equal((await w.send("uB", "/sessions/sess-b")).status, 200, "the owner's own read does not depend on the audit");
+  } finally { await w.close(); }
+});
+
+// ---- fix cycle 1: gate answer 2026-10-30 (qa/gates/wa-revoked-link-read-access.md): raw read access needs an ACTIVE link; admin still passes ----
+const setLinkState = (w: Awaited<ReturnType<typeof world>>, linkId: string, state: string) =>
+  w.f.db.collection("whatsapp_links").updateOne({ _id: linkId } as never, { $set: { state } } as never);
+
+for (const state of ["revoked", "suspended"]) {
+  test(`W7 gate: an owner whose link is ${state} reads no raw content (404 everywhere); an admin still reads it, audited`, async () => {
+    const w = await world({ production: true });
+    try {
+      await setLinkState(w, LA, state);
+      const missing = await w.json(await w.send("uA", "/whatsapp/review/wa-review:" + "0".repeat(64)));
+      const get = await w.send("uA", `/whatsapp/review/${w.ids.a![0]}`); assert.equal(get.status, 404); assert.deepEqual(await w.json(get), missing);
+      assert.equal((await w.send("uA", `/whatsapp/review/${w.ids.a![0]}/source`)).status, 404);
+      assert.equal((await w.send("uA", `/whatsapp/review/${w.ids.a![0]}/approve`, { method: "POST", body: {} })).status, 404);
+      assert.equal((await w.send("uA", "/sessions/sess-a")).status, 404);
+      assert.deepEqual(await listed(w, "uA"), [], "the owner's queue is empty");
+      assert.deepEqual(((await w.json(await w.send("uA", "/sessions"))).sessions as { _id: string }[]).map(x => x._id), ["sess-doc"]);
+      assert.equal(w.f.rows("published").length, 0, "no side effect");
+      assert.equal(w.events().length, 0);
+      assert.equal((await w.send("uB", "/sessions/sess-b")).status, 200, "another owner with an active link is unaffected");
+      const admin = await w.send("admin", "/sessions/sess-a"); assert.equal(admin.status, 200); assert.equal((await w.json(admin)).turns[0].text, TEXT.a);
+      assert.equal((await w.send("adminKey", `/whatsapp/review/${w.ids.a![0]}`)).status, 200);
+      assert.ok(w.events().length >= 2 && w.events().every(e => e.eventType === "admin.raw_read" && e.linkId === LA), "an admin read of a non-active link is an audited admin read");
+      await setLinkState(w, LA, "active");
+      assert.equal((await w.send("uA", "/sessions/sess-a")).status, 200, "reactivated link: the owner reads again");
+    } finally { await w.close(); }
+  });
+}
+
+test("W7 gate: an unstamped source is bound to its owner by an ACTIVE link only, and exactly one; a revoked or duplicated binding fails closed for the owner", async () => {
+  const w = await world();
+  try {
+    const raw = createWhatsAppRawAccess(w.f.db);
+    const owner = { kind: "session" as const, userId: "uA", admin: false }, admin = { kind: "key" as const, admin: true };
+    w.f.seed("sources", { _id: "src-u", tenantId: "tenant-a", kind: "whatsapp-batch", path: "u@g.us", ownerUserId: OA, consent: { given: true, recordedBy: "test" } });
+    assert.deepEqual(await raw.forSource("tenant-a", "src-u", owner), { allowed: true, linkId: LA, sourceId: "src-u", ownerView: true });
+    await setLinkState(w, LA, "revoked");
+    assert.deepEqual(await raw.forSource("tenant-a", "src-u", owner), { allowed: false }, "revoked link: the fallback does not find it");
+    assert.deepEqual(await raw.forSource("tenant-a", "src-u", admin), { allowed: true, linkId: null, sourceId: "src-u", ownerView: false });
+    await setLinkState(w, LA, "active");
+    w.f.seed("whatsapp_links", { ...link("e".repeat(24), "uA", OA), live: false });
+    assert.deepEqual(await raw.forSource("tenant-a", "src-u", owner), { allowed: false }, "two active links for one archiver owner: nobody is the owner");
+    assert.deepEqual(await raw.forSource("tenant-a", "src-u", admin), { allowed: true, linkId: null, sourceId: "src-u", ownerView: false });
+  } finally { await w.close(); }
+});

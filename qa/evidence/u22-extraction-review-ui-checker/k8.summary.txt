@@ -1,0 +1,5 @@
+   × individual extraction gold review > consumes authoritative evaluator export and discloses partial coverage with no gold or threshold promotion 62ms
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+TestingLibraryElementError: Unable to find an element with the text: /1\/2 reviewed; 1 pending/. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible.
+      Tests  1 failed | 8 passed (9)
+exit=1

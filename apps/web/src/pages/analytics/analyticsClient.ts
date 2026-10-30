@@ -36,7 +36,7 @@ export async function loadAnalytics(apiKey: string): Promise<AnalyticsData> {
     })
     : Promise.resolve({ ok: false, message: "Unable to load session details." });
   const [d, graph, gaps, jobs, usage] = await Promise.all([
-    details, part("the graph", () => loadGraph(apiKey) as Promise<unknown>), part("knowledge gaps", async () => (await listGaps(apiKey)).gaps as unknown),
+    details, part("the graph", () => loadGraph(apiKey).catch((error: unknown) => { if (error instanceof ApiError && error.status === 404) return null; throw error; }) as Promise<unknown>), part("knowledge gaps", async () => (await listGaps(apiKey)).gaps as unknown),
     part("provider jobs", async () => { const r = await listJobs(apiKey, 50); return { jobs: r.jobs as unknown, truncated: r.truncated, limit: r.limit }; }),
     part("usage", () => getUsage(apiKey, USAGE_DAYS)),
   ]);

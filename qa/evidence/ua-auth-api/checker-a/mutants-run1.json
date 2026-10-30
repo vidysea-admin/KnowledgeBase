@@ -1,0 +1,281 @@
+[
+ {
+  "id": "A4-1",
+  "note": "unknown body keys (tenant in body) no longer rejected",
+  "file": "apps/api/src/user-accounts/auth-router.ts",
+  "green": [
+   {
+    "t": "auth-router",
+    "tests": 15,
+    "pass": 15,
+    "fail": 0,
+    "failed": [],
+    "exit": 0
+   }
+  ],
+  "red": [
+   {
+    "t": "auth-router",
+    "tests": 15,
+    "pass": 14,
+    "fail": 1,
+    "failed": [
+     "A4 #1 signup over HTTP: new and existing email give a byte-equal body; unknown field and tenant-in-body are 400 and create nothing; no tenant configured is 503"
+    ],
+    "exit": 1
+   }
+  ],
+  "verdict": "KILLED"
+ },
+ {
+  "id": "A4-2",
+  "note": "stale unverified user may still verify",
+  "file": "apps/api/src/user-accounts/auth-service.ts",
+  "green": [
+   {
+    "t": "auth-service",
+    "tests": 17,
+    "pass": 17,
+    "fail": 0,
+    "failed": [],
+    "exit": 0
+   }
+  ],
+  "red": [
+   {
+    "t": "auth-service",
+    "tests": 17,
+    "pass": 16,
+    "fail": 1,
+    "failed": [
+     "A4 #2 unverified accounts older than 7 days are swept and cannot verify"
+    ],
+    "exit": 1
+   }
+  ],
+  "verdict": "KILLED"
+ },
+ {
+  "id": "A4-3",
+  "note": "wrong password accepted at login",
+  "file": "apps/api/src/user-accounts/auth-service.ts",
+  "green": [
+   {
+    "t": "auth-service",
+    "tests": 17,
+    "pass": 17,
+    "fail": 0,
+    "failed": [],
+    "exit": 0
+   }
+  ],
+  "red": [
+   {
+    "t": "auth-service",
+    "tests": 17,
+    "pass": 12,
+    "fail": 5,
+    "failed": [
+     "A4 #3 login: unknown email and wrong password are the same 401 and both run a full verify; invalid email shape too",
+     "A4 #3 login: active gets a session + csrf token; pending gets a ZERO-scope session; rejected / disabled / unverified get state only and no session",
+     "A4 #4 lockout: 5 failures lock the email 15 min, a never-registered one too; same 401 body; correct password refused while locked; success clears; admin unlock clears",
+     "A4 #4 a lock does not end existing sessions; the second lock lasts 30 min",
+     "A4 #9 every transition writes exactly one auth_events row with a closed-vocabulary detail; no row holds a password, token, cookie or raw email"
+    ],
+    "exit": 1
+   }
+  ],
+  "verdict": "KILLED"
+ },
+ {
+  "id": "A4-4",
+  "note": "lock not enforced at login",
+  "file": "apps/api/src/user-accounts/auth-service.ts",
+  "green": [
+   {
+    "t": "auth-service",
+    "tests": 17,
+    "pass": 17,
+    "fail": 0,
+    "failed": [],
+    "exit": 0
+   }
+  ],
+  "red": [
+   {
+    "t": "auth-service",
+    "tests": 17,
+    "pass": 15,
+    "fail": 2,
+    "failed": [
+     "A4 #4 lockout: 5 failures lock the email 15 min, a never-registered one too; same 401 body; correct password refused while locked; success clears; admin unlock clears",
+     "A4 #4 a lock does not end existing sessions; the second lock lasts 30 min"
+    ],
+    "exit": 1
+   }
+  ],
+  "verdict": "KILLED"
+ },
+ {
+  "id": "A4-5",
+  "note": "reset token not consumed (reusable)",
+  "file": "apps/api/src/user-accounts/auth-service.ts",
+  "green": [
+   {
+    "t": "auth-service",
+    "tests": 17,
+    "pass": 17,
+    "fail": 0,
+    "failed": [],
+    "exit": 0
+   }
+  ],
+  "red": [
+   {
+    "t": "auth-service",
+    "tests": 17,
+    "pass": 16,
+    "fail": 1,
+    "failed": [
+     "A4 #5 reset: forgot is always the same 202; an admin-issued token is single use; success revokes ALL sessions; rejected / disabled are refused generically"
+    ],
+    "exit": 1
+   }
+  ],
+  "verdict": "KILLED"
+ },
+ {
+  "id": "A4-6",
+  "note": "change password revokes no other session",
+  "file": "apps/api/src/user-accounts/auth-service.ts",
+  "green": [
+   {
+    "t": "auth-service",
+    "tests": 17,
+    "pass": 17,
+    "fail": 0,
+    "failed": [],
+    "exit": 0
+   }
+  ],
+  "red": [
+   {
+    "t": "auth-service",
+    "tests": 17,
+    "pass": 16,
+    "fail": 1,
+    "failed": [
+     "A4 #6 change password: wrong current is refused and counted; success revokes OTHER sessions only"
+    ],
+    "exit": 1
+   }
+  ],
+  "verdict": "KILLED"
+ },
+ {
+  "id": "A4-7",
+  "note": "logout does not clear the cookie",
+  "file": "apps/api/src/user-accounts/auth-service.ts",
+  "green": [
+   {
+    "t": "auth-service",
+    "tests": 17,
+    "pass": 17,
+    "fail": 0,
+    "failed": [],
+    "exit": 0
+   },
+   {
+    "t": "auth-router",
+    "tests": 15,
+    "pass": 15,
+    "fail": 0,
+    "failed": [],
+    "exit": 0
+   }
+  ],
+  "verdict": "UNVERIFIED (find string not unique)"
+ },
+ {
+  "id": "A4-8",
+  "note": "verify-email loses its per-IP token limiter",
+  "file": "apps/api/src/user-accounts/auth-router.ts",
+  "green": [
+   {
+    "t": "auth-router",
+    "tests": 15,
+    "pass": 15,
+    "fail": 0,
+    "failed": [],
+    "exit": 0
+   }
+  ],
+  "red": [
+   {
+    "t": "auth-router",
+    "tests": 15,
+    "pass": 14,
+    "fail": 1,
+    "failed": [
+     "A4 #8 rate limits: per-IP login / signup / forgot / token respond 429 with the standard body and Retry-After; per-email forgot 429 too"
+    ],
+    "exit": 1
+   }
+  ],
+  "verdict": "KILLED"
+ },
+ {
+  "id": "A4-9",
+  "note": "login success writes no audit row",
+  "file": "apps/api/src/user-accounts/auth-service.ts",
+  "green": [
+   {
+    "t": "auth-service",
+    "tests": 17,
+    "pass": 17,
+    "fail": 0,
+    "failed": [],
+    "exit": 0
+   }
+  ],
+  "red": [
+   {
+    "t": "auth-service",
+    "tests": 17,
+    "pass": 16,
+    "fail": 1,
+    "failed": [
+     "A4 #9 every transition writes exactly one auth_events row with a closed-vocabulary detail; no row holds a password, token, cookie or raw email"
+    ],
+    "exit": 1
+   }
+  ],
+  "verdict": "KILLED"
+ },
+ {
+  "id": "A4-10",
+  "note": "only an exact-case 'Bearer ' header is refused (Basic/bearer pass)",
+  "file": "apps/api/src/user-accounts/auth-router.ts",
+  "green": [
+   {
+    "t": "auth-router",
+    "tests": 15,
+    "pass": 15,
+    "fail": 0,
+    "failed": [],
+    "exit": 0
+   }
+  ],
+  "red": [
+   {
+    "t": "auth-router",
+    "tests": 15,
+    "pass": 15,
+    "fail": 0,
+    "failed": [],
+    "exit": 0
+   }
+  ],
+  "verdict": "SURVIVED"
+ }
+]

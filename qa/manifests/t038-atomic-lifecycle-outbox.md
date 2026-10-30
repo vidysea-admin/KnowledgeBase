@@ -2,8 +2,8 @@
 
 **Task:** T-038 scoped canonical producer repair; full parent remains HOLD
 **Priority tier:** 3 — root-authorized feature integration
-**Status:** ready-for-check
-**Handshake status:** ready-for-check
+**Status:** checked-PASS — closed out 2026-10-26 by maker resume, citing qa/verdicts/t038-atomic-lifecycle-outbox.md
+**Handshake status:** checked-PASS — closed out 2026-10-26 by maker resume, citing qa/verdicts/t038-atomic-lifecycle-outbox.md
 **Fix cycle:** 1
 **Maker:** /root/docker_context_review
 **Checker:** /root/docker_dependency_review/checker_t038

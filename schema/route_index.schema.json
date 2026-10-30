@@ -1,0 +1,66 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "kb://route_index",
+  "title": "RouteIndexDoc",
+  "description": "D-208 item 2: the persisted /route vectorless index, ONE document per tenant (`_id` = tenantId). Derived data, rebuildable from the tree at any time: topic/session nodes (`docs`), the BM25 postings over them (`bm25`) and the session id list. `fingerprint` is the shared search-cache visibility fingerprint and `treeRevision` the tree_index root `indexRevision`, both read BEFORE the build; a reader serves the document only when BOTH equal the current values, otherwise it rebuilds and overwrites. Routing text only: answer text always comes from `turns`. `postings` is an array of [term, [docIndex, termFrequency][]] pairs (not a map) so no term can be an illegal Mongo field name.",
+  "type": "object",
+  "properties": {
+    "_id": { "type": "string", "minLength": 1 },
+    "tenantId": { "type": "string", "minLength": 1 },
+    "schemaVersion": { "type": "integer", "enum": [1] },
+    "fingerprint": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "treeRevision": { "anyOf": [{ "type": "integer", "minimum": 0, "maximum": 9007199254740991 }, { "type": "null" }] },
+    "builtAt": { "type": "string", "format": "date-time" },
+    "sessionIds": { "type": "array", "items": { "type": "string", "minLength": 1 }, "maxItems": 10000 },
+    "docs": {
+      "type": "array",
+      "maxItems": 10000,
+      "items": {
+        "type": "object",
+        "properties": {
+          "nodeId": { "type": "string", "minLength": 1 },
+          "title": { "type": "string" },
+          "level": { "type": "string", "enum": ["session", "topic"] },
+          "sessionIds": { "type": "array", "items": { "type": "string", "minLength": 1 }, "minItems": 1 },
+          "facets": {
+            "type": "object",
+            "properties": {
+              "countries": { "type": "array", "items": { "type": "string" } },
+              "axes": { "type": "array", "items": { "type": "string" } },
+              "universities": { "type": "array", "items": { "type": "string" } }
+            },
+            "required": ["countries", "axes", "universities"],
+            "additionalProperties": false
+          },
+          "node": { "type": "object", "description": "The tree node without children (a TreeIndexNode leaf); only used to offer the node to the step B model." }
+        },
+        "required": ["nodeId", "title", "level", "sessionIds", "facets", "node"],
+        "additionalProperties": false
+      }
+    },
+    "bm25": {
+      "type": "object",
+      "properties": {
+        "n": { "type": "integer", "minimum": 0, "maximum": 10000 },
+        "avgLen": { "type": "number", "minimum": 0 },
+        "lens": { "type": "array", "items": { "type": "integer", "minimum": 0 }, "maxItems": 10000 },
+        "postings": {
+          "type": "array",
+          "items": {
+            "type": "array",
+            "prefixItems": [
+              { "type": "string" },
+              { "type": "array", "items": { "type": "array", "prefixItems": [{ "type": "integer", "minimum": 0 }, { "type": "integer", "minimum": 1 }], "minItems": 2, "maxItems": 2 } }
+            ],
+            "minItems": 2,
+            "maxItems": 2
+          }
+        }
+      },
+      "required": ["n", "avgLen", "lens", "postings"],
+      "additionalProperties": false
+    }
+  },
+  "required": ["_id", "tenantId", "schemaVersion", "fingerprint", "treeRevision", "builtAt", "sessionIds", "docs", "bm25"],
+  "additionalProperties": false
+}

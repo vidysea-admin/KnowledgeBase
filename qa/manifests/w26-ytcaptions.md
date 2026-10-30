@@ -1,6 +1,6 @@
 # w26-ytcaptions: import captions from the owner's own YouTube channel (official API)
 
-Status: ready-for-check
+Status: checked-PASS — closed out 2026-10-26 (resume reconcile) citing qa/verdicts/w26-ytcaptions.md
 Fix cycle: 1
 Lane: KnowledgeBase-lanes/w26-ytcaptions  Branch: lane/w26-ytcaptions  Base: 60cf1f683dbd5dcc0163b668df111d62ba4a2563
 Candidate SHA: see `git log -1 lane/w26-ytcaptions` (the commit that adds this file)

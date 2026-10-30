@@ -22,6 +22,18 @@ test("production text routes bind distinct Cloud generators and verifiers withou
   assert.deepEqual(routing.chains.transcribe, ["gemini"]);
 });
 
+test("D-207: /route step B has its own chain on gemini-3.5-flash-lite with minimal thinking; the cloud text chains are unchanged", async () => {
+  const routing = buildRouting();
+  assert.deepEqual(routing.chains.route, ["gemini-flash-lite"]);
+  const lite = routing.providers["gemini-flash-lite"]!;
+  assert.equal(lite.name, "gemini-flash-lite");
+  assert.notEqual(lite, routing.providers.gemini, "the default gemini (transcribe) provider is a separate, unchanged instance");
+  assert.equal(routing.chains.ask![0], "ollama-cloud");
+  const source = readFileSync(new URL("./production.ts", import.meta.url), "utf8");
+  assert.match(source, /"gemini-flash-lite": new GeminiProvider\(realTransport, \{[^}]*model: "gemini-3\.5-flash-lite"[^}]*thinkingLevel: "minimal"/);
+  assert.match(source, /createRouteDeps\(\{.*routeComplete\("route"/, "the live /route step B calls the route chain, not ask");
+});
+
 test("output verification cannot fall back to generation, even with an unsafe configured verifier chain", async () => {
   let generationCalls = 0;
   let verifierCalls = 0;
@@ -52,6 +64,8 @@ test("Compose requires an explicit database and does not bake provider secrets i
   assert.match(api, /MONGODB_DB: \$\{MONGODB_DB:\?/);
   assert.doesNotMatch(api, /MONGODB_DB:\s+lkb\b/);
   assert.match(api, /OLLAMA_API_KEY: \$\{OLLAMA_API_KEY:\?/);
-  const web = source.slice(source.indexOf("  web:"));
+  const webStart = source.indexOf("  web:");
+  const web = source.slice(webStart, source.indexOf("\n  bot:", webStart));
+  assert.ok(web.length > 0 && !web.includes("  bot:"), "web service slice is bounded");
   assert.doesNotMatch(web, /OLLAMA_API_KEY|GEMINI_API_KEY/);
 });

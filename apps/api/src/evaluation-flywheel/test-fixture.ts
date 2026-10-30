@@ -46,6 +46,9 @@ function match(row: Row, filter: Row): boolean {
         if (key === "$in") return Array.isArray(v.$in) && v.$in.some((value: unknown) => matchesValue(values, value));
         if (key === "$nin") return Array.isArray(v.$nin) && !v.$nin.some((value: unknown) => matchesValue(values, value));
         if (key === "$ne") return !matchesValue(values, v.$ne);
+        // D-206: the lexical candidate read uses case-insensitive `$regex` clauses; `$options` is consumed by `$regex`.
+        if (key === "$regex") return values.some(value => typeof value === "string" && new RegExp(String(v.$regex), typeof v.$options === "string" ? v.$options : "").test(value));
+        if (key === "$options") return typeof v.$regex === "string";
         return false;
       });
     }
@@ -66,12 +69,12 @@ export function memoryDb(seed: Record<string, Row[]> = {}, databaseName = "lkb_t
       };
       return {
         find(filter: Row = {}) {
-          let sort: Row = {};
-          const cursor = { sort(s: Row) { sort = s; return cursor; }, async toArray() {
+          let sort: Row = {}, max = Infinity;
+          const cursor = { sort(s: Row) { sort = s; return cursor; }, limit(n: number) { max = n; return cursor; }, async toArray() {
             log("find", filter); return structuredClone(rows.filter((r) => match(r, filter)).sort((a, b) => {
               for (const [k, direction] of Object.entries(sort)) { const av = get(a, k) as any, bv = get(b, k) as any;
                 if (av !== bv) return (av < bv ? -1 : 1) * Number(direction); } return 0;
-            }));
+            }).slice(0, max));
           } }; return cursor;
         },
         async findOne(filter: Row = {}) { log("findOne", filter); return structuredClone(rows.find((r) => match(r, filter)) ?? null); },
@@ -106,7 +109,7 @@ export function rig() {
   const deps: FlywheelDeps = {
     store: createMongoFlywheelStore(mem.db), now: () => clock,
     intake: async ({ tenantId }) => { assert.equal(tenantId, "t"); calls.intake++; return { status: "already-ingested", sourceId: SOURCE._id, sessionId: "s1" }; },
-    index: async (t, s) => { assert.equal(t, "t"); assert.equal(s, "s1"); calls.index++; return { sessionId: s, summary: { degraded: null }, claims: { degraded: null }, chunks: { written: 1, skipped: null }, entities: null,
+    index: async (t, s) => { assert.equal(t, "t"); assert.equal(s, "s1"); calls.index++; return { sessionId: s, summary: { degraded: null }, claims: { degraded: null }, chunks: { written: 1, skipped: null }, entities: null, gapRecorded: true,
       completion: { version: 2, strict: true, complete: true, generation: `index-${calls.index}`, turnCount: 1, treeWritten: true } }; },
     ask: async (t, q) => { assert.equal(t, "t"); assert.equal(q, ORIGINAL.question); calls.ask++; return { text: TURN.text, sources: { internal: [], web: [] }, insufficient_coverage: true }; },
   };

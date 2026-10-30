@@ -1,7 +1,7 @@
 # U2.5 stored-decision product consumer companion
 
-**Handshake status:** ready-for-check
-Status: ready-for-check
+**Handshake status:** checked-PASS — closed out 2026-10-26 (resume reconcile; latest verdict section PASS at this cycle, qa/verdicts/goal-u25-consumer.md)
+Status: checked-PASS — closed out 2026-10-26 (resume reconcile; latest verdict section PASS at this cycle, qa/verdicts/goal-u25-consumer.md)
 Fix cycle: 4
 Task: U2.5 (scoped consumer/provenance companion; parent remains HOLD)
 Priority: tier 3 explicit ALL40 continuation; tenant/source privacy and producer data writes are uncapped.

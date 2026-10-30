@@ -1,5 +1,5 @@
 # w17-champproof manifest
-Status: ready-for-check
+Status: superseded-by w17-wireapi (79571b92 PASS; F1 fixed, mongo-store.ts verifyEvidence)
 Fix cycle: 1
 Base: 9e55b642. Lane: lane/w17-champproof.
 

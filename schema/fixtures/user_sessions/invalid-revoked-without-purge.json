@@ -1,0 +1,14 @@
+{
+  "_id": "s-0001",
+  "tenantId": "toc",
+  "userId": "u-0001",
+  "familyId": "f-0001",
+  "tokenHash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "createdAt": "2026-10-29T10:00:00.000Z",
+  "lastUsedAt": "2026-10-29T10:00:00.000Z",
+  "rotatedAt": "2026-10-29T10:00:00.000Z",
+  "ipPrefix": "203.0.113.0/24",
+  "userAgentSummary": "Firefox on Windows",
+  "revokedAt": "2026-10-29T10:00:00.000Z",
+  "revokedReason": "admin"
+}

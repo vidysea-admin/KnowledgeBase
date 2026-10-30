@@ -1,0 +1,28 @@
+import { test } from "node:test";
+import assert from "node:assert/strict";
+import { createRequire } from "node:module";
+import { mkdtempSync, rmSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+import { MongoClient } from "mongodb";
+import { runCycle, createWiredDeps } from "./sync-links.mjs";
+const { applyWhatsappLinks } = createRequire(import.meta.url)("../../migrations/20261029120000-whatsapp-links.cjs");
+const url = process.env.W9_TEST_MONGO_URL;
+test("P-seed: empty whatsapp_links + env map only (real Mongo, real validators): seeded then synced; a second tenant's member link is isolated", async () => {
+  const mc = await new MongoClient(url).connect(), db = mc.db(`lkb_test_w9chkA_${Date.now()}`), root = mkdtempSync(join(tmpdir(), "w9chkA-"));
+  try {
+    await applyWhatsappLinks(db);
+    await db.collection("whatsapp_candidates").createIndex({ tenantId: 1, _id: 1 });
+    const OA = "1".repeat(24), J = "111111-1@g.us", fetched = [];
+    const env = { WHATSAPP_TENANT_OWNER_MAP: JSON.stringify([{ tenantId: "legacy-t", ownerUserId: OA }]) };
+    const deps = await createWiredDeps({ db, env, root, log: () => {}, archiver: null, storeOptions: {
+      listGroups: async (o) => [{ groupJid: J, ownerUserId: o, subject: "S", trackedPersonCount: 1 }],
+      fetchMessages: async (_j, o) => { fetched.push(o); return [{ messageId: "m1", personId: "p1", displayName: "E", text: "Scholarship closes Friday.", ts: "2026-10-14T10:00:00.000Z" }]; } } });
+    const runs = await runCycle(deps);
+    console.log("runs:", runs.map((r) => r.status + "/" + r.errorCode + "/" + JSON.stringify(r.groups.map(g=>[g.newTurns,g.candidatesCreated,g.errorCode]))).join(";"), "fetched:", fetched.length);
+    assert.equal(runs.length, 1); assert.equal(runs[0].status, "ok");
+    assert.equal(await db.collection("whatsapp_links").countDocuments({ tenantId: "legacy-t", state: "active", archiverOwnerId: OA }), 1);
+    assert.equal(await db.collection("turns").countDocuments({ tenantId: "legacy-t" }), 1);
+    assert.equal(await db.collection("turns").countDocuments({ tenantId: { $ne: "legacy-t" } }), 0);
+  } finally { await db.dropDatabase(); await mc.close(); rmSync(root, { recursive: true, force: true }); }
+});

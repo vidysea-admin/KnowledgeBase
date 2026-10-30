@@ -18,5 +18,8 @@ export interface WatchHeartbeat {
    * ISO-8601 instant at which a polling run for this source type last completed.
    */
   lastHeartbeatAt: string;
+  providerScanStatus?: "healthy" | "failed";
+  providerCheckedAt?: string;
+  coverageReceivedAt?: string;
   [k: string]: unknown;
 }

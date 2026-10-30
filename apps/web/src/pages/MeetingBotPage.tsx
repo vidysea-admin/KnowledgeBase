@@ -1,4 +1,5 @@
 import { useAuth } from "../auth/AuthContext.js";
+import { WriteScope } from "../auth/WriteScope.js";
 import { listWebinarOperations, listSessions } from "../api/sessions.js";
 import { listUpcomingMeetings } from "../api/calendar.js";
 import { listBotEvents } from "../api/botEvents.js";
@@ -29,9 +30,11 @@ export function MeetingBotPage(): React.ReactElement {
   return <>
     <div className="page-header"><h1>Meeting bot</h1>
       <p>Upcoming meetings, capture in progress, webinar operations and past recordings.</p></div>
-    <SendNowForm apiKey={apiKey} />
-    <BotPrivacyControls apiKey={apiKey} />
-    <CaptureReadinessControls apiKey={apiKey} />
+    <WriteScope>
+      <SendNowForm apiKey={apiKey} />
+      <BotPrivacyControls apiKey={apiKey} />
+      <CaptureReadinessControls apiKey={apiKey} />
+    </WriteScope>
     <RetentionSection state={retention} />
     <UpcomingSection state={upcoming} />
     <DiscoveryStatus state={ops} />

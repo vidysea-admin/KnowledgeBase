@@ -1,6 +1,6 @@
 # w27-speakerflake
 
-Status: ready-for-check
+Status: checked-PASS — closed out 2026-10-26 (resume reconcile) citing qa/verdicts/w27-speakerflake.md
 Fix cycle: 0
 Lane: KnowledgeBase-lanes/w27-speakerflake (branch lane/w27-speakerflake)
 Base: c7574a5e88ba9f89691fc6ff4b56b324582a30ee (origin/master)

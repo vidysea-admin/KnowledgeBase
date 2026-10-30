@@ -5,22 +5,21 @@ import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { complete as routeComplete, parseRoutingYaml, GeminiProvider, ClaudeCodeProvider, OllamaProvider, createOllamaCloudProviders, type Provider } from "@lkb/ai";
 import { treeSearch } from "@lkb/index";
-import { getDb, listHeartbeats, listWatchState } from "@lkb/db";
-import { createTelegramAlertSink } from "@lkb/core";
+import { getDb, listHeartbeats } from "@lkb/db";
 import type { ServerDeps } from "../server.js";
-import type { WatchSilenceDeps } from "../routes/health.js";
 import { createMongoApiKeyStore, createMongoEvalRunStore, createMongoJobWriter, createMongoTreeStore, createMongoBrainReadDeps,
   createMongoWatchedSourceDeps, createMongoCitationsDeps, createMongoHealthDeps, createMongoGraphReadDeps, createGwsCalendarReadDeps, createMeetingCandidatesDeps, createMongoKeysDeps } from "../store.js";
 import { createMongoIngestDeps } from "../ingest-store.js";
 import { buildSourceIntakeDeps } from "../source-intake/wiring.js";
 import { createMongoSearchDeps } from "../search-store.js";
+import { createRouteDeps } from "../route/route-store.js";
 import { createSessionDecisionsDeps } from '../session-decisions/reader.js';
-import { buildCapturePolicyIntegrations } from './integrations/capture-policy.js';
+import { buildCalendarWorkerIntegrations, buildCapturePolicyIntegrations } from './integrations/capture-policy.js';
 import { createMongoWhatsAppDeps } from "../whatsapp/store.js";
-import { createConfiguredWhatsAppOwnerResolver } from "../whatsapp/owner-config.js";
+import { createDbBackedWhatsAppOwners } from "../whatsapp/owner-config.js";
 import { realTransport } from "../ai-transport.js";
 import { createLlmScorer } from "../score.js";
-import { createTavilySearchFn } from "../ask/ask-web-fallback.js";
+import { createGeminiWebSearchFn } from "../ask/ask-web-fallback.js";
 import { indexSession, type BoundIndexer, type IndexSessionDeps } from "../indexing/session.js";
 import type { IndexCommittedHook } from "../indexing/types.js";
 import { composeGroundedPostProcessing, readGroundedJudgeCostLimit } from '../grounded-postprocessing/composition.js';
@@ -44,60 +43,16 @@ import { createMongoSpeakerSuggestionDeps } from "../speaker-suggestions/store.j
 import { buildNativeProductionIntegrations } from "./integrations/native-production.js";
 import { buildReviewIntegrations } from "./integrations/reviews.js";
 import { createConfiguredPublicWebinarDiscovery } from "../gws/public-webinar-config.js";
-import { createMongoWatchRunsDeps } from "../activity-health/watch-runs.js";
+import { createMongoWatchRunsDeps, createMongoWatchSilenceDeps, createMongoWatchStateReadDeps } from "../activity-health/watch-runs.js";
 import { createMongoClaimsListDeps } from "../claims/store.js";
 import { createConfiguredActivityHealthDeps } from "../activity-health/queue-reader.js";
 import { createLazyDatabase, defineLazyProperties } from "./lazy-database.js";
 import { resolveTileSuggest } from "./tile-suggest.js";
+import { buildUserAccounts } from "./integrations/user-accounts.js";
+import { logger } from "./logger.js";
 
 const ROUTING_CONFIG_PATH = fileURLToPath(new URL("../../../../config/ai-routing.yaml", import.meta.url));
 
-/** D-048/D-053: health reads only configured WATCH_HEARTBEAT_TENANTS through tenant-scoped
- * DB accessors. The permitted core Telegram sink binds lazily; API cannot import meeting-bot. */
-/** U4d (D-047/D-048): the ONE place `WATCH_HEARTBEAT_INTERVAL_MS` is parsed with its 1-hour
- * fallback — extracted out of `createMongoWatchSilenceDeps` (which used to inline this) so
- * `createMongoWatchStateReadDeps` below reads the exact same number instead of re-declaring the
- * fallback a third time (the first two are this file's former inline copy and
- * scripts/watch/lib/heartbeat.mjs's `watchHeartbeatIntervalMs`, pinned equal by
- * `health.test.ts`'s drift test). Writer, detector and now the page must all agree on one number,
- * or a watcher can look alive to one reader and dead to another. */
-function watchHeartbeatIntervalMs(): number {
-  const parsed = process.env.WATCH_HEARTBEAT_INTERVAL_MS ? Number(process.env.WATCH_HEARTBEAT_INTERVAL_MS) : NaN;
-  return Number.isFinite(parsed) && parsed > 0 ? parsed : 60 * 60 * 1000;
-}
-
-export function createMongoWatchSilenceDeps(): WatchSilenceDeps {
-  const tenantIds = (process.env.WATCH_HEARTBEAT_TENANTS ?? "toc").split(",").map((t) => t.trim()).filter(Boolean);
-  // U4b/R2 (D-053): a real alert transport, not a console sink. Construction reads env only
-  // (token/chatId), matching this factory's lazy-binding style and production.test.ts's
-  // "constructs without throwing or requiring a live network connection" guarantee -- the
-  // actual HTTPS call happens only if/when notifyWatchSilent is invoked.
-  const alertSink = createTelegramAlertSink();
-  return {
-    tenantIds,
-    intervalMs: watchHeartbeatIntervalMs(),
-    listHeartbeats: (tenantId) => listHeartbeats(tenantId),
-    notifyWatchSilent: (tenantId, sourceType, lastHeartbeatAt, intervalMs) =>
-      alertSink.notifyWatchSilent(tenantId, sourceType, lastHeartbeatAt, intervalMs),
-  };
-}
-
-/** U4d (D-047/ISS-361/ISS-358): read-only `watch_state`/`watch_heartbeat` deps merged into
- * `ServerDeps.watchedSources` below, alongside the A13 create/listActive/run trio
- * (`routes/watched-sources.ts`). Both accessors are the SAME tenant-scoped `@lkb/db` functions R1's
- * alert (`markWatchState`) and R2's detector (`listHeartbeats` above) already read/write, and
- * `heartbeatIntervalMs` is the SAME number the detector uses — so the `/watch` page can never show
- * a watcher as healthy that `/health` would already have alerted on as silent. Lives here rather
- * than in `store.ts` for the same measured reason `createMongoWatchSilenceDeps` does: `store.ts` is
- * at 299/300 non-blank lines with no room, and this file already does this exact kind of env-driven
- * composition-root wiring. */
-function createMongoWatchStateReadDeps() {
-  return {
-    listWatchState: (tenantId: string) => listWatchState(tenantId),
-    listHeartbeats: (tenantId: string) => listHeartbeats(tenantId),
-    heartbeatIntervalMs: watchHeartbeatIntervalMs(),
-  };
-}
 /** `write` for the router's own per-attempt ledger entries — a tenant isn't known until a
  * request resolves one, so router-level attempts (as opposed to askV2's own writes, which do
  * carry the real per-request tenantId) are logged under this fixed system id. */
@@ -130,6 +85,7 @@ export function buildRouting(): {
   // not just a targeted patch for the one job kind that happened to be caught.
   const providers: Record<string, Provider> = {
     gemini: new GeminiProvider(realTransport, { apiKey: process.env.GEMINI_API_KEY ?? "" }),
+    "gemini-flash-lite": new GeminiProvider(realTransport, { apiKey: process.env.GEMINI_API_KEY ?? "", model: "gemini-3.5-flash-lite", thinkingLevel: "minimal", name: "gemini-flash-lite" }), // D-207: /route step B (chain `route`)
     "claude-code": new ClaudeCodeProvider(realTransport),
     ...createOllamaCloudProviders(realTransport, {
       apiKey: process.env.OLLAMA_API_KEY ?? "",
@@ -192,13 +148,15 @@ export function buildIndexer(routing: ReturnType<typeof buildRouting> = buildRou
   };
 }
 
-export function buildProductionDeps(options: { onIndexCommitted?: IndexCommittedHook; captureReadinessHost?: HostCaptureReadinessAdapter } = {}): ServerDeps {
+export function buildProductionDeps(options: { onIndexCommitted?: IndexCommittedHook; captureReadinessHost?: HostCaptureReadinessAdapter; calendarWorkerDatabase?: Parameters<typeof buildCalendarWorkerIntegrations>[0]["db"] } = {}): ServerDeps {
   const db = createLazyDatabase(getDb);
+  const worker = buildCalendarWorkerIntegrations({db: options.calendarWorkerDatabase ?? db, env: process.env});
   const routing = buildRouting();
   const publicWebinars = createConfiguredPublicWebinarDiscovery(process.env.LKB_PUBLIC_WEBINAR_TENANT, process.env.LKB_PUBLIC_WEBINAR_SOURCES);
+  const capturePolicy = buildCapturePolicyIntegrations({root: fileURLToPath(new URL("../../../../", import.meta.url)), env: process.env});
   const { chains, providers, jobWrite } = routing;
 
-  const tavilySearchFn = createTavilySearchFn();
+  const tavilySearchFn = createGeminiWebSearchFn();
 
   const boundIndexer = buildIndexer(routing, options);
   const native = buildNativeProductionIntegrations(db);
@@ -206,7 +164,7 @@ export function buildProductionDeps(options: { onIndexCommitted?: IndexCommitted
   const deps: ServerDeps = {
     keyStore: createMongoApiKeyStore(),
     evalRuns: createMongoEvalRunStore(),
-    brain: withSessionArtifacts(createMongoBrainReadDeps(), fileURLToPath(new URL("../../../../", import.meta.url))),
+    brain: withSessionArtifacts({...createMongoBrainReadDeps(), ...(worker ? {listWebinarOperations: worker.listWebinarOperations} : {})}, fileURLToPath(new URL("../../../../", import.meta.url))),
     citations: createMongoCitationsDeps(),
     claims: createMongoClaimsListDeps(),
     // U4b/R2: the same Mongo health deps as before, plus the injected watcher-silence detector.
@@ -216,12 +174,13 @@ export function buildProductionDeps(options: { onIndexCommitted?: IndexCommitted
     // surface GET /watch-state serves (routes/watched-sources.ts).
     watchedSources: { ...createMongoWatchedSourceDeps(), ...createMongoWatchStateReadDeps() },
     search: createMongoSearchDeps({ nativeEvidence: native.resolver }),
+    route: createRouteDeps({ tree: createMongoTreeStore(native.resolver), complete: (job, tenantId) => routeComplete("route", job, { chains, providers, write: jobWrite, tenantId }) }), // D-206 vectorless /route, step B on the D-207 flash-lite chain
     // D-173: dormant semantic routes cannot be enabled through an old environment flag.
     semanticSearch: undefined,
     graph: createMongoGraphReadDeps(),
-    calendar: createGwsCalendarReadDeps(),
-    meetingCandidates: { ...createMeetingCandidatesDeps(), ...(publicWebinars.configured ? { discoverPublicWebinars: publicWebinars.discover } : {}) },
-    whatsapp: createMongoWhatsAppDeps(boundIndexer, { resolveOwner: createConfiguredWhatsAppOwnerResolver(process.env.WHATSAPP_TENANT_OWNER_MAP) }),
+    calendar: worker?.calendar ?? createGwsCalendarReadDeps(),
+    meetingCandidates: { ...createMeetingCandidatesDeps(undefined, undefined, undefined, undefined, worker?.listGmailCandidates, worker || process.env.LKB_JOIN_RULES_ENABLED === "1" ? {joinRules: capturePolicy.joinRules, ownedDomains: worker?.ownedDomains, gmailSummary: worker?.gmailSummary} : undefined), ...(publicWebinars.configured ? { discoverPublicWebinars: publicWebinars.discover } : {}) },
+    whatsapp: createMongoWhatsAppDeps(boundIndexer, { resolveOwners: createDbBackedWhatsAppOwners({ rawMap: process.env.WHATSAPP_TENANT_OWNER_MAP, db }) }) /* W4: links are authoritative; the env map only seeds legacy links */,
     keys: createMongoKeysDeps(),
     ingest: createMongoIngestDeps(boundIndexer),
     // T-045: OFF unless LKB_SOURCE_INTAKE=1 (route absent otherwise); see source-intake-wiring.ts.
@@ -268,16 +227,22 @@ export function buildProductionDeps(options: { onIndexCommitted?: IndexCommitted
           (job) => routeComplete("evaluator", job, { chains, providers, write: jobWrite, tenantId: ROUTER_TENANT_ID }),
         ),
         treeSearchFn: treeSearch,
-        // ISS-010 / ISS-274: ALWAYS wired now. createTavilySearchFn() (ask-web-fallback.ts) no
-        // longer returns undefined when TAVILY_API_KEY is empty -- it returns a real function that
-        // throws TavilyUnavailableError, so every off-corpus question actually reaches the
-        // web-fallback seam (D-041 ruling 2) and ask-v2.ts's catch logs the honest
-        // "unavailable" degradation instead of the seam being silently absent from askDeps.
+        // ISS-010 / ISS-274 / D-202: ALWAYS wired. createGeminiWebSearchFn() (ask-web-fallback.ts)
+        // is Gemini + Google Search grounding on GEMINI_API_KEY (Tavily is no longer called). It never
+        // returns undefined: without a key it returns a function that throws TavilyUnavailableError, so
+        // every off-corpus question reaches the web-fallback seam (D-041 ruling 2) and the ask graph's
+        // catch logs the honest "unavailable" degradation. The dep keeps its name `tavilySearchFn`.
         tavilySearchFn,
         write: jobWrite,
       },
     },
   };
+  if (worker) {
+    const workerHeartbeats = (tenantId: string) => listHeartbeats(tenantId).then(rows => worker.mergeHeartbeats(tenantId, rows));
+    deps.watchedSources.listHeartbeats = workerHeartbeats;
+    deps.watchedSources.workerHealth = worker.workerHealth;
+    if (deps.health.watchSilence) deps.health.watchSilence.listHeartbeats = workerHeartbeats;
+  }
   const sourceJobs = buildConfiguredSourceJobStore(process.env);
   const reviews = buildReviewIntegrations(db, process.env);
   const input = { db, env: process.env, root: fileURLToPath(new URL('../../../../', import.meta.url)),
@@ -291,11 +256,13 @@ export function buildProductionDeps(options: { onIndexCommitted?: IndexCommitted
   const hosting = buildHostingIntegrations({ ...input, keyStore: deps.keyStore, keys: deps.keys,
     notifications: tenant => collectNotifications({ activityHealth: deps.activityHealth!, jobs: deps.jobs!, watchRuns: deps.watchRuns!, fileQueue: deps.fileQueue }, tenant, 50) });
   const automation = buildAutomationIntegrations({ ...input, hosting: hosting.hosting });
-  const capturePolicy = buildCapturePolicyIntegrations(input);
+
   const botPrivacy = process.env.LKB_CAPTURE_CONTROL_DIR ? createHostBotPrivacyDeps(process.env.LKB_CAPTURE_CONTROL_DIR) : undefined;
   const captureReadiness = hosting.hosting && input.env.LKB_CAPTURE_SLOTS && input.env.LKB_TENANT_ID && options.captureReadinessHost
     ? createHostCaptureReadinessDeps({ root: input.root, env: input.env, hosting: hosting.hosting.service, host: options.captureReadinessHost }) : undefined;
   const result: ServerDeps = { ...deps, ...knowledge, ...hosting, ...automation, ...capturePolicy, ...reviews, botPrivacy, captureReadiness, sourceJobs, nativeEvidence: native.resolver,
+    // D-206: undefined (API keys unchanged) unless AUTH_CSRF_SECRET is usable; else mounts /auth and /admin.
+    userAccounts: buildUserAccounts(process.env, db, logger),
     sessionDecisions: createSessionDecisionsDeps(deps.brain, db),
     ask: { ...deps.ask, get answerWorkflow() { return answers().answerWorkflow; } } };
   return defineLazyProperties(result, {

@@ -3,7 +3,7 @@
  * Fetch is stubbed globally for the join-rules routes only; the page's other API modules are spied like CalendarPage.test.tsx.
  * D-015: the recorded reproductions of ISS-WEBHINTS-001 / ISS-T037OPT-002 / ISS-T037OPT-004 are re-run below.
  */
-import { cleanup, render, screen, waitFor } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router-dom";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
@@ -206,4 +206,36 @@ describe("opted-out state on load (one GET /calendar/join-rules per page load)",
     await open();
     expect(screen.getByRole("button", { name: "Opt out of this meeting" })).toBeEnabled();
   });
+});
+
+// Reusable class policy is distinct from a one-event opt-out.
+import { GmailPatternControl } from "./OptOutControl.js";
+const patternCandidate={senderEmail:"host@external.test",senderDomain:"external.test",subject:"Join webinar invitation"};
+async function patternOpen() { const user=userEvent.setup(); const onSaved=vi.fn(); render(<GmailPatternControl apiKey="test-key" candidate={patternCandidate} onSaved={onSaved}/>); await user.click(screen.getByRole("button",{name:"Ignore similar"})); await screen.findByRole("alertdialog",{name:"Ignore similar invitations"}); return {user,onSaved}; }
+test("cycle1 pattern previews exact class and saves with strong ETag preserving unrelated policy",async()=>{
+  const view={...VIEW(["concurrent-optout"]),ruleSet:{version:1,ownDomains:["office.test"],attendanceMode:"all",purposeGroups:[{id:"events",titleIncludes:["education"]}],rules:[{id:"existing",effect:"allow",match:{email:"a@other.test"}}]}};
+  getReply=()=>json(200,view,{ETag:'"v1"'}); const saved=vi.fn();
+  vi.stubGlobal("fetch",vi.fn((url:string,init?:RequestInit)=>{if(init?.method === "PUT"){saved(JSON.parse(String(init.body)),new Headers(init.headers));return json(200,{}, {ETag:'"v2"'});}return getReply();}));
+  const {user,onSaved}=await patternOpen(); expect(screen.getByText(/host@external.test.*current and future/i)).toBeInTheDocument();
+  await user.click(screen.getByRole("button",{name:"Save skip rule"}));await waitFor(()=>expect(onSaved).toHaveBeenCalledOnce());
+  const [body,headers]=saved.mock.calls[0]!;expect(headers.get("if-match")).toBe('"v1"');expect(body).toMatchObject({ownDomains:["office.test"],attendanceMode:"all",purposeGroups:view.ruleSet.purposeGroups});expect(body.rules[0]).toEqual(view.ruleSet.rules[0]);expect(body.rules[1]).toMatchObject({effect:"deny",match:{email:"host@external.test"}});expect(body).not.toHaveProperty("state");
+});
+test.each([401,403,412,428,503])("cycle1 pattern save failure %s never reports success or refreshes",async(status)=>{
+  getReply=()=>json(200,VIEW([]));vi.stubGlobal("fetch",vi.fn((_url:string,init?:RequestInit)=>init?.method === "PUT"?json(status,{error:"refused"}):getReply()));
+  const {user,onSaved}=await patternOpen();await user.click(screen.getByRole("button",{name:"Save skip rule"}));expect(await screen.findByRole("alert")).toBeInTheDocument();expect(onSaved).not.toHaveBeenCalled();
+});
+test("cycle1 pattern missing stored validator refuses PUT; domain/title previews are explicit",async()=>{
+  getReply=()=>json(200,{...VIEW([]),ruleSet:{version:1,ownDomains:["office.test"],rules:[]}});
+  const {user,onSaved}=await patternOpen();await user.selectOptions(screen.getByLabelText("Skip invitations matching"),"domain");expect(screen.getByText(/exact domain external.test/i)).toBeInTheDocument();
+  await user.selectOptions(screen.getByLabelText("Skip invitations matching"),"title");await user.clear(screen.getByLabelText("Literal title phrase"));fireEvent.change(screen.getByLabelText("Literal title phrase"),{target:{value:"a.*[b]"}});expect(screen.getByText(text=>text.includes("Literal title phrase “a.*[b]”"))).toBeInTheDocument();
+  expect(screen.getByRole("button",{name:"Save skip rule"})).toBeDisabled();expect(screen.getByRole("alert")).toHaveTextContent("version tag");expect(onSaved).not.toHaveBeenCalled();expect(sent.some(s=>s.method === "PUT")).toBe(false);
+});
+
+test.each(["domain","title"])("cycle1 pattern saves selected %s class with create precondition",async(kind)=>{
+  const saves: {body:any;headers:Headers}[]=[];vi.stubGlobal("fetch",vi.fn((_url:string,init?:RequestInit)=>{if(init?.method === "PUT"){saves.push({body:JSON.parse(String(init.body)),headers:new Headers(init.headers)});return json(200,{}, {ETag:'"v1"'});}return json(200,VIEW([]));}));
+  const {user,onSaved}=await patternOpen();await user.selectOptions(screen.getByLabelText("Skip invitations matching"),kind);
+  if(kind === "domain")await user.click(screen.getByLabelText("Include true subdomains"));
+  else fireEvent.change(screen.getByLabelText("Literal title phrase"),{target:{value:"a.*[b]"}});
+  await user.dblClick(screen.getByRole("button",{name:"Save skip rule"}));await waitFor(()=>expect(onSaved).toHaveBeenCalledOnce());
+  expect(saves).toHaveLength(1);expect(saves[0]!.headers.get("if-none-match")).toBe("*");expect(saves[0]!.body.rules[0].match).toEqual(kind === "domain"?{domain:"external.test",subdomains:true}:{titleIncludes:["a.*[b]"]});
 });

@@ -137,11 +137,35 @@ test("GET /compete serves the plain HTML form", async () => {
     assert.equal(res.status, 200);
     assert.match(res.headers.get("content-type") ?? "", /html/);
     const text = await res.text();
-    assert.match(text, /\/compete\/start/);
+    assert.match(text, /compete\/start/);
   } finally {
     await server.close();
   }
 });
+
+// ISS-408: behind the web proxy /compete lives at <APP_BASE_PATH>/api/compete, so the POST targets
+// must be relative to it, never root-absolute.
+for (const path of ["/compete", "/compete/"]) {
+  test(`GET ${path} POSTs resolve under the proxy prefix, no root-absolute internal reference (ISS-408)`, async () => {
+    const server = await startTestServer(buildTestDeps({ keyStore: fakeKeyStore(COMPETE_KEY) }));
+    try {
+      const res = await fetch(`${server.baseUrl}${path}`, { headers: { authorization: "Bearer compete-key" } });
+      assert.equal(res.status, 200);
+      const text = await res.text();
+      const pageUrl = `http://host/knowledgebase/api${path}`;
+      const root = /const API_ROOT = "([^"]*)";/.exec(text)?.[1];
+      assert.ok(root !== undefined, "API_ROOT injected, placeholder replaced");
+      assert.doesNotMatch(text, /__API_ROOT__/);
+      assert.equal(new URL(`${root}compete/start`, pageUrl).pathname, "/knowledgebase/api/compete/start");
+      assert.equal(new URL(`${root}compete/run-1/score`, pageUrl).pathname, "/knowledgebase/api/compete/run-1/score");
+      assert.doesNotMatch(text, /fetch\(\s*["'`]\//, "no root-absolute fetch");
+      assert.doesNotMatch(text, /\b(?:href|src|action)="\/(?!\/)/, "no root-absolute href/src/action");
+      assert.doesNotMatch(text, /\burl\(\s*["']?\//, "no root-absolute css url()");
+    } finally {
+      await server.close();
+    }
+  });
+}
 
 /** Real server-mounted handlers with offline req/res; no sockets or external dependencies. */
 async function mountedStart(deps: ServerDeps, key = "synthetic-key", question = "Is the grant guaranteed?") {

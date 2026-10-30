@@ -10,13 +10,17 @@ export function meetingCandidates(tenantId: string, db: Db = getDb()) {
   return scopedCollection<MeetingCandidates>(db, "meeting_candidates")(tenantId);
 }
 
-const PROVENANCE = ["senderAuthenticated", "receivedAt", "youtubeWatch", "youtubeWatchIssue", "meetingLinkIssue"] as const;
+const PROVENANCE = ["evidenceIssue", "senderAuthenticated", "receivedAt", "youtubeWatch", "youtubeWatchIssue", "meetingLinkIssue"] as const;
 const PRESERVED = ["_id", "messageId", "senderEmail", "senderDomain", "subject", "threadId", "status",
   "decidedAt", "detectedAt", "meetingUrl", "registrationUrl", "registrationOnly", "recordingUrl", "kind",
   "startTime", "endTime", "eventDate", "occurrenceId", "occurrenceKey", "sourceId", "sessionId"] as const;
 
 function refreshProvenance(existing: MeetingCandidates, doc: Omit<MeetingCandidates, "tenantId">) {
   const set: Record<string, unknown> = {};
+  if (doc.evidenceIssue !== undefined) {
+    if (typeof doc.evidenceIssue !== "string" || !["unresolved-body", "unsupported-attachment"].includes(doc.evidenceIssue)) throw new Error("Invalid candidate evidence refusal");
+    set.evidenceIssue = existing.evidenceIssue ?? doc.evidenceIssue;
+  }
   if (doc.senderAuthenticated !== undefined) {
     if (typeof doc.senderAuthenticated !== "boolean") throw new Error("Invalid candidate authentication provenance");
     set.senderAuthenticated = doc.senderAuthenticated;
@@ -67,6 +71,7 @@ function refreshProvenance(existing: MeetingCandidates, doc: Omit<MeetingCandida
 export async function createIfNew(tenantId: string, doc: Omit<MeetingCandidates, "tenantId">, db: Db = getDb()): Promise<boolean> {
   const collection = meetingCandidates(tenantId, db);
   if (doc.tenantId !== undefined && doc.tenantId !== tenantId) throw new Error("Candidate owner mismatch");
+  if (doc.evidenceIssue !== undefined && (typeof doc.evidenceIssue !== "string" || !["unresolved-body", "unsupported-attachment"].includes(doc.evidenceIssue))) throw new Error("Invalid candidate evidence refusal");
   const existing = await collection.findOne({ messageId: doc.messageId as string });
   if (existing) {
     if (existing.tenantId !== tenantId || existing.messageId !== doc.messageId ||

@@ -13,6 +13,7 @@ import { existsSync, readFileSync, realpathSync, statSync } from "node:fs";
 import path from "node:path";
 import type { Claims, Gaps, SkipReason, Sessions, SessionPages, Sources, Turns } from "@lkb/core";
 import { requireScope } from "../auth.js";
+import { auditWho, callerOf, type WhatsAppCaller } from "../whatsapp/owner-config.js";
 
 export interface SessionDetail {
   session: Sessions;
@@ -42,11 +43,33 @@ export interface WebinarOperation {
   updatedAt?: string; startTime?: string; endTime?: string;
 }
 export interface WebinarDiscoveryHealth { status: "healthy" | "failed"; checkedAt: string; lastSuccessAt?: string }
-export interface WebinarOperations { operations: WebinarOperation[]; omitted: number; discovery?: Record<"calendar" | "gmail", WebinarDiscoveryHealth> }
+export interface WebinarOperations { operations: WebinarOperation[]; omitted: number; discovery?: Record<"calendar" | "gmail", WebinarDiscoveryHealth>; worker?: import("./calendar.js").CalendarWorkerHealth }
+
+export function projectWebinarOperations(input: unknown): WebinarOperations {
+  const value = input as {operations?: unknown; omitted?: unknown};
+  if (!value || !Array.isArray(value.operations) || value.operations.length > 2000 ||
+    (value.omitted !== undefined && (!Number.isSafeInteger(value.omitted) || Number(value.omitted) < 0))) throw new Error("operation state unavailable");
+  const date = (v: unknown) => typeof v === "string" && Number.isFinite(Date.parse(v)) ? new Date(v).toISOString() : undefined;
+  const statuses = ["queued", "recording", "processing", "failed", "ready", "action_required"];
+  const operations = value.operations.map((raw: unknown): WebinarOperation => {
+    const row = raw as Record<string, unknown>;
+    if (!row || typeof row !== "object" || typeof row.id !== "string" || !/^[a-z0-9][a-z0-9-]{0,63}$/.test(row.id) || !statuses.includes(String(row.status))) throw new Error("operation state unavailable");
+    return {id: row.id, title: typeof row.title === "string" ? row.title.replace(/\b[a-z][a-z0-9+.-]*:\/\/\S+/gi, "[link removed]")
+      .replace(/(^|\s)(?:[a-z]:[\\/]|\\\\|\/)\S+/gi, "$1[path removed]").slice(0, 160) : "Webinar",
+      status: String(row.status), attempts: Number.isSafeInteger(row.attempts) && Number(row.attempts) >= 0 ? Number(row.attempts) : 0,
+      reason: row.reason ? WEBINAR_OPERATION_REASONS.includes(String(row.reason)) ? String(row.reason) : "processing-failed" : undefined,
+      updatedAt: date(row.updatedAt), startTime: date(row.startTime), endTime: date(row.endTime)};
+  }).sort((a, b) => (b.updatedAt ?? "").localeCompare(a.updatedAt ?? ""));
+  return {operations: operations.slice(0, 200), omitted: Number(value.omitted ?? 0) + Math.max(0, operations.length - 200)};
+}
+
+/** W7 (R-26): who is reading. Passed by the routes only; internal callers that omit it keep the trusted (approved-content-only) view. A WhatsApp session is returned
+ * to its link owner or an admin and is invisible (404 / absent from the list) to everyone else. `who` is the verified audit identity, or null when none exists. */
+export interface SessionReadContext { caller: WhatsAppCaller; who: { actorKind: "user" | "key"; actorId: string } | null }
 
 export interface BrainReadDeps {
-  listSessions(tenantId: string): Promise<Sessions[]>;
-  getSessionDetail(tenantId: string, sessionId: string): Promise<SessionDetail | null>;
+  listSessions(tenantId: string, read?: SessionReadContext): Promise<Sessions[]>;
+  getSessionDetail(tenantId: string, sessionId: string, read?: SessionReadContext): Promise<SessionDetail | null>;
   listSources(tenantId: string): Promise<Sources[]>;
   listGaps(tenantId: string): Promise<Gaps[]>;
   getSessionAsset?(tenantId: string, sessionId: string, frameId?: string): Promise<SessionAsset | null>;
@@ -61,9 +84,10 @@ export function withSessionArtifacts(deps: BrainReadDeps, root: string): BrainRe
     if (!relative || relative.startsWith("..") || path.isAbsolute(relative)) throw new Error("outside artifact root");
     return actual;
   }
-  async function artifacts(tenantId: string, id: string) {
+  /** `known` is a detail already read (and, for a WhatsApp session, authorized and audited) under the caller's read context; it is reused so the audit event is written once. */
+  async function artifacts(tenantId: string, id: string, known?: SessionDetail) {
     if (!/^[a-zA-Z0-9][a-zA-Z0-9._-]{0,149}$/.test(id)) return null;
-    const detail = await deps.getSessionDetail(tenantId, id);
+    const detail = known ?? await deps.getSessionDetail(tenantId, id);
     if (!detail || detail.session.tenantId !== tenantId || detail.session._id !== id) return null;
     const source = (await deps.listSources(tenantId)).find((s) => s._id === detail.session.sourceId && s.tenantId === tenantId);
     if (!source) return null;
@@ -100,6 +124,7 @@ export function withSessionArtifacts(deps: BrainReadDeps, root: string): BrainRe
   }
   return { ...deps,
     async listWebinarOperations(tenantId) {
+      if (deps.listWebinarOperations) return deps.listWebinarOperations(tenantId);
       const stateFile = path.join(root, "data", "webinar-release", "operations.json");
       if (!existsSync(stateFile)) return { operations: [], omitted: 0 };
       const file = confined(stateFile);
@@ -108,8 +133,6 @@ export function withSessionArtifacts(deps: BrainReadDeps, root: string): BrainRe
       if (typeof state.tenantId !== "string" || !/^[a-zA-Z0-9][a-zA-Z0-9._-]{0,99}$/.test(state.tenantId)) throw new Error("operation state ownership unavailable");
       if (state.tenantId !== tenantId) return { operations: [], omitted: 0 };
       if (state.version !== 1 || !state.operations || typeof state.operations !== "object" || Array.isArray(state.operations)) throw new Error("operation state unavailable");
-      const statuses = ["queued", "recording", "processing", "failed", "ready", "action_required"];
-      const reasons = WEBINAR_OPERATION_REASONS;
       const date = (value: unknown) => typeof value === "string" && Number.isFinite(Date.parse(value)) ? new Date(value).toISOString() : undefined;
       let discovery: WebinarOperations["discovery"];
       if (state.discovery !== undefined) {
@@ -122,22 +145,20 @@ export function withSessionArtifacts(deps: BrainReadDeps, root: string): BrainRe
           return [feed, {status: row.status, checkedAt, lastSuccessAt}];
         })) as NonNullable<WebinarOperations["discovery"]>;
       }
-      const operations: WebinarOperation[] = Object.entries(state.operations).map(([id, raw]) => {
+      const operations = Object.entries(state.operations).map(([id, raw]) => {
         const row = raw as Record<string, unknown>;
-        if (!row || row.tenantId !== tenantId || !/^[a-z0-9][a-z0-9-]{0,63}$/.test(id) || !statuses.includes(String(row.status))) throw new Error("operation state unavailable");
-        return { id, title: typeof row.title === "string" ? row.title.replace(/https?:\/\/\S+/gi, "[link removed]").slice(0, 160) : "Webinar",
-          status: String(row.status), attempts: Number.isInteger(row.attempts) && Number(row.attempts) >= 0 ? Number(row.attempts) : 0,
-          reason: row.reason ? reasons.includes(String(row.reason)) ? String(row.reason) : "processing-failed" : undefined,
-          updatedAt: date(row.updatedAt), startTime: date(row.startTime), endTime: date(row.endTime) };
-      }).sort((a, b) => (b.updatedAt ?? "").localeCompare(a.updatedAt ?? ""));
-      return { operations: operations.slice(0, 200), omitted: Math.max(0, operations.length - 200), discovery };
+        if (!row || row.tenantId !== tenantId) throw new Error("operation state unavailable");
+        return {...row, id};
+      });
+      return {...projectWebinarOperations({operations, omitted: 0}), discovery};
     },
-    async getSessionDetail(tenantId, id) {
-      const original = await deps.getSessionDetail(tenantId, id);
+    async getSessionDetail(tenantId, id, read) {
+      // W7: forward the read context. Dropping it here turned the owner/admin raw read (and its admin.raw_read audit) into a 404 in production.
+      const original = await deps.getSessionDetail(tenantId, id, read);
       if (!original || original.session.tenantId !== tenantId || original.session._id !== id) return null;
       const detail: SessionDetail = { ...original, media: undefined, notes: undefined, frames: undefined };
       try {
-        const a = await artifacts(tenantId, id);
+        const a = await artifacts(tenantId, id, original);
         if (!a) return detail;
         const media = mediaAsset(a.source);
         if (media) detail.media = { available: true, bytes: media.bytes, mime: media.mime };
@@ -181,13 +202,15 @@ export function publicSourceView(row: Sources): Record<string, unknown> {
   return out;
 }
 
+const readContext = (req: Request): SessionReadContext => ({ caller: callerOf(req), who: auditWho(req) });
+
 export function createBrainRouter(deps: BrainReadDeps): Router {
   const router = Router();
   router.get("/webinar-operations", requireScope("sessions"), async (req: Request, res: Response) => {
     try {
       const result = await deps.listWebinarOperations?.(req.auth!.tenantId) ?? { operations: [], omitted: 0 };
       res.setHeader("Cache-Control", "private, no-store"); res.setHeader("X-LKB-Tenant", req.auth!.tenantId); res.status(200).json(result);
-    } catch { res.status(503).json({ error: "operation_state_unavailable", message: "Webinar status unavailable; inspect the local runner state" }); }
+    } catch { res.status(503).json({ error: "operation_state_unavailable", message: "Webinar status unavailable; inspect the connected worker" }); }
   });
 
   for (const route of ["/sessions/:id/media", "/sessions/:id/frames/:frameId"]) {
@@ -201,12 +224,16 @@ export function createBrainRouter(deps: BrainReadDeps): Router {
   }
 
   router.get("/sessions", requireScope("sessions"), async (req: Request, res: Response) => {
-    const sessions = await deps.listSessions(req.auth!.tenantId);
-    res.status(200).json({ sessions });
+    try {
+      const sessions = await deps.listSessions(req.auth!.tenantId, readContext(req));
+      res.status(200).json({ sessions });
+    } catch { res.status(503).json({ error: "sessions_unavailable" }); }
   });
 
   router.get("/sessions/:id", requireScope("sessions"), async (req: Request, res: Response) => {
-    const detail = await deps.getSessionDetail(req.auth!.tenantId, req.params.id as string);
+    let detail: SessionDetail | null;
+    try { detail = await deps.getSessionDetail(req.auth!.tenantId, req.params.id as string, readContext(req)); }
+    catch { res.status(503).json({ error: "session_unavailable" }); return; } // e.g. the admin-read audit could not be written: nothing is returned
     if (!detail) {
       res.status(404).json({ error: "not_found", message: "no session with that id for this tenant" });
       return;

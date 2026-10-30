@@ -1,0 +1,7 @@
+orphan-recording-no-alias exit=1 launched=0
+orphan-recording-no-source exit=1 launched=0
+mapped-same-meeting exit=1 launched=0
+mapped-other-meeting exit=0 launched=1
+orphan-recording-no-alias: send-now refused: cannot tell whether a bot is already in this meeting (active webinar operation has no verifiable meeting identity); nothing was launched
+orphan-recording-no-source: send-now refused: cannot tell whether a bot is already in this meeting (active webinar operation has no verifiable meeting identity); nothing was launched
+mapped-same-meeting: send-now refused: a bot is already queued, joining or recording for this meeting (meet:abc-defg-hij); not sending a second one

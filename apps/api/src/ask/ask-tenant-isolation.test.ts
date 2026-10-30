@@ -173,8 +173,9 @@ test("hydrator: tenant A's quotes only, though B has the same sessionId with hig
   assert.equal(quotes[0]!.quote, "Visa forms open in October.");
   assert.deepEqual(leaks(out), []);
   assert.deepEqual(unscoped(db.queries, A), []);
-  // The review overlay / visibility gate add scoped findOne lookups; the corpus reads are the two finds.
-  assert.deepEqual(db.queries.filter((q) => q.op === "find").map((q) => [q.coll, q.returned]), [["turns", 1], ["chunks", 1]], "turns and chunks each returned only A's single row");
+  // The review overlay adds scoped findOne lookups. D-206 K1: the visibility gate re-reads the candidate turns in ONE batched
+  // tenant-scoped `find({ _id: { $in } })`, so the finds are the corpus turns read, that batch, and chunks - each A's single row.
+  assert.deepEqual(db.queries.filter((q) => q.op === "find").map((q) => [q.coll, q.returned]).sort(), [["chunks", 1], ["turns", 1], ["turns", 1]], "every find returned only A's single row");
 });
 
 test("hydrator: asked for a session that exists only for B it refuses (no source rows) and leaks nothing", async () => {
@@ -318,4 +319,17 @@ test("HTTP /answer-policy/simulate legacy arms path (extraCandidateArmsFor): arm
     assert.ok(db.queries.some((q) => q.coll === "turns"), "arms actually queried");
     assert.deepEqual(unscoped(db.queries, A), []);
   } finally { await server.close(); }
+});
+
+// ask-fast-rag C4: the default (single-call RAG) path keeps the key-derived tenant, and tenant B's chunk is never returned or cited.
+test("HTTP /ask default fast path as tenant A: at most 2 model calls, B's chunk/turn never returned, cited or sent to the model", async () => {
+  const db = new BlindDb(corpus());
+  const r = await runRoute({ db, tenantOfKey: A, body: { query: QUERY, filters: { sources: "all" } } });
+  assert.equal(r.status, 200, r.text);
+  assert.ok(r.prompts.length >= 1 && r.prompts.length <= 2, `model calls: ${r.prompts.length}`);
+  const body = JSON.parse(r.text) as { sources: { internal: { node_id: string; evidence: { sourceQuotes: { turnId: string }[] } }[] } };
+  assert.ok(body.sources.internal.length > 0, "non-vacuous: A got a cited answer");
+  assert.deepEqual(body.sources.internal.flatMap((s) => s.evidence.sourceQuotes.map((q) => q.turnId)).filter((t) => t !== "a-turn-1" && t !== "a-turn-2"), []);
+  for (const surface of [r.text, r.prompts, r.writes]) assert.deepEqual(leaks(surface), []);
+  assert.deepEqual(unscoped(db.queries, A), []);
 });

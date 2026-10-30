@@ -1,7 +1,7 @@
 # goal-t050
 
-**Handshake status:** ready-for-check (CORE SLICE ONLY)
-Status: ready-for-check
+**Handshake status:** checked-PASS (CORE SLICE ONLY) — closed out 2026-10-26 (resume reconcile) citing qa/verdicts/goal-t050.md
+Status: checked-PASS (CORE SLICE ONLY) — synced to canonical handshake 2026-10-26
 Fix cycle: 0
 Task: T-050
 Priority: tier 3, owner-authorized full roadmap completion under D-170. Data-write/tenant/credential-handling boundaries require full ceremony.

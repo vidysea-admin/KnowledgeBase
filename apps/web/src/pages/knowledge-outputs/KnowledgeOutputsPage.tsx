@@ -110,7 +110,7 @@ export function KnowledgeOutputsPage(): React.ReactElement {
             onChange={(e) => setEdits((old) => ({ ...old, [item.id]: e.target.value }))} style={{ width: "100%" }} />
             <button disabled={busy} onClick={() => setEdits((old) => ({ ...old, [item.id]: "" }))}>Remove {item.id}</button>{edits[item.id] === "" && <p>This item will be removed when saved.</p>}</>}
           <ul>{item.citationIds.map((id) => { const c = draft.citations.find((citation) => citation.id === id); return c ? <li key={id}>
-            <Link to={`/sessions/${encodeURIComponent(c.sessionId)}#turn-${encodeURIComponent(c.turnId)}`}>{c.speakerLabel ?? c.speakerRef} · {c.occurredAt ?? `${c.start}–${c.end} ${c.unit}`}</Link><blockquote>{c.quote}</blockquote>
+            <Link to={`/sessions/${encodeURIComponent(c.sessionId)}#turn-${encodeURIComponent(c.turnId)}`}>{c.speakerLabel ?? c.speakerRef} · {c.occurredAt ?? `${c.start}–${c.end} ${c.unit}`}</Link>{c.claimStatus === "needs-review" && <>{" "}<strong>Unverified (needs review)</strong></>}<blockquote>{c.quote}</blockquote>
           </li> : <li key={id}>Citation unavailable.</li>; })}</ul>
         </article>)}</section>)}
       {editing && <><button disabled={busy || !editTitle.trim() || Object.values(edits).some((v) => v !== "" && !v.trim())} onClick={() => { void action(save); }}>Save changes</button>{" "}<button disabled={busy} onClick={() => { setEdits({}); setEditTitle(draft.title); setEditing(false); }}>Cancel editing</button>{" "}</>}

@@ -49,7 +49,7 @@ test("index failure leaves watched hash due; retry consumes deduped stored conte
 
 test("positive consumer receipt is required; legacy and contradictory chunk receipts are refused", () => {
   const positive = {
-    sessionId: "s", summary: { degraded: null }, claims: { degraded: null }, chunks: { written: 1, skipped: null }, entities: null,
+    sessionId: "s", summary: { degraded: null }, claims: { degraded: null }, chunks: { written: 1, skipped: null }, entities: null, gapRecorded: true,
     completion: { version: 2, strict: false, complete: true, generation: "g", turnCount: 1, treeWritten: true },
   } as const;
   assertConnectorIndexConsumed(positive, "s");

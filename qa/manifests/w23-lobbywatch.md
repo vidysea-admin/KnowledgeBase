@@ -1,6 +1,6 @@
 # w23-lobbywatch
 
-Status: ready-for-check
+Status: checked-PASS — closed out 2026-10-26 (resume reconcile) citing qa/verdicts/w23-lobbywatch.md
 Fix cycle: 1
 Issue: ISS-LOBBYWATCH-001 (high). Lane lane/w23-lobbywatch, base 3c99337f.
 

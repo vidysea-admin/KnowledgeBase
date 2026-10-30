@@ -285,7 +285,7 @@ const linkEvent = (id: string, extra: Record<string, unknown>) =>
   ({id, summary: id, start: {dateTime: "2026-10-01T12:00:00Z"}, end: {dateTime: "2026-10-01T13:00:00Z"}, ...extra});
 const listWith = (items: unknown[]) => listUpcomingGwsMeetings(14, async () => JSON.stringify({items}));
 
-test("T-036 description/location links: carried per event, never leaked across events, text never returned", async () => {
+test("T-036 private Calendar descriptions stay per event; locations remain extraction input only", async () => {
   const zoom = "https://us02web.zoom.us/j/1234567890?pwd=SECRETPWD", meet = "https://meet.google.com/abc-defg-hij";
   const rows = await listWith([
     linkEvent("a", {description: `Passcode notes: private-note-xyz <a href="${zoom}">join</a>`}),
@@ -299,7 +299,7 @@ test("T-036 description/location links: carried per event, never leaked across e
   assert.equal(rows[3]!.meetingUrl, undefined); assert.equal(rows[3]!.meetingLinkIssue, "ambiguous");
   assert.equal(rows[4]!.meetingLinkIssue, "registration-only"); assert.equal("meetingLinkIssue" in rows[1]!, false);
   const json = JSON.stringify(rows);
-  assert.ok(!json.includes("private-note-xyz") && !json.includes("Hall 3") && !/"(description|location)":/.test(json)); // keys, not the new meetingUrlSource VALUES "description"/"location"
+  assert.ok(json.includes("private-note-xyz") && !json.includes("Hall 3") && !/"location":/.test(json)); // keys, not the new meetingUrlSource VALUES "description"/"location"
   const bad = await listUpcomingGwsMeetings(14, async () => JSON.stringify({items: [linkEvent("z", {description: "private-note-xyz", hangoutLink: 7})]})).catch((e: Error) => e);
   assert.ok(bad instanceof Error && !bad.message.includes("private-note-xyz"));
 });
@@ -308,12 +308,12 @@ test("T-036 default parity: event with conference link maps to exactly the pre-c
   const meet = "https://meet.google.com/abc-defg-hij";
   const [row] = await listWith([linkEvent("p", {hangoutLink: meet, organizer: {email: "o@x.org"}, description: "https://zoom.us/j/1234567890", location: "https://zoom.us/j/9999999999"})]);
   assert.deepEqual(row, {id: "p", title: "p", startTime: "2026-10-01T12:00:00Z", endTime: "2026-10-01T13:00:00Z", meetingUrl: meet, meetingUrlSource: "conference",
-    organizer: "o@x.org", cancelled: false, recurringEventId: undefined, originalStartTime: undefined, providerUpdated: undefined});
-  assert.deepEqual(Object.keys(row!), ["id", "title", "startTime", "endTime", "meetingUrl", "meetingUrlSource", "organizer", "cancelled", "recurringEventId", "originalStartTime", "providerUpdated"]);
+    organizer: "o@x.org", cancelled: false, recurringEventId: undefined, originalStartTime: undefined, providerUpdated: undefined, description: "https://zoom.us/j/1234567890"});
+  assert.deepEqual(Object.keys(row!), ["id", "title", "description", "startTime", "endTime", "meetingUrl", "meetingUrlSource", "organizer", "cancelled", "recurringEventId", "originalStartTime", "providerUpdated"]);
   const server = await startTestServer(buildTestDeps({calendar: {listUpcoming: async () => [row!]}, keyStore: fakeKeyStore({k: {tenantId: "tenant-1", scopes: ["calendar"]}})}));
   try {
     const body = await (await fetch(`${server.baseUrl}/calendar/upcoming`, {headers: {authorization: "Bearer k"}})).text();
-    assert.equal(body, JSON.stringify({meetings: [{id: "p", title: "p", startTime: "2026-10-01T12:00:00Z", endTime: "2026-10-01T13:00:00Z", meetingUrl: meet, meetingUrlSource: "conference", organizer: "o@x.org", cancelled: false}]}));
+    assert.equal(body, JSON.stringify({meetings: [{id: "p", title: "p", description: "https://zoom.us/j/1234567890", startTime: "2026-10-01T12:00:00Z", endTime: "2026-10-01T13:00:00Z", meetingUrl: meet, meetingUrlSource: "conference", organizer: "o@x.org", cancelled: false}]}));
   } finally { await server.close(); }
 });
 
@@ -330,7 +330,7 @@ test("ISS-T036CAL-001 provenance: every mapped link carries meetingUrlSource (co
   const by = Object.fromEntries(rows.map(r => [r.id, r]));
   assert.equal(by.conf!.meetingUrlSource, "conference"); assert.equal(by.loc!.meetingUrlSource, "location"); assert.equal(by.desc!.meetingUrlSource, "description");
   for (const id of ["none", "amb", "host"]) { assert.equal("meetingUrlSource" in by[id]!, false, id); assert.equal(by[id]!.meetingUrl, undefined, id); }
-  assert.equal(by.host!.meetingLinkIssue, "host-start-link"); assert.ok(!JSON.stringify(rows).includes("zak"));
+  assert.equal(by.host!.meetingLinkIssue, "host-start-link"); assert.ok(!rows.some(row => row.meetingUrl?.includes("zak")));
   const server = await startTestServer(buildTestDeps({calendar: {listUpcoming: async () => rows}, keyStore: fakeKeyStore({k: {tenantId: "tenant-1", scopes: ["calendar"]}})}));
   try {
     const body = await (await fetch(`${server.baseUrl}/calendar/upcoming?discovery=1`, {headers: {authorization: "Bearer k"}})).json() as {meetings: Record<string, unknown>[]};
@@ -338,4 +338,35 @@ test("ISS-T036CAL-001 provenance: every mapped link carries meetingUrlSource (co
     assert.deepEqual(src, {conf: "conference", loc: "location", desc: "description", none: undefined, amb: undefined, host: undefined});
   } finally { await server.close(); }
   console.log("ISS-T036CAL-001 mapper+HTTP: 3/3 sources carried, 3/3 link-less rows carry none");
+});
+
+test("default Calendar inventory retains missing-link, cancelled and unanswered events", async () => {
+  const rows = [{id: "no-link", title: "Private meeting", startTime: "", endTime: ""},
+    {id: "cancelled", title: "Cancelled", startTime: "", endTime: "", cancelled: true},
+    {id: "unanswered", title: "Invitation", startTime: "2026-10-27T12:00:00Z", endTime: "2026-10-27T13:00:00Z", responseStatus: "needsAction" as const}];
+  const server = await startTestServer(buildTestDeps({calendar: {listUpcoming: async () => rows}, keyStore: fakeKeyStore({k: {tenantId: "tenant-1", scopes: ["calendar"]}})}));
+  try { const response = await fetch(server.baseUrl+"/calendar/upcoming", {headers: {authorization: "Bearer k"}});
+    assert.equal(response.status, 200); assert.deepEqual((await response.json() as {meetings: unknown[]}).meetings, rows);
+    assert.equal(response.headers.get("cache-control"), "private, no-store");
+  } finally { await server.close(); }
+});
+
+test("Calendar privately carries bounded descriptions, confirmed state and the account's own RSVP", async () => {
+  const [row] = await listWith([linkEvent("rsvp", {status: "confirmed", description: "Career purpose: medicine\nPrivate operator text", attendees: [{self: true, responseStatus: "needsAction"}, {responseStatus: "declined"}]})]);
+  assert.equal(row!.description, "Career purpose: medicine\nPrivate operator text"); assert.equal(row!.status, "confirmed"); assert.equal(row!.responseStatus, "needsAction");
+  for (const extra of [{description: "x".repeat(32769)}, {description: 7}, {attendees: "invalid"}, {attendees: [{self: true, responseStatus: "invented"}]},
+    {attendees: [{self: true, responseStatus: "accepted"}, {self: true, responseStatus: "declined"}]}]) await assert.rejects(listWith([linkEvent("bad", extra)]), /unavailable/);
+});
+
+
+test("operator-day Calendar inventory includes earlier today without backdating freshness", async t => {
+  const scannedAt = "2026-10-27T07:00:00.000Z", calls: Record<string, unknown>[] = [];
+  t.mock.timers.enable({apis: ["Date"], now: new Date(scannedAt)});
+  const result = await listUpcomingGwsMeetings(14, async args => {
+    const params = JSON.parse(args[args.indexOf("--params") + 1]!); calls.push(params);
+    return JSON.stringify({kind: "calendar#events", items: [], ...(params.singleEvents === false ? {nextSyncToken: "terminal"} : {})});
+  }, undefined, {}, {timeZone: "Asia/Kolkata"});
+  assert.equal(calls.find(p => p.singleEvents === true)?.timeMin, "2026-10-26T18:30:00.000Z");
+  assert.equal(result.checkedAt, scannedAt);
+  await assert.rejects(listUpcomingGwsMeetings(14, async () => "{}", undefined, {}, {timeZone: "not-a-zone"}));
 });

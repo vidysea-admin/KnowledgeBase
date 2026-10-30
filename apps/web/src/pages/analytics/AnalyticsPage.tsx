@@ -69,6 +69,7 @@ export function AnalyticsPage(): React.ReactElement {
           </>;
         }}</Panel>
         <Panel title="Citation coverage" part={data.graph}>{value => {
+          if (value === null) return <p className="empty-note">No knowledge graph has been indexed for this tenant yet.</p>;
           const f = graphEvidence(value);
           return <>
             <p>Graph edges with evidence: {formatPercent(f.withEvidence)}.</p>

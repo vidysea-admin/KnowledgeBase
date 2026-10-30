@@ -1,6 +1,6 @@
 # w23-t059replay: ISS-T059REPLAY-001 historical replay must not replace the flywheel head
 
-Status: ready-for-check
+Status: checked-PASS — closed out 2026-10-26 (resume reconcile) citing qa/verdicts/w23-t059replay.md
 Fix cycle: 0
 Lane: C:\Users\product\Desktop\KnowledgeBase-lanes\w23-t059replay (branch lane/w23-t059replay)
 Base SHA: 3c99337f

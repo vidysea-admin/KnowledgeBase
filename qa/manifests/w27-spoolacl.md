@@ -1,5 +1,5 @@
 # Manifest - w27-spoolacl
-**Status:** ready-for-check
+**Status:** checked-PASS — closed out 2026-10-26 (resume reconcile) citing qa/verdicts/w27-spoolacl.md
 **Fix cycle:** 0
 **Lane:** C:\Users\product\Desktop\KnowledgeBase-lanes\w27-spoolacl (branch lane/w27-spoolacl)
 **Base SHA:** 4264418c (origin/master)

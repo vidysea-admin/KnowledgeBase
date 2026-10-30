@@ -1,0 +1,37 @@
+// Checker A cycle-1 falsification harness. Every mutant runs in its OWN dir inside the throwaway copy (outside the bound root); no backup/trap needed because the originals are never edited.
+import { mkdirSync, copyFileSync, readFileSync, writeFileSync, rmSync } from "node:fs";
+import { spawnSync } from "node:child_process";
+import { join } from "node:path";
+const root = process.cwd();
+const src = readFileSync(join(root, "scripts/whatsapp/sync-links.mjs"), "utf8");
+const MUT = [
+ ["W9-1 mid-run recheck removed (L80)", 'if (fresh?.state !== "active") { aborted = true; break; }', ""],
+ ["W9-2 any acquire error = skipped", 'if (e?.code === "locked") { row.status', 'if (true) { row.status'],
+ ["W9-3a $pull removed", 'if (flagsRemove.length) await links.updateOne({ _id: linkId }, { $pull: { "health.flags": { $in: flagsRemove } } });', ""],
+ ["W9-3b never add flags", '$addToSet: { "health.flags": { $each: flagsAdd } }', '$addToSet: { "health.flags": { $each: [] } }'],
+ ["W9-7 owing union dropped", "...active, ...owing]", "...active]"],
+ ["W9-7x revoked dropped from owing", 'distinct("tenantId", { state: { $in: ["unlinked", "revoked"] }, archiverUnlinkPending: true })', 'distinct("tenantId", { state: { $in: ["unlinked"] }, archiverUnlinkPending: true })'],
+ ["W9-7y owing ignores the pending flag", 'distinct("tenantId", { state: { $in: ["unlinked", "revoked"] }, archiverUnlinkPending: true })', 'distinct("tenantId", { state: { $in: ["unlinked", "revoked"] } })'],
+ ["W9-8 env-map tenant union dropped", "[...new Set([...entries.map((e) => e.tenantId), ...active, ...owing])]", "[...new Set([...active, ...owing])]"],
+ ["W9-8b seed failure no longer logged", 'resolver(tenantId, ADMIN_KEY).catch((e) => { if (classifyError(e) !== "not_configured") log(`tenant ${tenantId}: legacy seed failed (${classifyError(e)})`); });', 'resolver(tenantId, ADMIN_KEY).catch(() => {});'],
+ ["W9-2b lock fault not logged", 'deps.log(`link ${linkId}: lock acquire failed (${e?.code ?? e?.name ?? "error"})`);', ""],
+];
+const only = process.argv[2];
+const files = ["scripts/%/sync-links.test.mjs", "scripts/%/sync-links.mongo.test.mjs"];
+const run = (dir) => spawnSync(process.execPath, ["--test", "--import", "tsx", "--test-timeout=15000", `scripts/${dir}/sync-links.test.mjs`, `scripts/${dir}/sync-links.mongo.test.mjs`], { cwd: root, env: process.env, encoding: "utf8", timeout: 150000 });
+const tally = (r) => { const n = (k) => { const m = new RegExp("ℹ " + k + " (\d+)").exec(r.stdout); return m ? Number(m[1]) : 0; }; return { exit: r.status, pass: n("pass"), fail: n("fail"), cancelled: n("cancelled") }; };
+let i = 0;
+for (const [name, from, to] of MUT) {
+  i++; if (only && !name.startsWith(only)) continue;
+  const dir = `w9chkA-c1m${i}`, d = join(root, "scripts", dir);
+  rmSync(d, { recursive: true, force: true }); mkdirSync(d, { recursive: true });
+  for (const f of ["sync-links.mjs", "sync-links.test.mjs", "sync-links.mongo.test.mjs"]) copyFileSync(join(root, "scripts/whatsapp", f), join(d, f));
+  const count = src.split(from).length - 1;
+  if (count !== 1) { console.log(`${name}: PATTERN MATCHES ${count}x`); continue; }
+  const green = tally(run(dir));
+  writeFileSync(join(d, "sync-links.mjs"), src.replace(from, to));
+  const r = run(dir), red = tally(r);
+  const fails = [...r.stdout.matchAll(/✖ ([^\n]*?) \(/g)].map((m) => m[1].slice(0, 80)).filter((v, k, a) => a.indexOf(v) === k);
+  console.log(`${name}: green-before ${JSON.stringify(green)} | after ${JSON.stringify(red)} => ${red.exit !== 0 ? "KILLED" : "SURVIVED"} red: ${JSON.stringify(fails.slice(0, 3))}`);
+  rmSync(d, { recursive: true, force: true });
+}

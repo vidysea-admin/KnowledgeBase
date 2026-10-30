@@ -40,24 +40,32 @@ RUN pnpm install --frozen-lockfile --prod --filter "@lkb/api..."
 
 FROM deps AS web-build
 COPY apps/web ./apps/web
+COPY packages/ingest/src/join-policy ./packages/ingest/src/join-policy
 ARG VITE_API_BASE_URL=""
 ENV VITE_API_BASE_URL=${VITE_API_BASE_URL}
 RUN pnpm --filter @lkb/web build
 
-# Separate static frontend image. The existing nginx configuration handles SPA routes.
+# Separate static frontend image. ONE image serves any base path chosen at container start:
+#   APP_BASE_PATH  default "/"; e.g. "/knowledgebase" (docs/GO-LIVE-UBUNTU.md, "Base path").
+#   APP_API_BASE   optional explicit API base for the browser; default <base>/api (proxied by nginx).
+#   API_UPSTREAM   where nginx proxies <base>/api/*; default http://api:3300.
+# apps/web/nginx.conf is an envsubst template (rendered by the official entrypoint from
+# /etc/nginx/templates); apps/web/docker/* are entrypoint hooks (see their headers). ${PORT} is the
+# listen port (Cloud Run sets it; default 80).
 FROM nginx:1.27-alpine AS web
 COPY --from=web-build /app/apps/web/dist /usr/share/nginx/html
-# Cloud Run runtime: nginx listens on ${PORT} (default 80). The official image renders
-# /etc/nginx/templates/*.template with envsubst at start; only defined env names are replaced,
-# so nginx variables such as $uri stay intact. apps/web/nginx.conf itself keeps `listen 80`.
-COPY apps/web/nginx.conf /tmp/nginx.conf
-RUN mkdir -p /etc/nginx/templates && sed 's/listen 80;/listen ${PORT};/' /tmp/nginx.conf > /etc/nginx/templates/default.conf.template \
+COPY apps/web/nginx.conf /etc/nginx/templates/default.conf.template
+COPY apps/web/docker/18-lkb-base-path.envsh /docker-entrypoint.d/18-lkb-base-path.envsh
+COPY apps/web/docker/40-lkb-runtime-config.sh /docker-entrypoint.d/40-lkb-runtime-config.sh
+# Strip CR (a Windows checkout may have converted line endings) and make the hooks runnable/sourceable.
+RUN sed -i 's/\r$//' /etc/nginx/templates/default.conf.template /docker-entrypoint.d/18-lkb-base-path.envsh /docker-entrypoint.d/40-lkb-runtime-config.sh \
+  && chmod 0755 /docker-entrypoint.d/18-lkb-base-path.envsh /docker-entrypoint.d/40-lkb-runtime-config.sh \
   && grep -q 'listen ${PORT};' /etc/nginx/templates/default.conf.template \
-  && rm /tmp/nginx.conf /etc/nginx/conf.d/default.conf
-ENV PORT=80
+  && rm -f /etc/nginx/conf.d/default.conf
+ENV PORT=80 APP_BASE_PATH=/ API_UPSTREAM=http://api:3300
 EXPOSE 80
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
-  CMD ["sh", "-c", "wget -q --spider http://127.0.0.1:${PORT}/ || exit 1"]
+  CMD ["sh", "-c", "wget -q --spider http://127.0.0.1:${PORT}/healthz || exit 1"]
 
 # Pinned official standalone tooling. Downloads happen only during the approved build.
 FROM node:24-slim AS media-tool-download
@@ -65,7 +73,7 @@ ARG TARGETARCH
 RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates curl \
   && rm -rf /var/lib/apt/lists/*
 RUN set -eu; \
-  case "${TARGETARCH:-amd64}" in \
+  case "${TARGETARCH:-$(dpkg --print-architecture)}" in \
     amd64) asset=yt-dlp_linux; digest=58162f9bfdc27458ea47bfcb311cf47028f17d8154a8bf7d689861d46399230a ;; \
     arm64) asset=yt-dlp_linux_aarch64; digest=b16e4dab368a816cd05d477d698a605a6ae87ccee1c8ffd38fa21d7254141fcc ;; \
     *) echo 'Unsupported media-tool architecture' >&2; exit 1 ;; \
@@ -111,7 +119,7 @@ RUN set -eux; \
     node --check apps/api/dist/source-worker.js; \
     echo "api bundle sanity OK"
 # T-028 state dirs: created node-owned so compose named volumes mounted here are writable by UID 1000.
-RUN mkdir -p /var/lib/lkb/hosting /var/lib/lkb/counsellor && chown -R node:node /var/lib/lkb
+RUN mkdir -p /var/lib/lkb/hosting /var/lib/lkb/counsellor /var/lib/lkb/join-rules && chown -R node:node /var/lib/lkb
 # Non-root runtime user: the image's `node` user (UID 1000). The CI smoke test
 # (scripts/qa/container-workflows/run.sh) chowns its state volumes to 1000, so the UID is kept
 # (the sibling autoTesting image uses 10001).

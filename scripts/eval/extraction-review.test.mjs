@@ -1,6 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {readFileSync,writeFileSync,mkdtempSync,rmSync} from 'node:fs';
+import {readFileSync,writeFileSync,mkdtempSync,mkdirSync,rmSync} from 'node:fs';
+import {execFileSync} from 'node:child_process';
+import {createHash} from 'node:crypto';
 import {resolve} from 'node:path';
 import {tmpdir} from 'node:os';
 import {runInNewContext} from 'node:vm';
@@ -78,4 +80,23 @@ test('refuse alternate or changed corpus instead of mixing72 declarations with a
   assert.throws(()=>bridge(bundle,pending,'subset.json'),/alternate-corpus-refused/);
   const changed=structuredClone(bundle);changed.corpusBinding.sha256='0'.repeat(64);
   assert.throws(()=>bridge(changed,pending),/corpus-drift/);
+});
+test('ISS-390: the pinned packet is checked out as LF so its bytes match the pin on every platform',()=>{
+  const packet='data/eval/extraction-adjudication-packet.json', root=resolve(import.meta.dirname,'../..');
+  const attr=execFileSync('git',['-C',root,'check-attr','eol','--',packet],{encoding:'utf8'});
+  assert.match(attr,/: eol: lf\s*$/);
+  const bytes=readFileSync(resolve(root,packet));
+  assert.equal(bytes.includes(13),false);
+  assert.equal(createHash('sha256').update(bytes).digest('hex'),JSON.parse(readFileSync(resolve(root,'data/eval/extraction-draft-review/index.json'))).sourcePacket.sha256);
+});
+test('ISS-390: the pin is not loosened; a CRLF-converted packet is still refused as packet-drift',()=>{
+  const root=resolve(import.meta.dirname,'../..'), dir=mkdtempSync(resolve(tmpdir(),'iss390-')), CR=String.fromCharCode(13), LF=String.fromCharCode(10);
+  try {
+    const index=JSON.parse(readFileSync(resolve(root,'data/eval/extraction-draft-review/index.json')));
+    mkdirSync(resolve(dir,'data/eval/extraction-draft-review'),{recursive:true});
+    writeFileSync(resolve(dir,'data/eval/extraction-draft-review/index.json'),JSON.stringify(index));
+    const lf=readFileSync(resolve(root,index.sourcePacket.path),'utf8').split(CR+LF).join(LF);
+    writeFileSync(resolve(dir,index.sourcePacket.path),lf.split(LF).join(CR+LF));
+    assert.throws(()=>loadBundle(dir),/packet-drift/);
+  } finally {rmSync(dir,{recursive:true,force:true});}
 });

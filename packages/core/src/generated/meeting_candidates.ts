@@ -55,5 +55,9 @@ export interface MeetingCandidates {
   };
   youtubeWatchIssue?: "ambiguous";
   meetingLinkIssue?: "ambiguous" | "registration-only" | "host-start-link";
+  /**
+   * Acquisition refusal. Retained across rescans; never authorizes attendance or sender trust.
+   */
+  evidenceIssue?: "unresolved-body" | "unsupported-attachment";
   [k: string]: unknown;
 }

@@ -11,8 +11,10 @@ import { parseNativeSourceLocator, type NativeEvidenceResolver } from "../native
 
 export type VisibilityTurn = Pick<Turns, "_id" | "tenantId" | "sessionId" | "text"> & Partial<Pick<Turns, "speakerRef" | "speakerLabel" | "occurredAt">>;
 export type VisibilityClaim = Pick<Claims, "_id" | "tenantId" | "text" | "status" | "evidence"> & Pick<Claims, "source"> & { waReview?: unknown; origin?: unknown };
+import { VisibilityDeadlineError, withDeadline, newVisibilityRequestMemo, type VisibilityRequestMemo, type FilterTurnsOptions } from "./request-deadline.js";
+export { VisibilityDeadlineError, withDeadline, newVisibilityRequestMemo, type VisibilityRequestMemo, type FilterTurnsOptions };
 export interface KnowledgeVisibility {
-  filterTurns<T extends VisibilityTurn>(tenantId: string, rows: readonly T[]): Promise<T[]>;
+  filterTurns<T extends VisibilityTurn>(tenantId: string, rows: readonly T[], options?: FilterTurnsOptions): Promise<T[]>;
   sessionVisible(tenantId: string, sessionId: string): Promise<boolean>;
   sourceVisible(tenantId: string, sourceId: string): Promise<boolean>;
   claimVisible(tenantId: string, claim: VisibilityClaim): Promise<boolean>;
@@ -115,6 +117,53 @@ export function createKnowledgeVisibility(db: ReadDb, nativeEvidence?: NativeEvi
     return false;
   };
   const guarded = async <T>(fallback: T, run: () => Promise<T>): Promise<T> => { try { return await run(); } catch { return fallback; } };
+  const memoContext = (tenantId: string, sessionId: string, memo: VisibilityRequestMemo | undefined): Promise<Context | null> => {
+    const key = JSON.stringify([tenantId, sessionId]);
+    let hit = memo?.contexts.get(key) as Promise<Context | null> | undefined;
+    if (!hit) { hit = context(tenantId, sessionId); memo?.contexts.set(key, hit); }
+    return hit;
+  };
+  const RAW_CHUNK = 500, CONTEXT_PARALLEL = 8;
+  /** Batched equivalent of the former per-row loop (D-206 K1): same verdict per row, one `$in` read of raw turns, one effective pass,
+   * source context once per DISTINCT session. A read error rejects into the caller's fail-closed `[]`; WhatsApp-batch rows keep the strict per-turn proof. */
+  const filterBatch = async <T extends VisibilityTurn>(tenantId: string, rows: readonly T[], options: FilterTurnsOptions): Promise<T[]> => {
+    const candidates = rows.filter(row => row.tenantId === tenantId && text(row.sessionId) && text(row._id));
+    if (!candidates.length) return [];
+    const wanted = [...new Set(candidates.map(row => row._id))], raw = new Map<string, Turns>();
+    const turnsColl = db.collection<Turns>("turns");
+    for (let i = 0; i < wanted.length; i += RAW_CHUNK) {
+      const ids = new Set(wanted.slice(i, i + RAW_CHUNK));
+      const found = await turnsColl.find(withTenant<Turns>(tenantId, { _id: { $in: [...ids] } } as never)).toArray();
+      // Re-verify locally: a row outside this tenant or this id set is never trusted, whatever the store returned.
+      for (const turn of found) if (turn?.tenantId === tenantId && ids.has(turn._id)) raw.set(turn._id, turn);
+    }
+    const pairs = candidates.filter(row => raw.get(row._id)?.sessionId === row.sessionId);
+    const effective = new Map<string, Turns>();
+    if (pairs.length) {
+      const projected = await readEffectiveTurns(db, tenantId, [...new Set(pairs.map(row => raw.get(row._id)!))]);
+      for (const turn of projected) effective.set(turn._id, turn);
+    }
+    const survivors = pairs.filter(row => {
+      const turn = effective.get(row._id);
+      return turn !== undefined && turn._id === row._id && turn.sessionId === row.sessionId && text(turn.text) && text(turn.speakerRef)
+        && Number.isFinite(turn.tStart) && Number.isFinite(turn.tEnd) && turn.tStart >= 0 && turn.tEnd >= turn.tStart
+        && turn.text === row.text && !["speakerRef", "speakerLabel", "occurredAt"].some(key => Object.hasOwn(row, key)
+          && row[key as keyof VisibilityTurn] !== turn[key as keyof VisibilityTurn]);
+    });
+    const sessions = [...new Set(survivors.map(row => row.sessionId))], contexts = new Map<string, Context | null>();
+    for (let i = 0; i < sessions.length; i += CONTEXT_PARALLEL) {
+      const slice = sessions.slice(i, i + CONTEXT_PARALLEL);
+      const resolved = await Promise.all(slice.map(id => memoContext(tenantId, id, options.memo)));
+      slice.forEach((id, index) => contexts.set(id, resolved[index] ?? null));
+    }
+    const out: T[] = [];
+    for (const row of survivors) {
+      const ctx = contexts.get(row.sessionId);
+      if (!ctx || !text(row.text) || !effective.get(row._id)!.text.includes(row.text)) continue;
+      if (ctx.source.kind !== "whatsapp-batch" || await allowedTurn(tenantId, row.sessionId, row._id, row.text, true)) out.push(row);
+    }
+    return out;
+  };
   const claimVisible = (tenantId: string, claim: VisibilityClaim): Promise<boolean> => guarded(false, async () => {
     assertValidTenantId(tenantId, "knowledge.visibility");
     const current = await currentClaim(tenantId, claim);
@@ -154,18 +203,12 @@ export function createKnowledgeVisibility(db: ReadDb, nativeEvidence?: NativeEvi
       return source !== null && source._id === sourceId && sourceKinds.has(source.kind) && source.consent?.given !== false && source.kind !== "whatsapp-batch"
         && !await one<WhatsAppReviewCandidate>("whatsapp_candidates", tenantId, { sourceId });
     }),
-    filterTurns: <T extends VisibilityTurn>(tenantId: string, rows: readonly T[]): Promise<T[]> => guarded([] as T[], async () => {
-      assertValidTenantId(tenantId, "knowledge.visibility");
-      const out: T[] = [];
-      for (const row of rows) {
-        if (row.tenantId !== tenantId) continue;
-        const current = await currentTurn(tenantId, row.sessionId, row._id);
-        if (!current || current.text !== row.text || ["speakerRef", "speakerLabel", "occurredAt"].some(key => Object.hasOwn(row, key)
-          && row[key as keyof VisibilityTurn] !== current[key as keyof VisibilityTurn])) continue;
-        if (await allowedTurn(tenantId, row.sessionId, row._id, row.text, true)) out.push(row);
-      }
-      return out;
-    }),
+    filterTurns: async <T extends VisibilityTurn>(tenantId: string, rows: readonly T[], options: FilterTurnsOptions = {}): Promise<T[]> => {
+      try {
+        assertValidTenantId(tenantId, "knowledge.visibility");
+        return await withDeadline(options.deadlineAt, () => filterBatch(tenantId, rows, options));
+      } catch (error) { if (error instanceof VisibilityDeadlineError || options.throwOnError) throw error; return []; }
+    },
     trustedTree: (tenantId, root) => guarded(null, async () => {
       assertValidTenantId(tenantId, "knowledge.visibility");
       if (root && (root.tenantId !== tenantId || root.node_id !== `tenant:${tenantId}` || root.level !== "tenant")) return null;

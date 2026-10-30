@@ -36,7 +36,9 @@
  * the alert already fired on as silent.
  */
 import { useCallback, useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { useAuth } from "../auth/AuthContext.js";
+import { useCanWrite } from "../auth/WriteScope.js";
 import { listWatchedSources, runWatchedSources, type WatchedSource, type WatchedSourcesRunSummary } from "../api/watched-sources.js";
 import { listMeetingCandidates } from "../api/meeting-candidates.js";
 import { getWatchState, type WatchStateResponse } from "../api/watch-state.js";
@@ -79,6 +81,7 @@ const CANDIDATE_REASON: Record<string, string> = {
 
 export function WatchPage(): React.ReactElement {
   const { apiKey } = useAuth();
+  const canWrite = useCanWrite();
   const [sources, setSources] = useState<WatchedSource[] | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [candidates, setCandidates] = useState<MeetingCandidate[] | null>(null);
@@ -144,7 +147,7 @@ export function WatchPage(): React.ReactElement {
       <div className="card">
         <div className="section-title" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
           <span>Watched sources</span>
-          <button type="button" onClick={handlePollNow} disabled={polling} data-testid="poll-now-button">
+          <button type="button" onClick={handlePollNow} disabled={!canWrite || polling} data-testid="poll-now-button">
             {polling ? "Polling…" : "Poll now"}
           </button>
         </div>
@@ -257,7 +260,7 @@ export function WatchPage(): React.ReactElement {
       <div className="section-title">Next up (read-only)</div>
       <p className="row-meta" style={{ marginTop: "-0.4rem" }}>
         Meetings that will be auto-recorded. There is no cancel or force here &mdash; use{" "}
-        <a href="/calendar">Calendar</a> to change a decision before it is acted on.
+        <Link to="/calendar">Calendar</Link> to change a decision before it is acted on.
       </p>
       {candidatesError && (
         <div className="empty-note" data-testid="watch-next-up-degraded">

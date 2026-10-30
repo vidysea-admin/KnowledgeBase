@@ -1,5 +1,9 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { AuthProvider } from "./auth/AuthContext.js";
+import { useEffect, type ReactNode } from "react";
+import { BrowserRouter, Navigate, Routes, Route, useLocation } from "react-router-dom";
+import { routerBasename } from "./config/runtime.js";
+import { AuthProvider, useAuth } from "./auth/AuthContext.js";
+import { WriteScope } from "./auth/WriteScope.js";
+import { accountsEnabled } from "./api/user-accounts.js";
 import { LoginGate } from "./auth/LoginGate.js";
 import { AppShell } from "./layout/AppShell.js";
 import { DashboardPage } from "./pages/DashboardPage.js";
@@ -35,6 +39,7 @@ import { KnowledgeExplorerPage } from "./pages/explorer/KnowledgeExplorerPage.js
 import { ConfidenceGraphPage } from "./pages/graph-confidence/ConfidenceGraphPage.js";
 import { KnowledgeGapsPage } from "./pages/gaps/KnowledgeGapsPage.js";
 import { ActivityHealthPage } from "./pages/activity-health/ActivityHealthPage.js";
+import { KnowledgeProfilesPage } from "./pages/knowledge/KnowledgeProfilesPage.js";
 import { AnalyticsPage } from "./pages/analytics/AnalyticsPage.js";
 import { JoinRulesPage } from "./pages/join-rules/JoinRulesPage.js";
 import { SetupWizardPage } from "./pages/setup-wizard/SetupWizardPage.js";
@@ -48,41 +53,51 @@ import { ExtractionReviewPage } from "./pages/extraction-review/ExtractionReview
 import { LabelReviewPage } from "./pages/label-review/LabelReviewPage.js";
 import { ChampionshipPage } from "./pages/championship/ChampionshipPage.js";
 import { ConnectorsPage } from "./pages/ConnectorsPage.js";
+import { LoginPage } from "./pages/user-accounts/LoginPage.js";
+import { SignupPage } from "./pages/user-accounts/SignupPage.js";
+import { CheckEmailPage } from "./pages/user-accounts/CheckEmailPage.js";
+import { VerifyPage } from "./pages/user-accounts/VerifyPage.js";
+import { ForgotPage } from "./pages/user-accounts/ForgotPage.js";
+import { ResetPage } from "./pages/user-accounts/ResetPage.js";
+import { PendingPage } from "./pages/user-accounts/PendingPage.js";
+import { AccountPage } from "./pages/user-accounts/AccountPage.js";
+import { UsersAdminPage } from "./pages/user-accounts/UsersAdminPage.js";
+import { UserDetailPage } from "./pages/user-accounts/UserDetailPage.js";
+import { AuditPage } from "./pages/user-accounts/AuditPage.js";
 
-export function App(): React.ReactElement {
+/** The signed-in app: shell + every page route (unchanged API-key pages plus the account pages). */
+function Shell(): React.ReactElement {
   return (
-    <AuthProvider>
-      <LoginGate>
-        <BrowserRouter>
-          <AppShell>
-            <Routes>
+    <AppShell>
+      <Routes>
               <Route path="/" element={<DashboardPage />} />
               <Route path="/operations" element={<OperationsPage />} />
               <Route path="/counsellor" element={<CounsellorPage />} />
-              <Route path="/calibration-review" element={<CalibrationReviewPage />} />
-              <Route path="/extraction-review" element={<ExtractionReviewPage />} />
-              <Route path="/label-review" element={<LabelReviewPage />} />
-              <Route path="/championship" element={<ChampionshipPage />} />
-              <Route path="/automation/forms" element={<ApplicationFormsPage />} />
+              <Route path="/calibration-review" element={<WriteScope><CalibrationReviewPage /></WriteScope>} />
+              <Route path="/extraction-review" element={<WriteScope><ExtractionReviewPage /></WriteScope>} />
+              <Route path="/label-review" element={<WriteScope><LabelReviewPage /></WriteScope>} />
+              <Route path="/championship" element={<WriteScope><ChampionshipPage /></WriteScope>} />
+              <Route path="/automation/forms" element={<WriteScope><ApplicationFormsPage /></WriteScope>} />
               <Route path="/sessions" element={<SessionsListPage enableFilters={import.meta.env.VITE_SESSIONS_FILTERS === "1"} />} />
               <Route path="/sessions/:id" element={<SessionDetailPage />} />
               <Route path="/ask" element={<PolicyAskPage />} />
-              <Route path="/answer-policy" element={<PolicyManager />} />
-              <Route path="/answer-policies" element={<PolicyManager />} />
-              <Route path="/answer-review" element={<AnswerReviewPage />} />
+              <Route path="/answer-policy" element={<WriteScope><PolicyManager /></WriteScope>} />
+              <Route path="/answer-policies" element={<WriteScope><PolicyManager /></WriteScope>} />
+              <Route path="/answer-review" element={<WriteScope><AnswerReviewPage /></WriteScope>} />
               <Route path="/knowledge/documents" element={<KnowledgeDocumentsPage />} />
               <Route path="/knowledge/documents/:id" element={<KnowledgeDocumentsPage />} />
               <Route path="/knowledge/documents/:id/pages/:page" element={<KnowledgeDocumentsPage />} />
-              <Route path="/knowledge/collections" element={<CuratedCollections />} />
+              <Route path="/knowledge/collections" element={<WriteScope><CuratedCollections /></WriteScope>} />
               <Route path="/knowledge/topics" element={<KnowledgeTopicsPage />} />
               <Route path="/knowledge/topics/:id" element={<KnowledgeTopicsPage />} />
               <Route path="/knowledge/resources" element={<KnowledgeResourcesPage />} />
+              <Route path="/knowledge/profiles" element={<KnowledgeProfilesPage />} />
               <Route path="/knowledge/speakers" element={<KnowledgeSpeakerProfilePage />} />
               <Route path="/knowledge/speakers/:personId" element={<KnowledgeSpeakerProfilePage />} />
-              <Route path="/knowledge-outputs" element={<KnowledgeOutputsPage />} />
-              <Route path="/accounts" element={<CounsellorAccountsPage />} />
-              <Route path="/automation" element={<AutomationPage />} />
-              <Route path="/connectors" element={<ConnectorsPage />} />
+              <Route path="/knowledge-outputs" element={<WriteScope><KnowledgeOutputsPage /></WriteScope>} />
+              <Route path="/accounts" element={<WriteScope><CounsellorAccountsPage /></WriteScope>} />
+              <Route path="/automation" element={<WriteScope><AutomationPage /></WriteScope>} />
+              <Route path="/connectors" element={<WriteScope><ConnectorsPage /></WriteScope>} />
               <Route path="/transcript-review" element={<TranscriptReviewPage />} />
               <Route path="/transcript-review/:id" element={<TranscriptReviewPage />} />
               <Route path="/search" element={<SearchPage />} />
@@ -97,21 +112,61 @@ export function App(): React.ReactElement {
               <Route path="/calendar" element={<CalendarPage />} />
               <Route path="/watch" element={<WatchPage />} />
               <Route path="/sources" element={<SourcesPage />} />
-              <Route path="/settings" element={<SettingsPage />} />
+              <Route path="/settings" element={<WriteScope><SettingsPage /></WriteScope>} />
               <Route path="/jobs" element={<JobsPage />} />
               <Route path="/claims" element={<ClaimsPage />} />
               <Route path="/status" element={<SystemStatusPage />} />
               <Route path="/setup" element={<SetupWizardPage />} />
               <Route path="/ops-health" element={<OpsHealthPage />} />
               <Route path="/notifications" element={<NotificationsPage />} />
-              <Route path="/ingest" element={<IngestPage />} />
+              <Route path="/ingest" element={<WriteScope><IngestPage /></WriteScope>} />
               <Route path="/meeting-bot" element={<MeetingBotPage />} />
               <Route path="/whatsapp" element={<WhatsAppPage />} />
               <Route path="/whatsapp/review/:id/source" element={<ReviewSourcePage />} />
+              <Route path="/account" element={<AccountPage />} />
+              <Route path="/admin/users" element={<UsersAdminPage />} />
+              <Route path="/admin/users/:id" element={<UserDetailPage />} />
+              <Route path="/admin/audit" element={<AuditPage />} />
             </Routes>
-          </AppShell>
-        </BrowserRouter>
-      </LoginGate>
+    </AppShell>
+  );
+}
+
+/** Signed-out visitors go to /login (remembering where they were); a pending account waits on /pending. */
+function AccountGate({ children }: { children: ReactNode }): ReactNode {
+  const { apiKey, accountState, restoring, lastUserId } = useAuth();
+  const location = useLocation();
+  if (restoring) return <p className="empty-note" role="status">Checking your session…</p>;
+  if (apiKey === null) return <Navigate to="/login" replace state={{ from: `${location.pathname}${location.search}`, fromUserId: lastUserId }} />;
+  if (accountState === "pending") return <Navigate to="/pending" replace />;
+  return children;
+}
+
+/** Account sign-in on (config.js `userAccounts: true`): public auth pages, then the gated app. The cookie session is restored once per page load. */
+function AccountRoutes(): React.ReactElement {
+  const { restoreSession } = useAuth();
+  useEffect(() => { void restoreSession(); }, [restoreSession]);
+  return (
+    <Routes>
+      <Route path="/login/key" element={<LoginGate><Navigate to="/" replace /></LoginGate>} />
+      <Route path="/login" element={<LoginPage />} />
+      <Route path="/signup" element={<SignupPage />} />
+      <Route path="/signup/check-email" element={<CheckEmailPage />} />
+      <Route path="/verify" element={<VerifyPage />} />
+      <Route path="/forgot" element={<ForgotPage />} />
+      <Route path="/reset" element={<ResetPage />} />
+      <Route path="/pending" element={<PendingPage />} />
+      <Route path="*" element={<AccountGate><Shell /></AccountGate>} />
+    </Routes>
+  );
+}
+
+export function App(): React.ReactElement {
+  return (
+    <AuthProvider>
+      <BrowserRouter basename={routerBasename}>
+        {accountsEnabled() ? <AccountRoutes /> : <LoginGate><Shell /></LoginGate>}
+      </BrowserRouter>
     </AuthProvider>
   );
 }

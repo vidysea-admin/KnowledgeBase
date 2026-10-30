@@ -15,7 +15,7 @@ export function renderOutputMarkdown(draft: OutputDraft): string {
       for (const id of item.citationIds) {
         const source = draft.citations.find((c) => c.id === id)!;
         lines.push(...source.quote.split(/\r\n|\r|\n/u).map((q) => `> ${markdownLiteral(q)}`), "",
-          `[${line(source.sessionId)} / ${line(source.turnId)}](${source.href}) · ${line(source.speakerLabel ?? source.speakerRef)} (${line(source.speakerRef)}) · ${source.occurredAt ? `Occurred at ${line(source.occurredAt)}` : `${source.start}–${source.end} ${source.unit}`}`, "");
+          `[${line(source.sessionId)} / ${line(source.turnId)}](${source.href}) · ${line(source.speakerLabel ?? source.speakerRef)} (${line(source.speakerRef)}) · ${source.occurredAt ? `Occurred at ${line(source.occurredAt)}` : `${source.start}–${source.end} ${source.unit}`}${source.claimStatus === "needs-review" ? " · Unverified (needs review)" : ""}`, "");
       }
     }
     if (section.missing) lines.push(line(section.missing), "");

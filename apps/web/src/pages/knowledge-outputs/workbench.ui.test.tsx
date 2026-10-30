@@ -18,8 +18,9 @@ test("UI creates, cites, saves, reopens, revalidates and exports through authent
   const requests: { url: string; method: string; body: unknown }[] = [];
   let draft = { _id: "o1", tenantId: "a", kind: "faq", title: "Admissions FAQ", purpose: "Prepare Monday applications", sessionIds: ["s1"], revision: 1,
     createdAt: "2026-10-14T12:00:00Z", updatedAt: "2026-10-14T12:00:00Z", sourceDigest: "fixture", sourceCoverage: { status: "ready", withheldClaims: 0 }, provider: "fixture", model: "fixture", reviewState: "draft",
-    sections: [{ key: "faq", title: "Questions and answers", missing: "", items: [{ id: "faq-1", kind: "fact", text: "Q: When?\nA: Monday.", citationIds: ["e1"], validation: "ai-supported", assessmentDigest: "fixture-http-only" }] }],
-    citations: [{ id: "e1", claimId: "c1", turnId: "t1", sessionId: "s1", speakerRef: "speaker:1", start: 3, end: 9, unit: "seconds", quote: "Applications open Monday.", href: "/sessions/s1#turn-t1" }] };
+    sections: [{ key: "faq", title: "Questions and answers", missing: "", items: [{ id: "faq-1", kind: "fact", text: "Q: When?\nA: Monday.", citationIds: ["e1", "e2"], validation: "ai-supported", assessmentDigest: "fixture-http-only" }] }],
+    citations: [{ id: "e1", claimId: "c1", turnId: "t1", sessionId: "s1", speakerRef: "speaker:1", start: 3, end: 9, unit: "seconds", quote: "Applications open Monday.", href: "/sessions/s1#turn-t1", claimStatus: "needs-review" },
+      { id: "e2", claimId: "c2", turnId: "t2", sessionId: "s1", speakerRef: "speaker:2", start: 10, end: 12, unit: "seconds", quote: "Forms are online.", href: "/sessions/s1#turn-t2", claimStatus: "verified" }] };
   globalThis.fetch = async (url, opts) => {
     const method = opts?.method ?? "GET", body = opts?.body ? JSON.parse(String(opts.body)) : undefined;
     assert.equal((opts?.headers as Record<string, string>).authorization, "Bearer fixture-key");
@@ -47,6 +48,10 @@ test("UI creates, cites, saves, reopens, revalidates and exports through authent
     fireEvent.click(screen.getByLabelText("Source session")); fireEvent.click(screen.getByRole("button", { name: "Generate draft" }));
     await screen.findByRole("button", { name: "Edit draft" });
     assert.equal(screen.getByRole("link", { name: /speaker:1/u }).getAttribute("href"), "/sessions/s1#turn-t1");
+    // D-201 [C3]: exactly the needs-review citation (e1) carries the marker; the verified one (e2) shows none.
+    assert.equal(screen.getAllByText("Unverified (needs review)").length, 1);
+    assert.match(screen.getByText("Applications open Monday.").closest("li")?.textContent ?? "", /Unverified \(needs review\)/u);
+    assert.doesNotMatch(screen.getByText("Forms are online.").closest("li")?.textContent ?? "", /Unverified/u);
     assert.match(screen.getByText(/Model grounding assessment completed/u).textContent ?? "", /human review required/u);
     fireEvent.click(screen.getByRole("button", { name: "Edit draft" }));
     fireEvent.change(screen.getByLabelText("Draft title"), { target: { value: "Updated admissions FAQ" } });

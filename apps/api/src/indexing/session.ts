@@ -268,8 +268,8 @@ async function indexSessionWithinPublication(
     : deps.embed
     ? await writeSessionChunks(tenantId, sessionId, turns, preparedEmbed ? async () => preparedEmbed! : deps.embed, db, true, chunkProvenance, chunkGeneration)
     : { written: 0, skipped: "no-embedder" as const };
-  // Disabled vector retrieval is intentional, so it must not create an embedding backlog.
-  await recordVectorGap(tenantId, sessionId, chunks, db, retrievalMode);
+  // Disabled vector retrieval is intentional (no backlog). ISS-122: capture the never-throwing gap write's outcome.
+  const gapRecorded = await recordVectorGap(tenantId, sessionId, chunks, db, retrievalMode);
   if (strict && (chunks.skipped || !chunks.written)) throw new Error("strict webinar index incomplete: required chunks not persisted");
   const [allSessions, allPages, existingRoot] = await Promise.all([
     sessionsColl(tenantId).find({}).toArray() as Promise<Sessions[]>,
@@ -309,7 +309,7 @@ async function indexSessionWithinPublication(
 
   const tileSpeakerSuggestions = await runTileSuggestHook(committed, deps.tileSuggest, tenantId, sessionId, turns, db as Db); // T-042 P9 / D-160 hook: gating + fail-soft in ./session-tile-suggest-hook.ts
 
-  return { sessionId, chunks, entities, ...(speakerSuggestions ? { speakerSuggestions } : {}), ...(tileSpeakerSuggestions ? { tileSpeakerSuggestions } : {}), summary: { degraded: summaryDegraded?.reason ?? null, ...(summarizeResult.dropped ? { dropped: summarizeResult.dropped.length } : {}) },
+  return { sessionId, chunks, entities, gapRecorded, ...(speakerSuggestions ? { speakerSuggestions } : {}), ...(tileSpeakerSuggestions ? { tileSpeakerSuggestions } : {}), summary: { degraded: summaryDegraded?.reason ?? null, ...(summarizeResult.dropped ? { dropped: summarizeResult.dropped.length } : {}) },
     claims: { degraded: claimsDegraded?.reason ?? null, ...(claimsResult.dropped ? { dropped: claimsResult.dropped.length } : {}) },
     ...(decisionsOut ? { decisions: decisionsOut } : {}), ...(topicReport ? { topics: topicReport } : {}),
     ...(grounded ? { groundedNotes: { claims: claimWrite ?? null, judge: judgeTotals(summarizeResult.judgeSidecar, claimsResult.judgeSidecar) ?? null } } : {}),

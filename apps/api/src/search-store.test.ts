@@ -31,68 +31,10 @@ import type { NativeSourceLocator } from "@lkb/core";
 import { createMongoSearchDeps, createNativeSearch } from "./search-store.js";
 import { createNativeEvidenceResolver, type NativeCurrentUnit } from "./native-evidence/resolver.js";
 import { headId } from "./transcript-review/store.js";
+import { buildTurnPrefilter } from "./search-prefilter.js";
+import { readSearchCandidateTurns } from "./transcript-review/search-reader.js";
 
-const SESSIONS = [
-  { _id: "s1", tenantId: "toc", sourceId: "src1", title: "New Zealand Visas", date: "2026-01-01", status: { transcribe: "done", index: "done" } },
-  { _id: "s2", tenantId: "toc", sourceId: "src2", title: "Funding and Forex", date: "2026-01-02", status: { transcribe: "done", index: "done" } },
-  { _id: "s3", tenantId: "toc", sourceId: "src3", title: "AI in Counselling", date: "2026-01-03", status: { transcribe: "done", index: "done" } },
-  // A different tenant's row, present so an unscoped query is DETECTABLE rather than merely wrong.
-  { _id: "s9", tenantId: "other", sourceId: "src9", title: "Other Tenant Session", date: "2026-01-04", status: { transcribe: "done", index: "done" } },
-];
-
-const CORPUS = [
-  { _id: "t1", tenantId: "toc", sessionId: "s1", speakerRef: "spk:0", tStart: 0, tEnd: 1, text: "New Zealand student visa approval rates for the 2026 intake." },
-  { _id: "t2", tenantId: "toc", sessionId: "s2", speakerRef: "spk:0", tStart: 0, tEnd: 1, text: "Education loan interest rates and forex markups of 2.5% at banks." },
-  { _id: "t3", tenantId: "toc", sessionId: "s1", speakerRef: "spk:0", tStart: 0, tEnd: 1, text: "Completely unrelated small talk about the weather today." },
-  { _id: "t4", tenantId: "toc", sessionId: "s3", speakerRef: "spk:0", tStart: 0, tEnd: 1, text: "AI is reshaping counselling workflows in 2026." },
-  { _id: "t5", tenantId: "toc", sessionId: "s3", speakerRef: "spk:0", tStart: 0, tEnd: 1, text: "Is it ok to go without a bank statement?" },
-  // Second 2026 turn in s1: makes "2026" a 3-hit / 2-session query, so session dedup is testable.
-  { _id: "t6", tenantId: "toc", sessionId: "s1", speakerRef: "spk:0", tStart: 0, tEnd: 1, text: "Deadlines for the 2026 September cohort close in March." },
-  // Another tenant's turn — an unscoped turns query would score and return this.
-  { _id: "t9", tenantId: "other", sessionId: "s9", speakerRef: "spk:0", tStart: 0, tEnd: 1, text: "Another tenant private 2026 visa transcript." },
-];
-
-interface Call { coll: string; op: "find" | "findOne"; filter: Record<string, unknown> }
-
-/** Applies a filter the way Mongo would, so id-keyed and tenant-keyed resolution are falsifiable.
- * The old fake ignored the filter entirely, which is why 5A/5C/5D could not be caught. */
-function matches(filter: Record<string, unknown>, doc: Record<string, unknown>): boolean {
-  const values = (value: unknown, keys: string[]): unknown[] => !keys.length ? [value] : Array.isArray(value)
-    ? value.flatMap((item) => values(item, keys)) : values(value && typeof value === "object" ? (value as Record<string, unknown>)[keys[0]!] : undefined, keys.slice(1));
-  return Object.entries(filter).every(([key, condition]) => {
-    if (key === "$or") return (condition as Record<string, unknown>[]).some((branch) => matches(branch, doc));
-    const found = values(doc, key.split("."));
-    if (condition && typeof condition === "object") {
-      const operators = condition as Record<string, unknown>;
-      if ("$in" in operators) return found.some((value) => (operators.$in as unknown[]).includes(value));
-      if ("$regex" in operators) return found.some((value) => typeof value === "string" && new RegExp(String(operators.$regex), String(operators.$options)).test(value));
-    }
-    return found.some((value) => value === condition);
-  });
-}
-
-function capturingDb(extra: { turns?: Record<string, unknown>[]; heads?: Record<string, unknown>[]; sources?: Record<string, unknown>[]; tree?: Record<string, unknown> } = {}) {
-  const calls: Call[] = [];
-  const data = { turns: structuredClone(extra.turns ?? CORPUS), sessions: structuredClone(SESSIONS),
-    sources: structuredClone(extra.sources ?? SESSIONS.map((session) => ({ _id: session.sourceId, tenantId: session.tenantId, kind: "recording", path: `offline-fixture/${session._id}` }))),
-    transcript_reviews: structuredClone(extra.heads ?? []), tree_index: extra.tree ? [extra.tree] : [] };
-  const rows = (name: string): Record<string, unknown>[] => name in data ? data[name as keyof typeof data] : [];
-  const db = {
-    collection: (name: string) => ({
-      find: (filter: Record<string, unknown>) => {
-        calls.push({ coll: name, op: "find", filter });
-        let limit = Number.POSITIVE_INFINITY;
-        const cursor = { limit(value: number) { limit = value; return cursor; }, toArray: async () => structuredClone(rows(name).filter((d) => matches(filter, d)).slice(0, limit)) };
-        return cursor;
-      },
-      findOne: async (filter: Record<string, unknown>) => {
-        calls.push({ coll: name, op: "findOne", filter });
-        return structuredClone(rows(name).find((d) => matches(filter, d)) ?? null);
-      },
-    }),
-  };
-  return { db: db as never, calls, data };
-}
+import { SESSIONS, CORPUS, capturingDb, matches, type Call } from "./search-cache/search-fixture.testsupport.js";
 
 /** ISS-078. Mirrors `indexing.test.ts`'s `assertAllCallsConfined`: EVERY query must carry the
  * tenantId, not only the ones a given test happened to look at. */
@@ -215,19 +157,69 @@ test("each hit's (turnId, sessionId) pair matches what the scorer actually ranke
   }
 });
 
-test("candidate turns load once; current-proof reads are explicit and final session labels stay deduplicated (ISS-080/085)", async () => {
+test("candidate turns load once; visibility is batched per distinct session, not per candidate (ISS-080/085, D-206 K1/K2)", async () => {
   const { db, calls } = capturingDb();
-  const hits = await createMongoSearchDeps({ db }).search("toc", "2026", 10);
+  const hits = await createMongoSearchDeps({ db, cacheTtlMs: 0 }).search("toc", "2026", 10);
   const distinct = new Set(hits.map((h) => h.sessionId)).size;
-  const turnsFinds = calls.filter((c) => c.coll === "turns" && c.op === "find").length;
+  const turnsFinds = calls.filter((c) => c.coll === "turns" && c.op === "find");
   const turnsFindOnes = calls.filter((c) => c.coll === "turns" && c.op === "findOne").length;
   const lookups = calls.filter((c) => c.coll === "sessions" && c.op === "findOne").length;
   assert.ok(hits.length > distinct, `precondition: need a repeated session (${hits.length} hits over ${distinct})`);
-  assert.equal(turnsFinds, 1, `${turnsFinds} turns.find calls — turns must load exactly once per request`);
-  // T007 verifies each candidate against a fresh physical/effective turn both before and
-  // inside source eligibility. These security reads replace the previous zero-read premise.
-  assert.equal(turnsFindOnes, 2 * hits.length, "current-turn proof must not be skipped or multiplied per label lookup");
-  assert.equal(lookups, hits.length + distinct, "one source context per candidate plus one final safe label per distinct session");
+  // One candidate load (the $or prefilter) and ONE batched live-turn proof (_id $in) for the whole slice: never a find per candidate.
+  assert.equal(turnsFinds.length, 2, `${turnsFinds.length} turns.find calls`);
+  assert.equal(turnsFinds.filter((c) => "$or" in c.filter).length, 1, "the candidate prefilter runs exactly once per request");
+  assert.equal(turnsFinds.filter((c) => c.filter._id !== undefined).length, 1, "live-turn proof is a single batched $in read");
+  assert.equal(turnsFindOnes, 0, "no per-candidate turns.findOne (the former N+1)");
+  assert.equal(lookups, 2 * distinct, "one source context per DISTINCT session plus one final safe label per distinct session");
+});
+
+test("K2: visibility is judged on the best-ranked slice only, not on every candidate", async () => {
+  // 120 matching turns in s1 (all visible) -> asking for k=3 must not prove all 120.
+  const many = Array.from({ length: 120 }, (_, i) => ({ _id: `m${i}`, tenantId: "toc", sessionId: "s1", speakerRef: "spk:0", tStart: i, tEnd: i + 1,
+    text: `scholarship ${"filler ".repeat(i % 5)}deadline ${i}` }));
+  const { db, calls } = capturingDb({ turns: many });
+  const hits = await createMongoSearchDeps({ db, cacheTtlMs: 0 }).search("toc", "scholarship deadline", 3);
+  assert.equal(hits.length, 3);
+  const proof = calls.find((c) => c.coll === "turns" && c.op === "find" && c.filter._id !== undefined)!;
+  const asked = ((proof.filter._id as { $in: string[] }).$in).length;
+  assert.ok(asked <= 24, `visibility proof covered ${asked} of 120 candidates; expected only the first slice`);
+});
+
+test("K2: hits removed by visibility are refilled from the next slice (bounded by the ranking, not by a cap)", async () => {
+  // s1 holds the 60 best-scoring turns and is WITHDRAWN; s2 holds weaker ones. k=3 must still return 3 hits from s2.
+  const top = Array.from({ length: 60 }, (_, i) => ({ _id: `a${i}`, tenantId: "toc", sessionId: "s1", speakerRef: "spk:0", tStart: i, tEnd: i + 1, text: "scholarship deadline" }));
+  const low = Array.from({ length: 5 }, (_, i) => ({ _id: `b${i}`, tenantId: "toc", sessionId: "s2", speakerRef: "spk:0", tStart: i, tEnd: i + 1, text: `scholarship only ${i}` }));
+  const sources = SESSIONS.map((session) => ({ _id: session.sourceId, tenantId: session.tenantId, kind: "recording", path: `x/${session._id}`,
+    ...(session._id === "s1" ? { consent: { given: false, recordedBy: "owner" } } : {}) }));
+  const { db } = capturingDb({ turns: [...top, ...low], sources });
+  const hits = await createMongoSearchDeps({ db, cacheTtlMs: 0 }).search("toc", "scholarship deadline", 3);
+  assert.deepEqual(hits.map((h) => h.turnId), ["b0", "b1", "b2"]);
+  assert.ok(hits.every((h) => h.sessionId === "s2"), "no row of the withdrawn session may surface, however well it ranks");
+});
+
+test("K2 equivalence: score-first returns exactly what filter-first returned, over random corpora with random exclusions", async () => {
+  let seed = 12345;
+  const rand = () => (seed = (seed * 1103515245 + 12345) & 0x7fffffff) / 0x7fffffff;
+  const words = ["visa", "loan", "uk", "canada", "ielts", "fees", "toronto", "cost", "living", "deadline", "intake", "masters"];
+  const { createKnowledgeVisibility: makeVisibility } = await import("./visibility/knowledge.js");
+  for (let round = 0; round < 25; round++) {
+    const turns = Array.from({ length: 90 }, (_, i) => ({ _id: `r${i}`, tenantId: "toc", sessionId: `s${1 + (i % 3)}`, speakerRef: "spk:0", tStart: i, tEnd: i + 1,
+      text: Array.from({ length: 2 + Math.floor(rand() * 5) }, () => words[Math.floor(rand() * words.length)]).join(" ") }));
+    const withdrawn = new Set(["s1", "s2", "s3"].filter(() => rand() < 0.4));
+    const sources = SESSIONS.map((session) => ({ _id: session.sourceId, tenantId: session.tenantId, kind: "recording", path: `x/${session._id}`,
+      ...(withdrawn.has(session._id) ? { consent: { given: false, recordedBy: "owner" } } : {}) }));
+    const { db } = capturingDb({ turns, sources });
+    const query = Array.from({ length: 1 + Math.floor(rand() * 4) }, () => words[Math.floor(rand() * words.length)]).join(" ");
+    const k = 1 + Math.floor(rand() * 12);
+    // Reference = the pre-D-206 algorithm: filter EVERY candidate, then score.
+    const prefilter = buildTurnPrefilter(query)!;
+    const candidates = await readSearchCandidateTurns(db, "toc", prefilter);
+    const visible = await makeVisibility(db).filterTurns("toc", candidates);
+    const expected = lexicalSearchTurns(query, visible.map((t) => ({ _id: t._id, sessionId: t.sessionId, text: t.text })), k);
+    const actual = await createMongoSearchDeps({ db, cacheTtlMs: 0 }).search("toc", query, k);
+    assert.deepEqual(actual.map((h) => [h.turnId, h.sessionId, h.score]), expected.map((h) => [h.turnId, h.sessionId, h.score]),
+      `round ${round} q=${JSON.stringify(query)} k=${k} withdrawn=${[...withdrawn]}`);
+  }
 });
 
 test("a query with no usable tokens issues no database query at all", async () => {

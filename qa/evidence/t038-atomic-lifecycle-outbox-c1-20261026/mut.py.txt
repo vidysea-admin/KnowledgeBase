@@ -1,0 +1,8 @@
+import sys
+f, old, new = sys.argv[1], sys.argv[2], sys.argv[3]
+s = open(f, encoding='utf-8', newline='').read()
+nl = '\r\n' if '\r\n' in s else '\n'
+old = old.replace('\n', nl); new = new.replace('\n', nl)
+assert s.count(old) == 1, ('count', s.count(old))
+open(f, 'w', encoding='utf-8', newline='').write(s.replace(old, new))
+print('mutated', f)

@@ -43,7 +43,9 @@ export function loadWebinarSession(dir, sessionId, readBytes = readFileSync) {
   const read = (name) => JSON.parse(readBytes(file(name), "utf8"));
   const sourceBytes = readBytes(file('source.json'));
   const source = JSON.parse(sourceBytes.toString('utf8'));
-  if (!source.tenantId || !source._id || !source.title || source.audioLevel?.silent) throw new Error("invalid/silent webinar source");
+  // D-207: a toc-migrated provided document has no `title` in source.json; its session.json states it. Narrow on purpose.
+  const legacy = source.tenantId && source._id && !source.title ? providedSessionRow(dir, sessionId, source, read) : undefined;
+  if (!source.tenantId || !source._id || !(source.title || legacy) || source.audioLevel?.silent) throw new Error("invalid/silent webinar source");
   const validation = existsSync(join(dir, "validation.json")) ? read("validation.json") : undefined;
   if (validation && Object.hasOwn(validation, 'sourceSha256') &&
       (typeof validation.sourceSha256 !== 'string' || !/^[0-9a-f]{64}$/.test(validation.sourceSha256) || validation.sourceSha256 !== sha(sourceBytes))) {
@@ -130,13 +132,22 @@ export function loadWebinarSession(dir, sessionId, readBytes = readFileSync) {
     throw new Error("invalid turns or session/tenant identity mismatch");
   }
   const meta = existsSync(join(dir, "meta.json")) ? read("meta.json") : {
-    tenantId: source.tenantId, title: source.title, date: source.createdAt?.slice(0, 10),
-    t0: source.createdAt, platform: source.platform ?? "unknown", hostOrg: "Unresolved",
+    tenantId: source.tenantId, title: source.title ?? legacy?.title, date: legacy?.date ?? source.createdAt?.slice(0, 10),
+    t0: legacy ? `${legacy.date}T00:00:00.000Z` : source.createdAt, platform: source.platform ?? "unknown", hostOrg: legacy?.org ?? "Unresolved",
     people: [], orgs: [], countries: {}, topics: {},
-    capturedBy: { id: "user:vidysea-webinar-capture", via: source.captureMode ?? "provided" },
+    capturedBy: legacy ? { via: "provided" } : { id: "user:vidysea-webinar-capture", via: source.captureMode ?? "provided" },
+    ...(legacy ? { org: legacy.org, sessionStatus: legacy.status } : {}),
   };
   if (meta.tenantId !== source.tenantId || !meta.date || !Number.isFinite(Date.parse(meta.t0))) throw new Error("invalid metadata identity/date");
-  return { source, rawTurns, meta, screenEvidence, notes };
+  return { source, rawTurns, meta, screenEvidence, notes, legacyProvided: Boolean(legacy) };
+}
+
+/** D-207: session.json of a migrated provided-document session, only when it matches this source exactly (never invents a title). */
+function providedSessionRow(dir, sessionId, source, read) {
+  if (source.captureMode !== "provided" || source.captureConsent || source.audioLevel || !existsSync(join(dir, "session.json"))) return undefined;
+  const row = read("session.json");
+  return row?._id === sessionId && row.tenantId === source.tenantId && row.sourceId === source._id && typeof row.title === "string" && row.title.trim() &&
+    /^\d{4}-\d{2}-\d{2}$/.test(row.date ?? "") && Number.isFinite(Date.parse(`${row.date}T00:00:00Z`)) ? row : undefined;
 }
 
 export async function replaceSessionRows(scoped, scope, docs, gen) {
@@ -187,4 +198,83 @@ export function buildSessionFiles({ sessionId, tenantId, sessionDoc, meta, turns
   if (evidence.length === 0) throw new Error("buildSessionFiles: no transcript evidence");
   const sessionPage = { _id: `${sessionId}-page`, tenantId, sessionId, summary, keyInsights, evidence };
   return { session, sessionPage, claims: [] };
+}
+
+/** D-207: the same completeness gate prepareWebinarIndexProof applies, for sessions that have no capture artifacts to prove
+ *  (migrated provided documents, index-existing). Throws "index incomplete: <every reason>"; returns the result when complete. */
+export function assertIndexComplete(res, sessionId, expectedTurns) {
+  const c = res?.completion, why = [];
+  if (!c) why.push("no completion");
+  else {
+    if (c.version !== 2 || c.strict !== true || c.complete !== true) why.push("completion not complete or not strict");
+    if (expectedTurns !== undefined && c.turnCount !== expectedTurns) why.push(`indexed ${c.turnCount} turns, expected ${expectedTurns}`);
+    if (c.treeWritten !== true) why.push("tree not written");
+    if (!c.generation || !Number.isInteger(c.turnCount) || c.turnCount <= 0) why.push("no generation/turn count");
+    const mode = c.retrievalMode;
+    if (!(mode === "vectorless" ? c.lexicalWritten === true && c.provenanceValidated === true : mode === undefined || mode === "vector")) why.push("retrieval mode not ready");
+  }
+  if (res?.sessionId !== sessionId) why.push("session id mismatch");
+  if (res?.summary?.degraded) why.push(`summary degraded: ${res.summary.degraded}`);
+  if (res?.claims?.degraded) why.push(`claims degraded: ${res.claims.degraded}`);
+  if (res?.chunks?.skipped || !(res?.chunks?.written > 0)) why.push(`chunks not written${res?.chunks?.skipped ? ` (skipped: ${res.chunks.skipped})` : ""}`);
+  if (why.length) throw new Error(`index incomplete: ${why.join("; ")}`);
+  return res;
+}
+
+/** D-207: the previous failures were only a state flag (indexAttempt.state=failed, phase=preflight) with no reason. indexAttempt is a
+ *  closed schema, so the reason goes on a sibling `indexFailure` field of the session row (sessions allow extra fields). */
+export async function recordIndexFailure(sessionsScoped, sessionId, error, via = "sync-session") {
+  const reason = String(error instanceof Error ? error.message : error).replace(/mongodb(?:\+srv)?:\/\/\S+/gi, "mongodb://[redacted]").replace(/(?:sk|pk|key|AIza)[-_][A-Za-z0-9_-]{12,}|Bearer\s+\S+|(?:api[_-]?key|key|token|secret|password)=\S+/gi, "[redacted]").replace(/\s+/g, " ").slice(0, 1000);
+  const attempt = (await sessionsScoped.findOne({ _id: sessionId }))?.indexAttempt;
+  const doc = { at: new Date().toISOString(), via, reason, ...(attempt ? { generation: attempt.generation, state: attempt.state, phase: attempt.phase } : {}) };
+  await sessionsScoped.updateOne({ _id: sessionId }, { $set: { indexFailure: doc } });
+  return doc;
+}
+export const clearIndexFailure = (sessionsScoped, sessionId) => sessionsScoped.updateOne({ _id: sessionId }, { $unset: { indexFailure: "" } });
+
+/** D-207: --index-existing. Index a session whose rows are ALREADY in the target database (no local directory): verify they exist,
+ *  run the injected indexer (production: buildIndexer, as sync-session.mjs runs it after a sync), record why on failure. Writes nothing
+ *  but what the indexer writes and the indexFailure field; it never creates or replaces session/source/turn rows. */
+export async function indexExistingRows({ tenantId, sessionId, workDb, sessions, sources, turns, indexer, log = console.log }) {
+  const session = await sessions.findOne({ _id: sessionId });
+  if (!session) throw new Error(`index-existing: session ${sessionId} (tenant ${tenantId}) not found in ${workDb}; nothing indexed`);
+  const source = session.sourceId ? await sources.findOne({ _id: session.sourceId }) : null;
+  if (!source) throw new Error(`index-existing: source ${session.sourceId} of session ${sessionId} not found in ${workDb}; nothing indexed`);
+  if (source.testData === true && workDb !== "lkb_staging") throw new Error("index-existing: testData source: refusing to index it anywhere but lkb_staging");
+  const count = await turns.countDocuments({ sessionId });
+  if (!count) throw new Error(`index-existing: session ${sessionId} has no turns in ${workDb}; nothing indexed`);
+  const prior = session.indexAttempt;
+  log(`  existing rows in ${workDb}: turns ${count}, status.index ${session.status?.index}, prior attempt ${prior ? `${prior.state}/${prior.phase}` : "none"}${session.indexFailure ? `, last failure: ${session.indexFailure.reason}` : ""}`);
+  try {
+    const res = assertIndexComplete(await indexer(tenantId, sessionId), sessionId, count);
+    await clearIndexFailure(sessions, sessionId).catch(() => undefined); // a cosmetic marker must not turn a completed index into a failure
+    return res;
+  } catch (error) {
+    await recordIndexFailure(sessions, sessionId, error, "index-existing").catch(() => undefined);
+    throw error;
+  }
+}
+
+/** D-207: the production indexing step every path shares (sync --index and --index-existing): buildIndexer exactly as the live ingest binds it. */
+export async function productionIndexer({ root, groundedNotes }) {
+  const { buildIndexer } = await import("../../apps/api/src/composition/production.ts");
+  const { configuredNativeArchiveService } = await import("../native-capture/server.ts");
+  const { getDb } = await import("../../packages/db/src/client.js");
+  const nativeArchive = await configuredNativeArchiveService(process.env, getDb(), root);
+  if (nativeArchive) await nativeArchive.drain({ limit: 100 });
+  return buildIndexer(undefined, { strictWebinar: true,
+    ...(nativeArchive ? { onIndexCommitted: binding => nativeArchive.onIndexCommitted(binding) } : {}),
+    ...(groundedNotes ? { groundedNotes: true } : {}) });
+}
+
+/** D-207: connect to the already-guarded target (sync-session.mjs ran guardDatabase), index the existing rows, always close. */
+export async function indexExistingInDb({ target, workDb, tenantId, sessionId, root, groundedNotes }) {
+  const { connect, close, getDb } = await import("../../packages/db/src/client.js");
+  const { scopedCollection } = await import("../../packages/db/src/lib/tenantScope.js");
+  try {
+    await connect(target.url, target.dbName);
+    const coll = (name) => scopedCollection(getDb(), name)(tenantId);
+    return await indexExistingRows({ tenantId, sessionId, workDb, sessions: coll("sessions"), sources: coll("sources"), turns: coll("turns"),
+      indexer: async (t, s) => (await productionIndexer({ root, groundedNotes }))(t, s) });
+  } finally { await close(); }
 }

@@ -1,6 +1,6 @@
 # w23-onairbind: ISS-T045WORKER-002 OnAir session authority binding
 
-Status: ready-for-check
+Status: checked-PASS — closed out 2026-10-26 (resume reconcile) citing qa/verdicts/w23-onairbind.md
 Fix cycle: 0
 Lane: C:\Users\product\Desktop\KnowledgeBase-lanes\w23-onairbind (lane/w23-onairbind)
 Base SHA: 3c99337fb64188bc5ed94b2f058ecf92c8823864

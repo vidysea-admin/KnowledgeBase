@@ -29,7 +29,8 @@ function fieldMatches(actual: unknown, want: unknown): boolean {
         case "$ne": return arg === null ? actual !== undefined && actual !== null : actual !== arg;
         case "$gt": return typeof actual === "string" && typeof arg === "string" && actual > arg;
         case "$in": return (arg as unknown[]).some((w) => fieldMatches(actual, w));
-        case "$regex": return typeof actual === "string" && new RegExp(String(arg)).test(actual);
+        case "$regex": return typeof actual === "string" && new RegExp(String(arg), String(want.$options ?? "")).test(actual);
+        case "$options": return true; // consumed by $regex
         case "$exists": return (actual !== undefined) === Boolean(arg);
         default: return false;
       }
@@ -40,7 +41,8 @@ function fieldMatches(actual: unknown, want: unknown): boolean {
   return actual === want;
 }
 const at = (row: Row, path: string): unknown => path.split(".").reduce<unknown>((v, k) => (isObj(v) ? v[k] : undefined), row);
-const matches = (row: Row, filter: Record<string, unknown>) => Object.entries(filter).every(([k, v]) => fieldMatches(at(row, k), v));
+const matches = (row: Row, filter: Record<string, unknown>): boolean => Object.entries(filter).every(([k, v]) =>
+  k === "$or" ? (v as Record<string, unknown>[]).some((branch) => matches(row, branch)) : fieldMatches(at(row, k), v));
 /** Dotted-path `$set` / `$unset`, as the indexing attempt claim uses them (`"status.index"`). */
 function applyUpdate(row: Row, update: { $set?: Row; $unset?: Row }): void {
   const walk = (path: string, write: (parent: Row, key: string) => void) => {
@@ -94,9 +96,9 @@ export class BlindDb {
         for (const o of ops) replace(coll, o.replaceOne.filter, o.replaceOne.replacement, o.replaceOne.upsert === true, "bulkWrite");
         return { acknowledged: true };
       },
-      find: (filter: Record<string, unknown> = {}) => ({ toArray: async () => {
-        const rows = (self.data[coll] ?? []).filter((r) => matches(r, filter)); rec(coll, "find", filter, rows.length); return structuredClone(rows);
-      } }),
+      find: (filter: Record<string, unknown> = {}) => { let max = Number.POSITIVE_INFINITY; const cursor = { limit(n: number) { max = n; return cursor; }, toArray: async () => {
+        const rows = (self.data[coll] ?? []).filter((r) => matches(r, filter)).slice(0, max); rec(coll, "find", filter, rows.length); return structuredClone(rows);
+      } }; return cursor; },
       findOne: async (filter: Record<string, unknown> = {}) => {
         const row = (self.data[coll] ?? []).find((r) => matches(r, filter)) ?? null; rec(coll, "findOne", filter, row ? 1 : 0);
         return row ? structuredClone(row) : null;

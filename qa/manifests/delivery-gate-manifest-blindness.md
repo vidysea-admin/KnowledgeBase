@@ -16,7 +16,7 @@ pending state and no `ScheduleWakeup` was made — the machine form of THE CONTI
 because the loop once died every turn while believing it was self-continuing.
 
 **It could not see the handshake it exists to guard.** Its manifest predicate is
-`Status:\s*ready-for-check`, which **cannot match `**Status:** ready-for-check`** — after the colon
+`Status:\s*ready-for-check`, which **cannot match `**Status:** superseded-by ai_os ISS-416 Get-ManifestStatus rewrite (delivery-gate-stop.ps1:57-73); ISS-205 remains a fold-in for the next unit touching that block`** — after the colon
 comes `**`, and `\s*` will not consume it. That is the form **15** of this repo's manifests use.
 
 Measured against the live tree: the gate reported **1** pending check while **2** manifests sat
@@ -32,7 +32,7 @@ block for the first defect, not reported by anyone.
 ## The fixtures encoded the same blind spot
 
 `hook-fixtures.ps1:102` — and every other maker fixture — writes the **unbolded**
-`## Status: ready-for-check`, which is the one form the old regex could see. **The suite was green
+`## Status: superseded-by ai_os ISS-416 Get-ManifestStatus rewrite (delivery-gate-stop.ps1:57-73); ISS-205 remains a fold-in for the next unit touching that block`, which is the one form the old regex could see. **The suite was green
 because the tests shared the bug.** That is why a gate this repo depends on shipped blind: it was
 never tested against the shape its own project actually writes.
 
@@ -44,7 +44,7 @@ never tested against the shape its own project actually writes.
 | `D:/ai_os/.claude/hooks/tests/hook-fixtures.ps1` | +2 fixtures: the bolded form, and a 3-cycle verdict. |
 
 Stripping emphasis *and then* anchoring to line start is deliberate: stripping alone would make the
-gate match prose that merely **quotes** `Status: ready-for-check` — which close-out sections in this
+gate match prose that merely **quotes** `Status: superseded-by ai_os ISS-416 Get-ManifestStatus rewrite (delivery-gate-stop.ps1:57-73); ISS-205 remains a fold-in for the next unit touching that block` — which close-out sections in this
 repo do — turning a blind gate into a noisy one.
 
 ## How to verify
@@ -205,7 +205,7 @@ I invited a FAIL on Gap 4 and it landed. The checker cleared the other predicate
 `delivery-gate-stop.ps1` — they parse transcript JSONL, not markdown, so *"checked, not affected"* —
 but found the class alive in the two sibling hooks:
 
-- `mc-sessionstart.ps1:15` and `mc-precommit.ps1:43` still use the bare `Status: ready-for-check`
+- `mc-sessionstart.ps1:15` and `mc-precommit.ps1:43` still use the bare `Status: superseded-by ai_os ISS-416 Get-ManifestStatus rewrite (delivery-gate-stop.ps1:57-73); ISS-205 remains a fold-in for the next unit touching that block`
 - `mc-sessionstart.ps1:19` still ends in `Select-Object -First 1`
 
 **Live effect, measured this session:** the SessionStart directive reported

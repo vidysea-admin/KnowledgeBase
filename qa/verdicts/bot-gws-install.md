@@ -1,0 +1,32 @@
+# Verdict: bot-gws-install
+VERDICT: PASS
+Cycle checked: 0
+Commit checked: 330383cc (code 86234755; base 82b9b177), coordinator A
+Policy-Version: proportional-verification/2026-10-19.17
+
+Check plan: rebuild the image myself from the checked tree and run each criterion, one falsification per criterion in a copy of the blobs, adversarial pass on the credential path (VNC password) and the build trust root (sha256 pin). No live provider, no .env, no push.
+
+SCOREBOARD: 4/4 criteria met
+TIER: L (docker build files and the image test only; no product source under packages/ or scripts/)
+FAILURES: none
+CAPABILITY-COVERAGE: not-applicable (no portal or capability rows)
+LIVE-BROWSER: not-applicable (changed paths: docker/, docker-compose.yml, .env.example)
+ISSUES-WRITTEN: none (one proposed issue below, credential-handling class, filed by the coordinator at its discretion)
+EXECUTOR: claude-sonnet-subagent (checker: claude-sonnet-subagent)
+
+## EXPLANATION
+- Identity: `git diff 82b9b177..HEAD` touches exactly Dockerfile, entrypoint.sh, image.test.mjs, docker-compose.yml, .env.example plus the manifest; I built bot-gws-install:chkA from this worktree with no build-args (exit 0; layers cached from the maker's earlier build, including the gws RUN step whose text carries the pinned URL and digest, so the cache hit proves the same command). `git status` clean in the worktree after all checks.
+- C1: plain build exit 0; `docker run --rm --entrypoint gws chkA --version` -> `gws 0.22.5`, exit 0; `LKB_GWS_PATH=/usr/local/bin/gws`; /usr/local/bin/gws mode 0755; uid 1000. `docker compose --profile bot config` with the bot args unset forwards no GWS args (Dockerfile pins apply); `GWS_URL=zzz` is forwarded as `args: GWS_URL: zzz`.
+- C2: `--build-arg GWS_SHA256=000...0` (real URL) -> exit 1, `/tmp/gws.archive: FAILED` at the gws step, no image tagged. `--build-arg GWS_URL=` -> exit 1 "GWS_URL and GWS_SHA256 must both be set". `--build-arg GWS_SHA256=` -> same message, exit 1. No skip branch remains (static test asserts no "gws not installed"). The wrong-sha build downloaded the pinned asset from github once (the step is a cache miss with a changed arg).
+- C3: `-e BOT_MODE=doctor -e NODE_OPTIONS=--require=/nonexistent.js` (MSYS_NO_PATHCONV=1 so the path was not mangled) on the new image -> "doctor failed (exit 1)", exit 1. Same command on the pre-fix image lkb-bot-u1:test -> exit 0 (fail-open reproduced). Healthy `-e BOT_MODE=doctor` on the new image -> exit 0 with no MISSING line.
+- C4: login mode container (VNC_PASSWORD test value, run detached): `ps` shows `x11vnc ... -passwdfile rm:/tmp/runtime-node/vnc.pass`; a search of every /proc/*/cmdline for the password (own pid excluded) returns 0 hits; /tmp/runtime-node holds only `pulse` (pass file deleted after reading); RFB handshake offers security types [1, 2] (count 1, type 2 = VNC authentication), so authentication is enforced; Chrome (pid 7) has no VNC_PASSWORD in its environ.
+- Image-gated tests: `BOT_IMAGE=bot-gws-install:chkA LKB_DOCKER_TESTS=1 node --test docker/meeting-bot/image.test.mjs` -> 10 pass, 0 fail, 0 skipped. Static run without the image: 7 pass, 3 skipped.
+- Falsification (copy of the HEAD blobs in the scratchpad, per-mutation byte backup, restore from that mutation's own backup, `git hash-object --no-filters` equals `git rev-parse HEAD:<file>` after each; 90 s timeout; test file run alone; baseline 7 pass 0 fail): C1 `ARG GWS_SHA256=<hex>` -> `ARG GWS_SHA256=`: 6 pass 1 fail, KILLED. C2 `sha256sum -c -` -> `sha256sum -b -`: 6/1, KILLED. C3 doctor line -> `| tee /tmp/doctor.log` (the original defect): 6/1, KILLED. C4 `-passwdfile "rm:$VNC_PASSFILE"` -> `-passwd "$VNC_PASSWORD"`: 6/1, KILLED. All four restores HASH-OK. Note: a first attempt using `git archive` output hashed differently (archive applies eol conversion); I discarded it and used `git show` blobs, so the restore check compared like with like.
+- Observation on C4 scope (the reason for the proposed issue): the entrypoint unsets VNC_PASSWORD only inside the login branch, after pulseaudio and Xvfb have started and after x11vnc forks. Enumerating /proc/*/environ in the running login container, the variable is still present in tini (pid 1), pulseaudio (14), Xvfb (24) and x11vnc (34). Chrome and anything spawned later is clean, which is what the manifest claims and what the criterion's argv requirement needs; the manifest already discloses pid 1. Not treated as a criterion failure, because the criterion's argv, 0600-file, auth and Chrome-env requirements all hold and same-uid environ reads are disclosed as accepted for the operator-run, loopback-published login container.
+- Floor: static contract passes; manifest-reported lint:structure and snapshot --check not re-run by me (config/image files only, no source or docs/schema touched).
+- Not covered by me: a real VNC client session, a real meeting join, gws authentication (human step), an offline rebuild (the apt layer is cached but the sole new network use was the single wrong-sha download above).
+
+PROPOSED-ISSUE: {"sev":"low","unit":"bot-gws-install","file":"docker/meeting-bot/entrypoint.sh:35-44","title":"VNC_PASSWORD stays in the environ of pulseaudio, Xvfb and x11vnc in login mode","detail":"unset VNC_PASSWORD runs after pulseaudio -D, Xvfb and x11vnc have been started, so /proc/14/environ, /proc/24/environ and /proc/34/environ (and tini pid 1) still contain it; only Chrome and later children are clean. Readable by same-uid processes (Chrome runs as the same uid, and is no-sandbox when LKB_CHROME_NO_SANDBOX=1). Credential-handling class.","fix_direction":"in login mode read the value into the pass file and unset it at the top of the script, before pulseaudio and Xvfb start (or start the daemons with env -u VNC_PASSWORD); pid 1 will still hold it unless the container is started with a pass-file mount instead of an env var."}
+PROPOSED-ISSUE: {"sev":"low","unit":"bot-gws-install","file":"docker/meeting-bot/entrypoint.sh:38-41","title":"pass file is not removed if x11vnc fails to start","detail":"rm: deletion happens only when x11vnc reads the file; if it exits early under set -e, vnc.pass (0600, in the 0700 runtime dir) remains until the container is removed. Ledger only.","fix_direction":"trap or explicit rm -f of $VNC_PASSFILE on the failure path."}
+
+Metrics: check_min=28 mutants=4 policy=proportional-verification/2026-10-19.17 cycle=0 suite_runs=3 repeat_runs=0 tokens=unavailable

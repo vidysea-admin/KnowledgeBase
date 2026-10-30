@@ -4,6 +4,7 @@
  * (join-rules-normalize.ts). apps/web may not import packages/meeting-bot, so the rules are re-stated here;
  * this is a CONVENIENCE for the form only. The server re-validates and stays the authority.
  */
+import { validateJoinRuleSet } from "../../../../../packages/ingest/src/join-policy/join-rules.js";
 import { safePublicResourceUrl } from "../../safe-url.js";
 import { JOIN_RULES_ENFORCED } from "./enforcement.js";
 export const PLATFORMS = ["meet", "teams", "zoom", "webex", "zoho", "cloudonair", "unknown"] as const;
@@ -11,10 +12,11 @@ export type Platform = typeof PLATFORMS[number];
 export type Effect = "allow" | "deny";
 export type Scope = "internal" | "external";
 
-export interface RuleMatch { email?: string; domain?: string; subdomains?: boolean; platform?: Platform; scope?: Scope }
+export interface RuleMatch { email?: string; domain?: string; subdomains?: boolean; platform?: Platform; scope?: Scope; titleIncludes?: string[]; descriptionIncludes?: string[]; purposeAny?: string[] }
 export interface Rule { id: string; effect: Effect; match: RuleMatch }
-export interface RuleSet { version: 1; ownDomains: string[]; rules: Rule[] }
-export interface RuleState { approvedSenders: string[]; approvedDomains: string[]; optedOutEventIds: string[] }
+export interface PurposeGroup { id: string; titleIncludes?: string[]; descriptionIncludes?: string[] }
+export interface RuleSet { version: 1; ownDomains: string[]; rules: Rule[]; attendanceMode?: "all" | "rules"; purposeGroups?: PurposeGroup[] }
+export interface RuleState { approvedSenders: string[]; approvedDomains: string[]; optedOutEventIds: string[]; optedOutMeetings?: string[] }
 export interface JoinRulesView { ruleSet: RuleSet; state: RuleState }
 
 /** Request-size cap of the API (express.json default 100 kB). */
@@ -37,25 +39,30 @@ export function normalizeEmail(value: string): string | undefined {
 }
 
 /** Editable form of a rule: every matcher is a string so a half-typed value is representable. */
-export interface RuleDraft { key: number; id: string; effect: Effect; email: string; domain: string; subdomains: boolean; platform: "" | Platform; scope: "" | Scope }
-export interface DraftSet { ownDomains: string; rules: RuleDraft[] }
+export interface RuleDraft { key: number; id: string; effect: Effect; email: string; domain: string; subdomains: boolean; platform: "" | Platform; scope: "" | Scope; titleIncludes?: string; descriptionIncludes?: string; purposeAny?: string }
+export interface PurposeDraft { key: number; id: string; titleIncludes: string; descriptionIncludes: string }
+export interface DraftSet { ownDomains: string; rules: RuleDraft[]; attendanceMode?: "" | "all" | "rules"; purposeGroups?: PurposeDraft[] }
 
 export function draftFromRuleSet(set: RuleSet): DraftSet {
   return {
     ownDomains: set.ownDomains.join("\n"),
+    attendanceMode: set.attendanceMode ?? "",
+    purposeGroups: set.purposeGroups?.map((g, key) => ({key, id:g.id, titleIncludes:g.titleIncludes?.join("\n") ?? "", descriptionIncludes:g.descriptionIncludes?.join("\n") ?? ""})),
     rules: set.rules.map((r, key) => ({
       key, id: r.id, effect: r.effect, email: r.match.email ?? "", domain: r.match.domain ?? "", subdomains: r.match.subdomains !== false,
       platform: r.match.platform ?? "", scope: r.match.scope ?? "",
+      titleIncludes: r.match.titleIncludes?.join("\n") ?? "", descriptionIncludes:r.match.descriptionIncludes?.join("\n") ?? "", purposeAny:r.match.purposeAny?.join("\n") ?? "",
     })),
   };
 }
 
 export function newRuleDraft(key: number, n: number): RuleDraft {
-  return { key, id: `rule-${n}`, effect: "allow", email: "", domain: "", subdomains: true, platform: "", scope: "" };
+  return { key, id: `rule-${n}`, effect: "allow", email: "", domain: "", subdomains: true, platform: "", scope: "", titleIncludes:"", descriptionIncludes:"", purposeAny:"" };
 }
 
 /** Builds the request body: ONLY version, ownDomains, rules. Never a tenant, never state. */
 export function ruleSetFromDraft(draft: DraftSet): RuleSet {
+  const lines = (s?: string) => (s ?? "").split(/\r?\n/).map(s => s.trim()).filter(Boolean);
   const ownDomains = draft.ownDomains.split(/\r?\n/).map(s => s.trim()).filter(s => s !== "");
   const rules = draft.rules.map((r): Rule => {
     const match: RuleMatch = {};
@@ -63,9 +70,15 @@ export function ruleSetFromDraft(draft: DraftSet): RuleSet {
     if (r.domain.trim() !== "") { match.domain = r.domain.trim(); if (!r.subdomains) match.subdomains = false; }
     if (r.platform !== "") match.platform = r.platform;
     if (r.scope !== "") match.scope = r.scope;
+    for (const field of ["titleIncludes", "descriptionIncludes", "purposeAny"] as const) {
+      const values = lines(r[field]); if (values.length) match[field] = values;
+    }
     return { id: r.id, effect: r.effect, match };
   });
-  return { version: 1, ownDomains, rules };
+  return { version: 1, ownDomains, rules, ...(draft.attendanceMode ? {attendanceMode:draft.attendanceMode} : {}),
+    ...(draft.purposeGroups !== undefined ? {purposeGroups:draft.purposeGroups.map(g => ({id:g.id,
+      ...(lines(g.titleIncludes).length ? {titleIncludes:lines(g.titleIncludes)} : {}),
+      ...(lines(g.descriptionIncludes).length ? {descriptionIncludes:lines(g.descriptionIncludes)} : {})}))} : {}) };
 }
 
 /** The engine's refusals, as readable messages. An empty array means the client sees nothing wrong. */
@@ -82,8 +95,8 @@ export function validateRuleSetClient(set: RuleSet): string[] {
     seen.add(r.id);
     if (r.effect !== "allow" && r.effect !== "deny") errors.push(`${p}: choose allow or deny.`);
     const m = r.match;
-    if (m.email === undefined && m.domain === undefined && m.platform === undefined && m.scope === undefined) {
-      errors.push(`${p}: needs at least one matcher (sender, domain, platform or internal/external). A rule with no matcher is refused.`);
+    if (m.email === undefined && m.domain === undefined && m.platform === undefined && m.scope === undefined && m.titleIncludes === undefined && m.descriptionIncludes === undefined && m.purposeAny === undefined) {
+      errors.push(`${p}: needs at least one matcher (sender, domain, platform, internal/external, phrases or purpose). A rule with no matcher is refused.`);
     }
     if (m.email !== undefined && !normalizeEmail(m.email)) errors.push(`${p}: sender "${m.email}" is not a valid email address.`);
     if (m.domain !== undefined && !normalizeDomain(m.domain)) {
@@ -94,6 +107,8 @@ export function validateRuleSetClient(set: RuleSet): string[] {
     if (m.scope !== undefined && m.scope !== "internal" && m.scope !== "external") errors.push(`${p}: scope must be internal or external.`);
   });
   if (JSON.stringify(set).length > MAX_BODY_CHARS) errors.push("The rule set is too large to save (limit about 100 kB).");
+  // Reuse the canonical pure validator for mode, groups, literal phrase bounds and unknown fields.
+  if (errors.length === 0) { try { validateJoinRuleSet(set); } catch (e) { errors.push(e instanceof Error ? e.message : "Invalid join rules."); } }
   return errors;
 }
 
@@ -101,27 +116,21 @@ export function validateRuleSetClient(set: RuleSet): string[] {
 export const canonicalRuleSet = (set: RuleSet): string => JSON.stringify(set);
 
 const isObj = (v: unknown): v is Record<string, unknown> => typeof v === "object" && v !== null && !Array.isArray(v);
-const strings = (v: unknown): string[] | null => Array.isArray(v) && v.every(x => typeof x === "string") ? v as string[] : null;
+
 
 /** Defensive parse of a GET response; null when it is not the documented shape. */
 export function parseView(raw: unknown): JoinRulesView | null {
   if (!isObj(raw) || !isObj(raw.ruleSet) || !isObj(raw.state)) return null;
-  const rs = raw.ruleSet, st = raw.state;
-  const ownDomains = strings(rs.ownDomains), approvedSenders = strings(st.approvedSenders);
-  const approvedDomains = strings(st.approvedDomains), optedOutEventIds = strings(st.optedOutEventIds);
-  if (rs.version !== 1 || !ownDomains || !Array.isArray(rs.rules) || !approvedSenders || !approvedDomains || !optedOutEventIds) return null;
-  const rules: Rule[] = [];
-  for (const r of rs.rules) {
-    if (!isObj(r) || typeof r.id !== "string" || (r.effect !== "allow" && r.effect !== "deny") || !isObj(r.match)) return null;
-    const m = r.match, match: RuleMatch = {};
-    if (typeof m.email === "string") match.email = m.email;
-    if (typeof m.domain === "string") match.domain = m.domain;
-    if (typeof m.subdomains === "boolean") match.subdomains = m.subdomains;
-    if (typeof m.platform === "string" && (PLATFORMS as readonly string[]).includes(m.platform)) match.platform = m.platform as Platform;
-    if (m.scope === "internal" || m.scope === "external") match.scope = m.scope;
-    rules.push({ id: r.id, effect: r.effect, match });
-  }
-  return { ruleSet: { version: 1, ownDomains, rules }, state: { approvedSenders, approvedDomains, optedOutEventIds } };
+  try {
+    validateJoinRuleSet(raw.ruleSet);
+    // Preserve the existing display parser: server strings remain visible as text.
+    // The canonical evaluator independently validates state before any preview join.
+    const st = raw.state;
+    for (const key of ["approvedSenders", "approvedDomains", "optedOutEventIds", ...(st.optedOutMeetings !== undefined ? ["optedOutMeetings"] : [])])
+      if (!Array.isArray(st[key]) || !(st[key] as unknown[]).every(v => typeof v === "string")) return null;
+    // Copy the validated response without silently stripping newly supported fields.
+    return structuredClone({ruleSet:raw.ruleSet, state:raw.state}) as unknown as JoinRulesView;
+  } catch { return null; }
 }
 
 export type PendingKind = "sender" | "domain" | "optout";

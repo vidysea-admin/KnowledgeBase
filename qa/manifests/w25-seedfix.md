@@ -1,6 +1,6 @@
 # w25-seedfix: seeded slots refused at launch ("Legacy occupied or unproved profile refused")
 
-Status: ready-for-check
+Status: checked-PASS — closed out 2026-10-26 (resume reconcile) citing qa/verdicts/w25-seedfix.md
 Fix cycle: 0
 Lane: C:\Users\product\Desktop\KnowledgeBase-lanes\w25-seedfix  Branch: lane/w25-seedfix
 Base: ae5e2e71 (origin/master, PR #14)  Candidate: single commit on the branch (`git rev-parse lane/w25-seedfix`)

@@ -8,6 +8,8 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 
+import vm from "node:vm";
+import { CLIENT_AUTH_JS } from "./ui-shell.js";
 import { startTestServer } from "../testUtils.js";
 import { buildTestDeps } from "../fixtures.js";
 
@@ -73,5 +75,78 @@ test("every page's inline script never assigns innerHTML with a variable (XSS di
     }
   } finally {
     await server.close();
+  }
+});
+
+// ISS-408: behind the web proxy these pages are served at <APP_BASE_PATH>/api/... with the prefix
+// stripped before the API sees the request, so no internal reference may be root-absolute. The
+// browser-side resolution is simulated with URL(): the page URL is the proxy prefix + the path we
+// were asked for, and every ref must land back under the proxy prefix.
+const PROXY = "http://host/knowledgebase/api";
+const BASE_PATHS = ["/", "/sessions-ui", "/sessions-ui/", "/sessions-ui/some-id", "/sessions-ui/some-id/", "/dashboard-ui", "/docs-ui", "/docs-ui/"];
+
+for (const path of BASE_PATHS) {
+  test(`GET ${path}: nav links, script root and fetch targets stay under the proxy prefix (ISS-408)`, async () => {
+    const server = await startTestServer(buildTestDeps());
+    try {
+      const res = await fetch(`${server.baseUrl}${path}`);
+      assert.equal(res.status, 200);
+      const text = await res.text();
+      const pageUrl = `${PROXY}${path}`;
+      const hrefs = [...text.matchAll(/\b(?:href|src|action)="([^"]*)"/g)].map((m) => m[1] as string);
+      assert.ok(hrefs.length >= 5, "the nav links are present");
+      for (const h of hrefs) {
+        assert.doesNotMatch(h, /^(\/|[a-z][a-z0-9+.-]*:)/i, `internal ref ${h} must be relative`);
+        assert.ok(new URL(h, pageUrl).pathname.startsWith("/knowledgebase/api/"), `${h} resolves under the proxy prefix`);
+      }
+      // each nav entry points at the right sibling route, whatever the page depth
+      const navPaths = hrefs.map((h) => new URL(h, pageUrl).pathname);
+      for (const want of ["/knowledgebase/api/", "/knowledgebase/api/sessions-ui", "/knowledgebase/api/dashboard-ui", "/knowledgebase/api/docs-ui", "/knowledgebase/api/compete"]) {
+        assert.ok(navPaths.includes(want), `nav reaches ${want} (got ${navPaths.join(",")})`);
+      }
+      assert.doesNotMatch(text, /(?:fetch|location\.href|location\.assign)\(\s*["'`]\//, "no root-absolute fetch/navigation");
+      assert.doesNotMatch(text, /\.href\s*=\s*["'`]\//, "no root-absolute href assignment in script");
+      const root = /const API_ROOT = "([^"]*)";/.exec(text)?.[1];
+      if (text.includes("<script>")) {
+        assert.ok(root !== undefined, "script declares API_ROOT");
+        for (const api of ["sessions", "gaps", "sessions/some-id"]) {
+          assert.equal(new URL(root + api, pageUrl).pathname, `/knowledgebase/api/${api}`, `API call ${api} resolves to the API root`);
+        }
+        assert.equal(new URL(root + "sessions-ui/x", pageUrl).pathname, "/knowledgebase/api/sessions-ui/x");
+      }
+    } finally {
+      await server.close();
+    }
+  });
+}
+
+test("pages still resolve correctly when the API is deployed with no proxy prefix (relative refs are prefix-agnostic)", async () => {
+  const server = await startTestServer(buildTestDeps());
+  try {
+    const text = await (await fetch(`${server.baseUrl}/sessions-ui/some-id`)).text();
+    const root = /const API_ROOT = "([^"]*)";/.exec(text)?.[1] ?? "";
+    assert.equal(new URL(root + "sessions/some-id", "http://host/sessions-ui/some-id").pathname, "/sessions/some-id");
+    assert.equal(new URL("../dashboard-ui", "http://host/sessions-ui/some-id").pathname, "/dashboard-ui");
+  } finally {
+    await server.close();
+  }
+});
+
+test("the shared client apiFetch resolves every API call against API_ROOT (executed, not pattern-matched) (ISS-408)", async () => {
+  const urls: string[] = [];
+  for (const [root, pageUrl, want] of [
+    ["./", "http://host/knowledgebase/api/sessions-ui", "/knowledgebase/api/sessions"],
+    ["../", "http://host/knowledgebase/api/sessions-ui/some-id", "/knowledgebase/api/sessions/x"],
+  ] as const) {
+    const ctx = vm.createContext({
+      localStorage: { getItem: () => "k", setItem: () => {} },
+      document: { getElementById: () => null },
+      fetch: async (u: string) => { urls.push(u); return { ok: true, json: async () => ({}) }; },
+    });
+    vm.runInContext(`const API_ROOT = ${JSON.stringify(root)};\n${CLIENT_AUTH_JS};globalThis.apiFetch = apiFetch;`, ctx);
+    await (ctx as { apiFetch: (p: string) => Promise<unknown> }).apiFetch(want.endsWith("/x") ? "/sessions/x" : "/sessions");
+    const sent = urls.at(-1)!;
+    assert.doesNotMatch(sent, /^\//, "never root-absolute");
+    assert.equal(new URL(sent, pageUrl).pathname, want);
   }
 });

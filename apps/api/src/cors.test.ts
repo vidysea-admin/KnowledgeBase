@@ -23,9 +23,9 @@ test("preflight from an allowed origin: PUT allowed, If-Match and If-None-Match 
     assert.equal(r.status, 204);
     assert.equal(r.headers.get("access-control-allow-origin"), ORIGIN);
     const headers = list(r.headers.get("access-control-allow-headers"));
-    for (const h of ["content-type", "authorization", "if-match", "if-none-match"]) assert.ok(headers.includes(h), `allow-headers lacks ${h}: ${headers}`);
+    for (const h of ["content-type", "authorization", "if-match", "if-none-match", "x-lkb-work-db"]) assert.ok(headers.includes(h), `allow-headers lacks ${h}: ${headers}`);
     assert.ok(list(r.headers.get("access-control-allow-methods")).includes("put"));
-    assert.ok(list(r.headers.get("access-control-expose-headers")).includes("etag"));
+    for (const h of ["etag", "x-lkb-work-db", "x-lkb-tenant"]) assert.ok(list(r.headers.get("access-control-expose-headers")).includes(h), `expose-headers lacks ${h}`);
     assert.equal(r.headers.get("access-control-allow-credentials"), null);
     assert.match(r.headers.get("vary") ?? "", /Origin/i);
   });
@@ -34,7 +34,7 @@ test("preflight from an allowed origin: PUT allowed, If-Match and If-None-Match 
 test("the actual cross-origin response exposes ETag too (the preflight alone is not enough)", async () => {
   await withServer(async base => {
     const r = await fetch(`${base}/health`, { headers: { origin: ORIGIN } });
-    assert.ok(list(r.headers.get("access-control-expose-headers")).includes("etag"));
+    for (const h of ["etag", "x-lkb-work-db", "x-lkb-tenant"]) assert.ok(list(r.headers.get("access-control-expose-headers")).includes(h), `expose-headers lacks ${h}`);
   });
 });
 
@@ -46,4 +46,22 @@ test("origins are NOT widened: a disallowed or missing origin gets no CORS heade
         assert.equal(r.headers.get(h), null, `${String(origin)}: ${h}`);
     }
   });
+});
+
+
+test("work-DB candidate GET and scan preflight expose authorized operator context across origins", async () => {
+  const work = "calendar_cors_work";
+  const deps = buildTestDeps({keyStore: fakeKeyStore({operator: {tenantId: "tenant-a", scopes: ["gmail"]}})});
+  const server = await startTestServer({...deps, corsOrigins: [ORIGIN], meetingCandidates: {...deps.meetingCandidates,
+    getWorkDatabase: () => work, listCandidates: async () => [], scanGmail: async () => ({created: 0, autoApproved: 0})}});
+  try {
+    const result = await fetch(server.baseUrl+"/meeting-candidates", {headers: {origin: ORIGIN, authorization: "Bearer operator"}});
+    assert.equal(result.status, 200); assert.equal(result.headers.get("X-LKB-Work-DB"), work); assert.equal(result.headers.get("X-LKB-Tenant"), "tenant-a");
+    for (const h of ["etag", "x-lkb-work-db", "x-lkb-tenant"]) assert.ok(list(result.headers.get("access-control-expose-headers")).includes(h));
+    const preflight = await fetch(server.baseUrl+"/gmail/scan", {method: "OPTIONS", headers: {origin: ORIGIN,
+      "access-control-request-method": "POST", "access-control-request-headers": "authorization,content-type,x-lkb-work-db"}});
+    assert.equal(preflight.status, 204); assert.ok(list(preflight.headers.get("access-control-allow-headers")).includes("x-lkb-work-db"));
+    const scan = await fetch(server.baseUrl+"/gmail/scan", {method: "POST", headers: {origin: ORIGIN, authorization: "Bearer operator", "X-LKB-Work-DB": work}});
+    assert.equal(scan.status, 200);
+  } finally { await server.close(); }
 });

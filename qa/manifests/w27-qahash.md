@@ -1,6 +1,6 @@
 # w27-qahash: ISS-REVALIDATE-001 (QA report bound by turns.json content hash)
 
-Status: ready-for-check
+Status: checked-PASS — closed out 2026-10-26 (resume reconcile) citing qa/verdicts/w27-qahash.md
 Fix cycle: 1
 Base: 4264418c7488d95e76bc0d86e3920efb0e0ccd72 (origin/master)
 Changed paths: qa/manifests/w27-qahash.md only (NO source change: the fix is already on base)

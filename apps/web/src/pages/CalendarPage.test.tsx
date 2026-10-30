@@ -308,3 +308,101 @@ describe("[I5] the working list view is not deleted", () => {
     expect(await screen.findByRole("button", { name: "Scan Gmail" })).toBeInTheDocument();
   });
 });
+
+
+describe("connected worker coverage", () => {
+  test("stale inventory remains visible and does not authorize attendance", async () => {
+    vi.spyOn(calendarApi, "listUpcomingMeetings").mockResolvedValue({ meetings: MEETINGS, worker: { status: "stale", receivedAt: "2026-09-25T00:00:00Z" } } as Awaited<ReturnType<typeof calendarApi.listUpcomingMeetings>>);
+    renderAt("/calendar?date=2026-09-25");
+    expect(await screen.findByTestId("calendar-worker-health")).toHaveTextContent(/stale/i);
+    expect(screen.getByTestId("calendar-worker-health")).toHaveTextContent(/not.*schedul/i);
+    expect(screen.getByTestId("calendar-worker-health")).toHaveTextContent("Last snapshot received: 2026-09-25T00:00:00Z");
+    expect(screen.getByRole("button", { name: /Weekly Sync Up with Umesh/ })).toBeInTheDocument();
+  });
+  test("fresh complete empty inventory is distinct from a disconnected calendar", async () => {
+    vi.spyOn(calendarApi, "listUpcomingMeetings").mockResolvedValue({ meetings: [], worker: { status: "fresh", receivedAt: "2026-09-25T00:00:00Z" } } as Awaited<ReturnType<typeof calendarApi.listUpcomingMeetings>>);
+    renderAt("/calendar?date=2026-09-25");
+    expect(await screen.findByTestId("calendar-no-connection-note")).toHaveTextContent(/no upcoming events/i);
+    expect(screen.getByTestId("calendar-no-connection-note")).not.toHaveTextContent(/isn.t reachable/i);
+  });
+  test("cancelled source events retain their status in the details panel", async () => {
+    vi.spyOn(calendarApi, "listUpcomingMeetings").mockResolvedValue({ meetings: [{ ...MEETINGS[0]!, cancelled: true }] as UpcomingMeeting[] });
+    renderAt("/calendar?view=day&date=2026-09-25");
+    await userEvent.click(await screen.findByRole("button", { name: /Weekly Sync Up with Umesh/ }));
+    expect(within(await screen.findByTestId("event-detail")).getByText(/Status: cancelled/i)).toBeInTheDocument();
+  });
+});
+
+
+describe("complete calendar inventory in the list view", () => {
+  test("all-day meetings retain the source date in the list", async () => {
+    vi.spyOn(calendarApi, "listUpcomingMeetings").mockResolvedValue({ meetings: [{ id: "roadmap", title: "Monthly roadmap", startTime: "2026-11-02", endTime: "2026-11-03" }] });
+    renderAt("/calendar?view=list&date=2026-11-02");
+    expect(await screen.findByText(/All day/)).toBeInTheDocument();
+    expect(screen.getByText("Monthly roadmap")).toBeInTheDocument();
+  });
+  test("cancelled meetings remain listed without an active Join link", async () => {
+    vi.spyOn(calendarApi, "listUpcomingMeetings").mockResolvedValue({ meetings: [{ ...MEETINGS[0]!, cancelled: true }] as UpcomingMeeting[] });
+    renderAt("/calendar?view=list&date=2026-09-25");
+    expect(await screen.findByText(/Status: cancelled/)).toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: /^Join/ })).not.toBeInTheDocument();
+  });
+});
+
+
+describe("cycle1 operator inventory boundary", () => {
+  test("the real display client requests stale-readable operator inventory with auth", async () => {
+    vi.mocked(calendarApi.listUpcomingMeetings).mockRestore();
+    const fetcher = vi.spyOn(globalThis, "fetch").mockResolvedValue(new Response(JSON.stringify({ meetings: MEETINGS, worker: { status: "stale" } }), {status: 200, headers: {"content-type": "application/json"}}));
+    const result = await calendarApi.listUpcomingMeetings("test-key");
+    const [url, init] = fetcher.mock.calls[0]!;
+    expect(String(url)).toMatch(/\/calendar\/upcoming$/);
+    expect(init?.headers).toMatchObject({ authorization: "Bearer test-key" });
+    expect(result.worker?.status).toBe("stale");
+    expect(result.meetings).toHaveLength(2);
+  });
+
+  test.each(["month", "list"])("undated cancellation remains unplaced in %s without an invented date or Join", async (view) => {
+    vi.spyOn(sessionsApi, "listSessions").mockResolvedValue({ sessions: [] });
+    vi.spyOn(calendarApi, "listUpcomingMeetings").mockResolvedValue({ meetings: [{id: "tombstone", title: "Cancelled source record", startTime: "", endTime: "", status: "cancelled", cancelled: true, organizer: "organizer@example.test", meetingUrl: "https://meet.google.com/not-a-real-room"}], worker: {status: "stale"} });
+    renderAt("/calendar?view=" + view + "&date=2026-09-25");
+    const lane = await screen.findByTestId("calendar-unplaced");
+    expect(lane).toHaveTextContent("Cancelled source record");
+    expect(lane).toHaveTextContent(/No valid start date/);
+    expect(lane).toHaveTextContent(/cancelled/);
+    expect(lane).not.toHaveTextContent(/Invalid Date|1970|2026/);
+    expect(within(lane).queryByRole("link", {name: /Join/})).toBeNull();
+    expect(screen.queryByTestId("calendar-no-data")).toBeNull();
+    expect(screen.getByTestId("calendar-worker-health")).toHaveTextContent("stale");
+  });
+
+  test("a source outage cannot claim the tenant has no Calendar data", async () => {
+    vi.spyOn(sessionsApi, "listSessions").mockResolvedValue({sessions: []});
+    vi.spyOn(calendarApi, "listUpcomingMeetings").mockRejectedValue(new ApiError(503, "source unavailable"));
+    renderAt("/calendar?date=2026-09-25");
+    expect(await screen.findByTestId("calendar-degraded-note")).toBeInTheDocument();
+    expect(screen.queryByTestId("calendar-no-data")).toBeNull();
+  });
+});
+
+
+describe("cycle1 Gmail evidence and coverage", () => {
+  test("unresolved candidate evidence is visible and cannot be approved", async () => {
+    vi.spyOn(candidatesApi, "listMeetingCandidates").mockResolvedValue({candidates:[{_id:"refused",messageId:"synthetic",subject:"Invitation needs evidence",senderEmail:"host@example.test",senderDomain:"example.test",status:"pending",detectedAt:"2026-09-25T00:00:00Z",evidenceIssue:"unresolved-body"}]});
+    renderAt("/calendar?date=2026-09-25");
+    expect(await screen.findByText(/message body could not be resolved/)).toBeInTheDocument();
+    expect(screen.getByRole("button",{name:"Approve"})).toBeDisabled();
+    expect(screen.getByRole("button",{name:"Reject"})).toBeEnabled();
+    expect(screen.getByTestId("gmail-summary-unknown")).toHaveTextContent(/no complete scan is implied/);
+  });
+
+  test("source-provided scan counts retain incomplete status without fake totals", async () => {
+    vi.spyOn(candidatesApi, "listMeetingCandidates").mockResolvedValue({candidates:[],gmailSummary:{listed:9,fetched:8,candidates:2,excludedNonMeeting:3,excludedInternal:2,refusedSender:1,incompleteMessages:1,complete:false}});
+    renderAt("/calendar?date=2026-09-25");
+    const summary=await screen.findByTestId("gmail-summary");
+    expect(summary).toHaveTextContent("9 listed");
+    expect(summary).toHaveTextContent("2 internal");
+    expect(summary).toHaveTextContent("Scan incomplete");
+    expect(summary).not.toHaveTextContent("Scan complete.");
+  });
+});

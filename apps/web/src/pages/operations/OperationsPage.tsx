@@ -1,6 +1,7 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { useAuth } from "../../auth/AuthContext.js";
+import { WriteScope } from "../../auth/WriteScope.js";
 import { ApiError } from "../../api/client.js";
 import { listSessions } from "../../api/sessions.js";
 import { loadActivityHealth } from "../activity-health/activityHealthClient.js";
@@ -37,8 +38,10 @@ function OperationsSnapshot({ apiKey, view }: { apiKey: string; view: OperationV
   }, [apiKey]);
   return <>
     <SourceHealthPanel apiKey={apiKey} />
-    <OperationsIntegrationsPanel apiKey={apiKey} />
-    <EvaluationFlywheelPanel apiKey={apiKey} />
+    <WriteScope>
+      <OperationsIntegrationsPanel apiKey={apiKey} />
+      <EvaluationFlywheelPanel apiKey={apiKey} />
+    </WriteScope>
     <section className="card" aria-label="Session worklist"><h2>Session worklist</h2>
       <p>Ready means transcription and index are both done. Needs attention means a failed stage or an unknown status. Processing means a known stage is processing; pending work stays in All sessions.</p>
       <PanelBody panel={sessions}>{rows => {

@@ -19,6 +19,8 @@ export interface Job {
   tools?: unknown[];
   schema?: unknown;
   maxCost?: number;
+  /** Optional cancellation: a caller whose deadline passed (e.g. /route step B) aborts the in-flight call; the router stops trying further providers. */
+  signal?: AbortSignal;
 }
 
 export interface Usage {

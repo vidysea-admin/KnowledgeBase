@@ -28,6 +28,14 @@ raw
 data
 qa
 KnowledgeBase-lanes
+
+# local tool state and sibling worktrees (the bot image builds its own .venv and installs its own CfT)
+.worktrees
+.venv
+**/.venv
+.cache
+.handoffs
+.goal
 **/recordings
 **/Recordings
 reference

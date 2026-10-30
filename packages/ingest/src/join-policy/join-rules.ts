@@ -1,37 +1,16 @@
 /**
- * packages/ingest/src/join-policy/join-rules.ts — T-037 unit `t037-auto-join-rules-engine`.
- * Canonical pure, serialisable auto-join rules and evaluator. No I/O, clock or persistence;
- * API and bot compatibility exports share this implementation, with scheduler activation configured separately.
- *
- * DECISION: `join | skip | needs-approval`. A decision says only whether the bot may JOIN a
- * meeting without a click. It never says anything about registration: "approval does not prove
- * registration success" (T-037 task note), so there is deliberately no registration field here.
- *
- * PRECEDENCE (first match wins, evaluated top to bottom):
- *   1. per-meeting opt-out (state.optedOutEventIds contains event.id)  -> skip  (beats everything)
- *   2. a matching DENY rule (rule-list order)                          -> skip
- *   3. event cancelled                                                 -> skip
- *   4. event has no meeting URL                                        -> skip
- *   5. organiser missing/malformed                                     -> needs-approval (never join)
- *   6. a matching ALLOW rule (rule-list order)                         -> join
- *   7. approve-once sender (exact email) or approved domain (exact)    -> join
- *   8. nothing matched (DEFAULT-DENY)                                  -> needs-approval
- *
- * FAIL CLOSED ON INVALID DATA (C10): before any matching, the evaluator runs the SAME validators that
- * guard persistence (`validateJoinRuleSet` for the rule set, `validateJoinRuleState` for the state) and
- * matches against their normalised output. If either throws (wrong type, unknown field/kind/enum value,
- * bad domain/email, non-boolean flag, duplicate id, non-array list, null/undefined set...) the whole set
- * is invalid: the decision is `needs-approval` / `invalid-rule-set` and NEVER `join`; one bad rule
- * invalidates all rules (a broken deny rule cannot let a later allow win). The only thing honoured on
- * invalid data is a per-meeting opt-out (-> skip), because skip can never widen access.
- *
- * Matching: emails/domains are trimmed and lower-cased (one trailing dot on a domain is dropped).
- * A domain rule matches the exact domain or a TRUE subdomain (label boundary) only; set
- * `subdomains: false` on the rule for exact-only. Approved-once domains are exact-only.
+ * Canonical pure, serialisable join policy; API and bot compatibility exports share it.
+ * Opt-out wins, then deny, cancellation, missing link and unverifiable sender.
+ * Explicit all mode joins otherwise eligible meetings. Explicit rules mode needs a
+ * matching allow rule. Without a mode, allow rules and stored approvals retain legacy behaviour.
+ * Invalid rules/state never join; valid opt-outs still skip. Match fields are ANDed;
+ * phrase arrays and named purpose groups are ORed using normalized literal substrings.
+ * This policy grants no registration permission. Invitation/link/time/freshness guards
+ * remain the responsibility of the acquiring selector and runtime.
  */
 import { detectPlatform, type Platform } from "./platform.js";
-import { normalizeDomain, normalizeEmail } from "./join-rules-normalize.js";
-import { addMeetingEntries, normalizeMeetingEntries, optedOutMeetingMatch, type OptOutMeeting } from "./join-rules-optout.js";
+import { normalizeDomain, normalizeEmail, normalizePhrase, phraseMatches, isObj, rejectUnknownKeys, JoinRuleSetValidationError, validateJoinRuleState, type JoinRuleState } from "./join-rules-normalize.js";
+import { addMeetingEntries, optedOutMeetingMatch, type OptOutMeeting } from "./join-rules-optout.js";
 
 export const PLATFORMS: readonly Platform[] = ["meet", "teams", "zoom", "webex", "zoho", "cloudonair", "unknown"];
 
@@ -47,6 +26,9 @@ export interface JoinRuleMatch {
   platform?: Platform;
   /** internal = organiser domain is (a subdomain of) one of `ownDomains`. */
   scope?: OrganizerScope;
+  titleIncludes?: readonly string[];
+  descriptionIncludes?: readonly string[];
+  purposeAny?: readonly string[];
 }
 
 export interface JoinRule {
@@ -55,21 +37,18 @@ export interface JoinRule {
   match: JoinRuleMatch;
 }
 
+export interface JoinPurposeGroup { id: string; titleIncludes?: readonly string[]; descriptionIncludes?: readonly string[] }
+
 export interface JoinRuleSet {
   version: 1;
   ownDomains: readonly string[];
   rules: readonly JoinRule[];
+  /** Absent preserves legacy approval behaviour. Explicit rules requires a matching allow rule. */
+  attendanceMode?: "all" | "rules";
+  purposeGroups?: readonly JoinPurposeGroup[];
 }
 
-/** Persistable state; every change goes through the pure helpers below. */
-export interface JoinRuleState {
-  approvedSenders: readonly string[];
-  approvedDomains: readonly string[];
-  optedOutEventIds: readonly string[];
-  /** Optional (absent in older documents): meeting identities of opted-out meetings, see join-rules-optout.ts. */
-  optedOutMeetings?: readonly string[];
-}
-
+export type { JoinRuleState } from "./join-rules-normalize.js";
 export const EMPTY_JOIN_RULE_STATE: JoinRuleState = { approvedSenders: [], approvedDomains: [], optedOutEventIds: [] };
 
 /** Structural subset of `CalendarEvent`; `senderEmail` (when given) overrides `organizer`. */
@@ -79,11 +58,14 @@ export interface JoinRuleEvent {
   senderEmail?: string;
   meetingUrl?: string;
   cancelled?: boolean;
+  /** Untrusted source text: compared only as bounded literal data, never executed. */
+  title?: string;
+  description?: string;
 }
 
 export type JoinReason =
   | "meeting-opt-out" | "deny-rule" | "cancelled" | "no-meeting-url" | "sender-unverifiable"
-  | "allow-rule" | "approved-sender" | "approved-domain" | "no-matching-rule" | "invalid-rule-set";
+  | "all-mode" | "allow-rule" | "approved-sender" | "approved-domain" | "no-matching-rule" | "invalid-rule-set";
 
 export interface JoinDecision {
   action: "join" | "skip" | "needs-approval";
@@ -92,7 +74,7 @@ export interface JoinDecision {
   ruleId: string;
 }
 
-export { normalizeDomain, normalizeEmail, parseStrictEmail } from "./join-rules-normalize.js";
+export { JoinRuleSetValidationError, validateJoinRuleState, normalizeDomain, normalizeEmail, parseStrictEmail } from "./join-rules-normalize.js";
 
 /** Exact domain, or (when `subdomains`) a true subdomain on a label boundary. */
 function domainMatches(candidate: string, ruleDomain: string, subdomains: boolean): boolean {
@@ -100,8 +82,8 @@ function domainMatches(candidate: string, ruleDomain: string, subdomains: boolea
 }
 
 function ruleMatches(match: JoinRuleMatch, sender: { email: string; domain: string } | undefined,
-  platform: Platform, internal: boolean | undefined): boolean {
-  const keys = [match.email, match.domain, match.platform, match.scope].filter((v) => v !== undefined);
+  platform: Platform, internal: boolean | undefined, event: JoinRuleEvent, groups: readonly JoinPurposeGroup[]): boolean {
+  const keys = [match.email, match.domain, match.platform, match.scope, match.titleIncludes, match.descriptionIncludes, match.purposeAny].filter((v) => v !== undefined);
   if (keys.length === 0) return false; // empty matcher must never match everything
   if (match.email !== undefined) {
     const e = normalizeEmail(match.email);
@@ -116,6 +98,10 @@ function ruleMatches(match: JoinRuleMatch, sender: { email: string; domain: stri
     if (internal === undefined) return false; // unknown sender: scope can't be established
     if ((match.scope === "internal") !== internal) return false;
   }
+  if (match.titleIncludes && !phraseMatches(event.title, match.titleIncludes)) return false;
+  if (match.descriptionIncludes && !phraseMatches(event.description, match.descriptionIncludes)) return false;
+  if (match.purposeAny && !match.purposeAny.some(id => groups.some(group => group.id === id &&
+    (phraseMatches(event.title, group.titleIncludes) || phraseMatches(event.description, group.descriptionIncludes))))) return false;
   return true;
 }
 
@@ -143,6 +129,11 @@ export function evaluateJoinRules(event: JoinRuleEvent, rawRuleSet: JoinRuleSet,
     return { action: "needs-approval", reason: "invalid-rule-set", ruleId: "invalid-rule-set" };
   }
 
+  if (ruleSet.attendanceMode !== undefined || ruleSet.purposeGroups !== undefined ||
+    ruleSet.rules.some(r => r.match.titleIncludes || r.match.descriptionIncludes || r.match.purposeAny))
+  for (const field of ["title", "description"] as const) if (event[field] !== undefined &&
+    (typeof event[field] !== "string" || event[field]!.length > 20000))
+    return { action: "needs-approval", reason: "invalid-rule-set", ruleId: "invalid-rule-set" };
   const email = normalizeEmail(event.senderEmail ?? event.organizer);
   const sender = email ? { email, domain: email.slice(email.indexOf("@") + 1) } : undefined;
   const platform: Platform = typeof event.meetingUrl === "string" ? detectPlatform(event.meetingUrl) : "unknown";
@@ -150,17 +141,20 @@ export function evaluateJoinRules(event: JoinRuleEvent, rawRuleSet: JoinRuleSet,
   const internal = sender ? own.some((d) => domainMatches(sender.domain, d, true)) : undefined;
 
   for (const rule of ruleSet.rules) {
-    if (rule.effect === "deny" && ruleMatches(rule.match, sender, platform, internal)) return skip("deny-rule", rule.id);
+    if (rule.effect === "deny" && ruleMatches(rule.match, sender, platform, internal, event, ruleSet.purposeGroups ?? [])) return skip("deny-rule", rule.id);
   }
   if (event.cancelled === true) return skip("cancelled", "precondition");
   if (typeof event.meetingUrl !== "string" || event.meetingUrl.trim() === "") return skip("no-meeting-url", "precondition");
   if (!sender) return { action: "needs-approval", reason: "sender-unverifiable", ruleId: "precondition" };
 
+  if ((ruleSet.attendanceMode === "all" || ruleSet.attendanceMode === "rules") && internal) return skip("deny-rule", "office:internal");
+  if (ruleSet.attendanceMode === "all") return { action: "join", reason: "all-mode", ruleId: "mode:all" };
   for (const rule of ruleSet.rules) {
-    if (rule.effect === "allow" && ruleMatches(rule.match, sender, platform, internal)) {
+    if (rule.effect === "allow" && ruleMatches(rule.match, sender, platform, internal, event, ruleSet.purposeGroups ?? [])) {
       return { action: "join", reason: "allow-rule", ruleId: rule.id };
     }
   }
+  if (ruleSet.attendanceMode === "rules") return { action: "needs-approval", reason: "no-matching-rule", ruleId: "default-deny" };
   if (norm(state.approvedSenders, normalizeEmail).includes(sender.email)) {
     return { action: "join", reason: "approved-sender", ruleId: `approval:sender:${sender.email}` };
   }
@@ -219,53 +213,33 @@ export function ruleSetFromTrustedSenderConfig(cfg: TrustedSenderConfigLike, own
   return { version: 1, ownDomains: [...ownDomains], rules };
 }
 
-export class JoinRuleSetValidationError extends Error {
-  constructor(public readonly path: string, detail: string) {
-    super(`invalid join rule set at ${path}: ${detail}`);
-    this.name = "JoinRuleSetValidationError";
-  }
-}
-
-const isObj = (v: unknown): v is Record<string, unknown> => typeof v === "object" && v !== null && !Array.isArray(v);
-
-function rejectUnknownKeys(obj: Record<string, unknown>, allowed: readonly string[], path: string): void {
-  for (const k of Object.keys(obj)) if (!allowed.includes(k)) throw new JoinRuleSetValidationError(path, `unknown field "${k}"`);
-}
-
-/** Validates persisted/untrusted state and returns a normalised copy. Throws `JoinRuleSetValidationError`. */
-export function validateJoinRuleState(input: unknown): JoinRuleState {
-  if (!isObj(input)) throw new JoinRuleSetValidationError("$state", "must be an object");
-  rejectUnknownKeys(input, ["approvedSenders", "approvedDomains", "optedOutEventIds", "optedOutMeetings"], "$state");
-  const list = (key: string): unknown[] => {
-    const v = input[key];
-    if (!Array.isArray(v)) throw new JoinRuleSetValidationError(`$state.${key}`, "must be an array");
-    return v;
-  };
-  const approvedSenders = list("approvedSenders").map((v, i) => {
-    const n = normalizeEmail(v);
-    if (!n) throw new JoinRuleSetValidationError(`$state.approvedSenders[${i}]`, "not a valid email");
-    return n;
-  });
-  const approvedDomains = list("approvedDomains").map((v, i) => {
-    const n = normalizeDomain(v);
-    if (!n) throw new JoinRuleSetValidationError(`$state.approvedDomains[${i}]`, "not a valid domain");
-    return n;
-  });
-  const optedOutEventIds = list("optedOutEventIds").map((v, i) => {
-    if (typeof v !== "string" || v === "") throw new JoinRuleSetValidationError(`$state.optedOutEventIds[${i}]`, "must be a non-empty string");
-    return v;
-  });
-  if (input.optedOutMeetings === undefined) return { approvedSenders, approvedDomains, optedOutEventIds }; // old document: shape unchanged
-  let optedOutMeetings: string[];
-  try { optedOutMeetings = normalizeMeetingEntries(input.optedOutMeetings); }
-  catch (e) { throw new JoinRuleSetValidationError("$state.optedOutMeetings", e instanceof Error ? e.message : "invalid"); }
-  return { approvedSenders, approvedDomains, optedOutEventIds, optedOutMeetings };
-}
-
 /** Validates JSON-parsed input and returns a normalised copy. Throws `JoinRuleSetValidationError`. */
 export function validateJoinRuleSet(input: unknown): JoinRuleSet {
   if (!isObj(input)) throw new JoinRuleSetValidationError("$", "must be an object");
-  rejectUnknownKeys(input, ["version", "ownDomains", "rules"], "$");
+  rejectUnknownKeys(input, ["version", "ownDomains", "rules", "attendanceMode", "purposeGroups"], "$");
+  if (input.attendanceMode !== undefined && input.attendanceMode !== "all" && input.attendanceMode !== "rules")
+    throw new JoinRuleSetValidationError("$.attendanceMode", "must be all or rules");
+  const phrases = (value: unknown, path: string): string[] => {
+    if (!Array.isArray(value) || value.length < 1 || value.length > 20 ||
+      value.some(v => typeof v !== "string" || v.length > 160 || normalizePhrase(v) === ""))
+      throw new JoinRuleSetValidationError(path, "needs 1-20 non-empty literal phrases of at most 160 characters");
+    return [...new Set((value as string[]).map(normalizePhrase))];
+  };
+  const groupIds = new Set<string>();
+  let purposeGroups: JoinPurposeGroup[] | undefined;
+  if (input.purposeGroups !== undefined) {
+    if (!Array.isArray(input.purposeGroups) || input.purposeGroups.length > 50) throw new JoinRuleSetValidationError("$.purposeGroups", "must be an array of at most 50 groups");
+    purposeGroups = input.purposeGroups.map((g, i) => {
+      const p = `$.purposeGroups[${i}]`;
+      if (!isObj(g)) throw new JoinRuleSetValidationError(p, "must be an object");
+      rejectUnknownKeys(g, ["id", "titleIncludes", "descriptionIncludes"], p);
+      if (typeof g.id !== "string" || !/^[a-z][a-z0-9_-]{0,63}$/.test(g.id) || groupIds.has(g.id)) throw new JoinRuleSetValidationError(p, "needs a unique lowercase group id (1-64 characters)");
+      groupIds.add(g.id);
+      if (g.titleIncludes === undefined && g.descriptionIncludes === undefined) throw new JoinRuleSetValidationError(p, "needs title or description phrases");
+      return {id: g.id, ...(g.titleIncludes !== undefined ? {titleIncludes: phrases(g.titleIncludes, p + ".titleIncludes")} : {}),
+        ...(g.descriptionIncludes !== undefined ? {descriptionIncludes: phrases(g.descriptionIncludes, p + ".descriptionIncludes")} : {})};
+    });
+  }
   if (input.version !== 1) throw new JoinRuleSetValidationError("$.version", "must be 1");
   if (!Array.isArray(input.ownDomains)) throw new JoinRuleSetValidationError("$.ownDomains", "must be an array");
   if (!Array.isArray(input.rules)) throw new JoinRuleSetValidationError("$.rules", "must be an array");
@@ -285,9 +259,9 @@ export function validateJoinRuleSet(input: unknown): JoinRuleSet {
     if (r.effect !== "allow" && r.effect !== "deny") throw new JoinRuleSetValidationError(`${p}.effect`, 'must be "allow" or "deny"');
     const m = r.match;
     if (!isObj(m)) throw new JoinRuleSetValidationError(`${p}.match`, "must be an object");
-    rejectUnknownKeys(m, ["email", "domain", "subdomains", "platform", "scope"], `${p}.match`);
-    if (m.email === undefined && m.domain === undefined && m.platform === undefined && m.scope === undefined) {
-      throw new JoinRuleSetValidationError(`${p}.match`, "needs at least one of email, domain, platform, scope");
+    rejectUnknownKeys(m, ["email", "domain", "subdomains", "platform", "scope", "titleIncludes", "descriptionIncludes", "purposeAny"], `${p}.match`);
+    if (m.email === undefined && m.domain === undefined && m.platform === undefined && m.scope === undefined && m.titleIncludes === undefined && m.descriptionIncludes === undefined && m.purposeAny === undefined) {
+      throw new JoinRuleSetValidationError(`${p}.match`, "needs at least one of email, domain, platform, scope, titleIncludes, descriptionIncludes, purposeAny");
     }
     const match: JoinRuleMatch = {};
     if (m.email !== undefined) {
@@ -316,7 +290,14 @@ export function validateJoinRuleSet(input: unknown): JoinRuleSet {
       if (m.scope !== "internal" && m.scope !== "external") throw new JoinRuleSetValidationError(`${p}.match.scope`, 'must be "internal" or "external"');
       match.scope = m.scope;
     }
+    for (const field of ["titleIncludes", "descriptionIncludes"] as const) if (m[field] !== undefined) match[field] = phrases(m[field], `${p}.match.${field}`);
+    if (m.purposeAny !== undefined) {
+      if (!Array.isArray(m.purposeAny) || m.purposeAny.length < 1 || m.purposeAny.length > 20 || m.purposeAny.some(id => typeof id !== "string" || !groupIds.has(id)))
+        throw new JoinRuleSetValidationError(`${p}.match.purposeAny`, "needs 1-20 configured purpose group ids");
+      match.purposeAny = [...new Set(m.purposeAny as string[])];
+    }
     return { id: r.id, effect: r.effect, match };
   });
-  return { version: 1, ownDomains, rules };
+  return { version: 1, ownDomains, rules, ...(input.attendanceMode !== undefined ? {attendanceMode: input.attendanceMode} : {}),
+    ...(purposeGroups !== undefined ? {purposeGroups} : {}) };
 }

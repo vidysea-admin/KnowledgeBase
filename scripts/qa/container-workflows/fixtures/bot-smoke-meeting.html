@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>LKB bot-smoke fixture meeting</title>
+<style>
+  html, body { margin: 0; background: #101820; color: #e8eef4; font: 20px/1.4 sans-serif; }
+  #stage { display: block; width: 100vw; height: 80vh; }
+  #status { padding: 12px 24px; }
+</style>
+</head>
+<body>
+<canvas id="stage" width="1280" height="640"></canvas>
+<div id="status">bot-smoke fixture: looping animation + 440 Hz tone (no external assets)</div>
+<script>
+// Video: a looping canvas animation. Every frame differs, so the encoded video is never a static still.
+const canvas = document.getElementById('stage');
+const g = canvas.getContext('2d');
+let t = 0;
+function frame() {
+  t += 1;
+  g.fillStyle = 'hsl(' + (t * 2 % 360) + ', 60%, 18%)';
+  g.fillRect(0, 0, canvas.width, canvas.height);
+  for (let i = 0; i < 12; i++) {
+    g.fillStyle = 'hsl(' + ((t * 3 + i * 30) % 360) + ', 80%, 55%)';
+    const x = canvas.width / 2 + Math.cos(t / 30 + i / 2) * 420;
+    const y = canvas.height / 2 + Math.sin(t / 22 + i / 2) * 220;
+    g.beginPath();
+    g.arc(x, y, 34, 0, Math.PI * 2);
+    g.fill();
+  }
+  g.fillStyle = '#fff';
+  g.font = '48px sans-serif';
+  g.fillText('LKB bot-smoke frame ' + t, 40, 70);
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+
+// Audio: a 440 Hz oscillator through an AudioContext (autoplay is allowed by the bot's launch flags).
+// The tone is audible on the tab's audio track, which the tab-capture extension records.
+function startTone() {
+  const ctx = new (window.AudioContext || window.webkitAudioContext)();
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+  osc.type = 'sine';
+  osc.frequency.value = 440;
+  gain.gain.value = 0.5;
+  osc.connect(gain).connect(ctx.destination);
+  osc.start();
+  document.getElementById('status').textContent += ' | tone running, state=' + ctx.state;
+  if (ctx.state !== 'running') ctx.resume();
+}
+try { startTone(); } catch (e) { document.getElementById('status').textContent = 'tone failed: ' + e; }
+document.addEventListener('click', () => { try { startTone(); } catch (e) {} }, {once: true});
+</script>
+</body>
+</html>

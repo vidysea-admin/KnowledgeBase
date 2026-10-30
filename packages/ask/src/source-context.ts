@@ -84,6 +84,8 @@ export class BoundedAskError extends Error {
     this.budgetRefusal = budgetRefusal ? Object.freeze({ ...budgetRefusal }) : undefined;
   }
 }
+/** The answer step found no answer in the admitted context (model abstained, or the grounding judge rejected every sentence). Still a BoundedAskError for deep; the fast path turns it into an honest insufficient answer. */
+export class AnswerAbstainError extends BoundedAskError {}
 export const SOURCE_LIMITS = Object.freeze({
   catalogBytes: 64 * 1024, contextBytes: 48 * 1024, jobBytes: 64 * 1024,
   totalJobBytes: 256 * 1024, calls: 12, candidates: 6, startDeadlineMs: 240_000,

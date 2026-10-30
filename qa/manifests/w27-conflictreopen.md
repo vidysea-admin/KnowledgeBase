@@ -1,6 +1,6 @@
 # w27-conflictreopen
 
-Status: ready-for-check
+Status: checked-PASS — closed out 2026-10-26 (resume reconcile) citing qa/verdicts/w27-conflictreopen.md
 Fix cycle: 0
 Base SHA: 4264418c7488d95e76bc0d86e3920efb0e0ccd72
 Lane: C:\Users\product\Desktop\KnowledgeBase-lanes\w27-conflictreopen (branch lane/w27-conflictreopen)

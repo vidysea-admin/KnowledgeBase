@@ -39,23 +39,32 @@ export function ledgerFiles(root) {
   return [...(existsSync(canonical) ? [canonical] : []), ...shards];
 }
 
-/** Every row across the ledger union, plus a count of lines no consumer could parse. */
-export function readLedgerRows(root) {
+/**
+ * Every row across the ledger union, plus a count of lines no consumer could parse.
+ *
+ * A duplicate id across the union THROWS by default (a reader must never silently pick one of two
+ * rows). `{ collectDuplicates: true }` is the audit's mode: it reads on and adds
+ * `duplicates: [{ id, locations: ["<file>:<line>", ...] }]` (default return shape unchanged),
+ * so the audit can name every collision.
+ */
+export function readLedgerRows(root, { collectDuplicates = false } = {}) {
   const rows = [];
   let unparseable = 0;
-  const firstLocations = new Map();
+  const seen = new Map();
   for (const file of ledgerFiles(root)) {
     for (const [index, line] of readFileSync(file, "utf8").split("\n").entries()) {
       if (!line.trim()) continue;
       let row;
       try { row = JSON.parse(line); } catch { unparseable++; continue; }
       if (typeof row?.id === "string") {
-        const location = `${file}:${index + 1}`, first = firstLocations.get(row.id);
-        if (first) throw new Error(`Duplicate ledger id ${row.id}: ${first} and ${location}`);
-        firstLocations.set(row.id, location);
+        const location = `${file}:${index + 1}`, first = seen.get(row.id);
+        if (first && !collectDuplicates) throw new Error(`Duplicate ledger id ${row.id}: ${first[0]} and ${location}`);
+        if (first) first.push(location); else seen.set(row.id, [location]);
       }
       rows.push(row);
     }
   }
-  return { rows, unparseable };
+  if (!collectDuplicates) return { rows, unparseable };
+  const duplicates = [...seen].filter(([, locations]) => locations.length > 1).map(([id, locations]) => ({ id, locations }));
+  return { rows, unparseable, duplicates };
 }

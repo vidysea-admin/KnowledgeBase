@@ -1,5 +1,5 @@
 /**
- * Email and Google Calendar alert transports over the gws CLI (default <repo>/.cache/tools/gws-0.22.5/gws.exe, LKB_GWS_PATH overrides).
+ * Email and Google Calendar alert transports over the gws CLI (win32 default <repo>/.cache/tools/gws-0.22.5/gws.exe; elsewhere `gws` on PATH; LKB_GWS_PATH overrides on every platform).
  * `AutojoinGwsRunner` is the single seam: tests inject a fake and never start the real binary. No credential is ever read, passed or logged
  * here (gws authenticates from its own keyring); a failure surfaces only the exit code and a short, URL-free stderr line.
  */
@@ -9,8 +9,14 @@ import { cleanBotText } from "./bot-events.js";
 
 export type AutojoinGwsRunner = (args: string[]) => Promise<string>;
 
+export function resolveGwsBinary(repoRoot: string, env: NodeJS.ProcessEnv = process.env, platform: NodeJS.Platform = process.platform): string {
+  const override = env.LKB_GWS_PATH?.trim();
+  if (override) return override;
+  return platform === "win32" ? path.join(repoRoot, ".cache", "tools", "gws-0.22.5", "gws.exe") : "gws";
+}
+
 export function createGwsRunner(repoRoot: string, env: NodeJS.ProcessEnv = process.env): AutojoinGwsRunner {
-  const bin = env.LKB_GWS_PATH?.trim() || path.join(repoRoot, ".cache", "tools", "gws-0.22.5", "gws.exe");
+  const bin = resolveGwsBinary(repoRoot, env);
   return (args) => new Promise((resolve, reject) => {
     execFile(bin, args, { timeout: 30_000, maxBuffer: 2 * 1024 * 1024, windowsHide: true }, (err, stdout, stderr) => {
       if (!err) { resolve(stdout); return; }

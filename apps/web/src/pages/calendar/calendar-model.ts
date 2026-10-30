@@ -33,6 +33,11 @@ export interface CalendarEvent {
   org?: string;
   organizer?: string;
   meetingUrl?: string;
+  cancelled?: boolean;
+  status?: UpcomingMeeting["status"];
+  responseStatus?: UpcomingMeeting["responseStatus"];
+  attendanceSkipReason?: UpcomingMeeting["attendanceSkipReason"];
+  description?: string;
   participants?: string[];
   /** Internal route for a past session; absent for a meeting. */
   href?: string;
@@ -78,14 +83,21 @@ export function toCalendarEvents(
   }
 
   for (const m of meetings) {
-    const start = new Date(m.startTime);
-    if (Number.isNaN(start.getTime())) continue; // an unparseable row is skipped, never drawn at 00:00
-    const parsedEnd = m.endTime ? new Date(m.endTime) : null;
-    const end = parsedEnd && !Number.isNaN(parsedEnd.getTime())
-      ? parsedEnd
-      : new Date(start.getTime() + DEFAULT_MEETING_MINUTES * MS_PER_MINUTE);
-    const event: CalendarEvent = { id: `meeting:${m.id}`, kind: "meeting", title: m.title, start, end, allDay: false };
+    const allDay = /^\d{4}-\d{2}-\d{2}$/.test(m.startTime);
+    const start = allDay ? parseLocalDate(m.startTime) : new Date(m.startTime);
+    if (Number.isNaN(start.getTime()) || (allDay && toDateParam(start) !== m.startTime)) continue;
+    const parsedEnd = m.endTime ? (allDay && /^\d{4}-\d{2}-\d{2}$/.test(m.endTime) ? parseLocalDate(m.endTime) : new Date(m.endTime)) : null;
+    const end = parsedEnd && !Number.isNaN(parsedEnd.getTime()) && parsedEnd > start
+      ? new Date(parsedEnd.getTime() - (allDay ? 1 : 0))
+      : allDay ? new Date(start.getFullYear(), start.getMonth(), start.getDate(), 23, 59, 59, 999)
+        : new Date(start.getTime() + DEFAULT_MEETING_MINUTES * MS_PER_MINUTE);
+    const event: CalendarEvent = { id: `meeting:${m.id}`, kind: "meeting", title: m.title, start, end, allDay };
+    if (m.cancelled !== undefined || m.status === "cancelled") event.cancelled = m.cancelled === true || m.status === "cancelled";
     if (m.organizer) event.organizer = m.organizer;
+    if (m.status) event.status = m.status;
+    if (m.responseStatus) event.responseStatus = m.responseStatus;
+    if (m.attendanceSkipReason === "office-internal") event.attendanceSkipReason = m.attendanceSkipReason;
+    if (m.description) event.description = m.description;
     if (m.meetingUrl) event.meetingUrl = m.meetingUrl;
     events.push(event);
   }

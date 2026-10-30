@@ -1,6 +1,6 @@
 # w25-assistrec: assisted recording of human-played media (YouTube replays)
 
-Status: ready-for-check
+Status: checked-PASS — closed out 2026-10-26 (resume reconcile; latest verdict section PASS at this cycle, qa/verdicts/w25-assistrec.md)
 Fix cycle: 1
 Lane: KnowledgeBase-lanes/w25-assistrec  Branch: lane/w25-assistrec  Base: 50c320a6505a3d7d2802b42167b2a854355d5cd4
 Candidate SHA: see `git log -1 lane/w25-assistrec` (the commit that adds this file)

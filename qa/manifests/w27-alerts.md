@@ -1,6 +1,6 @@
 # w27-alerts
 
-Status: ready-for-check
+Status: checked-PASS — closed out 2026-10-26 (resume reconcile) citing qa/verdicts/w27-alerts.md
 Fix cycle: 0
 Base: 4264418c
 Lane: lane/w27-alerts

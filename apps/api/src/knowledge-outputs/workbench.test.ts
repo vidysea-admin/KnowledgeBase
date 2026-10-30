@@ -22,6 +22,7 @@ import { materializeWhatsAppClaim, revokeWhatsAppClaim } from "../whatsapp/revie
 import { WHATSAPP_REVIEW_LOG } from "../whatsapp/review/invalidate.js";
 import { headId, type ReviewHead } from "../transcript-review/store.js";
 import type { Db } from "mongodb";
+import { turn, claim, input, fixture, refuses } from "./workbench-fixture.js";
 
 /** Add ordinary cursor bounds to the actual T007 transactional fixture; no alternative approval implementation. */
 function boundedFixtureDb(db: Db): Db {
@@ -36,28 +37,6 @@ function boundedFixtureDb(db: Db): Db {
   } } as unknown as Db;
 }
 
-const turn = (): Turns => ({ _id: "t1", tenantId: "a", sessionId: "s1", speakerRef: "speaker:1", speakerLabel: "Admissions expert", tStart: 3, tEnd: 9, text: "Applications open Monday. The board decided to extend the deadline." });
-const claim = (): Claims => ({ _id: "c1", tenantId: "a", text: "Applications open Monday.", status: "verified", evidence: [{ turnId: "t1", sessionId: "s1", quote: "Applications open Monday." }] });
-const input = (kind: OutputInput["kind"] = "faq"): OutputInput => ({ kind, title: "Application preparation", purpose: "Prepare admissions questions for Monday", sessionIds: ["s1"] });
-function fixture() {
-  let sources: OutputSources = { sessions: [{ _id: "s1", tenantId: "a" } as Sessions], claims: [claim()], turns: [turn()] };
-  let supported = true, invalid = false, calls = 0, fail = false;
-  let kind: OutputInput["kind"] = "faq";
-  const repository = createMemoryOutputRepository();
-  const deps: OutputDeps = { repository, now: () => new Date("2026-10-14T12:00:00.000Z"),
-    readSources: async (tenantId) => tenantId === "a" ? structuredClone(sources) : { sessions: [], claims: [], turns: [] },
-    policy: async (_tenant, selection) => ({ status: "none", questionClass: selection.questionClass }),
-    complete: async (_tenant, job): Promise<CompleteResult> => {
-      calls++; if (fail) throw new Error("provider SECRET source content");
-      const prompt = JSON.parse(job.messages[1]!.content) as { items?: { id: string; text: string }[]; evidence?: { quote: string }[] };
-      const json = prompt.items ? { checks: prompt.items.map((i) => ({ id: i.id, supported: supported && !i.text.includes("free tuition") })) }
-        : { sections: sectionDefinitions[kind].map((s) => ({ key: s.key, items: s.key === "decisions" ? [] : [{ text: s.kind === "fact" ? (kind === "faq" ? `Q: What does this source state?\nA: ${prompt.evidence?.[0]?.quote ?? ""}` : `${prompt.evidence?.[0]?.quote ?? ""}`) : s.kind === "question" ? "When should we prepare the application?" : "Suggestion: discuss the Monday application opening.", citationIds: [invalid ? "invented" : "e1"] }] })) };
-      return { text: JSON.stringify(json), json, provider: "fixture-provider", model: "fixture-model", usage: { inputTokens: 100, outputTokens: 50 }, costUsd: 0 };
-    } };
-  return { deps, service: createOutputService(deps), repository,
-    setKind: (v: OutputInput["kind"]) => { kind = v; }, setSources: (v: OutputSources) => { sources = v; }, sources: () => sources,
-    setSupported: (v: boolean) => { supported = v; }, setInvalid: () => { invalid = true; }, setFailure: () => { fail = true; }, calls: () => calls };
-}
 
 test("independent verifier assesses generation and edits without using the synthesis chain", async () => {
   const f = fixture();
@@ -87,7 +66,6 @@ test("independent verifier failure cannot silently fall back to the synthesis ch
   assert.equal(f.calls(), 1);
   assert.deepEqual(await f.repository.list("a"), []);
 });
-const refuses = (code: string) => (e: unknown) => e instanceof OutputError && e.code === code;
 
 test("all three kinds synthesize through provider and independent grounding pass, then editable Markdown consumer", async () => {
   for (const kind of ["faq", "report", "meeting-brief"] as const) {
@@ -112,8 +90,9 @@ test("unsupported model interpretations remain withheld and cannot export", asyn
   assert.match(draft.sections[0]!.missing, /withheld/u);
   await assert.rejects(f.service.export("a", draft._id, 1), refuses("needs_review"));
 });
-test("excluded unverified source claims remain visible as partial coverage and refusal policy cannot call them ready", async () => {
-  const f = fixture(); f.sources().claims.push({ ...claim(), _id: "c2", status: "needs-review" });
+// D-201: needs-review is now citable (see the C1-C5 tests below); the withheld/partial path is pinned with a `conflicting` claim.
+test("excluded conflicting source claims remain visible as partial coverage and refusal policy cannot call them ready", async () => {
+  const f = fixture(); f.sources().claims.push({ ...claim(), _id: "c2", status: "conflicting" });
   const draft = await f.service.create("a", input());
   assert.deepEqual(draft.sourceCoverage, { status: "partial", withheldClaims: 1 });
   assert.match((await f.service.export("a", draft._id, 1)).markdown, /Source coverage: partial; 1 claims excluded/u);
@@ -306,7 +285,8 @@ test("removing a withheld item preserves other verified mappings and truthful co
   assert.equal(removed.sections[0]!.items.length, 1); assert.equal(removed.sections[0]!.items[0]!.validation, "ai-supported");
   assert.doesNotMatch((await f.service.export("a", draft._id, 3)).markdown, /Unsupported text/u);
 });
-test("actual TOC unreviewed sample refuses; a clearly synthetic verified copy demonstrates downstream consumption without raw mutation", async () => {
+// D-201 [C5]: the TOC sample's needs-review claims are citable without a refuse policy and still refuse under one.
+test("actual TOC needs-review sample: refuse policy refuses, no policy succeeds with unverified label; verified copy demonstrates downstream consumption without raw mutation", async () => {
   // Resolved from this file (repo-root data/), not the cwd: `pnpm -r test` runs with apps/api as cwd.
   const sample = new URL("../../../../data/toc-migrated/2026-08-27-in-focus-4/", import.meta.url);
   const path = new URL("turns.json", sample), claimsPath = new URL("claims.json", sample);
@@ -314,8 +294,14 @@ test("actual TOC unreviewed sample refuses; a clearly synthetic verified copy de
   const turns = JSON.parse(before.toString()) as Turns[], claims = JSON.parse(claimsBefore.toString()) as Claims[];
   const f = fixture();
   f.deps.readSources = async () => ({ sessions: [{ _id: "2026-08-27-in-focus-4", tenantId: "toc" } as Sessions], claims, turns });
+  const noPolicy = f.deps.policy;
+  f.deps.policy = async () => ({ status: "active", policy: { tenantId: "toc", policyId: "p1", version: 1, questionClass: "faq", mode: "internal-only", style: "concise", onInsufficient: "refuse", citations: "required", retired: false } as never });
   await assert.rejects(f.service.create("toc", { ...input(), sessionIds: ["2026-08-27-in-focus-4"] }), refuses("unavailable"));
   assert.equal(f.calls(), 0);
+  f.deps.policy = noPolicy;
+  const unreviewed = await f.service.create("toc", { ...input(), sessionIds: ["2026-08-27-in-focus-4"] });
+  assert.ok(unreviewed.citations.length > 0 && unreviewed.citations.every((c) => c.claimStatus === "needs-review"));
+  assert.equal(unreviewed.sourceCoverage.status, "partial");
   const first = turns.find((t) => t.text.trim()); assert.ok(first);
   const synthetic = fixture(); synthetic.sources().turns[0]!.text = first.text; synthetic.sources().claims[0]!.evidence[0]!.quote = first.text;
   const draft = await synthetic.service.create("a", input()); assert.equal(draft.citations[0]!.quote, first.text);

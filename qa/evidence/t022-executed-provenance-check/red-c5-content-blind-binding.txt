@@ -1,0 +1,63 @@
+✖ executed provenance binds local router adapters parser barrel lock resolver and runtime (323.7855ms)
+✔ executed provenance predecessor consumer refuses stale missing runtime or after-run bindings (57.0485ms)
+ℹ tests 2
+ℹ suites 0
+ℹ pass 1
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 707.9715
+
+✖ failing tests:
+
+test at scripts\eval\human-calibration.test.mjs:138:1
+✖ executed provenance binds local router adapters parser barrel lock resolver and runtime (323.7855ms)
+  AssertionError [ERR_ASSERTION]: packages/ai/src/router.ts
+      at TestContext.<anonymous> (C:\Users\Lenovo\AppData\Local\Temp\claude\d--KnowledgeBase\c2ef8d8a-4751-4a78-9ee6-bc8beb4a8c1f\scratchpad\row-c5\scripts\eval\human-calibration.test.mjs:151:16)
+      at Test.runInAsyncScope (node:async_hooks:214:14)
+      at Test.run (node:internal/test_runner/test:1103:25)
+      at Test.start (node:internal/test_runner/test:1000:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:358:17) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: {
+      format: 't022-executed-local-provenance-v1',
+      runtime: { executable: 'C:\\Program Files\\nodejs\\node.exe', version: 'v24.13.1', platform: 'win32', arch: 'x64', execArgvSha256: 'f126652f6c24cc38af3902f98ca6050ce56a196c10a8fd6dd9937549847c7f40', nodeOptionsSha256: 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855', aiEntry: 'C:\\Users\\Lenovo\\AppData\\Local\\Temp\\claude\\d--KnowledgeBase\\c2ef8d8a-4751-4a78-9ee6-bc8beb4a8c1f\\scratchpad\\row-c5\\packages\\ai\\src\\index.ts', tsxEntry: [Object] },
+      files: [
+        [Object], [Object], [Object], [Object],
+        [Object], [Object], [Object], [Object],
+        [Object], [Object], [Object], [Object],
+        [Object], [Object], [Object], [Object],
+        [Object], [Object], [Object], [Object],
+        [Object], [Object], [Object], [Object],
+        [Object], [Object], [Object], [Object],
+        [Object], [Object], [Object], [Object],
+        [Object], [Object], [Object], [Object],
+        [Object], [Object], [Object], [Object],
+        [Object], [Object]
+      ],
+      limitation: 'Conservative local source inventory and actual resolver/runtime entry; lock-bound external transitive bytes are not independently certified.'
+    },
+    expected: {
+      format: 't022-executed-local-provenance-v1',
+      runtime: { executable: 'C:\\Program Files\\nodejs\\node.exe', version: 'v24.13.1', platform: 'win32', arch: 'x64', execArgvSha256: 'f126652f6c24cc38af3902f98ca6050ce56a196c10a8fd6dd9937549847c7f40', nodeOptionsSha256: 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855', aiEntry: 'C:\\Users\\Lenovo\\AppData\\Local\\Temp\\claude\\d--KnowledgeBase\\c2ef8d8a-4751-4a78-9ee6-bc8beb4a8c1f\\scratchpad\\row-c5\\packages\\ai\\src\\index.ts', tsxEntry: [Object] },
+      files: [
+        [Object], [Object], [Object], [Object],
+        [Object], [Object], [Object], [Object],
+        [Object], [Object], [Object], [Object],
+        [Object], [Object], [Object], [Object],
+        [Object], [Object], [Object], [Object],
+        [Object], [Object], [Object], [Object],
+        [Object], [Object], [Object], [Object],
+        [Object], [Object], [Object], [Object],
+        [Object], [Object], [Object], [Object],
+        [Object], [Object], [Object], [Object],
+        [Object], [Object]
+      ],
+      limitation: 'Conservative local source inventory and actual resolver/runtime entry; lock-bound external transitive bytes are not independently certified.'
+    },
+    operator: 'notDeepStrictEqual',
+    diff: 'simple'
+  }
+c5 red2 exit=1

@@ -1,3 +1,15 @@
+> **2026-10-28 Wave 1 (approved: 2026-10-28, Umesh: "remaining run krr aur kaam khatam krr"; plan docs/REMAINING-PLAN-2026-10-28.md). TODO rows, parallel, file-disjoint:**
+> - W1-api-honest-status (G-A1+G-B2): unconfigured integrations answer 503 "not configured" (whatsapp/groups 500, calendar copy), mount connector-workflow router (/connectors 404); heartbeat read failure never reports "all fresh" (iss-368). files: apps/api/src/server.ts, apps/api/src/routes/{whatsapp*,connector-workflow*,health*} + tests · owner: server.ts
+> - W1-web-live-polish (G-A2): login shows the 401 message, /knowledge/profiles route, /analytics wiring, /api/graph 404 as empty state. files: apps/web/src/** + tests
+> - W1-tooling-honest-lint (G-B1+G-B3): lint:structure must not short-circuit (iss-367), .test.mjs in testPatterns (ISS-371), ledger duplicate-id guard over the issues*.jsonl union. files: package.json, structure.config.json, scripts/lint-*.mjs, scripts/tracker-audit* · owner: package.json
+> - W1-ask-trust (W-AFR): ISS-AFR-001..004 (default /ask verdict, web fallback reach, abstain, deadline orphan/auditLog). files: packages/ask/src/*, apps/api/src/answer-policy/*, apps/api/src/routes/ask/* (not production.ts)
+> - W1-speaker-rules-split (W-S step 1): split speaker-name-rules tests, no behaviour change. files: packages/index/src/pipeline/speaker-name-rules*
+> - W1-vector-gap-durability (W2, ISS-122): bring wave/vector-gap-durability onto current HEAD, tests green, ready-for-check. files: apps/api/src/indexing/*, ingest-store.ts, whatsapp-store.ts
+> - W1-speaker-handover-gate-test (ISS-SPEAKER-001, human-asked: Umesh 2026-10-28 "apply the best practices"): a predicate-level test that turns red when the ISS-255 handover gate in hasNamingCue (packages/index/src/pipeline/speaker-name-rules.ts:205-206) is removed. Test-only. files: packages/index/src/pipeline/speaker-rules/speaker-name-rules-handover.test.ts
+> **2026-10-28 (D-200): row 0 is the only unit to run now.** Older rows below are historical.
+> **2026-10-28 (D-202): row 0b `gemini-web-fallback` TODO, human-asked (Umesh: "use krro gemini", paid key). files: apps/api/src/ask/ask-web-fallback.ts, apps/api/src/composition/production.ts, setup-status.ts, setupModel.ts + tests · schema: no · lanes: code · after: none. Building in .worktrees/gemini-web-fallback.**
+**2026-10-28 (D-203): row 0c `ask-fast-rag` TODO, human-asked (Umesh via VC session: "let it work like how the rag based chatbot works"). Default /ask = top-k retrieval + 1 answer LLM call + <=1 grounding check; old graph behind filters.mode="deep"; response shape unchanged; target 5-10 s. files: apps/api/src/routes/ask/*, apps/api/src/answer-policy/*, packages/ask/src/* + tests · schema: no · not production.ts (gemini-web-fallback owns it). DONE 2026-10-28: dual check PASS cycle 1 (qa/verdicts/ask-fast-rag.md, .b.md), merged b348ab8b, not pushed. Candidates: ISS-AFR-001..012 in qa/issues.afr.jsonl (4 medium: verdict hard-coded correct, web fallback unreachable, no abstain, deadline orphan/auditLog) await human pick.**
+
 # QUEUE — maker tick 2026-09-28 (iss-346 cycle-1 FAIL, HELD; slug collision gated)
 
 > **iss-346-round-cap-mechanical-check is HELD, not stalled.** Cycle-1 verdict `8ac0582`: FAIL,
@@ -26,6 +38,7 @@
 
 | # | unit | tier | why now | cap check |
 |---|---|---|---|---|
+| 0 | `claims-citable-needs-review` — **TODO** | 1 (Approver-directed, D-200) | Umesh 2026-10-28: needs-review claims citable with visible `verification: "unverified"`, anchored to the evidence turn; rejected never cited; verified ranks first. Unblocks counsellor 0-sources (`answer-workflow.ts:144/157`) and knowledge-outputs 422 (`service.ts:32`). Local validation only; live rollout is a human step. **Stop the loop after this unit closes out.** | new seam — clear |
 | 1 | `iss-367-lint-structure-no-shortcircuit` (folds in ISS-371) | 2 (high) | **released** — it was `SERIAL` on the iss-346 check because it re-runs `lint-loc`; that check has returned. **CORRECTION to this tick's first draft: ISS-371 is severity `medium`, not high.** Under this repo's severity gate a medium gets a ledger entry and is "verified inside the next unit that touches the same file" — not its own ceremony. That unit is ISS-367, whose own `fix_direction` says to do the `testPatterns` entry FIRST because it drops `lint-loc` 5→4 and changes the masking picture. So they are one unit, not two | 0 prior PASSes on `package.json` / `structure.config.json` / `scripts/lint-*.mjs` — clear |
 | 2 | `iss-368-heartbeat-read-failure-is-not-health` | 2 (high) | a `listHeartbeats` throw is reported as zero silent watchers — byte-identical to "all fresh", contradicting D-048; its standing test pins the wrong answer and passes on the broken implementation | `apps/api/src/routes/health.ts` 1 prior PASS — under the cap |
 | 3 | `ledger-duplicate-id-guard` | 2 (high) | `SERIAL` this wave — see below | 0 prior PASSes — clear |
@@ -1186,3 +1199,33 @@ Remaining acceptance is explicitly split:
 - **Tracker state:** seven started parents remain in_progress, T-059/T-060 remain pending, and no parent is marked done here. `.goal/goal.json` project_path still stores the historical D:\KnowledgeBase value: repo-wide targeted reader search found no consumer proving it is a current runtime checkout selector, so it was preserved rather than guessing external semantics.
 
 Current source-table tracker verification: `node scripts/tracker-audit.mjs --json --gate g1` -> exit 0, `ok: true`, `findings: []`, after canonical source-state and acceptance-gate notes were updated.
+
+## 2026-10-30 user-accounts wave 3 close-out (A4 + A6 dual PASS, merged locally 33670a8e / cdc61b36, not pushed)
+- DONE 2026-10-30 (dual PASS cycle 0, merged) `ua-production-enable` (plan gap, needed before A9; include a request-level /admin mount test: anon 401, key POST 403, admin session POST 200 - review of ua-admin-mount; and close ISS-UAADMIN-005: unlock through the built router clears the A4 throttle row, issue-link origin asserted): `composition/production.ts` never sets `ServerDeps.userAccounts`, so `/auth` and `/admin` are unmounted in production even with `AUTH_CSRF_SECRET`. One-line enablement `userAccounts: buildUserAccounts(process.env, db, logger)`; production.ts sits at exactly its 300-line budget, so first move a self-contained helper (e.g. the watch-silence deps) out. Tier L (auth), dual-trigger. In scope of the approved user-accounts plan (gate plan-approved-user-accounts.md).
+- DONE `ua-admin-mount` (the A6 CORE-REQUEST, be587455): dual PASS cycle 0; ISS-UAADMIN-005 (wiring test gap) folded into ua-production-enable.
+
+### Candidates (human picks) — from the A4/A6 dual checks
+- priority: security · ISS-UAAUTH-001 (medium) lockout TOCTOU: concurrent wrong-password burst bypasses the 5-failure lock (qa/issues.uaauth.jsonl).
+- priority: security · ISS-UAAUTH-002 (medium) login racing a password reset keeps a session alive / rehash can overwrite the new password.
+- priority: security · ISS-UAADMIN-001 (medium, data write) admin change applied with no audit row when the audit write fails; retry 409.
+- priority: security · ISS-UAADMIN-002 (low, owner decision) an admin may issue a password-reset link for another admin (peer takeover).
+- low: ISS-UAAUTH-003..005, ISS-UAADMIN-003..004.
+
+## 2026-10-30 user-accounts A7 close-out (ua-web dual PASS cycle 1, merged locally 36ec91df, not pushed)
+- DONE `ua-web` (A7 web client: login/signup/verify/reset/pending/account pages, admin UI, cookie session + CSRF, viewer read-only scope). Cycle 0 A FAIL (fixture exit 1; viewer write controls) / B PASS; cycle 1 both PASS. Merged-head check: 19 files / 230 tests passed, tsc exit 0. Senior review Warning folded into cycle 1 (qa/evidence/review-ua-web/).
+- NEXT (plan): A8 `ua-deploy-cookie-proxy` (docs + runtime flag userAccounts in apps/web/docker/40-lkb-runtime-config.sh = ISS-UAWEB-004; compose env forwards need an Approved-by entry), then A9 live proof by a fresh checker.
+
+### Candidates (human picks) — from the A7 dual check
+- priority: S2 · ISS-UAWEB-001 (high) any 401 ends the web session: cookie users are signed out on /meeting-bot (capture-readiness requires keyId) and likely on ~20 keyId-guarded routers. Blocks a clean A9 live proof (qa/issues.uaweb.jsonl).
+- low: ISS-UAWEB-002..005 (WriteScope disables filters, console 401/403 lines, runtime flag -> A8, vite dev cross-origin).
+- DONE 2026-10-30 `ua-deploy-cookie-proxy` (A8): PASS cycle 0 (one checker), merged locally 84fe76f7. APP_USER_ACCOUNTS runtime flag (closes ISS-UAWEB-004), docs/user-accounts/ops.md, DEVOPS-HANDOVER 4b, .env.example names. ISS-UADEPLOY-001..002 fixed at close-out.
+- HUMAN_GATE (A9 prerequisite): docker-compose.yml forwards need an Approved-by entry: api `AUTH_CSRF_SECRET USER_SIGNUP_TENANT USER_SIGNUP_DAILY_CAP APP_PUBLIC_ORIGIN APP_BASE_PATH TRUST_PROXY_HOPS`, web `APP_USER_ACCOUNTS`. APP_BASE_PATH is web-only today, so the api cookie Path is wrong behind /knowledgebase.
+
+## 2026-10-30 whatsapp-multiuser W4 close-out
+- DONE `wa-owner-resolver` (W4): dual PASS cycle 0, senior review Approve; merged locally ebc4ef8f. Ledger qa/issues.waowner.jsonl ISS-WAOWNER-001..005 (2 medium, 3 low).
+- W7 brief MUST include ISS-WAOWNER-002 (route 409 ambiguous_link / 404 absent group, caller + linkId threading, repair path scope); W5/W9 briefs must include ISS-WAOWNER-001 (seed before reading whatsapp_links).
+- W3 `wa-archiver-client`: checker A PASS, checker B and review pending/in (review Warning, lows).
+- DONE `wa-archiver-client` (W3): dual PASS cycle 0, review Warning (lows); merged locally 7b572ebc (76 tests: 57 pass, 0 fail, 19 skipped by design on merged head). Criterion 5 compose half HELD at HUMAN_GATE H-11 (ISS-WAARCH-001: compose forwards + keep/rename/drop WHATSAPP_ARCHIVER_API_ALLOW_PRIVATE_HTTP). ISS-WAARCH-002..003 low.
+- IN PROGRESS: W7 `wa-isolation-read-side` (carries ISS-WAOWNER-002), W9 `wa-sync-scheduler` (carries ISS-WAOWNER-001). W5 waits on HUMAN_GATE H-4 (self-approval rule when Umesh is the only admin).
+- DONE 2026-10-30: W9 `wa-sync-scheduler` dual PASS cycle 1, merged b1b135cc; ISS-WASYNC-001..004 (001 medium: unlink retry inert until W8 schema field). IN PROGRESS: W7 (A PASS c1, B pending), W5 `wa-links-api` building. Gates H-4, H-9 answered.
+- DONE 2026-10-30: W7 `wa-isolation-read-side` dual PASS cycle 1, merged; ISS-WAIRS-001..005 (001 medium: repair loop has no production caller). Next: W8 after W5.

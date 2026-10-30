@@ -1,0 +1,60 @@
+// ================= B1CHK independent probes (checker B, cycle 1) =================
+test("B1CHK-1 production composition: matrix, single audit per admin read, no text in event, other-tenant admin blind", async () => {
+  const w = await world({ production: true });
+  try {
+    const missing = await w.json(await w.send("uA", "/sessions/sess-nope"));
+    assert.equal((await w.send("uA", "/sessions/sess-a")).status, 200);
+    for (const id of ["sess-b", "sess-l", "sess-x"]) { const r = await w.send("uA", `/sessions/${id}`); assert.equal(r.status, 404, id); assert.deepEqual(await w.json(r), missing, id); }
+    assert.equal(w.events().length, 0);
+    const a1 = await w.send("admin", "/sessions/sess-a"); assert.equal(a1.status, 200);
+    assert.equal(w.events().length, 1);
+    const a2 = await w.send("adminKey", "/sessions/sess-l"); assert.equal(a2.status, 200);
+    assert.equal(w.events().length, 2);
+    const ev = w.events();
+    console.log("EVENTS", JSON.stringify(ev));
+    assert.deepEqual(ev.map(e => e.eventType), ["admin.raw_read", "admin.raw_read"]);
+    assert.deepEqual(ev.map(e => e.actorKind), ["user", "key"]);
+    for (const e of ev) { const s = JSON.stringify(e); for (const t of Object.values(TEXT)) assert.ok(!s.includes(t)); }
+    const x = await w.send("adminX", "/sessions/sess-a"); assert.equal(x.status, 404); assert.deepEqual(await w.json(x), missing);
+    assert.equal(w.events().length, 2);
+    // a 3-arg regression canary: owner read in production does not write an admin event
+    assert.equal((await w.send("uB", "/sessions/sess-b")).status, 200); assert.equal(w.events().length, 2);
+  } finally { await w.close(); }
+});
+
+for (const state of [null, 7]) {
+  test(`B1CHK-2 gate state=${JSON.stringify(state)}: owner locked out on every raw route (prod wiring); admin audited; others unaffected`, async () => {
+    const w = await world({ production: true });
+    try {
+      await w.f.db.collection("whatsapp_links").updateOne({ _id: LA } as never, { $set: { state } } as never);
+      const missing = await w.json(await w.send("uA", "/sessions/sess-nope"));
+      const r = await w.send("uA", "/sessions/sess-a"); assert.equal(r.status, 404); assert.deepEqual(await w.json(r), missing);
+      assert.equal((await w.send("uA", `/whatsapp/review/${w.ids.a![0]}`)).status, 404);
+      assert.equal((await w.send("uA", `/whatsapp/review/${w.ids.a![0]}/source`)).status, 404);
+      assert.equal((await w.send("uA", `/whatsapp/review/${w.ids.a![0]}/approve`, { method: "POST", body: {} })).status, 404);
+      assert.equal((await w.send("uA", `/whatsapp/review/${w.ids.a![0]}/reject`, { method: "POST", body: {} })).status, 404);
+      assert.deepEqual(await listed(w, "uA"), []);
+      assert.ok(!((await w.json(await w.send("uA", "/sessions"))).sessions as { _id: string }[]).some(x => x._id === "sess-a"));
+      assert.equal(w.f.rows("published").length, 0); assert.equal(w.sourceReads(), 0, "source reader never touched for the locked-out owner");
+      assert.equal((await w.send("uB", "/sessions/sess-b")).status, 200);
+      assert.equal((await w.send("admin", "/sessions/sess-a")).status, 200);
+      assert.equal(w.events().length, 1); assert.equal(w.events()[0]!.linkId, LA);
+    } finally { await w.close(); }
+  });
+}
+
+test("B1CHK-3 unstamped fallback: re-link takeover shape and duplicates (observation)", async () => {
+  const w = await world();
+  try {
+    const raw = createWhatsAppRawAccess(w.f.db);
+    w.f.seed("sources", { _id: "src-u", tenantId: "tenant-a", kind: "whatsapp-batch", path: "u@g.us", ownerUserId: OA, consent: { given: true, recordedBy: "test" } });
+    await w.f.db.collection("whatsapp_links").updateOne({ _id: LA } as never, { $set: { state: "revoked" } } as never);
+    w.f.seed("whatsapp_links", { ...link("e".repeat(24), "uNEW", OA) });
+    const takeover = await raw.forSource("tenant-a", "src-u", { kind: "session", userId: "uNEW", admin: false });
+    const oldOwner = await raw.forSource("tenant-a", "src-u", { kind: "session", userId: "uA", admin: false });
+    console.log("RELINK unstamped: new user =", JSON.stringify(takeover), " old owner =", JSON.stringify(oldOwner));
+    // stamped source (the W7 ingest path) is NOT taken over:
+    const stamped = await raw.forSource("tenant-a", "src-a", { kind: "session", userId: "uNEW", admin: false });
+    assert.deepEqual(stamped, { allowed: false });
+  } finally { await w.close(); }
+});

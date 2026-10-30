@@ -1,0 +1,5 @@
+   × individual extraction gold review > fails closed for trusted-human refusal and discards a previous tenant response 1165ms
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+Error: expect(element).not.toBeInTheDocument()
+      Tests  1 failed | 5 skipped (6)
+exit=1

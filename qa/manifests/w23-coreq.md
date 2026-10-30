@@ -1,6 +1,6 @@
 # Manifest: w23-coreq
 
-Status: ready-for-check
+Status: checked-PASS — closed out 2026-10-26 (resume reconcile) citing qa/verdicts/w23-coreq.md
 Fix cycle: 1
 Base: 3c99337f
 Lane: lane/w23-coreq (C:\Users\product\Desktop\KnowledgeBase-lanes\w23-coreq)

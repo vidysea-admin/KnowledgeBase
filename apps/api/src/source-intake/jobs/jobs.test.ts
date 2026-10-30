@@ -25,7 +25,7 @@ function fixture(context: { after(fn: () => void): void }): string {
 function complete(): SourceIntakeResult {
   return { status: "created", sessionId: "session-a", sourceId: "a:fixturehash", turnCount: 1,
     indexing: { status: "done", receipt: { sessionId: "session-a", summary: { degraded: null }, claims: { degraded: null },
-      entities: null, chunks: { written: 1, skipped: null }, completion: { version: 2, strict: true, complete: true,
+      entities: null, gapRecorded: true, chunks: { written: 1, skipped: null }, completion: { version: 2, strict: true, complete: true,
         treeWritten: true, generation: "test-generation", turnCount: 1 } } } };
 }
 const runner = (store: SourceJobStore, intake: () => Promise<SourceIntakeResult>, allowed = true) => ({

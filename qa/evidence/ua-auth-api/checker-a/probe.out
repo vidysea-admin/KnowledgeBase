@@ -1,0 +1,53 @@
+PROBE throttle rows 4
+PROBE P1 ok
+✔ P1 enumeration: signup new/existing/rejected/disabled byte+header equal; login unknown/wrong/badshape/locked equal (5522.8104ms)
+PROBE throttle rows after 5 variant failures 1
+PROBE login with correct pw after 5 variant failures -> 401
+✔ P3 lock key normalisation: case/space/NFKC variants share one lock (218.4564ms)
+PROBE session after reset 401 {"error":"session_revoked","message":"this session has ended; sign in again"}
+PROBE session after reset 401 {"error":"session_revoked","message":"this session has ended; sign in again"}
+PROBE weak 400 {"error":"invalid_request","message":"the request is not acceptable","fields":["newPassword"],"reasons":["too_short"]}
+PROBE parallel redeem statuses 200,400,400,400,400,400,400,400
+✔ P6 reset/verify tokens: single use, cross-purpose, expiry, session death, rejected/disabled generic (3407.4007ms)
+PROBE authorization header variant "Basic dTpw" 403 0
+PROBE authorization header variant "bearer key-admin" 403 0
+PROBE authorization header variant "" 403 0
+PROBE authorization header variant "Token abc" 403 0
+PROBE x-api-key /auth/session 401
+PROBE admin w/ key 503 {"error":"not_implemented","message":"admin routes are not available yet"}
+PROBE admin no key 401 {"error":"unauthorized","message":"missing or malformed Authorization: Bearer <key> header"}
+✔ P7 Bearer/Authorization on every /auth route, with and without cookie; case/path variants; no session minted (6370.5252ms)
+PROBE grep "correct hors" absent
+PROBE grep "another long" absent
+PROBE grep "wrong wrong " absent
+PROBE grep "bG1Ah3qY9bEF" absent
+PROBE grep "5ynH1olzqpBf" absent
+PROBE grep "-nYk_iO2VvXB" absent
+PROBE grep "jki0DUTLbPSK" absent
+PROBE grep "yet another " absent
+PROBE grep "wtK7tEY45YYf" absent
+PROBE grep "YvPn5Fq_b9z_" absent
+PROBE grep "SECRETUA" absent
+PROBE grep "ghost-canary" absent
+PROBE grep "newbie@x.org" absent
+PROBE grep "Canary Displ" absent
+PROBE event histogram {"signup/ok/new_account":1,"signup/denied/existing_account":1,"link_issued/ok/admin_action":2,"email_verified/ok/none":1,"email_verified/failed/token_invalid":1,"login_failed/failed/unknown_account":5,"locked/denied/locked":1,"login_failed/denied/locked":1,"login_failed/failed/invalid_credentials":1,"login_ok/ok/none":2,"password_changed/failed/invalid_credentials":1,"password_changed/ok/self_action":1,"password_reset/ok/none":1,"unlocked/ok/admin_action":1,"logout/ok/none":1}
+PROBE keys of an event _id,at,type,outcome,detail,purgeAt,targetUserId,subjectHash,ipPrefix,tenantId
+✔ P8 audit events carry no secrets after a full scenario; raw unknown email absent (1779.5936ms)
+PROBE change w/o csrf 403 {"error":"csrf","message":"missing or invalid CSRF proof"}
+PROBE sessions list {"sessions":[{"id":"fb753044-b171-458c-bfaf-144b02432e1e","current":false,"createdAt":"2026-11-01T00:00:00.000Z","lastUsedAt":"2026-11-01T00:00:00.000Z"},{"id":"c91090fb-62b8-4d8e-a81c-90dd508d682d","current":true,"createdAt":"2026-11-01T00:00:00.000Z","lastUsedAt":"2026-11-01T00:00:00.000Z"}]}
+PROBE logout-all 200 __Secure-lkb_sid=; Max-Age=0; Expires=Thu, 01 Jan 1970 00:00:00 GMT; Path=/knowledgebase/api; HttpOnly; Secure; SameSite=Strict
+PROBE logout set-cookie __Secure-lkb_sid=; Max-Age=0; Expires=Thu, 01 Jan 1970 00:00:00 GMT; Path=/knowledgebase/api; HttpOnly; Secure; SameSite=Strict login set-cookie __Secure-lkb_sid=NGLLDBdX5eUVGkyaU-EuQgB82zBeqViC24rTyuhCEsU; Max-Age=34560000; Path=/knowledgebase/api; HttpOnly; Secure; SameSite=Strict
+✔ P9 change password / logout / sessions (2100.4961ms)
+PROBE login XFF spoof statuses 401,401,401,429,429 900 {"error":"rate_limited","message":"too many requests — slow down and retry after the window"}
+PROBE forgot per-email 202,202,202,429
+PROBE forgot different emails 202,202,202,202
+✔ P10 rate limit: per-IP login 429 standard body, XFF spoof does not reset; per-email forgot (1396.9083ms)
+ℹ tests 7
+ℹ suites 0
+ℹ pass 7
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 114622.4952

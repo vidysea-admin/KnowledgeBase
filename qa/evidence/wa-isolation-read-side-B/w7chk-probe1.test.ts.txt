@@ -1,0 +1,25 @@
+import { test } from "node:test";
+import assert from "node:assert/strict";
+import type { WhatsAppMessage } from "@lkb/ingest";
+import { createWhatsAppReviewWiring } from "./review/compose.js";
+import { WHATSAPP_REVIEW_LOG } from "./review/invalidate.js";
+import { WhatsAppGroupNotFoundError, type WhatsAppCaller, type WhatsAppOwnerGrant } from "./owner-config.js";
+import { wireMongoFixture } from "./review/wire-fixtures.js";
+const LA = "a".repeat(24), LB = "b".repeat(24), OA = "1".repeat(24), OB = "2".repeat(24);
+test("P1 probe: member A ingesting B's group jid -> 404, but is a marker left behind?", async () => {
+  const fx = wireMongoFixture();
+  const grants: WhatsAppOwnerGrant[] = [{ linkId: LA, ownerUserId: OA }, { linkId: LB, ownerUserId: OB }];
+  const resolveOwners = async (_t: string, caller?: WhatsAppCaller) => caller?.admin ? grants : caller?.kind === "session" ? grants.filter(g => g.linkId === (caller.userId === "uA" ? LA : LB)) : [];
+  const wiring = createWhatsAppReviewWiring({ appDb: () => fx.db, resolveOwners, now: () => "2026-10-14T11:00:00.000Z",
+    listGroups: async owner => owner === OB ? [{ groupJid: "bgroup@g.us", ownerUserId: owner, subject: "B", trackedPersonCount: 1 }] : [],
+    fetchMessages: async (_g, owner) => [{ messageId: "m1", personId: "p", displayName: "E", text: "Topic: x", ts: "2026-10-14T10:00:00.000Z" } as WhatsAppMessage] });
+  await assert.rejects(() => wiring.whatsapp.ingestGroup("tenant-a", "bgroup@g.us", { caller: { kind: "session", userId: "uA", admin: false }, linkId: LB }), WhatsAppGroupNotFoundError);
+  console.log("MARKERS after A's rejected ingest:", JSON.stringify(fx.rows(WHATSAPP_REVIEW_LOG)));
+  console.log("sources:", fx.rows("sources").length);
+  // poison: bogus jid + attacker-chosen linkId
+  await assert.rejects(() => wiring.whatsapp.ingestGroup("tenant-a", "bogus@g.us", { caller: { kind: "session", userId: "uA", admin: false } }));
+  console.log("MARKERS after bogus:", JSON.stringify(fx.rows(WHATSAPP_REVIEW_LOG)));
+  const rep = await wiring.repairPendingInvalidations("tenant-a").then(r => "repaired " + JSON.stringify(r), e => "repair threw " + (e as Error).name);
+  console.log("repair:", rep);
+  console.log("sources after repair:", fx.rows("sources").length);
+});

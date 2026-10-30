@@ -289,3 +289,29 @@ test("embed: an EMPTY BATCH still returns dims 0 without throwing — no texts, 
   assert.equal(r.dims, 0);
   assert.equal(t.calls.length, 0);
 });
+
+// ---- D-207 item 3: gemini-3.5-flash-lite with a thinking level ---------------------------------------------------------------
+test("gemini thinkingLevel: configured -> generationConfig.thinkingConfig.thinkingLevel is sent; unset -> the body is unchanged", async () => {
+  const body = { candidates: [{ content: { parts: [{ text: "{}" }] } }], usageMetadata: { promptTokenCount: 3, candidatesTokenCount: 1 } };
+  const lite = fakeTransport({ status: 200, body });
+  const p = new GeminiProvider(lite, { apiKey: "k", model: "gemini-3.5-flash-lite", thinkingLevel: "minimal", name: "gemini-flash-lite" });
+  const r = await p.complete(FIXTURE_JOB);
+  assert.equal(p.name, "gemini-flash-lite");
+  assert.equal(r.provider, "gemini-flash-lite");
+  assert.equal(r.model, "gemini-3.5-flash-lite");
+  assert.match(lite.calls[0]!.url!, /models\/gemini-3\.5-flash-lite:generateContent/);
+  assert.deepEqual((lite.calls[0]!.body as { generationConfig?: unknown }).generationConfig, { thinkingConfig: { thinkingLevel: "minimal" } });
+  const plain = fakeTransport({ status: 200, body });
+  await new GeminiProvider(plain, { apiKey: "k" }).complete(FIXTURE_JOB);
+  assert.equal("generationConfig" in (plain.calls[0]!.body as object) && (plain.calls[0]!.body as { generationConfig?: unknown }).generationConfig !== undefined, false);
+  assert.equal(new GeminiProvider(plain, { apiKey: "k" }).name, "gemini", "default name unchanged");
+});
+
+test("gemini: job.signal is handed to the transport so an aborted /route step B really cancels the fetch; the model is listed", async () => {
+  const t = fakeTransport({ status: 200, body: { candidates: [{ content: { parts: [{ text: "x" }] } }] } });
+  const ctl = new AbortController();
+  const p = new GeminiProvider(t, { apiKey: "k" });
+  await p.complete({ ...FIXTURE_JOB, signal: ctl.signal });
+  assert.equal(t.calls[0]!.signal, ctl.signal);
+  assert.ok((await p.listModels()).some((m) => m.id === "gemini-3.5-flash-lite"));
+});

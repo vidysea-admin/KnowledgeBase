@@ -242,3 +242,10 @@ change deleted while HEAD still held it. Both unit files hashed to the base blob
 only because HEAD was intact. The rules as previously written permit that shape exactly — the backup
 was taken, the trap did fire, `cmp` would have reported a clean restore — which makes it a defect in
 the rule, not merely an incident. Filed as ISS-104CC-2.
+
+## Consent is out of scope (2026-10-29, Umesh as Approver, D-210)
+
+Consent is handled by the backend team, not this project. Do **not** open units, issues, fixes, checks,
+probes or questions about consent (capture consent, consent withdrawal, consent policies, consent-based
+cache invalidation). Leave the existing consent code exactly as it is: don't extend it, don't remove it.
+A checker or sweep finding that is only about consent is noted in `EXPLANATION:` and never filed or built.

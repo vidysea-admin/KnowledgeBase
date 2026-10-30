@@ -1,0 +1,31 @@
+✔ executed provenance binds local router adapters parser barrel lock resolver and runtime (926.4198ms)
+✖ executed provenance predecessor consumer refuses stale missing runtime or after-run bindings (93.552ms)
+ℹ tests 2
+ℹ suites 0
+ℹ pass 1
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1351.2597
+
+✖ failing tests:
+
+test at scripts\eval\human-calibration.test.mjs:169:1
+✖ executed provenance predecessor consumer refuses stale missing runtime or after-run bindings (93.552ms)
+  AssertionError [ERR_ASSERTION]: Missing expected exception.
+      at TestContext.<anonymous> (C:\Users\Lenovo\AppData\Local\Temp\claude\d--KnowledgeBase\c2ef8d8a-4751-4a78-9ee6-bc8beb4a8c1f\scratchpad\row-c9\scripts\eval\human-calibration.test.mjs:183:14)
+      at Test.runInAsyncScope (node:async_hooks:214:14)
+      at Test.run (node:internal/test_runner/test:1103:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:785:18)
+      at Test.postRun (node:internal/test_runner/test:1232:19)
+      at Test.run (node:internal/test_runner/test:1160:12)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:358:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: /executed implementation mismatch/,
+    operator: 'throws',
+    diff: 'simple'
+  }
+c9 red exit=1

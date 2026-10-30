@@ -136,3 +136,33 @@ describe("apiFetch", () => {
   });
 });
 
+
+
+describe("Gmail work database handshake", () => {
+  afterEach(() => vi.unstubAllGlobals());
+  test("scan obtains the authenticated work binding before POST and never reuses another login", async () => {
+    const {scanGmail} = await import("./meeting-candidates.js");
+    const fetchMock = vi.fn(async (_url: string, init: RequestInit) => init.method === "POST" ?
+      new Response('{"created":1,"autoApproved":0}') : new Response('{"candidates":[]}', {headers: {"X-LKB-Work-DB": new Headers(init.headers).get("authorization") === "Bearer a" ? "lkb_work_a" : "lkb_work_b", "X-LKB-Tenant": "toc"}}));
+    vi.stubGlobal("fetch", fetchMock);
+    await scanGmail("a"); await scanGmail("b");
+    expect(fetchMock).toHaveBeenCalledTimes(4);
+    expect(new Headers(fetchMock.mock.calls[1]![1].headers).get("X-LKB-Work-DB")).toBe("lkb_work_a");
+    expect(new Headers(fetchMock.mock.calls[3]![1].headers).get("X-LKB-Work-DB")).toBe("lkb_work_b");
+  });
+  test("missing work binding refuses before any scan write", async () => {
+    const {scanGmail} = await import("./meeting-candidates.js");
+    const fetchMock = vi.fn(async () => new Response('{"candidates":[]}'));
+    vi.stubGlobal("fetch", fetchMock);
+    await expect(scanGmail("a")).rejects.toMatchObject({status: 503});
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+  });
+});
+
+import { scanGmail, listMeetingCandidates } from "./meeting-candidates.js";
+test("cycle1 Gmail scan binds work DB from authorized inventory and preserves summary",async()=>{
+  const summary={listed:2,fetched:2,candidates:1,excludedNonMeeting:1,excludedInternal:0,refusedSender:0,incompleteMessages:0,complete:true};
+  const request=vi.fn(async(_url:string,init?:RequestInit)=>new Response(JSON.stringify(init?.method === "POST"?{created:1,autoApproved:0,gmailSummary:summary}:{candidates:[],gmailSummary:summary}),{status:200,headers:{"X-LKB-Work-DB":"fixture-work","X-LKB-Tenant":"owner"}}));vi.stubGlobal("fetch",request);
+  expect(await listMeetingCandidates("key")).toEqual({candidates:[],gmailSummary:summary});expect((await scanGmail("key")).gmailSummary).toEqual(summary);
+  const [url,init]=request.mock.calls.at(-1)!;expect(url).toContain("/gmail/scan");expect(new Headers(init?.headers).get("X-LKB-Work-DB")).toBe("fixture-work");expect(new Headers(init?.headers).get("Authorization")).toBe("Bearer key");
+});

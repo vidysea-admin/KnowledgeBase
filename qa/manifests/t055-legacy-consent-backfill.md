@@ -1,6 +1,6 @@
 # Manifest: t055-legacy-consent-backfill
 
-Status: ready-for-check
+Status: checked-PASS — closed out 2026-10-26 (resume reconcile) citing qa/verdicts/t055-legacy-consent-backfill.md
 Fix cycle: 1
 Unit: ISS-T055STORE-001 / D-181, staging-only backfill of consent-given `sources` rows for legacy documents
 Lane: w22-consentfill (lane/w22-consentfill, root C:\Users\product\Desktop\KnowledgeBase-lanes\w22-consentfill). Base 24c42b31 (lane/w21-integrate, PR #7 head). Code candidate 9c1fcb4f; decision commit b8868a14; this manifest is the commit after 9c1fcb4f.

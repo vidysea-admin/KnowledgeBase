@@ -1,0 +1,7 @@
+   × individual extraction gold review > shows exact source/candidate and native choices, initially unset with no writes 115ms
+   × individual extraction gold review > requires fresh affirmation and stores one native label against current revision/input 216ms
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+Error: expect(element).toHaveValue()
+Error: expect(element).toHaveValue()
+      Tests  2 failed | 7 passed (9)
+exit=1

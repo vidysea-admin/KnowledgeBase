@@ -1,5 +1,5 @@
 # Manifest - w29-spoolhash
-**Status:** ready-for-check
+**Status:** checked-PASS — closed out 2026-10-26 (resume reconcile) citing qa/verdicts/w29-spoolhash.md
 **Fix cycle:** 0
 **Lane:** C:\Users\product\Desktop\KnowledgeBase-lanes\w29-spoolhash (branch lane/w29-spoolhash)
 **Base SHA:** 4ca0271e3a8be2b6b7efc199280bd165493e9e77 (origin/master)

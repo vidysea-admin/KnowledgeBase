@@ -1,0 +1,21 @@
+PROBE timing median ms {"unknown":30.7,"wrong":31.2,"badshape":28.5,"locked":33.2}
+PROBE verify calls total / with null stored hash {"verifies":23,"verifiesNull":18,"verifiesReal":5}
+✔ Q1 timing: unknown vs wrong vs locked vs badshape, real argon2 (recorded, not asserted tight) (821.8936ms)
+✔ Q2 lockout schedule with fake clock: 5/15min, doubling, success clears, admin unlock clears, existing sessions unaffected (2425.765ms)
+PROBE burst: statuses of correct-password request (last): 200 total verifies run: 12 of 12
+PROBE sequential: verifies run: 5 of 12
+✔ Q3 TOCTOU: parallel burst of wrong guesses before the lock lands (real argon2, in-memory CAS store) (630.0988ms)
+PROBE verify stale 400 {"error":"invalid_token","message":"this link is invalid or has expired"}
+PROBE re-signup after 7d 202 user rows with that email: unverified
+PROBE old@ rows after resignup: unverified@2026-11-08
+✔ Q4 stale unverified: sweep at signup, verify of stale user fails, unverified older than 7d (309.029ms)
+PROBE login after 5 failed password-changes (session holder locks owner out): 401
+✔ Q5 change-password lockout interplay + session-revoke exceptions; login with role-less active user (258.7634ms)
+ℹ tests 5
+ℹ suites 0
+ℹ pass 5
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 5477.2893

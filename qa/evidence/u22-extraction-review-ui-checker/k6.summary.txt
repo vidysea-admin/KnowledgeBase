@@ -1,0 +1,8 @@
+Error: Uncaught [TypeError: Cannot read properties of undefined (reading 'summary')]
+    at performUnitOfWork (D:\KnowledgeBase\node_modules\.pnpm\react-dom@18.3.1_react@18.3.1\node_modules\react-dom\cjs\react-dom.development.js:26599:12) TypeError: Cannot read properties of undefined (reading 'summary')
+Error: Uncaught [TypeError: Cannot read properties of undefined (reading 'summary')]
+    at performUnitOfWork (D:\KnowledgeBase\node_modules\.pnpm\react-dom@18.3.1_react@18.3.1\node_modules\react-dom\cjs\react-dom.development.js:26599:12) TypeError: Cannot read properties of undefined (reading 'summary')
+Error: Not implemented: navigation (except hash changes)
+   × individual extraction gold review > refuses foreign or changed-source exports before constructing a download 1046ms
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+TestingLibraryElementError: Unable to find role="alert"

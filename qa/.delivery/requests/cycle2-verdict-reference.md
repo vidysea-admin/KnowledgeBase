@@ -1,0 +1,29 @@
+# Calendar operational completion — primary independent final CODE reviewer
+Cycle checked: 2
+Policy-Version: proportional-verification/2026-10-19.17
+VERDICT: CONTINUE-NEEDED
+CODE-REVIEW: FAIL
+PUSH-CANDIDATE: NO
+SENIOR-REVIEW: Block
+Active unit: qa/manifests/calendar-bot-code-release.md; CODE-READY, product Fix cycle2 of max2, original CODE criterion. Parent C1-C8 remains unaccepted; delivery phase0 does not reset product cycle.
+CHECK-PLAN: CODE → full87-file scope inventory and changed authority/consumer review; independent production-default HTTP plus invalid-enabled refusal; original F1-F7 and new mail-policy critical selections; one isolated default-policy falsification; source freeze and strict evidence-reuse assessment. Internal operator/API audience; code-push boundary only.
+SERIAL: assigned fresh reviewer performs own checks; user forbids agents, source edits, production access, commits and push.
+CHECKED-STATE: base/HEAD0c2edb1497d40c227a4dd216a06bbe31b9fe502e; all87 current files match release-source-identity.json before/after. Identity file SHA25629f5912d7b5d699c73231596b01096ef6ed72c6581faae786349fb8fe565afdb; Node v24.13.1 win32 x64. Installed maker/checker, structure config and lock hashes match pinned packet. Root policy-check was not independently rerun.
+
+## Blocking finding
+PROPOSED-ISSUE: C4-YEAR-UNCERTAINTY [P2, C4, >99% confidence] Missing source year becomes scheduling authority. apps/api/src/gws/public-webinars.ts:247-261 chooses an event year from the provider receipt within a 31-day window; apps/api/src/gws/gws-gmail.ts:194-200 feeds that receipt into the parser and emits concrete start/end at233-234. Receipt time proves when mail arrived, not the event year. apps/api/src/store.ts:175-180 and scripts/webinar/calendar-attendance-source.mjs:93-98 discard timeProvenance while retaining those instants. The actual downstream selectAutoRecordItems accepts the authenticated pending invitation with no uncertainty/refusal. This violates original C4 and the approved repair instruction "Do not guess year/time"; an existing green year-inference test asserts the conflicting behavior rather than establishing compliance.
+Own deterministic reproduction: yearless synthetic invitation, provider receipt2026-10-20, explicit October27 12–1PM PT; mapper emits2026-10-27T19:00Z..20:00Z, yearSource=provider-receivedAt. Actual selector with senderAuthenticated=true/status=pending returns toSchedule=1, skipped=[]; assertion expected0 fails, exit1. No real mail/provider/credentials/capture. Exact executable source, commands and output: qa/.delivery/results/primary-checker.md.
+Scope attribution: inference is added by this candidate; base parser required an explicit year. Same original C4 correctness boundary, not a newly invented feature or a request to waive live gates.
+
+## Independent checks
+- node --test --test-concurrency=1 --import tsx apps/api/src/composition/integrations/capture-policy.test.ts apps/api/src/composition/integrations/mounted-routes.test.ts apps/api/src/routes/meeting-candidates.test.ts →54/54 PASS, exit0, duration7561.8864ms. Disabled/no-flags native mounted GET200; invalid explicitly enabled policy/worker refuses before candidate DB reads. Atomic active-key CAS, revocation, immutable receipts, replay, stale boundary, private projections and typed snapshot transport also PASS.
+- Targeted name-filtered10-file acceptance command in result →71/71 PASS, exit0, duration9302.8745ms. Covers Calendar/MIME/office/date/rules/CORS/publisher downstream behavior. These green tests do not negate the independent C4 counterexample.
+- Isolated copy: node --test --test-concurrency=1 "--test-name-pattern=disabled Compose defaults" --import tsx apps/api/src/composition/integrations/mounted-routes.test.ts →GREEN1/1 exit0; revert only production.ts:219 conditional to unconditional policy injection →intended AssertionError503!==200, RED exit1. Child timeout30000ms; finally byte-restored/compared; original file hash unchanged. Owned temp removed after unlinking dependency junctions; no bound-tree mutation.
+- git diff --check 0c2edb1497d40c227a4dd216a06bbe31b9fe502e →exit0. Full diff87files,4581insertions/795deletions; no unbound changed path.
+SCOREBOARD: repaired default-policy criterion PASS; CODE FAIL on1 newly evidenced original-C4 defect; full parent CONTINUE-NEEDED.
+REUSE: broad maker680/684 (4skips), TSC/build records are supporting records only, not independently reused execution. Existing57-test identity differs on2 relocated tests and lacks complete test-execution config/transitive/runtime binding; current launch packet identity alone cannot repair that. No broad suite/TSC repeats; no sibling result used.
+BASELINE: known unchanged extraction fixture failures and scripts/qa31/30 structure cap remain disclosed; no green CI claim. These are not the cause of this CODE FAIL.
+LIVE-BROWSER: not performed for this code-only review; hosted/browser validation remains a parent gate. No credentials or production access.
+REMAINING: root disposition of C4 finding under max2 cap (no automatic cycle3/reset), then required independent aggregation/push gate. Parent live hosted identity/config and Calendar/Gmail comparison, scheduler/heartbeat, real two-slot AV/capture/transcripts, restart/recovery,7-day observation, Ubuntu qualification, provider-backed extraction/index/cited Ask, human semantic/evaluation and production promotion all remain OPEN.
+ISSUES-WRITTEN: none; dual-check proposed finding only; ledger/parent manifest untouched.
+Metrics: start=2026-10-27T12:00:04.895Z end=2026-10-27T12:10:53.244Z wall_min=10.81 agent_min=unavailable blocked_min=0 suite_runs=0 repeat_runs=0 mutations=1 cycle=2 resumes=0 tokens=unavailable builder_min=unavailable check_min=10.81 maker_tokens=unavailable checker_tokens=unavailable policy=proportional-verification/2026-10-19.17 check_s=648 mutants=1 defects_unit=1 defects_6c=0

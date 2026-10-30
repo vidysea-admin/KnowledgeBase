@@ -32,13 +32,13 @@ async function driveRecord(scenario: string, untilMs: number) {
   const keys=["LKB_BROWSER_PROFILE_DIRECTORY","LKB_CAPTURE_CONTROL_TOKEN","LKB_CAPTURE_CONTROL_GENERATION","LKB_CAPTURE_CONFIRMED_NO_ALTERNATIVE"];
   const saved=new Map(keys.map(key=>[key,process.env[key]]));for(const key of keys)delete process.env[key];process.env.LKB_CAPTURE_CONFIRMED_NO_ALTERNATIVE="false";
   writeFileSync(script, FAKE_RC); process.env.FAKE_RC = scenario;
-  const finalizeCalls: unknown[][] = [],normalizeCalls: unknown[] = []; let polls = 0, pollsAtEvent: number | undefined, pollsAtStop: number | undefined;
+  const finalizeCalls: unknown[][] = [],normalizeCalls: unknown[] = [],normalizeInputs: string[] = []; let polls = 0, pollsAtEvent: number | undefined, pollsAtStop: number | undefined;
   try {
     const t0 = Date.now(); let error: unknown;
     await runRecord(["https://meet.google.com/abc-defg-hij", "--until", new Date(t0 + untilMs).toISOString(), "--backend", "tab",
       "--session-id", "t034-rc", "--tenant", "fixture", "--title", "fixture", "--lean-video",
       "--recorded-by", "fixture-operator", "--capture-approved-by", "fixture-owner", "--capture-approval-ref", "fixture-only", "--organizer-consent", "unknown", "--consent-note", "fixture-only"], {
-      recordDir, telegram: notifier, normalize: (video,lean) => {normalizeCalls.push(lean);return video;}, wait: async () => { polls++; await new Promise((r) => setTimeout(r, 20)); }, finalize: async (...args) => { finalizeCalls.push(args); },
+      recordDir, telegram: notifier, normalize: (video,lean) => {normalizeCalls.push(lean);normalizeInputs.push(video);return video.replace(/\.webm$/,".playable.webm");}, wait: async () => { polls++; await new Promise((r) => setTimeout(r, 20)); }, finalize: async (...args) => { finalizeCalls.push(args); },
       tab: (onEvent) => { const t = createTabBrowserDeps({python: process.execPath, joinScript: script, profileDir: join(dir, "profile"), recordDir,
         extensionDir: join(REPO_ROOT, "packages/meeting-bot/py/tab-capture"), sessionId: "t034-rc", tenantId: "fixture", startupTimeoutMs: 15000, log: () => {},
         onEvent: (h, e) => { if (e.event === "capture-error" || (e.event === "capture-stopped" && e.failed !== false)) pollsAtEvent ??= polls; onEvent(h, e); }});
@@ -47,7 +47,7 @@ async function driveRecord(scenario: string, untilMs: number) {
     const webm = existsSync(recordDir) ? readdirSync(recordDir).filter((n) => n.endsWith(".webm")) : [];
     const status = webm.length ? JSON.parse(readFileSync(join(recordDir, webm[0]! + ".status.json"), "utf8")) : undefined;
     const media = webm.length ? readFileSync(join(recordDir, webm[0]!), "utf8") : undefined;
-    return {error, finalizeCalls, normalizeCalls, pollsAtEvent, pollsAtStop, status, media};
+    return {error, finalizeCalls, normalizeCalls, normalizeInputs, pollsAtEvent, pollsAtStop, status, media};
   } finally { delete process.env.FAKE_RC;for(const [key,value] of saved){if(value===undefined)delete process.env[key];else process.env[key]=value;}rmSync(dir, {recursive: true, force: true}); }
 }
 const T4 = {timeout: 60000};
@@ -75,5 +75,9 @@ test("ISS-T034FIX-004 parity: a clean tab stop is not a capture failure (status 
   assert.equal(r.finalizeCalls.length, 1, "a clean fixture reaches the immediate finalizer without an encoder");
   assert.deepEqual(r.normalizeCalls,[false],"No lossy normalization before original consent EOF is measured");
   assert.equal(r.finalizeCalls[0]![10],true,"Lean flag reaches finalizer after original duration binding");
+  // ISS-CAPTUREMAKER-002: the finalizer binds the consent clock from the pre-normalization raw capture, not the remux.
+  assert.match(String(r.finalizeCalls[0]![0]),/\.playable\.webm$/,"Finalizer is handed the lossless remux for public selection");
+  assert.equal(r.finalizeCalls[0]![11],r.normalizeInputs[0],"Live caller forwards the exact pre-normalization original");
+  assert.doesNotMatch(String(r.finalizeCalls[0]![11]),/\.playable\.webm$/,"The forwarded original is never the remux");
   if (r.error) assert.doesNotMatch((r.error as Error).message, /failed stop|lost audio|Malformed/);
 });

@@ -1,6 +1,6 @@
 # w23-spkscorer
 
-Status: ready-for-check
+Status: checked-PASS — closed out 2026-10-26 (resume reconcile) citing qa/verdicts/w23-spkscorer.md
 Fix cycle: 1
 Lane: lane/w23-spkscorer · Base: 3c99337f · Candidate: the lane HEAD commit "w23-spkscorer cycle 1" (cycle 0 was 9243679f, checker verdict 9b71e57a FAIL) · Tier: high (ISS-289, ISS-283), medium (ISS-290). Ledger rows NOT flipped.
 

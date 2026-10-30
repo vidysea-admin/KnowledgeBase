@@ -70,6 +70,26 @@ const SHARED_CSS = `
   .footer-note { margin-top: 1.5rem; font-size: 0.78rem; color: var(--muted); text-align: center; }
 `;
 
+/** Path from the page the browser is on back to the API root, as a relative prefix ("./", "../",
+ * "../../"). Every internal link, script fetch and form target in the API-served HTML is built
+ * from this instead of a root-absolute "/x": behind the web proxy the API lives at
+ * `<APP_BASE_PATH>/api/` (e.g. `/knowledgebase/api/`), the proxy strips that prefix before the
+ * request reaches us, so the server never learns it (nginx sends no X-Forwarded-Prefix) and a
+ * "/sessions" fetch would hit the SPA host root instead of the API. Relative refs resolve against
+ * whatever prefix the browser used. The depth comes from the raw request path, trailing slash
+ * included: `/x` and `/x/` have different base directories. */
+export function relRoot(req: { originalUrl?: string; url?: string }): string {
+  const pathname = (req.originalUrl ?? req.url ?? "/").split(/[?#]/, 1)[0] ?? "/";
+  const segments = pathname.split("/").filter(Boolean).length;
+  const depth = pathname.endsWith("/") ? segments : Math.max(segments - 1, 0);
+  return depth === 0 ? "./" : "../".repeat(depth);
+}
+
+/** Relative target for a root-based route path (`/sessions-ui`) given the page's `relRoot`. */
+export function relHref(rootRel: string, path: string): string {
+  return rootRel + path.replace(/^\/+/, "");
+}
+
 // Only pages that actually exist today. `/ingest-ui` and `/meeting-bot-ui` land in a separate
 // unit (real write path + honest empty-state, higher-risk than these read-only pages) — add
 // their nav entries in that unit, not before, so no link here is ever dead.
@@ -81,9 +101,9 @@ const NAV_ITEMS: { path: string; label: string }[] = [
   { path: "/compete", label: "Compete" },
 ];
 
-function renderNav(activePath: string): string {
+function renderNav(activePath: string, rootRel: string): string {
   return NAV_ITEMS.map((item) =>
-    `<a href="${item.path}"${item.path === activePath ? ' class="active"' : ""}>${item.label}</a>`,
+    `<a href="${relHref(rootRel, item.path)}"${item.path === activePath ? ' class="active"' : ""}>${item.label}</a>`,
   ).join("\n    ");
 }
 
@@ -95,9 +115,13 @@ export interface PageOptions {
   description: string;
   bodyHtml: string;
   scriptJs?: string;
+  /** `relRoot(req)` of the request being rendered; defaults to "./" (a page served at the root). */
+  rootRel?: string;
 }
 
 export function renderPage(opts: PageOptions): string {
+  const rootRel = opts.rootRel ?? "./";
+  if (!/^(\.\/|(\.\.\/)+)$/.test(rootRel)) throw new Error("rootRel must be ./ or a chain of ../");
   return `<!doctype html>
 <html>
 <head>
@@ -113,13 +137,14 @@ export function renderPage(opts: PageOptions): string {
     <h1>${opts.heading}</h1>
     <p>${opts.description}</p>
     <nav class="top-nav">
-    ${renderNav(opts.activePath)}
+    ${renderNav(opts.activePath, rootRel)}
     </nav>
   </header>
   ${opts.bodyHtml}
   <div class="footer-note">Internal preview build &middot; running against the real seeded TOC knowledge base</div>
 </div>
-${opts.scriptJs ? `<script>${opts.scriptJs}</script>` : ""}
+${opts.scriptJs ? `<script>const API_ROOT = ${JSON.stringify(rootRel)};
+${opts.scriptJs}</script>` : ""}
 </body>
 </html>
 `;
@@ -134,9 +159,10 @@ function apiKey() {
   if (input && input.value) { localStorage.setItem("lkbApiKey", input.value); return input.value; }
   return stored || "";
 }
+function apiUrl(path) { return API_ROOT + String(path).replace(/^\\/+/, ""); }
 async function apiFetch(path) {
-  const res = await fetch(path, { headers: { authorization: "Bearer " + apiKey() } });
-  if (!res.ok) throw new Error("HTTP " + res.status + " on " + path);
+  const res = await fetch(apiUrl(path), { headers: { authorization: "Bearer " + apiKey() } });
+  if (!res.ok) throw new Error("HTTP " + res.status + " on /" + String(path).replace(/^\\/+/, ""));
   return res.json();
 }
 function clearChildren(node) {

@@ -1,0 +1,142 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "kb://users",
+  "title": "users",
+  "description": "User accounts (docs/features/user-accounts, D-206, UA-2/UA-27). A person belongs to exactly ONE tenant (v1: one email = one user = one tenant), so uniqueness of emailNormalized is GLOBAL (unique index { emailNormalized: 1 }), not per tenant. emailNormalized is the output of the UA-2 normaliser (trim, NFKC, lowercase, one '@', max 254, no control characters); the store only checks that a value is already in that form. passwordHash is a PHC string (argon2id, or the scrypt fallback), NEVER a plaintext password; the pattern rejects anything that is not '$<alg>$...'. Only status 'active' has access, and an active user always carries a role; a non-active user may carry a role (disabled keeps the previous one) or none. The tenant on a session principal comes from this row, never from a header or body.",
+  "type": "object",
+  "required": [
+    "_id",
+    "tenantId",
+    "emailNormalized",
+    "displayName",
+    "passwordHash",
+    "status",
+    "createdAt",
+    "updatedAt"
+  ],
+  "properties": {
+    "_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 64,
+      "description": "userId. Random UUID."
+    },
+    "tenantId": {
+      "type": "string",
+      "minLength": 1,
+      "description": "From server configuration (USER_SIGNUP_TENANT) or the bootstrap script; never from a request body."
+    },
+    "emailNormalized": {
+      "type": "string",
+      "minLength": 3,
+      "maxLength": 254,
+      "pattern": "^[^@]+@[^@]+$",
+      "description": "UA-2 normalised address; the unique key and the mail recipient."
+    },
+    "displayName": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 100
+    },
+    "passwordHash": {
+      "type": "string",
+      "minLength": 20,
+      "maxLength": 512,
+      "pattern": "^\\$(argon2id|scrypt)\\$[!-~]+$",
+      "description": "PHC-format hash only (UA-10); parameters travel with it so it can be re-hashed later."
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "unverified",
+        "pending",
+        "active",
+        "rejected",
+        "disabled"
+      ]
+    },
+    "role": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "enum": [
+        "admin",
+        "member",
+        "viewer",
+        null
+      ],
+      "description": "Set by an admin at approval (no default). Required whenever status is active."
+    },
+    "mailStatus": {
+      "type": "string",
+      "enum": [
+        "sent",
+        "not_sent"
+      ],
+      "description": "UA failure table: when no mail could be sent the admin queue shows 'unverified (mail not sent)'."
+    },
+    "emailVerifiedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "statusChangedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "statusChangedBy": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 64,
+      "description": "Acting userId, or 'bootstrap-script'."
+    },
+    "passwordChangedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "lastLoginAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "updatedAt": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "not": {
+    "required": [
+      "status"
+    ],
+    "properties": {
+      "status": {
+        "enum": [
+          "active"
+        ]
+      }
+    },
+    "anyOf": [
+      {
+        "not": {
+          "required": [
+            "role"
+          ]
+        }
+      },
+      {
+        "required": [
+          "role"
+        ],
+        "properties": {
+          "role": {
+            "type": "null"
+          }
+        }
+      }
+    ]
+  },
+  "additionalProperties": false
+}

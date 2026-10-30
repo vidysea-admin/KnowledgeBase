@@ -228,6 +228,6 @@ test("config/ai-routing.yaml has a note-judge route (verifier model first, not t
   assert.deepEqual(Object.fromEntries(Object.entries(chains).filter(([k]) => k !== "note-judge")), {
     transcribe: ["gemini"], namemap: cloud, summarize: cloud, claims: cloud, decisions: cloud, speakers: ["ollama"], "tree-summary": cloud, topics: cloud,
     evaluator: ["ollama-cloud-verifier", "ollama-cloud"], "output-verifier": ["ollama-cloud-verifier"], "output-generation": ["ollama-cloud"], answer: cloud, ask: cloud,
-    vision: ["ollama", "gemini"],
+    vision: ["ollama", "gemini"], route: ["gemini-flash-lite"],
   });
 });

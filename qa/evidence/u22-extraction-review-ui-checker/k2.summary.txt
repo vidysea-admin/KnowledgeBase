@@ -1,0 +1,8 @@
+   × authenticated extraction review transport > sends one exact native option with current CAS and no tenant, actor or fabricated audit 13ms
+     → expected "spy" to be called with arguments: [ …(3) ]
+-       "expectedRevision": 7,
++       "expectedRevision": 8,
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+AssertionError: expected "spy" to be called with arguments: [ …(3) ]
+-       "expectedRevision": 7,
++       "expectedRevision": 8,

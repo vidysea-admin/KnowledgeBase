@@ -56,6 +56,7 @@ export interface KnowledgeOutputs {
     quote: string;
     href: string;
     occurredAt?: string;
+    claimStatus?: "verified" | "needs-review";
   }[];
   sourceCoverage: {
     status: "ready" | "partial";

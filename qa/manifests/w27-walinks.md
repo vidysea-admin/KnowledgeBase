@@ -1,6 +1,6 @@
 # w27-walinks: WhatsApp-shared meeting link discovery (agent-buildable parts, flag OFF)
 
-Status: ready-for-check
+Status: checked-PASS — closed out 2026-10-26 (resume reconcile) citing qa/verdicts/w27-walinks.md
 Fix cycle: 0
 Lane: C:\Users\product\Desktop\KnowledgeBase-lanes\w27-walinks (branch lane/w27-walinks)
 Base: a9b202b4 (origin/master)

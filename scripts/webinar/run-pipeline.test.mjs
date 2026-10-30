@@ -252,7 +252,7 @@ test('a stuck alert reaches the overall deadline and releases the lane without l
     assert.equal(existsSync(join(f.stateDir, 'poller.lock')), false);
 }, true));
 test('preview deduplicates cross-source token rotation and writes/captures nothing', () => withFixture(async (f) => {
-    f.deps.loadCandidates = async () => [{id: 'mail-one', status: 'pending', title: 'University webinar',
+    f.deps.loadCandidates = async () => [{id: 'mail-one', status: 'pending', senderAuthenticated: true, title: 'University webinar',
       senderEmail: 'speaker@university.edu', senderDomain: 'university.edu', startTime: event().startTime,
       endTime: event().endTime, meetingUrl: 'https://meeting.zoho.com/meeting/123?token=rotated'}];
     const result = await runPipelineTick(f.deps);
@@ -295,7 +295,7 @@ test('corrected discovery reconsiders prerequisite barriers without duplicate ca
     ['invalid-time', {endTime: '2026-09-30T12:00:00Z'}],
   ]) {
     await withFixture(async (f) => {
-      let candidate = {...event(), id: 'mail-one', status: 'pending', senderEmail: 'host@example.org', senderDomain: 'example.org', providerUpdated: '2026-09-30T11:00:00.000Z', ...before};
+      let candidate = {...event(), id: 'mail-one', status: 'pending', senderAuthenticated: true, senderEmail: 'host@example.org', senderDomain: 'example.org', providerUpdated: '2026-09-30T11:00:00.000Z', ...before};
       f.deps.loadCalendarEvents = async () => [];
       f.deps.loadCandidates = async () => [candidate];
       const first = await runPipelineTick(f.deps, true);
@@ -386,3 +386,27 @@ test('either failed feed blocks capture, persists health and alerts once until r
     }, true);
   }
 });
+
+
+test('unapproved Gmail authentication stays refused through the real pipeline', async () => {
+  for (const senderAuthenticated of [undefined, false]) await withFixture(async f => {
+    f.deps.loadCalendarEvents = async () => [];
+    f.deps.loadCandidates = async () => [{...event(), id: 'unverified-mail', status: 'pending', senderEmail: 'host@example.org', senderDomain: 'example.org', senderAuthenticated}];
+    const result = await runPipelineTick(f.deps);
+    assert.equal(result.toRecord.length, 0); assert.equal(f.calls.length, 0);
+    assert.equal(result.skipped[0]?.reason, senderAuthenticated === false ? 'untrusted-sender' : 'needs-review');
+  });
+});
+
+test('cycle1 running publisher retains literal all-day and full mirror cancellation with no capture',()=>withFixture(async f=>{
+  const allDay=event({id:'all-day',startTime:'2026-10-28',endTime:'2026-10-29'}), cancelled={id:'outside',title:'Cancelled webinar',cancelled:true,providerUpdated:receipt};
+  f.deps.loadCalendarAcquisition=async(_token,checkedAt)=>({version:1,tenantId:'fixture',scope:'available-connected-source-state',complete:true,mode:'baseline',checkedAt,syncToken:'full-source',sourceEvents:[allDay,cancelled],meetings:[allDay]});
+  let sent;f.deps.publishWorkerState=async value=>{sent=value;}; await runPipelineTick(f.deps,true);assert.deepEqual(sent.meetings,[allDay]);assert.deepEqual(sent.sourceEvents,[allDay,cancelled]);assert.equal(f.calls.length,0);
+  f.deps.loadCalendarAcquisition=async(token,checkedAt)=>({version:1,tenantId:'fixture',scope:'available-connected-source-state',complete:true,mode:'sync',checkedAt,requestedSyncToken:token,syncToken:'next-source',sourceEvents:[allDay],meetings:[allDay]});await runPipelineTick(f.deps,true);assert.deepEqual(sent.sourceEvents,[allDay,cancelled]);assert.deepEqual(sent.meetings,[allDay]);assert.equal(f.calls.length,0);
+},true));
+test('cycle1 rejected upload retains previous source checkpoint and grants no capture',()=>withFixture(async f=>{
+  f.deps.loadCalendarEvents=async()=>[]; await runPipelineTick(f.deps,true);
+  const file=join(f.stateDir,'operations.json'), before=JSON.parse(readFileSync(file)).source;
+  f.deps.loadCalendarEvents=async()=>[event()];f.deps.publishWorkerState=async()=>{throw Error('fixture upload refused');};
+  await assert.rejects(runPipelineTick(f.deps,true),/acquisition validation/);assert.deepEqual(JSON.parse(readFileSync(file)).source,before);assert.equal(f.calls.length,0);
+},true));

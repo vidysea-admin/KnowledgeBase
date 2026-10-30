@@ -1,6 +1,6 @@
 # w24-signedslots: parallel signed-in recordings via seeded capture slots
 
-Status: ready-for-check
+Status: checked-PASS — closed out 2026-10-26 (resume reconcile) citing qa/verdicts/w24-signedslots.md
 Fix cycle: 1
 
 ## Fix cycle 1 (verdict 5c950edb: F1-F3)

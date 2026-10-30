@@ -1,0 +1,34 @@
+import subprocess, sys, os, json
+COPY=r"C:/Users/Lenovo/AppData/Local/Temp/claude/D--KnowledgeBase/e7be82aa-d0d7-4247-9d84-e121aa4badfc/scratchpad/w7chk-A-copy"
+BOUND=r"D:/KnowledgeBase/.worktrees/wa-isolation-read-side"
+HEAD="bfc5350f"
+RD="apps/api/src/whatsapp/isolation-read-side.test.ts"; WR="apps/api/src/whatsapp/isolation-write-side.test.ts"
+RT="apps/api/src/routes/whatsapp.test.ts"
+M=[
+ ("C1","apps/api/src/whatsapp/owner-config.ts","link.userId.length > 0 && link.userId === caller.userId;","(link.userId.length > 0 && (link.userId === caller.userId || true));",[RD]),
+ ("C2","apps/api/src/whatsapp-review/review-source.ts","if (!decision.allowed) { res.status(404).json({ error: \"not_found\" }); return; }","",[RD]),
+ ("C3","apps/api/src/routes/whatsapp.ts","code: classifyIngestFailure(err), linkId","code: classifyIngestFailure(err), message: err instanceof Error ? err.message : String(err), linkId",[WR,RT]),
+ ("C4","apps/api/src/whatsapp/review/ingest.ts","...otherCandidates.map(c => ({ tenantId, id: c._id, text: c.text })),","",[WR]),
+ ("C5","apps/api/src/whatsapp/owner-config.ts","if (ownerView || caller.admin === true)","if (ownerView || caller.admin === true || (link !== null && link.userId == null && caller.kind === \"key\"))",[RD]),
+ ("C6","apps/api/src/whatsapp/store.ts","(g) => g.groupJid === groupJid && g.ownerUserId === grant.ownerUserId","(g) => g.groupJid === groupJid",[WR,RD]),
+]
+def sh(cmd,cwd=None,timeout=240):
+    return subprocess.run(cmd,cwd=cwd,capture_output=True,text=True,encoding="utf-8",errors="replace",shell=True,timeout=timeout)
+out={}
+for cid,f,old,new,tests in M:
+    p=os.path.join(COPY,f)
+    orig=open(p,encoding="utf8",newline="").read()
+    assert orig.count(old)==1,(cid,orig.count(old))
+    # green-before in copy
+    g=sh("node --test --import tsx "+" ".join(tests),COPY)
+    gp=[l for l in g.stdout.splitlines() if l.startswith("ℹ pass") or l.startswith("ℹ fail")]
+    try:
+        open(p,"w",encoding="utf8",newline="").write(orig.replace(old,new))
+        r=sh("node --test --import tsx "+" ".join(tests),COPY)
+        red=[l for l in r.stdout.splitlines() if l.startswith("✖") and "failing tests" not in l]
+        rp=[l for l in r.stdout.splitlines() if l.startswith("ℹ pass") or l.startswith("ℹ fail")]
+    finally:
+        open(p,"w",encoding="utf8",newline="").write(orig)
+    h1=sh(f"git hash-object {f}",COPY).stdout.strip(); h2=sh(f"git -C {BOUND} rev-parse {HEAD}:{f}").stdout.strip()
+    out[cid]={"green":gp,"mut":rp,"red":sorted(set(red))[:6],"head_fidelity":h1==h2}
+    print(cid,json.dumps(out[cid],ensure_ascii=True),flush=True)

@@ -176,3 +176,13 @@ test("a new ambiguity is recorded, never erased by a later scan, and identical p
   assert.equal(await createIfNew("owner", candidate({youtubeWatchIssue: "ambiguous", meetingLinkIssue: "ambiguous"}), m.db), false);
   assert.equal(m.calls.filter(c => c.op === "update").length, 1);
 });
+
+test("attachment refusal persists across rescans and human-decision races", async () => {
+  const first = old(); const model = memory([first]);
+  await createIfNew("owner",candidate({evidenceIssue:"unsupported-attachment"}),model.db);
+  assert.equal(model.rows[0]?.evidenceIssue,"unsupported-attachment");assert.equal(model.rows[0]?.status,"rejected");
+  await createIfNew("owner",candidate(),model.db);assert.equal(model.rows[0]?.evidenceIssue,"unsupported-attachment");
+  await createIfNew("owner",candidate({evidenceIssue:"unresolved-body"}),model.db);assert.equal(model.rows[0]?.evidenceIssue,"unsupported-attachment");
+  for(const evidenceIssue of ["unsafe",null])await assert.rejects(createIfNew("owner",candidate({evidenceIssue}),model.db),/Invalid candidate evidence/);
+  const raced=memory([old()],rows=>{rows[0]!.status="approved";});await assert.rejects(createIfNew("owner",candidate({evidenceIssue:"unsupported-attachment"}),raced.db),/changed/);assert.equal(raced.rows[0]?.evidenceIssue,undefined);
+});

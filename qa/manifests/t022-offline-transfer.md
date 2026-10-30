@@ -1,7 +1,7 @@
 # T022 offline assertions into current authenticated review
 
-Status: ready-for-check
-Handshake status: ready-for-check
+Status: checked-PASS — closed out 2026-10-26 by maker resume, citing qa/verdicts/t022-offline-transfer.md
+Handshake status: checked-PASS — closed out 2026-10-26 by maker resume, citing qa/verdicts/t022-offline-transfer.md
 Fix cycle: 1
 Task: T-022
 Priority tier: 3 — remaining roadmap behavior, parent still HOLD

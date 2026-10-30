@@ -51,7 +51,10 @@ export function verifyPrivateArtifact(directory:string,run:typeof spawnSync=spaw
     // Restrict this child only to the trusted native executable's modules; never alter host settings.
     const env={...Object.fromEntries(Object.entries(process.env).filter(([key])=>key.toLowerCase()!=="psmodulepath")),PSModulePath:path.join(path.dirname(executable),"Modules")};
     const began=performance.now();
-    const result=run(executable,["-NoProfile","-NonInteractive","-File",script,"-TargetPath",resolved],{env,encoding:"utf8",timeout:5000,maxBuffer:65536,windowsHide:true,shell:false});
+    const launch=()=>run(executable,["-NoProfile","-NonInteractive","-File",script,"-TargetPath",resolved],{env,encoding:"utf8",timeout:5000,maxBuffer:65536,windowsHide:true,shell:false});
+    // Exactly ONE retry, on ETIMEDOUT only (slow shared hosts; ISS-394, mirrors meeting-bot 9d05aaec). Any other failure, or a second timeout, fails closed.
+    let result=launch();
+    if((result.error as NodeJS.ErrnoException|undefined)?.code==="ETIMEDOUT")result=launch();
     if(result.error||result.status!==0||typeof result.stdout!=="string"||Buffer.byteLength(result.stdout)>65536)throw nativeUnavailable(result,performance.now()-began);
     let proof:unknown;try{proof=JSON.parse(result.stdout.replace(/^\uFEFF/,""));}catch{throw new Error("Invalid private directory ACL response");}
     validatePrivateAclSnapshot(proof,resolved);

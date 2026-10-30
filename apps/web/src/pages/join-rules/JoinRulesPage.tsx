@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useAuth } from "../../auth/AuthContext.js";
+import { useCanWrite, WriteScope } from "../../auth/WriteScope.js";
 import { ApprovalsPanel } from "./ApprovalsPanel.js";
 import { RegistrationPolicyPanel } from "./RegistrationPolicyPanel.js";
 import { JOIN_RULES_ENFORCED, pageCopy } from "./enforcement.js";
@@ -40,7 +41,9 @@ export function JoinRulesPage(): React.ReactElement {
   const [phase, setPhase] = useState<Phase>({ name: "loading" });
   const [loaded, setLoaded] = useState<Loaded | null>(null);
   const [draft, setDraft] = useState<DraftSet>({ ownDomains: "", rules: [] });
-  const [readOnly, setReadOnly] = useState(false);
+  const [forbiddenWrite, setReadOnly] = useState(false);
+  const canWrite = useCanWrite();
+  const readOnly = forbiddenWrite || !canWrite;
   const [busy, setBusy] = useState(false);
   const [notice, setNotice] = useState<Notice>(null);
   const [problems, setProblems] = useState<string[]>([]);
@@ -152,7 +155,7 @@ export function JoinRulesPage(): React.ReactElement {
 
   return <>
     <div className="page-header"><h1>Join rules</h1><p>{copy.subtitle}</p></div>
-    {apiKey && <RegistrationPolicyPanel apiKey={apiKey} />}
+    {apiKey && <WriteScope><RegistrationPolicyPanel apiKey={apiKey} /></WriteScope>}
     {!apiKey ? <p className="card empty-note">Sign in with an API key to view join rules.</p>
       : phase.name === "loading" ? <p role="status">Loading join rules…</p>
       : phase.name === "blocked" ? <div className="card">
@@ -164,7 +167,7 @@ export function JoinRulesPage(): React.ReactElement {
         {notice && <p role={notice.kind === "ok" ? "status" : "alert"} className={notice.kind === "ok" ? "card" : "card error-note"}>{notice.text}{notice.kind === "ok" && <span>{copy.noticeSuffix}</span>}</p>}
         <section className="card" aria-label="Rule set">
           <h2 className="section-title">Rules</h2>
-          <RuleSetEditor draft={draft} disabled={readOnly || busy} onChange={next => { setDraft(next); setProblems([]); }} onAdd={addRule} />
+          <RuleSetEditor state={loaded.view.state} draft={draft} disabled={readOnly || busy} onChange={next => { setDraft(next); setProblems([]); }} onAdd={addRule} />
           {problems.length > 0 && <ul role="alert" className="error-note" aria-label="Problems with the rules">{problems.map(m => <li key={m}>{m}</li>)}</ul>}
           {stale && <div role="alertdialog" aria-label="Rules changed on the server" className="card" style={{ borderLeft: "4px solid var(--warn)" }}>
             <p><strong>{MESSAGES.stale}</strong></p>
@@ -182,6 +185,7 @@ export function JoinRulesPage(): React.ReactElement {
         <section className="card" aria-label="Approvals and opt-outs">
           <h2 className="section-title">Approvals and opt-outs</h2>
           <p className="row-meta">{copy.approvalsNote}</p>
+          {loaded.view.ruleSet.attendanceMode === "rules" && <p className="row-meta">Stored sender and domain approvals apply in legacy mode. Rules mode requires a matching allow rule. Meeting opt-outs apply in every mode.</p>}
           <ApprovalsPanel state={loaded.view.state} disabled={readOnly} busy={busy} onConfirm={p => void confirmPending(p)} />
         </section>
       </>}

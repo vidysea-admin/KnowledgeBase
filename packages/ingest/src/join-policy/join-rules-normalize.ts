@@ -1,3 +1,13 @@
+/** Persistable state; every change goes through the pure helpers below. */
+export interface JoinRuleState {
+  approvedSenders: readonly string[];
+  approvedDomains: readonly string[];
+  optedOutEventIds: readonly string[];
+  /** Optional (absent in older documents): meeting identities of opted-out meetings, see join-rules-optout.ts. */
+  optedOutMeetings?: readonly string[];
+}
+
+import { normalizeMeetingEntries } from "./join-rules-optout.js";
 /**
  * packages/ingest/src/join-policy/join-rules-normalize.ts — ISS-367: pure email/domain normalisers
  * split out of join-rules.ts (file-length budget). Re-exported from join-rules.ts; behaviour unchanged.
@@ -36,4 +46,54 @@ export function parseStrictEmail(value: unknown): { email: string; domain: strin
   const n = normalizeEmail(lower);
   if (n === undefined || n !== lower) return undefined;
   return { email: n, domain: n.slice(n.indexOf("@") + 1) };
+}
+
+export const normalizePhrase = (s: string): string => s.trim().replace(/\s+/g, " ").toLowerCase();
+export function phraseMatches(text: unknown, phrases?: readonly string[]): boolean {
+  if (typeof text !== "string" || text.length > 20000 || !phrases) return false;
+  const normalized = normalizePhrase(text);
+  return phrases.some(phrase => normalized.includes(phrase));
+}
+
+export class JoinRuleSetValidationError extends Error {
+  constructor(public readonly path: string, detail: string) {
+    super(`invalid join rule set at ${path}: ${detail}`);
+    this.name = "JoinRuleSetValidationError";
+  }
+}
+
+export const isObj = (v: unknown): v is Record<string, unknown> => typeof v === "object" && v !== null && !Array.isArray(v);
+
+export function rejectUnknownKeys(obj: Record<string, unknown>, allowed: readonly string[], path: string): void {
+  for (const k of Object.keys(obj)) if (!allowed.includes(k)) throw new JoinRuleSetValidationError(path, `unknown field "${k}"`);
+}
+
+/** Validates persisted/untrusted state and returns a normalised copy. Throws `JoinRuleSetValidationError`. */
+export function validateJoinRuleState(input: unknown): JoinRuleState {
+  if (!isObj(input)) throw new JoinRuleSetValidationError("$state", "must be an object");
+  rejectUnknownKeys(input, ["approvedSenders", "approvedDomains", "optedOutEventIds", "optedOutMeetings"], "$state");
+  const list = (key: string): unknown[] => {
+    const v = input[key];
+    if (!Array.isArray(v)) throw new JoinRuleSetValidationError(`$state.${key}`, "must be an array");
+    return v;
+  };
+  const approvedSenders = list("approvedSenders").map((v, i) => {
+    const n = normalizeEmail(v);
+    if (!n) throw new JoinRuleSetValidationError(`$state.approvedSenders[${i}]`, "not a valid email");
+    return n;
+  });
+  const approvedDomains = list("approvedDomains").map((v, i) => {
+    const n = normalizeDomain(v);
+    if (!n) throw new JoinRuleSetValidationError(`$state.approvedDomains[${i}]`, "not a valid domain");
+    return n;
+  });
+  const optedOutEventIds = list("optedOutEventIds").map((v, i) => {
+    if (typeof v !== "string" || v === "") throw new JoinRuleSetValidationError(`$state.optedOutEventIds[${i}]`, "must be a non-empty string");
+    return v;
+  });
+  if (input.optedOutMeetings === undefined) return { approvedSenders, approvedDomains, optedOutEventIds }; // old document: shape unchanged
+  let optedOutMeetings: string[];
+  try { optedOutMeetings = normalizeMeetingEntries(input.optedOutMeetings); }
+  catch (e) { throw new JoinRuleSetValidationError("$state.optedOutMeetings", e instanceof Error ? e.message : "invalid"); }
+  return { approvedSenders, approvedDomains, optedOutEventIds, optedOutMeetings };
 }

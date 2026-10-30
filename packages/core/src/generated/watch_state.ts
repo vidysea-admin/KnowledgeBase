@@ -24,5 +24,169 @@ export interface WatchState {
    * The data/toc-migrated session id this row's recording was ingested into, once status is 'ingested'.
    */
   sessionId?: string;
+  /**
+   * D-192 private immutable worker staging. Visible only through an active bound api_keys.workerFence; never public watch metadata or counselling knowledge.
+   */
+  workerSnapshot?: {
+    keyId: string;
+    digest: string;
+    receivedAt: string;
+    state: {
+      version: 1;
+      account: string;
+      hostId: string;
+      generation: string;
+      sequence: number;
+      checkedAt: string;
+      complete: boolean;
+      /**
+       * @maxItems 2000
+       */
+      meetings: {
+        id: string;
+        title: string;
+        description?: string;
+        startTime: "" | string;
+        endTime: "" | string;
+        status?: "confirmed" | "tentative" | "cancelled";
+        responseStatus?: "accepted" | "declined" | "tentative" | "needsAction";
+        meetingUrl?: string;
+        meetingUrlSource?: "conference" | "location" | "description";
+        meetingLinkIssue?: "ambiguous" | "registration-only" | "host-start-link";
+        youtubeWatch?: {
+          url: string;
+          videoId: string;
+          source: "location" | "description";
+        };
+        youtubeWatchIssue?: "ambiguous";
+        organizer?: string;
+        cancelled?: boolean;
+        recurringEventId?: string;
+        originalStartTime?:
+          | {
+              date: string;
+            }
+          | {
+              dateTime: string;
+            };
+        providerUpdated?: string;
+      }[];
+      /**
+       * @maxItems 500
+       */
+      candidates: {
+        messageId: string;
+        receivedAt?: string;
+        threadId?: string;
+        registrationUrl?: string;
+        subject: string;
+        senderEmail: string;
+        senderDomain: string;
+        senderAuthenticated?: boolean;
+        meetingUrl?: string;
+        recordingUrl?: string;
+        youtubeWatch?: {
+          url: string;
+          videoId: string;
+          source: "body" | "snippet";
+        };
+        youtubeWatchIssue?: "ambiguous";
+        meetingLinkIssue?: "ambiguous" | "registration-only" | "host-start-link";
+        kind?: "past-recording" | "upcoming";
+        startTime?: string;
+        endTime?: string;
+        registrationOnly?: boolean;
+        evidenceIssue?: "unresolved-body" | "unsupported-attachment";
+      }[];
+      operations: {
+        /**
+         * @maxItems 2000
+         */
+        operations: {
+          id: string;
+          title: string;
+          status: "queued" | "recording" | "processing" | "failed" | "ready" | "action_required";
+          attempts: number;
+          reason?: string;
+          updatedAt?: string;
+          startTime?: string;
+          endTime?: string;
+        }[];
+        omitted: number;
+        discovery?: {
+          calendar: {
+            status: "healthy" | "failed";
+            checkedAt: string;
+            lastSuccessAt?: string;
+          };
+          gmail: {
+            status: "healthy" | "failed";
+            checkedAt: string;
+            lastSuccessAt?: string;
+          };
+        };
+      };
+      /**
+       * @maxItems 2000
+       */
+      sourceEvents: {
+        id: string;
+        title: string;
+        description?: string;
+        startTime: "" | string;
+        endTime: "" | string;
+        status?: "confirmed" | "tentative" | "cancelled";
+        responseStatus?: "accepted" | "declined" | "tentative" | "needsAction";
+        meetingUrl?: string;
+        meetingUrlSource?: "conference" | "location" | "description";
+        meetingLinkIssue?: "ambiguous" | "registration-only" | "host-start-link";
+        youtubeWatch?: {
+          url: string;
+          videoId: string;
+          source: "location" | "description";
+        };
+        youtubeWatchIssue?: "ambiguous";
+        organizer?: string;
+        cancelled?: boolean;
+        recurringEventId?: string;
+        originalStartTime?:
+          | {
+              date: string;
+            }
+          | {
+              dateTime: string;
+            };
+        providerUpdated?: string;
+        /**
+         * @minItems 1
+         * @maxItems 32
+         */
+        recurrence?: [string, ...string[]];
+      }[];
+      gmailSummary?: {
+        listed: number;
+        fetched: number;
+        candidates: number;
+        excludedNonMeeting: number;
+        excludedInternal: number;
+        refusedSender: number;
+        incompleteMessages: number;
+        complete: boolean;
+      };
+    };
+  };
+  /**
+   * D-192 private immutable acknowledgement of an already published worker fence; allows exact historical retries without changing publication or freshness.
+   */
+  workerReceipt?: {
+    keyId: string;
+    account: string;
+    hostId: string;
+    generation: string;
+    sequence: number;
+    digest: string;
+    receivedAt: string;
+    complete: boolean;
+  };
   [k: string]: unknown;
 }

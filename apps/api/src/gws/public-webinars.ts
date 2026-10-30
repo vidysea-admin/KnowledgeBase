@@ -133,3 +133,133 @@ export async function discoverPublicWebinars(sources: PublicWebinarSource[], dep
   }
   return { version: 1, checkedAt: now.toISOString(), complete: gaps.length === 0, candidates: [...candidates.values()], gaps };
 }
+
+/** Shared literal invitation-time parser; public prose remains excluded by parsePublicWebinars. */
+const MONTHS = [
+  "january", "february", "march", "april", "may", "june",
+  "july", "august", "september", "october", "november", "december",
+];
+// Real Ashoka mail uses Sep/Sept abbreviations, including in forwarded subjects.
+const MONTH_ALIASES: Record<string, number> = {};
+for (const [i, full] of MONTHS.entries()) {
+  MONTH_ALIASES[full] = i;
+  MONTH_ALIASES[full.slice(0, 3)] = i;
+}
+MONTH_ALIASES.sept = 8;
+
+// Date selection is explicit and local to the invitation; never borrow a forwarded year.
+const MONTH_PATTERN = Object.keys(MONTH_ALIASES).join("|");
+const DATE_PATTERN = String.raw`(?:\d{4}-\d{2}-\d{2}|(?:${MONTH_PATTERN})\.?\s+\d{1,2}(?:st|nd|rd|th)?(?:,?\s+\d{4})?|\d{1,2}(?:st|nd|rd|th)?\s+(?:${MONTH_PATTERN})\.?(?:,?\s+\d{4})?)`;
+const DATE_RE = new RegExp(String.raw`(?<![\w.-])${DATE_PATTERN}(?!\d)`, "gi");
+const ISO_DATE_RE = /^(\d{4})-(\d{2})-(\d{2})$/;
+const DATE_NEAR_LABEL_RE = /\b(?:Day\s*&?\s*Date|Date\s*&?\s*Time|Date)\b[\s:*]*/gi;
+const TIME_SINGLE_RE = /(?<![\w:.])(\d+(?::\d+)?\s*[AP]M)\b(?:[ \t]*(Pacific(?:[ \t]+Time)?|Eastern(?:[ \t]+Time)?|PDT|PST|EDT|EST|PT|ET|IST|UTC|GMT)\b)?/gi;
+const TZ_OFFSET_MINUTES: Record<string, number> = { IST: 330, UTC: 0, GMT: 0 };
+const TIME_ZONES: Record<string, string> = { PT: "America/Los_Angeles", PDT: "America/Los_Angeles", PST: "America/Los_Angeles",
+  PACIFIC: "America/Los_Angeles", "PACIFIC TIME": "America/Los_Angeles", ET: "America/New_York", EDT: "America/New_York",
+  EST: "America/New_York", EASTERN: "America/New_York", "EASTERN TIME": "America/New_York", IST: "Asia/Kolkata", UTC: "UTC", GMT: "UTC" };
+
+export interface SessionTimeProvenance {
+  yearSource: "explicit" | "provider-receivedAt" | "reference";
+  dateText: string;
+  timeZones: string[];
+  referenceTime?: string;
+}
+
+function parseMonthName(dateStr: string): { year?: number; month: number; day: number } | undefined {
+  const iso = ISO_DATE_RE.exec(dateStr.trim());
+  if (iso) return { year: Number(iso[1]), month: Number(iso[2]) - 1, day: Number(iso[3]) };
+  const m = /^(?:([A-Za-z]+)\.?\s+(\d{1,2})(?:st|nd|rd|th)?|(\d{1,2})(?:st|nd|rd|th)?\s+([A-Za-z]+)\.?)(?:,?\s+(\d{4}))?$/i.exec(dateStr.trim());
+  if (!m) return undefined;
+  const month = MONTH_ALIASES[(m[1] ?? m[4] ?? "").toLowerCase()];
+  if (month === undefined) return undefined;
+  return { ...(m[5] ? {year: Number(m[5])} : {}), month, day: Number(m[2] ?? m[3]) };
+}
+
+function buildIsoDateTime(dateStr: string, timeStr: string, tz: string | undefined, inferredYear?: number): string | undefined {
+  const parsedDate = parseMonthName(dateStr);
+  const year = parsedDate?.year ?? inferredYear;
+  if (!parsedDate || year === undefined || year < 1000 || year > 9999 || !tz) return undefined;
+  const t = /^(\d{1,2})(?::(\d{2}))?\s*([AP]M)$/i.exec(timeStr.trim());
+  if (!t || Number(t[1]) < 1 || Number(t[1]) > 12 || Number(t[2] ?? 0) > 59) return undefined;
+  const hour = Number(t[1]) % 12 + (t[3]?.toUpperCase() === "PM" ? 12 : 0), minute = Number(t[2] ?? 0);
+  const localMillis = Date.UTC(year, parsedDate.month, parsedDate.day, hour, minute);
+  const local = new Date(localMillis);
+  if (local.getUTCFullYear() !== year || local.getUTCMonth() !== parsedDate.month || local.getUTCDate() !== parsedDate.day) return undefined;
+  const token = tz.toUpperCase().replace(/\s+/g, " ");
+  const zone = TIME_ZONES[token];
+  if (!zone) return undefined;
+  if (Object.hasOwn(TZ_OFFSET_MINUTES, token)) return new Date(localMillis - TZ_OFFSET_MINUTES[token]! * 60_000).toISOString();
+  // Invert event-local civil time against IANA rules. Gaps have zero matches; folds
+  // have two unless an explicit daylight/standard token selects exactly one.
+  const offsets = zone === "America/Los_Angeles" ? [420, 480] : [240, 300];
+  const explicitOffset: Record<string, number> = { PDT: 420, PST: 480, EDT: 240, EST: 300 };
+  const formatter = new Intl.DateTimeFormat("en-CA", {timeZone: zone, year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", hourCycle: "h23"});
+  const matches = offsets.filter(offset => explicitOffset[token] === undefined || explicitOffset[token] === offset).map(offset => localMillis + offset * 60_000).filter(instant => {
+    const parts = Object.fromEntries(formatter.formatToParts(new Date(instant)).map(part => [part.type, part.value]));
+    return Number(parts.year) === year && Number(parts.month) === parsedDate.month + 1 && Number(parts.day) === parsedDate.day && Number(parts.hour) === hour && Number(parts.minute) === minute;
+  });
+  return matches.length === 1 ? new Date(matches[0]!).toISOString() : undefined;
+}
+
+/** Unknown/malformed date, year, zone or conflicting representations stay unscheduled. */
+export function extractSessionDateTime(text: string, context: {receivedAt?: string; reference?: Date} = {}): {
+  startTime?: string; endTime?: string; timeProvenance?: SessionTimeProvenance;
+} {
+  const labels = [...text.matchAll(DATE_NEAR_LABEL_RE)];
+  if (labels.length > 1) return {};
+  let dateStr: string, afterDate: number;
+  if (labels[0]) {
+    const start = labels[0].index! + labels[0][0].length;
+    const match = new RegExp(String.raw`^(?:(?:Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday),?\s+)?(${DATE_PATTERN})(?!\d)`, "i").exec(text.slice(start));
+    if (!match?.[1]) return {};
+    dateStr = match[1]; afterDate = start + match[0].length;
+  } else {
+    const dates = [...text.matchAll(DATE_RE)];
+    if (!dates.length || dates.some(date => JSON.stringify(parseMonthName(date[0])) !== JSON.stringify(parseMonthName(dates[0]![0])))) return {};
+    const date = dates[dates.length - 1]!; dateStr = date[0]; afterDate = date.index! + dateStr.length;
+  }
+  // Reject a truncated/invalid year and never cross another date or forwarded header.
+  if (/^\d/.test(text.slice(afterDate)) || (parseMonthName(dateStr)?.year === undefined && /^\s*,?\s*\d{4,}/.test(text.slice(afterDate)))) return {};
+  const scope = text.slice(afterDate, afterDate + 512).split(/\b(?:Sent|From|Subject):|\bForwarded\b/i)[0]!;
+  if ([...scope.matchAll(DATE_RE)].length) return {};
+  const times = [...scope.matchAll(TIME_SINGLE_RE)];
+  if (!times.length || times.length > 4) return {};
+  // One range, optionally restated in another zone, or equivalent start instants.
+  const groups: {start: string; end?: string; zone: string}[] = [];
+  for (let i = 0; i < times.length; i++) {
+    const current = times[i]!, next = times[i + 1];
+    if (i === 0 && /\d/.test(scope.slice(0, current.index))) return {};
+    const between = next ? scope.slice(current.index! + current[0].length, next.index) : "";
+    if (next && /^\s*(?:-|–|—|to)\s*$/i.test(between)) {
+      const zone = current[2] ?? next[2];
+      if (!zone || !next[2] || (current[2] && current[2].toUpperCase() !== next[2].toUpperCase())) return {};
+      groups.push({start: current[1]!, end: next[1]!, zone}); i++;
+    } else {
+      if (!current[2]) return {};
+      groups.push({start: current[1]!, zone: current[2]});
+    }
+  }
+  const parsed = parseMonthName(dateStr);
+  if (!parsed) return {};
+  let referenceTime: string | undefined, yearSource: SessionTimeProvenance["yearSource"] = "explicit";
+  let years = parsed.year === undefined ? [] : [parsed.year];
+  if (parsed.year === undefined) {
+    const ref = context.receivedAt !== undefined ? new Date(context.receivedAt) : context.reference;
+    // Provider context must be an actual ISO instant, not JS's overflowing-date parsing.
+    if (!ref || !Number.isFinite(ref.getTime())) return {};
+    if (context.receivedAt !== undefined && !/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{3})?Z$/.test(context.receivedAt)) return {};
+    if (context.receivedAt !== undefined && ref.toISOString().slice(0, 19) !== context.receivedAt.slice(0, 19)) return {};
+    referenceTime = ref.toISOString(); yearSource = context.receivedAt !== undefined ? "provider-receivedAt" : "reference";
+    years = [ref.getUTCFullYear() - 1, ref.getUTCFullYear(), ref.getUTCFullYear() + 1];
+  }
+  const candidates = years.flatMap(year => {
+    const resolved = groups.map(group => ({start: buildIsoDateTime(dateStr, group.start, group.zone, year), end: group.end ? buildIsoDateTime(dateStr, group.end, group.zone, year) : undefined}));
+    const first = resolved[0]!;
+    if (!first.start || resolved.some((row, i) => !row.start || row.start !== first.start || (groups[i]!.end && (!row.end || row.end <= row.start)) || row.end !== first.end)) return [];
+    if (referenceTime && Math.abs(Date.parse(first.start) - Date.parse(referenceTime)) > 31 * 86400_000) return [];
+    return [{startTime: first.start, ...(first.end ? {endTime: first.end} : {})}];
+  });
+  if (candidates.length !== 1) return {};
+  return {...candidates[0], timeProvenance: {yearSource, dateText: dateStr, timeZones: [...new Set(groups.map(group => TIME_ZONES[group.zone.toUpperCase().replace(/\s+/g, " ")]!))], ...(referenceTime ? {referenceTime} : {})}};
+}

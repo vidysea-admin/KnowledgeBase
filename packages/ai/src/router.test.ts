@@ -202,3 +202,16 @@ test("embed() throws rather than returning zero vectors when NO chain member can
     return true;
   });
 });
+
+test("an aborted job.signal stops the chain: no further provider is attempted after the abort (ISS-421)", async () => {
+  const ctl = new AbortController();
+  let secondCalled = false;
+  const first: Provider = { name: "first", listModels: async () => [], complete: async () => { ctl.abort(); throw new Error("aborted"); } };
+  const second: Provider = { name: "second", listModels: async () => [], complete: async () => { secondCalled = true; return okResult("second"); } };
+  const { write } = recordingWrite();
+  await assert.rejects(complete("k", { ...FIXTURE_JOB, signal: ctl.signal }, { chains: { k: ["first", "second"] }, providers: { first, second }, write, tenantId: "t" }));
+  assert.equal(secondCalled, false);
+  const pre = new AbortController(); pre.abort();
+  await assert.rejects(complete("k", { ...FIXTURE_JOB, signal: pre.signal }, { chains: { k: ["first", "second"] }, providers: { first, second }, write, tenantId: "t" }));
+  assert.equal(secondCalled, false, "an already-aborted job attempts nobody");
+});

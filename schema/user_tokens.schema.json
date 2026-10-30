@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "kb://user_tokens",
+  "title": "user_tokens",
+  "description": "Single-use email-verification and password-reset tokens (UA-4/UA-21). Only sha256(token) is stored (tokenHash, globally unique); the raw 256-bit value exists once, in the mail or the admin-issued link. A token is bound to (userId, purpose): a reset token cannot verify and vice versa. Valid 24 h (verify) or 1 h (reset) from createdAt; usedAt marks the single use. purgeAt (BSON Date) is expiresAt plus a short grace and drives the TTL index, so spent and expired tokens disappear on their own.",
+  "type": "object",
+  "required": ["_id", "tenantId", "userId", "purpose", "tokenHash", "issuedVia", "createdAt", "expiresAt", "purgeAt"],
+  "properties": {
+    "_id": { "type": "string", "minLength": 1, "maxLength": 64 },
+    "tenantId": { "type": "string", "minLength": 1 },
+    "userId": { "type": "string", "minLength": 1, "maxLength": 64 },
+    "purpose": { "type": "string", "enum": ["verify_email", "password_reset"] },
+    "tokenHash": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "issuedVia": { "type": "string", "enum": ["mail", "admin"], "description": "'admin' = one-time link issued from the admin page (no outbound mail in v1)." },
+    "issuedBy": { "type": "string", "minLength": 1, "maxLength": 64, "description": "Admin userId when issuedVia is 'admin'." },
+    "createdAt": { "type": "string", "format": "date-time" },
+    "expiresAt": { "type": "string", "format": "date-time" },
+    "usedAt": { "type": "string", "format": "date-time" },
+    "purgeAt": { "type": "string", "format": "date-time", "tsType": "Date", "x-bsonType": "date", "description": "BSON Date; TTL." }
+  },
+  "additionalProperties": false
+}

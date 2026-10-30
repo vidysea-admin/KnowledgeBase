@@ -9,8 +9,11 @@
  * There is deliberately NO undo here yet (the server route exists; the control is the next unit), and the confirm text says so.
  */
 import { useEffect, useRef, useState } from "react";
-import { classify, MESSAGES, postPending } from "../join-rules/joinRulesClient.js";
+import { getJoinRules, looksStored, putRuleSet, type LoadedRules, classify, MESSAGES, postPending } from "../join-rules/joinRulesClient.js";
 import { JOIN_RULES_ENFORCED, LINK_NOT_NEW_NOTE, UNRECOGNISED_LINK_NOTE, optOutCopy } from "../join-rules/enforcement.js";
+import { ApiError } from "../../api/client.js";
+import type { MeetingCandidate } from "../../api/types.js";
+import { normalizeDomain, normalizeEmail, validateRuleSetClient, type Rule } from "../join-rules/joinRulesModel.js";
 import { linkOutcome } from "./optOutOutcome.js";
 
 export interface OptOutControlProps {
@@ -105,4 +108,49 @@ export function OptOutControl(props: OptOutControlProps): React.ReactElement {
       )}
     </div>
   );
+}
+
+/** A deliberately selected, reusable deny class; server CAS keeps live opt-outs and approvals. */
+export function GmailPatternControl({apiKey,candidate,onSaved}: {apiKey:string;candidate:Pick<MeetingCandidate,"senderEmail"|"senderDomain"|"subject">;onSaved:()=>void|Promise<void>}): React.ReactElement {
+  const [open,setOpen]=useState(false),[busy,setBusy]=useState(false),[loaded,setLoaded]=useState<LoadedRules|null>(null);
+  const [kind,setKind]=useState<"sender"|"domain"|"title">("sender"),[phrase,setPhrase]=useState(candidate.subject.slice(0,180)),[subdomains,setSubdomains]=useState(false);
+  const [error,setError]=useState<string|null>(null),[note,setNote]=useState<string|null>(null);
+  const identity=JSON.stringify([apiKey,candidate.senderEmail,candidate.senderDomain,candidate.subject]), current=useRef(identity),inFlight=useRef(false);
+  current.current=identity;
+  useEffect(()=>{setOpen(false);setLoaded(null);setError(null);setNote(null);setBusy(false);inFlight.current=false;setKind("sender");setSubdomains(false);setPhrase(candidate.subject.slice(0,180));return()=>{current.current="";};},[identity]);
+  const sender=normalizeEmail(candidate.senderEmail),domain=normalizeDomain(candidate.senderDomain);
+  const value=kind === "sender"?sender:kind === "domain"?domain:phrase.trim().replace(/\s+/g," ");
+  const valid=Boolean(value && value.length<=(kind === "title"?180:kind === "domain"?253:320) && !/[\u0000-\u001f]/.test(value));
+  const versionOK=Boolean(loaded && (loaded.etag ? /^"[^"\r\n]+"$/.test(loaded.etag) : !looksStored(loaded.view)));
+  async function load():Promise<void>{
+    if(inFlight.current)return; const request=identity;inFlight.current=true;setOpen(true);setBusy(true);setError(null);setLoaded(null);
+    try{const result=await getJoinRules(apiKey);if(current.current!==request)return;setLoaded(result);if(result.etag ? !/^"[^"\r\n]+"$/.test(result.etag) : looksStored(result.view))setError(MESSAGES.noEtag);}
+    catch(e){if(current.current===request)setError(e instanceof ApiError && e.status===403?MESSAGES.readForbidden:MESSAGES.loadFailed);}
+    finally{if(current.current===request){inFlight.current=false;setBusy(false);}}
+  }
+  async function save():Promise<void>{
+    if(inFlight.current || !loaded || !versionOK || !valid)return;const request=identity;inFlight.current=true;setBusy(true);setError(null);
+    try{
+      const match:Rule["match"]=kind === "sender"?{email:value!}:kind === "domain"?{domain:value!,subdomains}:{titleIncludes:[value!]};
+      const ids=new Set(loaded.view.ruleSet.rules.map(r=>r.id));let n=1;while(ids.has("gmail-skip-"+n))n++;
+      const ruleSet={...loaded.view.ruleSet,rules:[...loaded.view.ruleSet.rules,{id:"gmail-skip-"+n,effect:"deny" as const,match}]};
+      if(validateRuleSetClient(ruleSet).length){setError("Choose a valid bounded sender, domain or literal title phrase.");return;}
+      await putRuleSet(apiKey,ruleSet,loaded.etag);if(current.current!==request)return;setOpen(false);setNote("Skip rule saved for current and future matching invitations.");
+      try{await onSaved();}catch{if(current.current===request)setError("Rule saved. The invitation list could not refresh; reload it to see the matches.");}
+    }catch(e){if(current.current===request){const status=e instanceof ApiError?e.status:0;setError(status===412?MESSAGES.stale:status===428?MESSAGES.preconditionRequired:status===403?MESSAGES.readOnly:status===401?MESSAGES.unauthorized:status===503?MESSAGES.unavailable:MESSAGES.writeFailed);}}
+    finally{if(current.current===request){inFlight.current=false;setBusy(false);}}
+  }
+  return <div data-testid="gmail-pattern-control">
+    {!open && <button type="button" disabled={busy} onClick={()=>void load()}>Ignore similar</button>}
+    {note && <p role="status">{note}</p>}{error && <p role="alert">{error}</p>}
+    {open && <div role="alertdialog" aria-label="Ignore similar invitations" className="card">
+      <label>Skip invitations matching <select aria-label="Skip invitations matching" value={kind} disabled={busy} onChange={e=>setKind(e.target.value as typeof kind)}><option value="sender">This sender</option><option value="domain">This domain</option><option value="title">A literal title phrase</option></select></label>
+      {kind === "domain" && <label><input type="checkbox" checked={subdomains} disabled={busy} onChange={e=>setSubdomains(e.target.checked)}/>Include true subdomains</label>}
+      {kind === "title" && <label>Literal title phrase <input aria-label="Literal title phrase" maxLength={180} value={phrase} disabled={busy} onChange={e=>setPhrase(e.target.value)}/></label>}
+      <p>{kind === "sender"?"Sender "+(value??"invalid sender"):kind === "domain"?(subdomains?"Domain and true subdomains ":"Exact domain ")+(value??"invalid domain"):"Literal title phrase “"+value+"” (case-insensitive, not a regular expression)"} — skip current and future matching invitations. This affects a class of invitations; unrelated rules stay in place.</p>
+      <button type="button" disabled={busy || !valid || !versionOK} onClick={()=>void save()}>Save skip rule</button>
+      <button type="button" disabled={busy} onClick={()=>{setOpen(false);setError(null);}}>Cancel</button>
+      {!busy && <button type="button" onClick={()=>void load()}>Reload latest rules</button>}
+    </div>}
+  </div>;
 }

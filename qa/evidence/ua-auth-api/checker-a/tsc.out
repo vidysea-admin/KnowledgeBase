@@ -1,0 +1,2 @@
+src/knowledge-outputs/repository-adapter.test.ts(6,23): error TS2307: Cannot find module '../../../../qa/packets/t058-output-workbench.fixture.json' or its corresponding type declarations.
+exit 2

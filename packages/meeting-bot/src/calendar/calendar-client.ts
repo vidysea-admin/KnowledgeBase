@@ -56,25 +56,31 @@ function semantic(row: Occurrence): string {
 }
 function normalizeOccurrence(source: Occurrence["source"], input: Snapshot): Occurrence {
   const common = ["id", "title", "startTime", "endTime", "meetingUrl", "cancelled", "providerUpdated"];
-  shape(input, [...common, ...(source === "calendar" ? ["organizer", "recurringEventId", "originalStartTime", "meetingUrlSource"] : ["senderEmail", "senderDomain", "senderAuthenticated", "status", "kind", "registrationOnly", "registrationUrl", "messageId", "threadId", "receivedAt", "youtubeWatch", "youtubeWatchIssue", "meetingLinkIssue"])]);
+  shape(input, [...common, ...(source === "calendar" ? ["organizer", "recurringEventId", "originalStartTime", "meetingUrlSource", "description", "status", "responseStatus", "youtubeWatch", "youtubeWatchIssue", "meetingLinkIssue"] : ["senderEmail", "senderDomain", "senderAuthenticated", "status", "kind", "registrationOnly", "registrationUrl", "messageId", "threadId", "receivedAt", "youtubeWatch", "youtubeWatchIssue", "meetingLinkIssue", "evidenceIssue"])]);
   text(input.id, 1024, true); text(input.title, 2000); text(input.meetingUrl, 8192);
   text(input.startTime, 128); text(input.endTime, 128); text(input.organizer, 320);
   text(input.meetingUrlSource, 32); // any short string is kept as-is: auto-join.ts treats everything but "conference" as untrusted
+  if (source === "calendar" && ((input.description !== undefined && (typeof input.description !== "string" || input.description.length > 32768 || /[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]/.test(input.description))) ||
+      (input.status !== undefined && !["confirmed", "tentative", "cancelled"].includes(input.status)) ||
+      (input.responseStatus !== undefined && !["accepted", "declined", "tentative", "needsAction"].includes(input.responseStatus)))) fail();
   if (input.cancelled !== undefined && typeof input.cancelled !== "boolean") fail();
   if (source === "gmail" && (!["pending", "approved", "rejected", "auto_approved"].includes(input.status ?? "") ||
       (input.kind !== undefined && !["upcoming", "past-recording"].includes(input.kind)) ||
       (input.registrationOnly !== undefined && typeof input.registrationOnly !== "boolean") ||
       (input.senderAuthenticated !== undefined && typeof input.senderAuthenticated !== "boolean"))) fail();
   if (source === "gmail") { text(input.senderEmail, 320, true); text(input.senderDomain, 320, true); }
-  if (source === "gmail") {
-    if (input.receivedAt !== undefined && time(input.receivedAt) !== input.receivedAt) fail();
+  if (source === "gmail" && input.receivedAt !== undefined && time(input.receivedAt) !== input.receivedAt) fail();
+  {
+    if (input.evidenceIssue !== undefined && (source !== "gmail" || !['unresolved-body', 'unsupported-attachment'].includes(input.evidenceIssue))) fail();
     if (input.youtubeWatchIssue !== undefined && input.youtubeWatchIssue !== 'ambiguous') fail();
     if (input.meetingLinkIssue !== undefined && !['ambiguous', 'registration-only', 'host-start-link'].includes(input.meetingLinkIssue)) fail();
     if (input.youtubeWatch !== undefined) {
       shape(input.youtubeWatch, ['url', 'videoId', 'source']);
       const watch = input.youtubeWatch;
-      if (typeof watch.videoId !== 'string' || !/^[A-Za-z0-9_-]{11}$/.test(watch.videoId) || watch.url !== `https://www.youtube.com/watch?v=${watch.videoId}` || !['body','snippet'].includes(String(watch.source))) fail();
+      if (typeof watch.videoId !== 'string' || !/^[A-Za-z0-9_-]{11}$/.test(watch.videoId) || watch.url !== `https://www.youtube.com/watch?v=${watch.videoId}` || !(source === "calendar" ? ["location", "description"] : ["body", "snippet"]).includes(String(watch.source))) fail();
     }
+  }
+  if (source === "gmail") {
     text(input.registrationUrl, 8192);
     for (const id of [input.messageId, input.threadId]) if (id !== undefined && (typeof id !== "string" || !/^[A-Za-z0-9_-]{1,256}$/.test(id))) fail();
     if (input.registrationUrl !== undefined) {
@@ -83,7 +89,7 @@ function normalizeOccurrence(source: Occurrence["source"], input: Snapshot): Occ
     }
   }
   const snapshot: Snapshot = {id: input.id, title: input.title ?? "", cancelled: input.cancelled ?? false};
-  for (const key of source === "calendar" ? ["meetingUrl", "meetingUrlSource", "organizer", "recurringEventId"] : ["meetingUrl", "senderEmail", "senderDomain", "senderAuthenticated", "status", "kind", "registrationOnly", "registrationUrl", "messageId", "threadId", "receivedAt", "youtubeWatch", "youtubeWatchIssue", "meetingLinkIssue"]) {
+  for (const key of source === "calendar" ? ["meetingUrl", "meetingUrlSource", "organizer", "recurringEventId", "description", "status", "responseStatus", "youtubeWatch", "youtubeWatchIssue", "meetingLinkIssue"] : ["meetingUrl", "senderEmail", "senderDomain", "senderAuthenticated", "status", "kind", "registrationOnly", "registrationUrl", "messageId", "threadId", "receivedAt", "youtubeWatch", "youtubeWatchIssue", "meetingLinkIssue", "evidenceIssue"]) {
     const value = input[key as keyof Snapshot];
     if (value !== undefined) Object.assign(snapshot, {[key]: value});
   }
@@ -263,7 +269,7 @@ export function reconcileWebinarSources(input: {
       currentKey: current && !untrustedSnapshot(snapshot) ? webinarSessionKey(current) : undefined, ...(boundaryChanged ? {boundaryChanged: true as const} : {})});
     const classification = classifyWebinarInvite(snapshot.title ?? ""), future = !snapshot.endTime || snapshot.endTime > input.checkedAt;
     if ((classification !== "meeting" && future) || unresolved) inventory.push({occurrenceKey: key, reviewKey: webinarSessionKey(`source-review|${key}`),
-      sessionKey: current && !untrustedSnapshot(snapshot) ? webinarSessionKey(current) : undefined, classification, snapshot, reason: unresolved ?? linked?.reviewReason ?? row.reviewReason ?? (snapshot.cancelled ? "cancelled" : undefined)});
+      sessionKey: current && !untrustedSnapshot(snapshot) ? webinarSessionKey(current) : undefined, classification, snapshot, reason: unresolved ?? (snapshot.evidenceIssue !== undefined ? "needs-review" : undefined) ?? linked?.reviewReason ?? row.reviewReason ?? (snapshot.cancelled ? "cancelled" : undefined)});
     if (unresolved) continue; // a legacy-scope block empties both feeds below anyway
     if (row.source === "calendar") calendarEvents.push({...snapshot, title: snapshot.title ?? "", startTime: snapshot.startTime ?? "", endTime: snapshot.endTime ?? ""} as CalendarEvent);
     else candidates.push(snapshot as AutoRecordCandidateInput);

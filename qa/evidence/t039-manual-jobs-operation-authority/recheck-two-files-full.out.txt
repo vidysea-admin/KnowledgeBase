@@ -1,0 +1,38 @@
+(node:2588) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ canonical queued/recording operations without scheduled files block their own meeting across restart (28.3948ms)
+✔ valid Meet, Zoom and Teams URLs launch exactly once with the normalised URL (0.7125ms)
+✔ --until is passed through; absent --until adds nothing (0.2965ms)
+✔ bad --until is rejected by the real todayAt parser before anything launches (0.5166ms)
+✔ usage errors throw and launch nothing (0.3735ms)
+✔ every planner refusal maps to a message, exits 1 and launches nothing (0.8531ms)
+✔ duplicate live job refuses for queued, joining, recording and an unknown status (0.3375ms)
+✔ finished jobs (processing, ready, failed, action_required) and other meetings do not block (0.334ms)
+✔ an unreadable state refuses with exit 1 and launches nothing (0.2064ms)
+✔ credentials are never echoed: only the host is printed (0.4093ms)
+✔ readLiveJobs: missing state is no jobs; corrupt or wrong-shape state throws (cannot tell) (22.1725ms)
+✔ default authority is canonical operations: expired scheduled file cannot hide an active operation (34.4404ms)
+✔ plan refusals through the real planner: hostile and unsupported links are 400 and nothing is launched (no log file is created) (76.4867ms)
+✔ until: a bad value is 400 from the adapter's validator (28.5598ms)
+✔ tenant: the host serves ONE capture tenant; another tenant's key is 403 even with the scope (8.1597ms)
+✔ duplicate: a live job for the same meeting (any spelling) -> 409; an ended job does not block (429.1871ms)
+✔ duplicate through the REAL live-job reader: a scheduled job file for the meeting -> 409; a corrupt one -> 503 (cannot tell), nothing launched (7.2205ms)
+✔ live-job state unreadable (reader throws) -> 503 and nothing is launched (6.8451ms)
+✔ launch: 202 with a job id; the child got the validated URL and flags as separate argv entries (no shell), tenant from the key (424.5113ms)
+✔ launcher that dies at once -> 502 (not 202); a missing node binary -> 502 (64.2974ms)
+✔ scope: a key with only calendar is 403 end to end (6.4137ms)
+✔ untilProblem: invalid clock values, past times and times beyond 24 h are refused; real near-future values pass (0.3412ms)
+✔ until through the real route: past and far-future values are 400 with NO launch (no log file); a valid one still launches (432.8428ms)
+✔ untilProblem: a non-existent calendar date that would roll into the 24 h window is refused (2026-02-29 is not a date) (0.2845ms)
+✔ status: flag OFF by default (env unset) -> no status method; ON by option or env value 1 only (0.461ms)
+✔ status: live claim by that job id = running; none and young = launching; none and old = not-running (10.0515ms)
+✔ status: a tenant this host does not serve is forbidden, even for a job id that is running for the host tenant (2.2381ms)
+✔ status: unreadable live-recording state is 'unreadable', never not-running (3.4202ms)
+ℹ tests 28
+ℹ suites 0
+ℹ pass 28
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 4072.0753

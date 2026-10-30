@@ -1,0 +1,20 @@
+✔ new canonical kinds use actual mappings and separate existing ordinary/failure ceilings; tenant feed consumes all (12.7585ms)
+✔ discovery failure overflow uses the existing one-per-hour durable digest across restart (16.648ms)
+✔ non-career deferred test data stays out of ordinary email but remains visible to its tenant (2.9727ms)
+✔ actual canonical producer reaches durable sink, real tenant host reader and API projection for all three new kinds (13.4191ms)
+✔ canonical alert projection keeps finite coverage detail, staging, exact output and no private row fields (1.2156ms)
+✔ canonical updates/artifact events/terminal outcomes reach the configured sink in order (1.7844ms)
+✔ discovery degradation and recovery retain the same outage identity and never copy provider error values (0.7125ms)
+✔ canonical replay is bounded, excludes foreign tenant rows, and flushes actual durable retries (3.8668ms)
+✔ saturated started event survives real durable write, terminal transition, old lookback and restart replay (218.6554ms)
+✔ failed channel stays durable and feed acquisition preserves queued outage snapshots before first save (0.5171ms)
+✔ first durable transition save includes its event and restart replays after crash before enqueue (25.9704ms)
+ℹ tests 11
+ℹ suites 0
+ℹ pass 11
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 6397.2417
+exit=0

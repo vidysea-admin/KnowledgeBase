@@ -371,3 +371,60 @@ test("adapter: duplicate and unrepresentable config entries stay valid and keep 
   assert.equal(evaluateJoinRules(ev("z@sub.q.org"), rs).action, "needs-approval");
   assert.equal(evaluateJoinRules(ev("z@other.org"), rs).action, "needs-approval");
 });
+
+
+test("explicit attendance modes and literal purpose matching fail closed", () => {
+  const purpose = { id: "career", titleIncludes: ["career planning"], descriptionIncludes: ["college choice"] };
+  const rs: JoinRuleSet = { ...set([allow("purpose", { domain: "x.com", titleIncludes: ["workshop", "career"], descriptionIncludes: ["students"], purposeAny: ["career"] })]), attendanceMode: "rules", purposeGroups: [purpose] };
+  const event = ev("a@x.com", { title: "Career   Planning workshop", description: "For STUDENTS" });
+  assert.equal(evaluateJoinRules(event, rs).action, "join");
+  for (const changed of [{ title: "sports" }, { description: "staff" }, { organizer: "a@y.com" }]) assert.notEqual(evaluateJoinRules({ ...event, ...changed }, rs).action, "join");
+  assert.equal(evaluateJoinRules(ev("a@x.com", {title: "career", description: "students college choice"}), rs).action, "join");
+  const approved = { ...EMPTY_JOIN_RULE_STATE, approvedSenders: ["a@x.com"] };
+  assert.equal(evaluateJoinRules(ev("a@x.com"), { ...set(), attendanceMode: "rules" }, approved).action, "needs-approval");
+  assert.equal(evaluateJoinRules(ev("a@x.com", {description:"x".repeat(20001)}), set(), approved).action, "join");
+  const all: JoinRuleSet = { ...set([deny("deny", { descriptionIncludes: ["private"] })]), attendanceMode: "all" };
+  assert.equal(evaluateJoinRules(ev("a@x.com"), all).action, "join");
+  assert.equal(evaluateJoinRules(ev("a@x.com", { description: "Private session" }), all).reason, "deny-rule");
+  assert.equal(evaluateJoinRules(ev("a@x.com"), all, recordOptOut(EMPTY_JOIN_RULE_STATE, "e1")).reason, "meeting-opt-out");
+  assert.equal(evaluateJoinRules(ev("a@x.com", {cancelled: true}), all).reason, "cancelled");
+  assert.equal(evaluateJoinRules(ev("a@x.com", {meetingUrl: undefined}), all).reason, "no-meeting-url");
+  assert.equal(evaluateJoinRules(ev("a@x.com", { description: "private" + "x".repeat(20000) }), all).action, "needs-approval");
+  for (const attendanceMode of ["all", "rules"] as const) for (const organizer of ["STAFF@OFFICE.EXAMPLE", "a@dept.office.example"])
+    assert.deepEqual(evaluateJoinRules(ev(organizer), {...set([allow("internal", {scope:"internal"})], ["Office.Example"]), attendanceMode}, {...EMPTY_JOIN_RULE_STATE,approvedSenders:[organizer.toLowerCase()]}), {action:"skip",reason:"deny-rule",ruleId:"office:internal"});
+  const literal = { ...set([allow("literal", { titleIncludes: [".*"] })]), attendanceMode: "rules" };
+  assert.notEqual(evaluateJoinRules(ev("a@x.com", {title: "anything"}), literal as JoinRuleSet).action, "join");
+  assert.equal(evaluateJoinRules(ev("a@x.com", {title: "literal .* text"}), literal as JoinRuleSet).action, "join");
+});
+
+test("purpose rule validation refuses unknown groups, malformed modes and every bounds violation", () => {
+  const base = { ...set([allow("a", {titleIncludes: ["topic"]})]), attendanceMode: "rules" };
+  const invalid = [
+    {...base, attendanceMode: "auto"}, {...base, purposeGroups: {}},
+    {...base, purposeGroups: [{id: "Bad", titleIncludes: ["x"]}]},
+    {...base, purposeGroups: [{id: "career"}]},
+    {...base, purposeGroups: [{id: "career", titleIncludes: ["x"]}, {id: "career", titleIncludes: ["y"]}]},
+    {...base, purposeGroups: Array.from({length: 51}, (_, i) => ({id: 'g'+i, titleIncludes: ['x']}))},
+    {...base, rules: [allow("a", {purposeAny: ["missing"]})]},
+    ...[[], [" "], ["x".repeat(161)], Array(21).fill("x"), [12], "topic"].map(value => ({...base, rules: [{id:"a", effect:"allow", match:{titleIncludes:value}}]})),
+    {...base, rules:[allow("a", {purposeAny:Array(21).fill("career")})], purposeGroups:[{id:"career", titleIncludes:["x"]}]},
+    {...base, purposeGroups:[{id:"career", titleIncludes:["x"], regex:".*"}]},
+  ];
+  for (const raw of invalid) {
+    assert.throws(() => validateJoinRuleSet(raw));
+    assert.equal(evaluateJoinRules(ev("a@x.com", {title:"topic"}), raw as JoinRuleSet).reason, "invalid-rule-set");
+  }
+  const normalized = validateJoinRuleSet({...base, rules:[allow("a", {titleIncludes:["  CAREER   Planning  "]})]});
+  assert.deepEqual(normalized.rules[0]!.match.titleIncludes, ["career planning"]);
+});
+
+test("explicit modes reach the actual veto selector with purpose text and preserved legacy defaults", async () => {
+  const {applyJoinRules} = await import("./join-rules-select.js");
+  const item = {source:"calendar", sourceId:"e1", sessionKey:"session-1", title:"Career planning", description:"for students", sender:"a@x.com", meetingUrl:MEET};
+  const selection = {toSchedule:[item], skipped:[]} as unknown as Parameters<typeof applyJoinRules>[0];
+  const rs: JoinRuleSet = {...set([allow("a", {descriptionIncludes:["students"],purposeAny:["career"]})]),attendanceMode:"rules",purposeGroups:[{id:"career",titleIncludes:["career planning"]}]};
+  assert.equal(applyJoinRules(selection,rs,{state:EMPTY_JOIN_RULE_STATE}).toSchedule.length,1);
+  assert.equal(applyJoinRules(selection,{...set(),attendanceMode:"rules"},{state:EMPTY_JOIN_RULE_STATE}).toSchedule.length,0);
+  assert.equal(applyJoinRules(selection,set(),{state:EMPTY_JOIN_RULE_STATE}).toSchedule.length,1);
+  assert.equal(applyJoinRules(selection,{...rs,attendanceMode:"all"},{state:recordOptOut(EMPTY_JOIN_RULE_STATE,"e1")}).skipped[0]?.reason,"opted-out");
+});

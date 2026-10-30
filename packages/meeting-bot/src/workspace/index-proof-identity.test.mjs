@@ -45,8 +45,11 @@ test('test-data source remains staging-only even when caller and proof agree on 
 });
 
 test('legacy v2 still refuses count mismatch and non-string generation', t => {
-  const f = producedProofFixture(t);
+  const f = producedProofFixture(t, 'knowledge-turns.json', 'legacy');
   const { sourceId, sourceHash, workDb, inputArtifact, ...legacy } = f.proof;
+  // ISS-392: positive control. The unpatched v2 proof must be admitted, so each refusal below is attributable to its patch alone.
+  f.write('index-proof.json', { ...legacy, version: 2 });
+  assert.equal(validateIndexProof(f.dir, 'session-a').generation, 'current-generation');
   for (const patch of [{ turnCount: 2 }, { generation: 1 }, { generation: ' ' }]) {
     f.write('index-proof.json', { ...legacy, version: 2, ...patch });
     assert.throws(() => validateIndexProof(f.dir, 'session-a'), /strict index proof/);

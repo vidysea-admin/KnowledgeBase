@@ -112,3 +112,4 @@ packages/meeting-bot/py/fixtures/*.rendered.html
 # Zoom webinar transcripts kept local for privacy
 data/toc-migrated/2026-10-13-zoom-webinar-p1/
 data/toc-migrated/2026-10-13-zoom-webinar-p2/
+.worktrees/

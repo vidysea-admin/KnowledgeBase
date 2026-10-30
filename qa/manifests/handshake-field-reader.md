@@ -131,7 +131,7 @@ files) surfaced 2 unexpected "disagreements": `delivery-gate-manifest-blindness.
 class `[\s\-*#>|`]*`, carried over verbatim from the module's own pre-existing regex, which includes a
 backtick. Both files contain a line that **opens with a backtick-quoted example** of the exact
 bold-blindness bug class this repo keeps hitting, e.g.
-`` `## Status: ready-for-check`, which is the one form the old regex could see `` at
+`` `## Status: checked-PASS`, which is the one form the old regex could see `` at — closed out 2026-10-26 (resume reconcile) citing qa/verdicts/handshake-field-reader.md
 `delivery-gate-manifest-blindness.md:35` (confirmed via `sed -n '35p'`) — prose *about* the bug, read as
 a real field declaration because the code span's opening tick satisfied `^[\s\-*#>|`]*`.
 
@@ -308,4 +308,4 @@ Reproductions 3-4 deliberately left open, out of D-043 item 3's scope.**
 - Does not claim a PASS. Only `/checker` can PASS this unit.
 
 ## **Status:** checked-PASS (cycle 0)
-**Handshake status:** ready-for-check
+**Handshake status:** checked-PASS — synced 2026-10-26 to the closed-out cycle-0 handshake earlier in this file

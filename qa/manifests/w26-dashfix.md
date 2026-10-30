@@ -1,6 +1,6 @@
 # w26-dashfix: dashboard panels fail independently; Sessions "index: pending" investigated
 
-Status: ready-for-check
+Status: checked-PASS — closed out 2026-10-26 (resume reconcile) citing qa/verdicts/w26-dashfix.md
 Fix cycle: 0
 Lane: KnowledgeBase-lanes/w26-dashfix  Branch: lane/w26-dashfix  Base: fd471686
 Candidate SHA: see `git log -1 lane/w26-dashfix` (the commit that adds this file)

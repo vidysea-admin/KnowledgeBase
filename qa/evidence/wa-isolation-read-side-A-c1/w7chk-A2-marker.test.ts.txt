@@ -1,0 +1,56 @@
+import { test } from "node:test";
+import assert from "node:assert/strict";
+import { MongoClient } from "mongodb";
+import { createWhatsAppReviewWiring } from "./compose.js";
+import { whatsAppLogId, WHATSAPP_REVIEW_LOG } from "./invalidate.js";
+
+const url = process.env.WA_REVIEW_TEST_MONGO_URL;
+const OA = "6a8d0c692fcc75f0e911b878", OB = "6a8d0c692fcc75f0e911b879";
+const LA = "a".repeat(24), LB = "b".repeat(24);
+test("w7chk-A2 real Mongo: rejected ingests leave no marker; poison markers never abort repair; shared jid repairs per link", { skip: !url }, async () => {
+  const name = `lkb_test_wa_review_${Date.now()}`;
+  const client = await new MongoClient(url!).connect();
+  try {
+    const db = client.db(name);
+    await db.collection("whatsapp_links").insertMany([
+      { _id: LA, tenantId: "tenant-a", userId: "uA", state: "active", live: true, archiverOwnerId: OA },
+      { _id: LB, tenantId: "tenant-a", userId: "uB", state: "active", live: true, archiverOwnerId: OB }] as never);
+    const wire = createWhatsAppReviewWiring({
+      appDb: () => db,
+      resolveOwners: async (_t, caller) => {
+        const all = [{ linkId: LA, ownerUserId: OA }, { linkId: LB, ownerUserId: OB }];
+        if (caller?.admin) return all;
+        if (caller?.kind === "session") return all.filter(g => (g.linkId === LA ? "uA" : "uB") === caller.userId);
+        return [];
+      },
+      listGroups: async (owner: string) => [{ groupJid: "same@g.us", ownerUserId: owner, subject: "G", trackedPersonCount: 1 }],
+      fetchMessages: async () => [{ messageId: "m1", personId: "p1", displayName: "Expert", text: "Scholarship closes Friday.", ts: "2026-10-14T10:00:00.000Z" }],
+    } as never);
+    const A = { caller: { kind: "session", userId: "uA", admin: false } as const };
+    const log = db.collection(WHATSAPP_REVIEW_LOG), src = db.collection("sources");
+    // 1. member A names B's link, a bogus jid, and B's link with the right jid
+    await assert.rejects(wire.whatsapp.ingestGroup("tenant-a", "same@g.us", { ...A, linkId: LB }));
+    await assert.rejects(wire.whatsapp.ingestGroup("tenant-a", "nope@g.us", A));
+    await assert.rejects(wire.whatsapp.ingestGroup("tenant-a", "same@g.us", { ...A, linkId: "zz" } as never));
+    assert.equal(await log.countDocuments({ kind: "pending-invalidation" } as never), 0, "no marker after rejected ingests");
+    assert.equal(await src.countDocuments({}), 0, "no source after rejected ingests");
+    // 2. seeded markers: poison first, then legit per-link markers (one old key shape without link in key)
+    const old = whatsAppLogId("tenant-a", "pending-invalidation", "same@g.us");
+    await log.insertMany([
+      { _id: "poison-1", tenantId: "tenant-a", kind: "pending-invalidation", groupJid: "nope@g.us", linkId: LA, at: "t" },
+      { _id: "poison-2", tenantId: "tenant-a", kind: "pending-invalidation", groupJid: "same@g.us", linkId: "zzzz", at: "t" },
+      { _id: "poison-3", tenantId: "tenant-a", kind: "pending-invalidation", groupJid: "same@g.us", linkId: { $ne: 1 }, at: "t" },
+      { _id: old, tenantId: "tenant-a", kind: "pending-invalidation", groupJid: "same@g.us", linkId: LA, at: "t" },
+      { _id: whatsAppLogId("tenant-a", "pending-invalidation", "same@g.us", LB), tenantId: "tenant-a", kind: "pending-invalidation", groupJid: "same@g.us", linkId: LB, at: "t" },
+    ] as never);
+    const repaired = await wire.repairPendingInvalidations("tenant-a");
+    console.log("REPAIRED", JSON.stringify(repaired));
+    const left = await log.find({ kind: "pending-invalidation" } as never).toArray() as any[];
+    console.log("LEFT", JSON.stringify(left.map(m => ({ id: m._id, skipped: m.lastRepairSkipped ?? null }))));
+    assert.deepEqual(repaired.sort(), ["same@g.us", "same@g.us"]);
+    assert.deepEqual(left.map(m => m._id).sort(), ["poison-1", "poison-2", "poison-3"]);
+    assert.ok(left.every(m => typeof m.lastRepairSkipped === "string"));
+    const sources = await src.find({ tenantId: "tenant-a" } as never).toArray() as any[];
+    assert.equal(sources.length, 2); assert.deepEqual(sources.map(s => s.sourceMeta.whatsappLinkId).sort(), [LA, LB]);
+  } finally { await client.db(name).dropDatabase(); await client.close(); }
+});

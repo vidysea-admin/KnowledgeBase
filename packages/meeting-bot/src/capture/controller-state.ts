@@ -102,6 +102,13 @@ export function getProcessStartTime(pid: number, probes: {
   }
 }
 
+/** `.lkb-tab-capture.lock` body: a bare pid (legacy, also written by capture login) or `pid` + newline + controller start-time identity. Anything else is invalid. */
+export function parseCaptureLock(text: string): {pid: number; startTime: string | undefined} | undefined {
+  const match = /^([1-9]\d{0,9})(?:\n([^\n]{1,128}))?$/.exec(text);
+  const pid = match ? Number(match[1]) : NaN;
+  return match && Number.isSafeInteger(pid) && pid <= 2147483647 ? {pid, startTime: match[2]} : undefined;
+}
+
 /** Missing identity retains legacy pid trust; only a proven mismatch rejects it. */
 export function controllerMatchesIdentity(expectedStartedAt: string | undefined, actualStartedAt: string | undefined): boolean {
   if (!expectedStartedAt || !actualStartedAt) return true;
@@ -229,7 +236,7 @@ export async function finalizeControllerRecording(
         if (!status.controllerStartedAt || !actualStart || controllerMatchesIdentity(status.controllerStartedAt, actualStart)) throw new Error("Recovery controller live or identity unknown");
       }
       const lock = confinedRecoveryPath(path.join(profileDir, ".lkb-tab-capture.lock"), profileDir, !status.cleanupComplete);
-      if (existsSync(lock) && readFileSync(lock, "utf8") !== String(status.pid)) throw new Error("Recovery profile lock ownership refused");
+      if (existsSync(lock) && parseCaptureLock(readFileSync(lock, "utf8"))?.pid !== status.pid) throw new Error("Recovery profile lock ownership refused");
       const extension = confinedRecoveryPath(path.join(recordDir, `.extension-${handle}`), recordDir, !status.cleanupComplete);
       if (existsSync(extension)) for (const name of readdirSync(extension)) confinedRecoveryPath(path.join(extension, name), extension);
       const stop = confinedRecoveryPath(path.join(recordDir, `.stop-${handle}`), recordDir, false);
@@ -237,10 +244,10 @@ export async function finalizeControllerRecording(
       recovery = {...status, state: "recovering", plannedUntil: state.until, coverageIncomplete: true, recoveryReason: "controller-interrupted-coverage-unverified"};
       writeFileSync(statusPath, JSON.stringify(recovery) + "\n");
       try {
-        if (existsSync(lock) && readFileSync(lock, "utf8") !== String(status.pid)) throw new Error("Recovery lock changed before cleanup");
+        if (existsSync(lock) && parseCaptureLock(readFileSync(lock, "utf8"))?.pid !== status.pid) throw new Error("Recovery lock changed before cleanup");
         writeFileSync(stop, "stop");
         cleanupOwnedBrowserProfile(profileDir, {...context, stopFile: stop}, actions.cleanup);
-        if (existsSync(lock) && readFileSync(lock, "utf8") !== String(status.pid)) throw new Error("Recovery lock changed during cleanup");
+        if (existsSync(lock) && parseCaptureLock(readFileSync(lock, "utf8"))?.pid !== status.pid) throw new Error("Recovery lock changed during cleanup");
         rmSync(lock, {force: true}); rmSync(extension, {recursive: true, force: true}); rmSync(stop, {force: true}); rmSync(reload, {force: true});
         recovery = {...recovery, cleanupComplete: true};
         writeFileSync(statusPath, JSON.stringify(recovery) + "\n");

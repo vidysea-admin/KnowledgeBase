@@ -1,6 +1,6 @@
 # w27-partialtree
 
-Status: ready-for-check
+Status: checked-PASS — closed out 2026-10-26 (resume reconcile) citing qa/verdicts/w27-partialtree.md
 Fix cycle: 0
 Base: 2ff2b7f3a64a2ebaea43781e08860de18de7f72c (lane/w27-partialtree; origin/master has since moved to 1b80673e, not merged)
 Candidate: see the commit that adds this file (git log -1 on lane/w27-partialtree)

@@ -1,5 +1,5 @@
 # Manifest - w27-aitransport
-**Status:** ready-for-check
+**Status:** checked-PASS — closed out 2026-10-26 (resume reconcile) citing qa/verdicts/w27-aitransport.md
 **Fix cycle:** 0
 **Contract:** none (fixes ISS-CILINUX4-001, ISS-OLLAMAFIRST-001, ISS-OLLAMAFIRST-002; all medium, non-security)
 **Lane:** w27-aitransport (branch lane/w27-aitransport, from origin/master 4264418c)

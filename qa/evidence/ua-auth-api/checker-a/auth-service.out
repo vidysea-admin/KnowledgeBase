@@ -1,0 +1,26 @@
+✔ A4 #1 signup: new and existing email give a byte-equal response; both hash; only one user exists; cross-tenant duplicate is the same response (22.4936ms)
+✔ A4 #1 signup: invalid email / displayName / policy-failing password are 400 and create nothing; role/status can never be supplied (1.8491ms)
+✔ A4 #8 signup: global daily cap -> 429 signup_capacity (before any lookup); per-email limit 3/h -> 429 rate_limited (6.9204ms)
+✔ A4 #2 verify: an admin-issued token moves unverified -> pending exactly once; reuse / expired / wrong purpose / junk give the same 400 (5.4063ms)
+✔ A4 #2 unverified accounts older than 7 days are swept and cannot verify (1.4805ms)
+✔ A4 #3 login: unknown email and wrong password are the same 401 and both run a full verify; invalid email shape too (2.4474ms)
+✔ A4 #3 login: active gets a session + csrf token; pending gets a ZERO-scope session; rejected / disabled / unverified get state only and no session (4.9251ms)
+✔ A4 #3 login success rehashes an old hash and stamps lastLoginAt (1.2716ms)
+✔ A4 #4 a successful login clears the failure counter: 4 failures, a success, 4 more failures do not lock (3.8034ms)
+✔ A4 #4 lockout: 5 failures lock the email 15 min, a never-registered one too; same 401 body; correct password refused while locked; success clears; admin unlock clears (6.4904ms)
+✔ A4 #4 a lock does not end existing sessions; the second lock lasts 30 min (10.6949ms)
+✔ A4 #5 reset: forgot is always the same 202; an admin-issued token is single use; success revokes ALL sessions; rejected / disabled are refused generically (4.9428ms)
+✔ A4 #5 reset: a policy failure does not burn the token; expired and wrong-purpose tokens are the generic 400 (1.8381ms)
+✔ A4 #6 change password: wrong current is refused and counted; success revokes OTHER sessions only (3.289ms)
+✔ A4 #7 logout / logout-all / session list / revoke-own: the right rows are revoked, another user's session id is 404 (4.4937ms)
+✔ A4 #9 every transition writes exactly one auth_events row with a closed-vocabulary detail; no row holds a password, token, cookie or raw email (5.7052ms)
+✔ A4 issueToken (for A6): unknown user -> null; an invalid user id cannot mint; the token verifies only for its purpose (0.8542ms)
+ℹ tests 17
+ℹ suites 0
+ℹ pass 17
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1977.434
+exit 0

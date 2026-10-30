@@ -1,7 +1,7 @@
 # T-034 startup owned cleanup
 
-**Handshake status:** ready-for-check
-**Status:** ready-for-check
+**Handshake status:** checked-PASS — closed out 2026-10-26 by maker resume, citing qa/verdicts/t034-startup-owned-cleanup.md
+**Status:** checked-PASS — closed out 2026-10-26 by maker resume, citing qa/verdicts/t034-startup-owned-cleanup.md
 **Fix cycle:** 0
 **Task:** T-034; ISS-CAPTUREMAKER-001
 **Priority tier:** 2 — high security/resource issue encountered during explicitly allocated tier-3 capture task.

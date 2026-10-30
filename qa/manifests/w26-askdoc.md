@@ -1,6 +1,6 @@
 # w26-askdoc: go-live guide: Mongo replica set required for Ask; T-028 scope
 
-Status: ready-for-check
+Status: checked-PASS — closed out 2026-10-26 (resume reconcile) citing qa/verdicts/w26-askdoc.md
 Fix cycle: 2
 Lane: KnowledgeBase-lanes/w26-askdoc  Branch: lane/w26-askdoc  Base: fd471686
 Candidate SHA: see `git log -1 lane/w26-askdoc` (the commit that adds this file)

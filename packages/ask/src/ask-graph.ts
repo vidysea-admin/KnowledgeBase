@@ -39,6 +39,10 @@ export interface AskGraphState {
   askResult?: AskResult;
   boundedSources: ContextSource[];
   refinedContext?: string;
+  /** Bounded answers only: source IDs cited by the sentences that survived grounding (read by the fast path). */
+  citedSourceIds?: string[];
+  /** Fast path only: the answer prompt tells the model it may abstain (`sentences: []`). */
+  abstainable?: boolean;
   result?: AskV2Result;
   /** Names of nodes entered, in order (diagnostic only; never part of the output). */
   readonly trace: AskNodeName[];
@@ -67,13 +71,19 @@ function collectNodesById(root: TreeIndexNode): Map<string, TreeIndexNode> {
   return byId;
 }
 
-const retrieveNode: AskGraphNode = {
-  name: "retrieve",
-  async run(s) {
+/** Bounded answer context: exact source quotes of the admitted nodes (tuple identity attached) plus unverified web text. */
+export function boundedSourcesOf(nodes: TreeIndexNode[], web: WebSource[]): ContextSource[] {
+  return [
+    ...nodes.flatMap((n) => sourceQuotes(n).map((q) => ({ id: q.id, text: q.quote, origin: q.origin, source: isNativeSourceQuote(q) ? { sourceLocator: q.sourceLocator } : { speakerRef: q.speakerRef, turnId: q.turnId, sessionRef: q.sessionRef, tStart: q.tStart, tEnd: q.tEnd } }))),
+    ...web.map((w, i) => ({ id: `web-${i}`, text: webDocText(w), origin: "web-unverified" })),
+  ];
+}
+
+/** Merge tree-selected candidates with the extra retrieval arms, enforce tenant-tree membership, bound and hydrate.
+ * Shared by the deep `retrieve` node and the fast path (which passes no tree-selected candidates and a `limit`). */
+export async function gatherCandidates(s: AskGraphState, treeCandidates: TreeIndexNode[], limit?: number): Promise<TreeIndexNode[]> {
     const { query, tree, deps, auditLog } = s;
-    const { treeSearchFn, extraCandidateArmsFn, write, tenantId } = deps;
-    const catalog = deps.sourceContext ? sourceCatalog(tree) : tree;
-    const treeCandidates = await selectNodes(query, catalog, s.loggingComplete("select_nodes"), (_catalog, ids) => treeSearchFn(tree, ids));
+    const { extraCandidateArmsFn, write, tenantId } = deps;
     let candidates = treeCandidates;
     if (extraCandidateArmsFn) {
       const extra = await extraCandidateArmsFn(query, tree);
@@ -95,9 +105,10 @@ const retrieveNode: AskGraphNode = {
     if (deps.sourceContext) {
       const byId = collectNodesById(tree);
       candidates = candidates.map((n) => byId.get(n.node_id)).filter((n): n is TreeIndexNode => n !== undefined);
-      if (candidates.length > SOURCE_LIMITS.candidates) {
-        auditLog.push({ jobKind: "ask.candidates_bounded", step: `${candidates.length - SOURCE_LIMITS.candidates} lower-ranked candidates omitted from bounded scoring` });
-        candidates = candidates.slice(0, SOURCE_LIMITS.candidates);
+      const cap = Math.min(SOURCE_LIMITS.candidates, limit ?? SOURCE_LIMITS.candidates);
+      if (candidates.length > cap) {
+        auditLog.push({ jobKind: "ask.candidates_bounded", step: `${candidates.length - cap} lower-ranked candidates omitted from bounded scoring` });
+        candidates = candidates.slice(0, cap);
       }
       const hydrated = await deps.sourceContext.hydrate(query, candidates);
       candidates = validateHydration(hydrated, candidates);
@@ -111,7 +122,15 @@ const retrieveNode: AskGraphNode = {
       }
       auditLog.push({ jobKind: "ask.source_hydrated", step: `${candidates.length} source nodes; snapshot ${hydrated.snapshotSHA256}; ${hydrated.sourceBytes} source bytes` });
     }
-    s.candidates = candidates;
+    return limit !== undefined && !deps.sourceContext ? candidates.slice(0, limit) : candidates;
+}
+
+const retrieveNode: AskGraphNode = {
+  name: "retrieve",
+  async run(s) {
+    const { query, tree, deps } = s;
+    const catalog = deps.sourceContext ? sourceCatalog(tree) : tree;
+    s.candidates = await gatherCandidates(s, await selectNodes(query, catalog, s.loggingComplete("select_nodes"), (_catalog, ids) => deps.treeSearchFn(tree, ids)));
   },
 };
 
@@ -161,10 +180,7 @@ const refineNode: AskGraphNode = {
     const { query, deps, auditLog } = s;
     const askResult = s.askResult!;
     const goodDocNodes: TreeIndexNode[] = askResult.scored.filter((x) => x.score >= s.lower).map((x) => x.node);
-    const boundedSources: ContextSource[] = deps.sourceContext ? [
-      ...goodDocNodes.flatMap((n) => sourceQuotes(n).map((q) => ({ id: q.id, text: q.quote, origin: q.origin, source: isNativeSourceQuote(q) ? { sourceLocator: q.sourceLocator } : { speakerRef: q.speakerRef, turnId: q.turnId, sessionRef: q.sessionRef, tStart: q.tStart, tEnd: q.tEnd } }))),
-      ...askResult.sources.web.map((w, i) => ({ id: `web-${i}`, text: webDocText(w), origin: "web-unverified" })),
-    ] : [];
+    const boundedSources: ContextSource[] = deps.sourceContext ? boundedSourcesOf(goodDocNodes, askResult.sources.web) : [];
     s.boundedSources = boundedSources;
     if (deps.sourceContext && !boundedSources.length) {
       s.result = { ...askResult, answer: "No supported internal source was retrieved. Web fallback is unavailable or returned no evidence.", auditLog };
@@ -190,7 +206,7 @@ const answerNode: AskGraphNode = {
     const revalidate = s.deps.sourceContext?.revalidate;
     if (nativeNodes.length && !revalidate) throw new BoundedAskError("native source revalidation is unavailable");
     if (nativeNodes.length) await revalidate!(nativeNodes);
-    const answerResult = await generateAnswer(s.query, s.refinedContext!, askResult.sources, s.loggingComplete("answer"), s.deps.sourceContext ? { boundedSources: s.boundedSources } : undefined);
+    const answerResult = await generateAnswer(s.query, s.refinedContext!, askResult.sources, s.loggingComplete("answer"), s.deps.sourceContext ? { boundedSources: s.boundedSources, abstain: s.abstainable, onCited: (ids) => { s.citedSourceIds = ids; } } : undefined);
     s.budget?.assertHealthy();
     if (nativeNodes.length) await revalidate!(nativeNodes);
     s.result = { ...askResult, answer: answerResult.text, auditLog: s.auditLog,
@@ -260,14 +276,15 @@ export async function askGraphV2(query: string, tree: TreeIndexNode, deps: AskV2
     const run = (options.officialGraph ?? officialAskGraphEnabled()) ? runAskLangGraphNodes : runAskGraphNodes;
     return await run(ASK_GRAPH, initAskGraphState(query, tree, deps));
   }
-  catch (err) {
-    if (deps.sourceContext) {
-      const failure = err instanceof BoundedAskError ? err : new BoundedAskError("source or completion processing failed");
-      const error = failure.budgetRefusal
-        ? JSON.stringify({ format: "lkb.budget_refusal.v1", message: failure.message, budgetRefusal: failure.budgetRefusal }) : failure.message;
-      await recordJob({ tenantId: deps.tenantId, kind: "ask.source_context_refused", status: "failed", error }, deps.write);
-      throw failure;
-    }
-    throw err;
-  }
+  catch (err) { throw await askFailure(err, deps); }
+}
+
+/** Bounded mode records one explicit refusal and rethrows a BoundedAskError; legacy callers keep the original error. */
+export async function askFailure(err: unknown, deps: AskV2Deps): Promise<unknown> {
+  if (!deps.sourceContext) return err;
+  const failure = err instanceof BoundedAskError ? err : new BoundedAskError("source or completion processing failed");
+  const error = failure.budgetRefusal
+    ? JSON.stringify({ format: "lkb.budget_refusal.v1", message: failure.message, budgetRefusal: failure.budgetRefusal }) : failure.message;
+  await recordJob({ tenantId: deps.tenantId, kind: "ask.source_context_refused", status: "failed", error }, deps.write);
+  return failure;
 }

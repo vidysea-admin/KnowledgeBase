@@ -255,6 +255,21 @@
       }
     }
   ],
+  "whatsapp_links": [
+    { "keys": { "tenantId": 1, "_id": 1 }, "unique": true },
+    { "keys": { "tenantId": 1, "userId": 1 }, "name": "whatsapp_links_live_user", "unique": true, "partialFilterExpression": { "live": true, "userId": { "$type": "string" } } },
+    { "keys": { "archiverOwnerId": 1 }, "name": "whatsapp_links_archiver_owner", "unique": true, "partialFilterExpression": { "archiverOwnerId": { "$type": "string" } } },
+    { "keys": { "tenantId": 1, "state": 1 } }
+  ],
+  "whatsapp_sync_runs": [
+    { "keys": { "tenantId": 1, "_id": 1 }, "unique": true },
+    { "keys": { "tenantId": 1, "linkId": 1, "startedAt": -1 } }
+  ],
+  "whatsapp_events": [
+    { "keys": { "tenantId": 1, "_id": 1 }, "unique": true },
+    { "keys": { "tenantId": 1, "at": 1, "_id": 1 } },
+    { "keys": { "tenantId": 1, "linkId": 1, "at": 1 } }
+  ],
   "trusted_senders": [
     {
       "keys": {
@@ -615,5 +630,36 @@
     { "keys": { "tenantId": 1, "_id": 1 }, "unique": true },
     { "keys": { "tenantId": 1, "linkHash": 1, "scopeHash": 1, "policyHash": 1 } },
     { "keys": { "tenantId": 1, "bindingHash": 1, "policyHash": 1, "policyRevision": 1, "hostScopeHash": 1 } }
+  ],
+  "users": [
+    { "keys": { "tenantId": 1 } },
+    { "keys": { "emailNormalized": 1 }, "unique": true },
+    { "keys": { "tenantId": 1, "status": 1, "createdAt": 1 } }
+  ],
+  "user_sessions": [
+    { "keys": { "tenantId": 1 } },
+    { "keys": { "tokenHash": 1 }, "unique": true },
+    { "keys": { "previousTokenHash": 1 }, "partialFilterExpression": { "previousTokenHash": { "$type": "string" } } },
+    { "keys": { "retiredTokenHashes": 1 }, "partialFilterExpression": { "retiredTokenHashes.0": { "$exists": true } } },
+    { "keys": { "tenantId": 1, "userId": 1 } },
+    { "keys": { "tenantId": 1, "familyId": 1 } },
+    { "keys": { "purgeAt": 1 }, "expireAfterSeconds": 0 }
+  ],
+  "user_tokens": [
+    { "keys": { "tenantId": 1 } },
+    { "keys": { "tokenHash": 1 }, "unique": true },
+    { "keys": { "tenantId": 1, "userId": 1, "purpose": 1 } },
+    { "keys": { "purgeAt": 1 }, "expireAfterSeconds": 0 }
+  ],
+  "auth_throttles": [
+    { "keys": { "tenantId": 1 } },
+    { "keys": { "tenantId": 1, "subjectHash": 1 }, "unique": true },
+    { "keys": { "purgeAt": 1 }, "expireAfterSeconds": 0 }
+  ],
+  "auth_events": [
+    { "keys": { "tenantId": 1 } },
+    { "keys": { "tenantId": 1, "at": -1, "_id": -1 } },
+    { "keys": { "tenantId": 1, "targetUserId": 1, "at": -1 } },
+    { "keys": { "purgeAt": 1 }, "expireAfterSeconds": 0 }
   ]
 }

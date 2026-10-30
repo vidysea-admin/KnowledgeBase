@@ -8,12 +8,13 @@
 Vidysea's own `/brain` (operating-brain `INDEX.md` → deep pages → raw transcripts), moved from
 markdown-on-disk into MongoDB with an API. It ingests session recordings, documents, and
 messages (starting with TOC community webinars, then WhatsApp expert groups), transcribes and
-attributes every fact to a speaker + timestamp, indexes them as a vectorless tree (structured
-sessions) plus a vector index (unstructured chat), and answers questions through a CRAG-style
+attributes every fact to a speaker + timestamp, indexes every source type vectorless (provenance-
+bound trees + keyword retrieval + graph, D-173), and answers questions through a CRAG-style
 router that trusts internal knowledge first and falls back to the web only when internal
 coverage is insufficient, always citing sources separately. Output = a queryable, cited
 knowledge base served via a Developer API, and ultimately an **AI virtual counsellor** built as
 a client of that API — with the long-range goal of beating top human counsellors head-to-head.
+Read next: `docs/HLD.md` (pipeline stage status, deployment) and `docs/LLD.md` (data model, API, flows).
 
 ## Directory tree (depth 2)
 
@@ -26,10 +27,14 @@ a client of that API — with the long-range goal of beating top human counsello
 - `data/`
   - `data/eval/`
   - `data/toc-migrated/`
+- `docker/`
+  - `docker/meeting-bot/`
 - `docs/`
   - `docs/adr/`
+  - `docs/api/`
   - `docs/archive/`
   - `docs/features/`
+  - `docs/user-accounts/`
   - `docs/whatsapp/`
 - `migrations/`
 - `packages/` — Application logic, one exported symbol per concept
@@ -65,6 +70,8 @@ a client of that API — with the long-range goal of beating top human counsello
   - `qa/watch/`
 - `raw/` — Data and source repos
   - `raw/TOC/`
+- `references/`
+  - `references/portals/`
 - `schema/` — JSON Schemas + fixtures + Python validator
   - `schema/fixtures/`
 - `scripts/`
@@ -81,6 +88,7 @@ a client of that API — with the long-range goal of beating top human counsello
   - `scripts/watch/`
   - `scripts/watched-sources/`
   - `scripts/webinar/`
+  - `scripts/whatsapp/`
 - `skills/`
   - `skills/checker/`
   - `skills/maker/`
@@ -99,6 +107,8 @@ a client of that API — with the long-range goal of beating top human counsello
 | answer_source_conflicts | _id, id, tenantId, runId, createdAt, by, explanation, a, b, candidateDigest, evidenceDigest, status | yes |
 | api_keys | _id, tenantId, keyHash, createdAt | no |
 | application_operations |  | no |
+| auth_events | _id, tenantId, at, type, outcome, detail, purgeAt | no |
+| auth_throttles | _id, tenantId, subjectHash, failures, lockCount, windowStartedAt, lastFailureAt, purgeAt | no |
 | automation_runs |  | no |
 | championship_events | _id, tenantId, revision, createdAt, title, questions, counsellors, judges, rubric, reviewReference, bankDigest, trials, evidenceStatus | yes |
 | chunks | _id, tenantId, sourceRef, turnRefs, chunkIndex | no |
@@ -114,11 +124,12 @@ a client of that API — with the long-range goal of beating top human counsello
 | knowledge_collections | _id, tenantId, title, members, revision, updatedAt | no |
 | knowledge_outputs | _id, tenantId, kind, title, purpose, sessionIds, revision, createdAt, updatedAt, sourceDigest, provider, model, reviewState, sections, citations, sourceCoverage | no |
 | media | _id, tenantId, sourceRef, kind, retention | no |
-| meeting_candidates | _id, tenantId, messageId, subject, senderEmail, senderDomain, status, detectedAt | no |
+| meeting_candidates | _id, tenantId, messageId, subject, senderEmail, senderDomain, status, detectedAt | yes |
 | operations_schedules | _id, tenantId, kind, revision, enabled, intervalHours, nextRunAt, lastAttemptAt, lastSuccessAt, lastResult, lastErrorCode, runId, leaseToken, leaseUntil, audit | no |
 | orgs | _id, tenantId, name | no |
 | programs | _id, tenantId, name | no |
 | registration_link_approvals | _id, tenantId, decisionId, linkHash, scopeHash, policyHash, approvedBy, approvedAt, expiresAt | no |
+| route_index | _id, tenantId, schemaVersion, fingerprint, treeRevision, builtAt, sessionIds, docs, bm25 | no |
 | session_pages | _id, tenantId, sessionId, summary, evidence | yes |
 | sessions | _id, tenantId, sourceId, title, date, status | no |
 | sources | _id, tenantId, kind, hash, consent, createdAt, captureMode | no |
@@ -134,11 +145,17 @@ a client of that API — with the long-range goal of beating top human counsello
 | trusted_senders | _id, tenantId, senderDomain, approvalCount, autoApprove | no |
 | turns | _id, tenantId, sessionId, speakerRef, tStart, tEnd, text | yes |
 | usage_events | _id, tenantId, kind, at, day, outcome, latencyMs | no |
+| user_sessions | _id, tenantId, userId, familyId, tokenHash, createdAt, lastUsedAt, rotatedAt | no |
+| user_tokens | _id, tenantId, userId, purpose, tokenHash, issuedVia, createdAt, expiresAt, purgeAt | no |
+| users | _id, tenantId, emailNormalized, displayName, passwordHash, status, createdAt, updatedAt | no |
 | watch_heartbeat | _id, tenantId, sourceType, lastHeartbeatAt | no |
 | watch_reports | _id, tenantId, runAt, mode, digestPath | no |
 | watch_state | _id, tenantId, sourceType, sourceId, status, seenAt | no |
 | watched_sources | _id, tenantId, url, reputationTier, checkIntervalHours, active | no |
 | whatsapp_candidates | _id, tenantId, sourceId, groupJid, sessionId, kind, text, contentHash, evidence, flags, status, createdAt | yes |
+| whatsapp_events | _id, tenantId, eventType, at, actorKind | no |
+| whatsapp_links | _id, tenantId, userId, label, state, live, studentData, createdAt, updatedAt | no |
+| whatsapp_sync_runs | _id, tenantId, linkId, startedAt, status | no |
 
 ## Recent feature events (last 20)
 
@@ -162,9 +179,8 @@ unilaterally; they resolve only through /checkpoint verdicts)
   eval-harness work (T-012) starts. Question bank sources fixed by D-007.
 - **Q4:** ~~Consent rule~~ **CLOSED by D-002 → D-008:** provided-first capture (H8); silent
   capture last resort; provenance frozen. Legal exposure recorded once in D-002 and accepted.
-- **Q5:** ~~Dedicated vector DB?~~ **CLOSED by D-003 → D-021:** brute-force exact cosine in
-  `packages/index/src/vector/` over `chunks`, behind `vectorSearchFn`. Atlas Vector Search is
-  unavailable (self-hosted mongod, no `+srv`), and at 1452×3072 an exhaustive scan is exact.
+- **Q5:** ~~Dedicated vector DB?~~ **CLOSED by D-021, then moot by D-173:** retrieval is
+  vectorless; the brute-force cosine retriever in `packages/index/src/vector/` is dormant.
 - **Q6 (gated purge level):** what "processed to a defined level" means before media purge —
   D-008 fixes the gate (all citing claims verified + retained ±15 s evidence clips); the
   concrete retention values and purge job design are T-026, not yet decided.

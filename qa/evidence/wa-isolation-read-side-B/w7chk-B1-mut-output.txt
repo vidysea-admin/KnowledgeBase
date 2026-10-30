@@ -1,0 +1,76 @@
+== MUTANT F1-A-P1-read-dropped (apps/api/src/routes/brain.ts)
+ℹ fail 4
+ℹ pass 33
+✖ W7 A-P1 production wiring (withSessionArtifacts around the trusted readers): owner and admin read raw; everyone else gets 404; a non-owner admin read is audited once (68.6441ms)
+✖ W7 A-P1 production wiring: an admin read whose audit event cannot be written is a 503 and returns nothing (84.9473ms)
+✖ W7 gate: an owner whose link is revoked reads no raw content (404 everywhere); an admin still reads it, audited (104.5248ms)
+✖ W7 gate: an owner whose link is suspended reads no raw content (404 everywhere); an admin still reads it, audited (86.1428ms)
+✖ failing tests:
+ℹ fail 3
+ℹ pass 5
+✖ B1CHK-1 production composition: matrix, single audit per admin read, no text in event, other-tenant admin blind (276.7095ms)
+✖ B1CHK-2 gate state=7: owner locked out on every raw route (prod wiring); admin audited; others unaffected (84.7466ms)
+✖ B1CHK-2 gate state=null: owner locked out on every raw route (prod wiring); admin audited; others unaffected (461.2393ms)
+✖ failing tests:
+ℹ fail 0
+ℹ pass 1
+restored=yes (F1-A-P1-read-dropped) hash 0048bdfd8fbc3708a3556cf0c4d3569b9c0af0f7 == 21dfc204 blob
+== MUTANT F2-B-P1-notfound-falls-through (apps/api/src/whatsapp/review/ingest.ts)
+ℹ fail 4
+ℹ pass 33
+✖ W7 B-P1: a rejected ingest (another owner's jid, a bogus jid, a foreign linkId, an ambiguous jid) leaves no marker and no source row (2.6064ms)
+✖ W7 B-P1: after a rejected cross-owner ingest the real owner's approved claims are still visible (no stale marker hides them) (23.0427ms)
+✖ W7 B-P2: a poison marker (not found, unauthorized link, malformed link id) is recorded and skipped; it never aborts the tenant's repair loop or ingests for an unauthorized link (1.9407ms)
+✖ W7 store narrowing: member reaches own link only; admin all; plain key legacy only; linkId only narrows; foreign/ambiguous cases fail without effects (19.4678ms)
+✖ failing tests:
+ℹ fail 0
+ℹ pass 8
+ℹ fail 1
+ℹ pass 0
+✖ P1 probe: member A ingesting B's group jid -> 404, but is a marker left behind? (42.9707ms)
+✖ failing tests:
+restored=yes (F2-B-P1-notfound-falls-through) hash 1937c31bd7d3c04a17dc608cf909886f2cbc0180 == 21dfc204 blob
+== MUTANT F3-gate-state (apps/api/src/whatsapp/owner-config.ts)
+ℹ fail 2
+ℹ pass 35
+✖ W7 gate: an owner whose link is revoked reads no raw content (404 everywhere); an admin still reads it, audited (30.883ms)
+✖ W7 gate: an owner whose link is suspended reads no raw content (404 everywhere); an admin still reads it, audited (33.3736ms)
+✖ failing tests:
+ℹ fail 2
+ℹ pass 6
+✖ B1CHK-2 gate state=7: owner locked out on every raw route (prod wiring); admin audited; others unaffected (24.2781ms)
+✖ B1CHK-2 gate state=null: owner locked out on every raw route (prod wiring); admin audited; others unaffected (40.2779ms)
+✖ failing tests:
+ℹ fail 0
+ℹ pass 1
+restored=yes (F3-gate-state) hash 16576cc021127c4d70c07647bf44604572262824 == 21dfc204 blob
+== MUTANT F4-fallback-active-only (apps/api/src/whatsapp/owner-config.ts)
+ℹ fail 1
+ℹ pass 36
+✖ W7 gate: an unstamped source is bound to its owner by an ACTIVE link only, and exactly one; a revoked or duplicated binding fails closed for the owner (11.5202ms)
+✖ failing tests:
+ℹ fail 0
+ℹ pass 8
+ℹ fail 0
+ℹ pass 1
+restored=yes (F4-fallback-active-only) hash 16576cc021127c4d70c07647bf44604572262824 == 21dfc204 blob
+== MUTANT F5-repair-notfound-catch (apps/api/src/whatsapp/review/compose.ts)
+ℹ fail 1
+ℹ pass 36
+✖ W7 B-P2: a poison marker (not found, unauthorized link, malformed link id) is recorded and skipped; it never aborts the tenant's repair loop or ingests for an unauthorized link (1.442ms)
+✖ failing tests:
+ℹ fail 0
+ℹ pass 8
+ℹ fail 0
+ℹ pass 1
+restored=yes (F5-repair-notfound-catch) hash e59786b5c9469a5707780763bf4ae79037600163 == 21dfc204 blob
+== MUTANT F6-marker-key-per-link (apps/api/src/whatsapp/review/ingest.ts)
+ℹ fail 1
+ℹ pass 36
+✖ W7 B-P1/A-P2: the marker names the RESOLVED link (never caller input), is keyed per (group, link), and a shared jid repairs under each owner (6.9736ms)
+✖ failing tests:
+ℹ fail 0
+ℹ pass 8
+ℹ fail 0
+ℹ pass 1
+restored=yes (F6-marker-key-per-link) hash 1937c31bd7d3c04a17dc608cf909886f2cbc0180 == 21dfc204 blob

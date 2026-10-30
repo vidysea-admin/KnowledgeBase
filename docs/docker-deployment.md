@@ -33,7 +33,9 @@ or pass them as Docker build arguments.
 | `OLLAMA_API_KEY` | Runtime Ollama Cloud text credential, forwarded only to API; never a build argument. |
 | `OLLAMA_CLOUD_MODEL` / `OLLAMA_CLOUD_VERIFIER_MODEL` | Defaults `glm-5.3-flash` / `deepseek-v4.1-flash`. |
 | `GEMINI_API_KEY` | Optional at startup; needed when the configured audio transcription path runs. |
-| `VITE_API_BASE_URL` | Public API URL the user's browser can reach, e.g. `https://api.example.com`; baked into the frontend during build. Rebuild web when it changes. |
+| `APP_BASE_PATH` | Runtime base path of the web container, default `/`; production `/knowledgebase`. No rebuild to change. See `docs/GO-LIVE-UBUNTU.md` 4a. |
+| `APP_API_BASE` / `API_UPSTREAM` | Optional: explicit browser-side API base / where the web container proxies `<base>/api/*` (default `http://api:3300`). |
+| `VITE_API_BASE_URL` | Legacy build-time override of the browser's API URL. Leave empty: the browser uses `<base>/api`, proxied by the web container. Rebuild web if you set it. |
 | `CORS_ORIGINS` | Comma-separated frontend origins including scheme and port, e.g. `https://kb.example.com`; must match the browser's frontend origin. |
 | `WEB_PORT` | Host port mapped to nginx port 80; defaults to 8080. |
 
@@ -45,10 +47,10 @@ at runtime and explicitly name the database, for example:
 docker run -d --name lkb-api --env-file /secure/lkb-api.env -p 3300:3300 lkb-api
 ```
 
-The web image's nginx configuration serves SPA deep links such as `/sessions`. It does
-not proxy API requests. `VITE_API_BASE_URL` must therefore be the browser-reachable API
-URL, not `http://api:3300` (the private Compose service address). Compose defaults to
-`http://localhost:3300` for local use. DevOps supplies public hostnames, TLS termination
+The web image's nginx configuration (an envsubst template, `apps/web/nginx.conf`) serves SPA deep
+links such as `<base>/sessions` and proxies `<base>/api/*` to `API_UPSTREAM` with the prefix stripped, so
+the browser reaches the API same-origin. A standalone web container (not on the Compose network) needs
+`API_UPSTREAM` to a host that resolves at start. DevOps supplies public hostnames, TLS termination
 and external routing. Bind ports only where the chosen ingress can reach them.
 
 ## Data, health and optional integrations

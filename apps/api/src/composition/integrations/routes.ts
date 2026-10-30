@@ -10,6 +10,7 @@ import { createChampionshipRouter } from '../../routes/championship/championship
 import { createEvaluationFlywheelRouter } from '../../evaluation-flywheel/router.js';
 import { createKnowledgeRouter } from '../../knowledge/collections-router.js';
 import { createConnectorWorkflowRouter } from '../../connector-workflow/router.js';
+import { notConfigured } from '../../routes/stubs.js';
 import { createOutputRouter } from '../../knowledge-outputs/router.js';
 import { createAnswerHistoryRouter } from '../../answer-policy/answer-router.js';
 import type { AnswerReviewAuthority } from '../../answer-policy/answer-router.js';
@@ -36,13 +37,15 @@ import type { CaptureReadinessDeps } from '../../capture-readiness/types.js';
 import { createSessionDecisionsRouter } from '../../session-decisions/router.js';
 import type { SessionDecisionsDeps } from '../../session-decisions/reader.js';
 import { createRegistrationApprovalRouter, REGISTRATION_APPROVE_SCOPE, type RegistrationApprovalRouterDeps } from '../../registration-approvals/router.js';
+import { createWhatsAppLinksRouter, type LinksRouterDeps } from '../../whatsapp/links/router.js';
+import { createWhatsAppSelectionRouter } from '../../whatsapp/selection/router.js';
 
 export type IntegratedWorkflows = EvaluationIntegrations & AnswerIntegrations & TranscriptIntegrations
   & Pick<KnowledgeIntegrations, 'knowledge' | 'connectorWorkflow' | 'whatsappReview'>
   & Pick<HostingIntegrations, 'hosting' | 'counsellorAccounts' | 'operationsSchedules' | 'retentionStatus'>
   & AutomationIntegrations & { botPrivacy?: BotPrivacyDeps; captureReadiness?: CaptureReadinessDeps; sessionDecisions?: SessionDecisionsDeps;
     answerReviewAuthority?: AnswerReviewAuthority; speakerRelations?: SpeakerRelationsRouterDeps; speakerRelationSource?: SpeakerRelationSourceRouterDeps;
-    nativeEvidence?: NativeEvidenceResolver; speakerAttributes?: SpeakerAttributesRouterDeps; registrationApprovals?: RegistrationApprovalRouterDeps; extractionReview?: Parameters<typeof createExtractionReviewRouter>[0]; labelReview?: Parameters<typeof createLabelReviewRouter>[0] };
+    nativeEvidence?: NativeEvidenceResolver; speakerAttributes?: SpeakerAttributesRouterDeps; registrationApprovals?: RegistrationApprovalRouterDeps; extractionReview?: Parameters<typeof createExtractionReviewRouter>[0]; labelReview?: Parameters<typeof createLabelReviewRouter>[0]; whatsappLinks?: LinksRouterDeps };
 const unavailable: RequestHandler = (_req, res) => { res.status(503).json({ error: 'workflow_unavailable', message: 'Workflow is unavailable; configure its required runtime.' }); };
 
 /** Called strictly after the shared authentication/rate-limit perimeter. */
@@ -64,7 +67,11 @@ export function mountIntegratedWorkflows(app: Express, deps: IntegratedWorkflows
   if (deps.knowledge) app.use(createKnowledgeRouter(deps.knowledge));
   else app.use('/knowledge', requireScope('sessions'), unavailable);
   if (deps.connectorWorkflow) app.use(createConnectorWorkflowRouter(deps.connectorWorkflow));
+  else app.use('/connector-workflow', requireScope('sources'), notConfigured('connector-workflow')); // LKB_CONNECTOR_WORKFLOW off: 503 not_configured, not a raw 404 (G-A1)
   if (deps.whatsappReview) app.use(deps.whatsappReview);
+  if (deps.whatsappLinks) app.use(createWhatsAppLinksRouter(deps.whatsappLinks)); // W5: own-link lifecycle + admin approval; shared requireAuth/CSRF ran before this mount
+  else app.use('/whatsapp/links', requireScope('whatsapp-link'), unavailable);
+  app.use(createWhatsAppSelectionRouter()); // W6 fills this stub
   if (deps.speakerRelationSource) app.use(createSpeakerRelationSourceRouter(deps.speakerRelationSource));
   if (deps.nativeEvidence) app.use(createNativeEvidenceRouter(deps.nativeEvidence));
   if (deps.speakerAttributes) app.use(createSpeakerAttributesRouter(deps.speakerAttributes));

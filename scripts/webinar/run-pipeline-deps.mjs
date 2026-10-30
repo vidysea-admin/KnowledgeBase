@@ -3,9 +3,11 @@ import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { isProtectedWorkDbName } from '../lib/transcript-provenance.mjs';
 import { createSchedulerRuntime } from './scheduler/deps-runtime.mjs';
+import { resolveAttendanceExecutable } from './calendar-attendance-source.mjs';
 import { register } from 'tsx/esm/api';
 register();
 const {createHttpCalendarLoader, createHttpCandidateLoader} = await import('../../packages/meeting-bot/src/calendar/schedule-tick.ts');
+const {withOnairMailFromEnv, applyOnairWatchDefault} = await import('../../packages/meeting-bot/src/calendar/onair/onair-mail-loader.ts');
 const {redactJoinLink} = await import('../../packages/meeting-bot/src/calendar/auto-record-policy.ts');
 const {launchControlledRecording} = await import('../../packages/meeting-bot/src/capture/reconnect-gaps.ts');
 const {createTelegramChannel} = await import('../../packages/meeting-bot/src/capture/notify/telegram-channel.ts');
@@ -19,7 +21,14 @@ export function safeText(text) {
     catch { return '[redacted-url]'; }
   }).slice(0, 500);
 }
-export function createPipelineDeps(env = process.env) {
+/** `inject` (tests only): `loadOnairMails` / `resolveOnair` replace the gws mail read and the OnAir link resolver. */
+export function createPipelineDeps(env = process.env, inject = {}) {
+  env = {...env}; // One resolved environment shared by capture, registration and alert transports.
+  applyOnairWatchDefault(env, ROOT); // D-207: the record child (launched with {...env}) gets LKB_ONAIR_WATCH=1 unless explicitly turned off.
+  for (const [name, key] of [['gws', 'LKB_GWS_PATH'], ['ffmpeg', 'LKB_FFMPEG'], ['ffprobe', 'LKB_FFPROBE'], ['python', 'LKB_PYTHON']]) {
+    try {env[key] = resolveAttendanceExecutable(name, env[key], env);}
+    catch {if (env[key]) throw new Error('Configured runtime executable is missing: ' + name);}
+  }
   const api = (env.LKB_API_URL ?? 'http://localhost:3300').replace(/\/$/, '');
   const log = (text) => console.log(safeText(text));
   let channel, channelInitialized = false;
@@ -62,8 +71,12 @@ export function createPipelineDeps(env = process.env) {
       }
       // Preserve legacy mapping while refusing failed discovery in this runner.
       let failure = false;
-      const loader = createHttpCandidateLoader(api, env.LKB_API_KEY,
+      const gmail = createHttpCandidateLoader(api, env.LKB_API_KEY,
         (message) => { log(message); if (/skipping|fetch failed/i.test(message)) failure = true; }, true);
+      // D-207/D-208: OnAir "You're registered" mails join the Gmail candidates (default on, LKB_ONAIR_MAIL=0 off). Its own log keeps its
+      // errors out of the failure detector above: a failed OnAir read costs only OnAir candidates, never the whole discovery.
+      const loader = withOnairMailFromEnv(gmail, env, ROOT, log, createHttpCalendarLoader(api, env.LKB_API_KEY),
+        {loadMails: inject.loadOnairMails, resolve: inject.resolveOnair});
       const rows = await loader();
       if (failure) throw new Error('Gmail candidate discovery unavailable');
       return rows;

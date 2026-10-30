@@ -22,12 +22,26 @@ test("lkb without the production flag: refused (env alone)", () => {
   assert.throws(() => requireScriptDatabase({MONGODB_URL: URL_, MONGO_WORK_DB: "lkb", MONGODB_DB: "lkb"}, [], P), /refused/);
 });
 test("production flag alone, wrong/missing/case-variant MONGODB_DB: refused", () => {
-  for (const db of [undefined, "", "LKB", "lkb_work_x", " lkb2"])
+  for (const db of [undefined, "", " ", "LKB", "LKB_PROD", " LkB_PrOd ", "lkb_work_x", " lkb2", "global_university_db"])
     assert.throws(() => requireScriptDatabase({MONGODB_URL: URL_, MONGODB_DB: db}, [PRODUCTION_FLAG], P), /MONGODB_DB=lkb/, String(db));
 });
 test("flag + MONGODB_DB=lkb accepted only when script allows production", () => {
   assert.deepEqual(requireScriptDatabase({MONGODB_URL: URL_, MONGODB_DB: "lkb"}, [PRODUCTION_FLAG], P), {url: URL_, dbName: "lkb"});
   assert.throws(() => requireScriptDatabase({MONGODB_URL: URL_, MONGODB_DB: "lkb"}, [PRODUCTION_FLAG]), /refused/);
+  for (const dbName of ["lkb", "lkb_prod"]) {
+    const env = {MONGODB_URL: URL_, MONGODB_DB: dbName, MONGO_WORK_DB: dbName};
+    assert.deepEqual(requireScriptDatabase(env, [PRODUCTION_FLAG], P), {url: URL_, dbName});
+    assert.deepEqual(requireScriptDatabase({...env, MONGODB_DB: ` 	${dbName} `}, [PRODUCTION_FLAG], P), {url: URL_, dbName});
+    assert.throws(() => requireScriptDatabase(env, [], P), /refused/);
+    assert.throws(() => requireScriptDatabase(env, ["--i-know-this-is-production=true"], P), /refused/);
+    assert.throws(() => requireScriptDatabase(env, [PRODUCTION_FLAG]), /refused/);
+    assert.throws(() => requireScriptDatabase({...env, MONGODB_DB: undefined}, [PRODUCTION_FLAG], P), /MONGODB_DB=lkb/);
+    for (const url of [undefined, "", "  ", null, 42])
+      assert.throws(() => requireScriptDatabase({...env, MONGODB_URL: url}, [PRODUCTION_FLAG], P), /Mongo URL/);
+  }
+  for (const name of ["lkb", "LKB", " lkb ", "lkb_prod", "LKB_PROD", " LkB_PrOd ", "global_university_db"])
+    for (const allow of [undefined, "lkb_staging"])
+      assert.throws(() => requireScriptDatabase({MONGODB_URL: URL_, MONGO_WORK_DB: name, MONGODB_DB: name, LKB_ALLOW_STAGING: allow}, [], P), /refused/);
 });
 test("intended work DB accepted without any flag", () => {
   assert.deepEqual(requireScriptDatabase(work, []), {url: URL_, dbName: "lkb_work_x"});

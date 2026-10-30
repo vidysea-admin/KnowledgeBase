@@ -1,6 +1,6 @@
 # w26-composeenv: forward T-028 env to the api container without breaking auth when unset
 
-Status: ready-for-check
+Status: checked-PASS — closed out 2026-10-26 (resume reconcile) citing qa/verdicts/w26-composeenv.md
 Fix cycle: 2
 Lane: KnowledgeBase-lanes/w26-composeenv  Branch: lane/w26-composeenv  Base: 96463791
 Candidate SHA: see `git log -1 lane/w26-composeenv` (the commit that adds this file)
