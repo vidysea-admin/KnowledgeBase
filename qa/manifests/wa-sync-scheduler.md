@@ -3,8 +3,8 @@
 **Goal task:** whatsapp-multiuser W9 `wa-sync-scheduler`
 **Date:** 2026-10-30
 **Policy-Version:** proportional-verification/2026-10-19.17
-**Status:** ready-for-check
-**Handshake status:** ready-for-check
+**Status:** checked-PASS
+**Handshake status:** checked-PASS
 **Fix cycle:** 1
 **Dual check:** required
 dual-trigger: prod-write|tenancy scripts/whatsapp/sync-links.mjs:218
