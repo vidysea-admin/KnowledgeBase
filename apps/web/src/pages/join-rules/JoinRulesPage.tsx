@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useAuth } from "../../auth/AuthContext.js";
+import { useCanWrite, WriteScope } from "../../auth/WriteScope.js";
 import { ApprovalsPanel } from "./ApprovalsPanel.js";
 import { RegistrationPolicyPanel } from "./RegistrationPolicyPanel.js";
 import { JOIN_RULES_ENFORCED, pageCopy } from "./enforcement.js";
@@ -40,7 +41,9 @@ export function JoinRulesPage(): React.ReactElement {
   const [phase, setPhase] = useState<Phase>({ name: "loading" });
   const [loaded, setLoaded] = useState<Loaded | null>(null);
   const [draft, setDraft] = useState<DraftSet>({ ownDomains: "", rules: [] });
-  const [readOnly, setReadOnly] = useState(false);
+  const [forbiddenWrite, setReadOnly] = useState(false);
+  const canWrite = useCanWrite();
+  const readOnly = forbiddenWrite || !canWrite;
   const [busy, setBusy] = useState(false);
   const [notice, setNotice] = useState<Notice>(null);
   const [problems, setProblems] = useState<string[]>([]);
@@ -152,7 +155,7 @@ export function JoinRulesPage(): React.ReactElement {
 
   return <>
     <div className="page-header"><h1>Join rules</h1><p>{copy.subtitle}</p></div>
-    {apiKey && <RegistrationPolicyPanel apiKey={apiKey} />}
+    {apiKey && <WriteScope><RegistrationPolicyPanel apiKey={apiKey} /></WriteScope>}
     {!apiKey ? <p className="card empty-note">Sign in with an API key to view join rules.</p>
       : phase.name === "loading" ? <p role="status">Loading join rules…</p>
       : phase.name === "blocked" ? <div className="card">

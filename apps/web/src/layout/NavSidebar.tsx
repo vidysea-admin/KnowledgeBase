@@ -5,6 +5,7 @@ import {
   IngestIcon, MeetingBotIcon, WhatsAppIcon, SettingsIcon, ExternalLinkIcon, DocsIcon, GapIcon,
 } from "../components/icons.js";
 import { API_BASE_URL } from "../api/client.js";
+import { useOptionalAuth } from "../auth/AuthContext.js";
 
 // apps/api serves /compete and /docs-ui itself, not apps/web -- in dev these run on different
 // ports, so links need to target the API origin.
@@ -63,7 +64,16 @@ const NAV_ITEMS: NavItem[] = [
   { to: "/notifications", label: "Notifications", icon: <SettingsIcon /> },
 ];
 
+// Shown only to an account session (an API-key operator has no account); the admin pair only to role admin. The server enforces both.
+const ACCOUNT_ITEMS: NavItem[] = [{ to: "/account", label: "Your account", icon: <SettingsIcon /> }];
+const ADMIN_ITEMS: NavItem[] = [
+  { to: "/admin/users", label: "Users", icon: <SettingsIcon /> },
+  { to: "/admin/audit", label: "Account audit", icon: <DocsIcon /> },
+];
+
 export function NavSidebar(): React.ReactElement {
+  const auth = useOptionalAuth();
+  const items = [...NAV_ITEMS, ...(auth?.user ? ACCOUNT_ITEMS : []), ...(auth?.user?.role === "admin" ? ADMIN_ITEMS : [])];
   // Below 640px the sidebar becomes a top bar; the links sit behind this menu button.
   // On desktop the button is display:none and the link list is always shown (see styles.css).
   const [open, setOpen] = useState(false);
@@ -82,13 +92,20 @@ export function NavSidebar(): React.ReactElement {
         </button>
       </div>
       <div id="nav-links" className="nav-links" onClick={() => setOpen(false)}>
-        {NAV_ITEMS.map((item) => (
+        {items.map((item) => (
           <NavLink key={item.to} to={item.to} end={item.to === "/"} className={({ isActive }) => (isActive ? "active" : "")}>
             {item.icon}
             <span>{item.label}</span>
           </NavLink>
         ))}
         <div className="nav-divider" />
+        {auth?.user && (
+          <div className="nav-account">
+            <span>{auth.user.displayName} ({auth.user.role ?? "pending"})</span>
+            <button type="button" onClick={() => void auth.signOut()}>Sign out</button>
+            {auth.signOutError && <p role="alert" className="error-note">{auth.signOutError}</p>}
+          </div>
+        )}
         <a href={`${API_BASE_URL}/compete`}><ExternalLinkIcon /><span>Compete</span></a>
         <a href={`${API_BASE_URL}/docs-ui`}><DocsIcon /><span>API Docs</span></a>
       </div>

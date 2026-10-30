@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../auth/AuthContext.js";
+import { useCanWrite, WriteScope } from "../auth/WriteScope.js";
 import { listWhatsAppGroups, ingestWhatsAppGroup, type WhatsAppGroup, type WhatsAppIngestResult } from "../api/whatsapp.js";
 import { ApiError } from "../api/client.js";
 import { ReviewQueue } from "./whatsapp/ReviewQueue.js";
@@ -11,6 +12,7 @@ export function WhatsAppPage(): React.ReactElement {
 }
 
 function WhatsAppPageState({ apiKey }: { apiKey: string | null }): React.ReactElement {
+  const canWrite = useCanWrite();
   const [groups, setGroups] = useState<WhatsAppGroup[] | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [ingestingJid, setIngestingJid] = useState<string | null>(null);
@@ -69,7 +71,7 @@ function WhatsAppPageState({ apiKey }: { apiKey: string | null }): React.ReactEl
                   <button
                     type="button"
                     onClick={() => handleIngest(g)}
-                    disabled={ingestingJid === g.groupJid}
+                    disabled={!canWrite || ingestingJid === g.groupJid}
                     style={{ marginTop: "0.6rem", alignSelf: "flex-start" }}
                   >
                     {ingestingJid === g.groupJid ? "Ingesting…" : "Ingest into knowledge base"}
@@ -87,7 +89,7 @@ function WhatsAppPageState({ apiKey }: { apiKey: string | null }): React.ReactEl
         </div>
       )}
 
-      <ReviewQueue key={apiKey} apiKey={apiKey} revision={reviewRevision} />
+      <WriteScope><ReviewQueue key={apiKey} apiKey={apiKey} revision={reviewRevision} /></WriteScope>
     </>
   );
 }
