@@ -9,7 +9,8 @@ import { passageLexicalScorer } from "./passage-lexical.js";
 export interface NativeSourceIdentity { sourceId: string; revisionHash: string }
 /** The production publisher must enumerate bounded, tenant-authorized current passage locators. */
 export type ListNativeLocators = (tenantId: string, source: NativeSourceIdentity) => Promise<readonly NativeSourceLocator[]>;
-export interface NativeHydratorDeps { resolver: NativeEvidenceResolver; listLocators: ListNativeLocators }
+/** `externalEligible` is the W11/R-32 gate (a WhatsApp source not studentData "no", or unresolvable, is false). Required, so no caller can forget it. */
+export interface NativeHydratorDeps { resolver: NativeEvidenceResolver; listLocators: ListNativeLocators; externalEligible: (tenantId: string, sourceId: string) => Promise<boolean> }
 const sha = (value: string) => createHash("sha256").update(value, "utf8").digest("hex");
 
 export function createNativeSourceHydrator(tenantId: string, deps: NativeHydratorDeps): HydrateSourcesFn {
@@ -22,6 +23,7 @@ export function createNativeSourceHydrator(tenantId: string, deps: NativeHydrato
       if (typeof sourceId !== "string" || !sourceId.trim() || typeof revisionHash !== "string" || !revisionHash.trim()
         || seen.has(node.node_id)) throw new BoundedAskError("ambiguous native source identity");
       seen.add(node.node_id);
+      if (!await deps.externalEligible(tenantId, sourceId)) throw new BoundedAskError("native source is unavailable for external-model use");
       const identity = { sourceId, revisionHash };
       const exact = node.evidence?.sourceLocator;
       const locators = exact === undefined ? await deps.listLocators(tenantId, identity) : [exact as NativeSourceLocator];

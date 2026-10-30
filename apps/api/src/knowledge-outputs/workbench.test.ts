@@ -216,9 +216,9 @@ test("actual T056 service lookup applies saved tenant policy and refuses its cha
 test("actual T007 approval capability excludes raw WhatsApp and rechecks current source drift before output/export", async () => {
   const chat = reviewInput("Scholarship applications open Monday."), tenant = chat.source.tenantId;
   // Native publication requires explicit current source consent; this test intends a consented, reviewed source.
-  chat.source = { ...chat.source, consent: { given: true, recordedBy: "owner" } } as typeof chat.source;
+  chat.source = { ...chat.source, consent: { given: true, recordedBy: "owner" }, sourceMeta: { whatsappLinkId: "link-w" } } as typeof chat.source; // W11: the default studentData "no" link admits reviewed text
   const rawTurn = { ...chat.turns[0]!, _id: "turn-unreviewed", text: "Private personal message", speakerLabel: "Private participant" };
-  const fx = wireMongoFixture({ sources: [chat.source], sessions: [{ ...chat.session, title: "Private group title", date: "2026-10-14T10:00:00.000Z", status: { transcribe: "done", index: "done" } }],
+  const fx = wireMongoFixture({ whatsapp_links: [{ _id: "link-w", tenantId: tenant, studentData: "no", state: "active", live: true }], sources: [chat.source], sessions: [{ ...chat.session, title: "Private group title", date: "2026-10-14T10:00:00.000Z", status: { transcribe: "done", index: "done" } }],
     turns: [...chat.turns, rawTurn], claims: [{ _id: "unapproved-legacy", tenantId: tenant, source: "whatsapp", status: "verified", text: rawTurn.text,
       evidence: [{ turnId: rawTurn._id, sessionId: chat.session._id, quote: rawTurn.text }] }] });
   const db = boundedFixtureDb(fx.db), f = fixture(); f.deps.readSources = createMongoOutputReader(db);

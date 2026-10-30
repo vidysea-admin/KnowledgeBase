@@ -4,6 +4,7 @@ import { test } from "node:test";
 import type { TreeIndexNode } from "@lkb/core";
 import { createSourceHydrator } from "./source-context.js";
 import { leaks, PUB_SESSION, TENANT, WA_SESSION, waWorld, type WaState } from "../visibility/wa-quarantine.testsupport.js";
+import { linkCase } from "../visibility/external-model.testsupport.js";
 
 const sessionNode = (sessionId: string, summary: string): TreeIndexNode => ({ node_id: `tenant:${TENANT}/session:${sessionId}`, level: "session", title: sessionId,
   summary, children: [], evidence: { sessionRef: sessionId } });
@@ -22,7 +23,7 @@ for (const state of ["pending", "rejected"] as WaState[]) {
   });
 }
 test("approved WhatsApp hydrates only reviewed text, never the unreviewed sibling or the group title", async () => {
-  const w = waWorld("approved");
+  const w = waWorld("approved"); linkCase(w, "no"); // W11 gate H-10: the default studentData "no" admits approved text
   const result = await createSourceHydrator(TENANT, { db: w.db })("PLANTZEBRA UNREVIEWEDOCELOT scholarship tuition", [sessionNode(WA_SESSION, "x")]);
   assert.deepEqual(leaks(result, { allowApprovedText: true }), []);
   assert.equal(JSON.stringify(result).includes("wa-turn-2"), false);

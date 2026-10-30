@@ -14,6 +14,8 @@ export function createMongoOutputReader(db: Db): OutputDeps["readSources"] {
     if (authorized.length !== sessionIds.length) throw new OutputError("not_found", 404);
     const safe = await Promise.all(sessionIds.map((id) => visibility.safeCitationSession(tenantId, id)));
     if (safe.some((session) => session === null)) throw new OutputError("not_found", 404);
+    // W11/R-32 G3: a WhatsApp session whose link is not studentData "no" (or unresolvable) never feeds the generator or verifier model; refused like any unavailable session.
+    if ((await Promise.all(sessionIds.map((id) => visibility.externalModelEligibleSession(tenantId, id)))).includes(false)) throw new OutputError("not_found", 404);
     const candidateClaims = await claims(tenantId).find({ "evidence.sessionId": { $in: sessionIds } }).sort({ _id: 1 }).limit(201).toArray();
     if (candidateClaims.length > 200) throw new OutputError("unavailable", 422);
     const selectedClaims: Claims[] = [];
