@@ -1,0 +1,36 @@
+{
+ "schema_version": "compact-handoff/1",
+ "shared_instructions": "Project D:/KnowledgeBase, main tree, branch docs/devops-golive-2026-10-26, base cf244ceb, uncommitted diff in apps/api (git diff -- apps/api): knowledge.ts now always composes whatsappEvents; whatsapp-wiring.test.ts C2 events rows removed and new C4 added. Unit wa-events-without-archiver fixes ISS-WACW-001 under gate qa/gates/wa-events-archiver-gate.md answered (a) by Umesh 2026-10-31. Policy proportional-verification/2026-10-19.17, tier L, dual check (auth trigger knowledge.ts:98). Read the manifest first (source). Read-only toward product code: never commit, push, deploy, touch Mongo, read/print .env or secrets; consent (D-210) out of scope. NEVER mutate the bound tree: falsify only in a copy or a git worktree under your scratchpad (git worktree add --detach, apply the diff, git worktree remove after; never rm -rf). Re-run in apps/api: node --test --import tsx src/composition/integrations/whatsapp-wiring.test.ts src/whatsapp/events.test.ts src/whatsapp/links/router.test.ts src/whatsapp/selection/router.test.ts and npx tsc --noEmit -p . . Verdict fields: VERDICT PASS|FAIL, Cycle checked: 0, Policy-Version, evidence commands+outputs, falsification (green before/red after/restored), EXPLANATION, ISSUES-WRITTEN none or PROPOSED-ISSUE lines (dual check: write no ledger rows), check_min=. Do not commit the verdict; leave it in the tree. Return a short summary. You are blind coordinator B, adversarial auth/tenancy. Write qa/verdicts/wa-events-without-archiver.b.md; never read the A verdict (.md without .b). With archiver env unset, try to read another tenant's events or bypass whatsapp-admin: keys with other scopes, member/viewer sessions, query params (cursor, limit, tenantId, since), path variants (trailing slash, case, /whatsapp/events/x), CSRF/auth perimeter. Write probes as a throwaway test in your scratchpad worktree modelled on whatsapp-wiring.test.ts (composes real buildKnowledgeIntegrations with env {} via linksRig). Report probe counts and outcomes. One falsification for C2 (drop scope or tenant filter in the copy).",
+ "sources": [
+  {
+   "path": "qa/manifests/wa-events-without-archiver.md",
+   "sha256": "760644f353228b76921aeedcc8009ccdd72a81bc7b44e0da44e1e0f21a568284",
+   "ranges": [
+    [
+     1,
+     43
+    ]
+   ]
+  }
+ ],
+ "task": {
+  "id": "chk-wa-ewa-b",
+  "owner": "chk-wa-ewa-b",
+  "purpose": "check wa-events-without-archiver",
+  "dependencies": [],
+  "acceptance": [
+   "verdict file written"
+  ],
+  "checks": [
+   "no push",
+   "no prod writes",
+   "no secrets",
+   "no consent",
+   "no bound-tree mutation"
+  ]
+ },
+ "bounds": {
+  "max_source_bytes": 65536,
+  "max_prompt_bytes": 98304
+ }
+}

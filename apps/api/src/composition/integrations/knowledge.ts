@@ -31,15 +31,16 @@ export interface KnowledgeIntegrations {
   connectorWorkflow?: ConnectorWorkflowDeps;
   whatsappReview?: Router;
   whatsapp?: WhatsAppRouteDeps;
-  /** Multi-user WhatsApp (W5 links, W6 selection, W12 events): present only when the archiver service API is configured; absent -> routes.ts answers 503. */
+  /** Multi-user WhatsApp (W5 links, W6 selection): present only when the archiver service API is configured; absent -> routes.ts answers 503. */
   whatsappLinks?: LinksRouterDeps;
   whatsappSelection?: SelectionRouterDeps;
+  /** W12 events: Mongo-only, always composed, archiver or not (qa/gates/wa-events-archiver-gate.md (a), ISS-WACW-001). */
   whatsappEvents?: EventsRouterDeps;
 }
 
 /** The multi-user WhatsApp surfaces are live only with a valid archiver service API config (WHATSAPP_ARCHIVER_API_URL + _TOKEN). Neither set or an invalid pair -> not configured (fail closed). */
 export function whatsAppMultiUserConfigured(env: NodeJS.ProcessEnv, log: Pick<Logger, "warn">): boolean {
-  try { return loadArchiverConfig(env) !== null; } catch { log.warn("whatsapp multi-user: archiver service API config is invalid, links, selection and events answer 503"); return false; }
+  try { return loadArchiverConfig(env) !== null; } catch { log.warn("whatsapp multi-user: archiver service API config is invalid, links and selection answer 503"); return false; }
 }
 
 export function buildKnowledgeIntegrations(input: {
@@ -95,6 +96,7 @@ export function buildKnowledgeIntegrations(input: {
     // Candidate-only ingestion has no direct indexer; approval remains a separate transaction.
     whatsapp: reviewedWhatsApp.whatsapp,
     whatsappReview,
-    ...(multiUser ? { whatsappLinks: buildWhatsAppLinks(input.env, input.db, log), whatsappSelection: buildWhatsAppSelection(input.env, input.db, log), whatsappEvents: buildWhatsAppEvents(input.db) } : {}),
+    whatsappEvents: buildWhatsAppEvents(input.db),
+    ...(multiUser ? { whatsappLinks: buildWhatsAppLinks(input.env, input.db, log), whatsappSelection: buildWhatsAppSelection(input.env, input.db, log) } : {}),
   };
 }

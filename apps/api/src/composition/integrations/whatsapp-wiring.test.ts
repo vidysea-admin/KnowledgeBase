@@ -1,7 +1,8 @@
 /**
  * wa-composition-wiring (ISS-WASEL-001, ISS-WAEF-002, ISS-WALINKS-004 wiring part): the three multi-user WhatsApp routers are composed by the REAL
  * `buildKnowledgeIntegrations` (not injected by hand) and mounted by the real `createServer` perimeter. Configured (archiver service API env set) ->
- * the real links, selection and events routers answer; unconfigured -> each surface answers 503 AFTER its scope check; no route opens without auth.
+ * the real links, selection and events routers answer; unconfigured -> links and selection answer 503 AFTER their scope check; no route opens without auth.
+ * Events are Mongo-only and served with or without the archiver (qa/gates/wa-events-archiver-gate.md answer (a), ISS-WACW-001).
  */
 import { test, after } from "node:test";
 import assert from "node:assert/strict";
@@ -64,12 +65,11 @@ test("C1/C3 configured: events, links and selection are served by their real rou
   } finally { await rig.close(); }
 });
 
-test("C2 unconfigured (no archiver env, invalid config): every surface is 503 after its scope check, never open", async () => {
+test("C2 unconfigured (no archiver env, invalid config): links and selection are 503 after their scope check, never open", async () => {
   for (const env of [{}, { WHATSAPP_ARCHIVER_API_URL: "not a url", WHATSAPP_ARCHIVER_API_TOKEN: "short" }]) {
     const rig = await composed(env); try {
       const jid = "120363000000000001@g.us", id = "c".repeat(24);
       for (const [who, method, path, want] of [
-        [null, "GET", "/whatsapp/events", 401], ["u-admin", "GET", "/whatsapp/events", 503], [{ key: "k-admin-only" }, "GET", "/whatsapp/events", 503], ["u-member", "GET", "/whatsapp/events", 403], ["u-viewer", "GET", "/whatsapp/events", 403],
         [null, "GET", "/whatsapp/links", 401], ["u-member", "GET", "/whatsapp/links", 503], ["u-admin", "GET", "/whatsapp/links", 503], ["u-viewer", "GET", "/whatsapp/links", 403],
         ["u-member", "GET", "/whatsapp/links/notice", 503], [{ key: "k-admin-only" }, "GET", "/whatsapp/links/notice", 403], ["u-viewer", "GET", "/whatsapp/links/notice", 403],
         ["u-member", "POST", "/whatsapp/links", 503], ["u-viewer", "POST", "/whatsapp/links", 403],
@@ -83,6 +83,22 @@ test("C2 unconfigured (no archiver env, invalid config): every surface is 503 af
         assert.equal(r.status, want, `${who ?? "anon"} ${method} ${path} -> ${r.status} ${r.text}`);
         if (want === 503) assert.equal(r.json?.error, "workflow_unavailable");
       }
+    } finally { await rig.close(); }
+  }
+});
+
+test("C4 ISS-WACW-001: the events feed is served without the archiver (no env, invalid config), same scope and tenant checks", async () => {
+  for (const env of [{}, { WHATSAPP_ARCHIVER_API_URL: "not a url", WHATSAPP_ARCHIVER_API_TOKEN: "short" }]) {
+    const rig = await composed(env); try {
+      assert.equal((await rig.call(null, "GET", "/whatsapp/events")).status, 401, "no route opens without auth");
+      for (const who of [as("u-admin"), { key: "k-admin-only" }] as const) {
+        const ev = await rig.call(who, "GET", "/whatsapp/events");
+        assert.equal(ev.status, 200, ev.text); assert.deepEqual(ev.json!.events.map((e: { id: string }) => e.id), ["a".repeat(24)], "tenant-1 events only");
+      }
+      const t2 = await rig.call(as("t2-admin"), "GET", "/whatsapp/events");
+      assert.equal(t2.status, 200, t2.text); assert.deepEqual(t2.json!.events.map((e: { id: string }) => e.id), ["b".repeat(24)], "tenant-2 events only");
+      assert.equal((await rig.call(as("u-member"), "GET", "/whatsapp/events")).status, 403, "member refused on the admin feed");
+      assert.equal((await rig.call(as("u-viewer"), "GET", "/whatsapp/events")).status, 403, "viewer refused on the admin feed");
     } finally { await rig.close(); }
   }
 });
