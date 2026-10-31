@@ -113,3 +113,14 @@ export function fakeRouteDb(opts: FakeDbOpts = {}) {
   }) };
   return { db: db as never, calls, data, faults };
 }
+
+/** ISS-WARLG-001: link states a `whatsapp_links` row can be in after a live link goes away (revoked/unlinked/rejected carry `live` false, suspended keeps `live` true by `isLiveLinkState`). */
+export const WA_LINK_ID = "link-wa";
+export type WaLinkKind = "live" | "revoked" | "unlinked" | "rejected" | "suspended";
+export const WA_DEAD_LINKS: readonly WaLinkKind[] = ["revoked", "unlinked", "rejected", "suspended"];
+/** Rewires the recording source of `sessionId` (tenant toc) into a WhatsApp source bound to `WA_LINK_ID`, and sets the link row to `kind` (studentData "no" throughout). */
+export function setWaLink(data: Record<string, Record<string, unknown>[]>, sessionId: string, kind: WaLinkKind): void {
+  const source = data.sources!.find((s) => s._id === `src-toc:${sessionId}`)!;
+  Object.assign(source, { kind: "whatsapp-batch", sourceMeta: { whatsappLinkId: WA_LINK_ID } });
+  data.whatsapp_links = [{ _id: WA_LINK_ID, tenantId: "toc", state: kind === "live" ? "active" : kind, live: kind === "live" || kind === "suspended", studentData: "no" }];
+}

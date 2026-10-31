@@ -162,11 +162,54 @@ async function send<T>(path: string, apiKey: string, options: ApiFetchOptions, m
     if (res.status === 403 && code === "csrf" && apiKey === SESSION_CREDENTIAL && mayRefreshCsrf && sentSession === authSession && await refreshCsrfToken()) {
       return send<T>(path, apiKey, options, false);
     }
-    if (res.status === 401) invalidateAuth(apiKey, sentSession, serverMessage);
+    if (res.status === 401) await onUnauthorized(path, apiKey, sentSession, code, serverMessage);
     throw new ApiError(res.status, message, { code, retryAfterSeconds: parseRetryAfter(res.headers?.get?.("retry-after")), reasons });
   }
   options.onResponseHeaders?.(res.headers);
   return res.json() as Promise<T>;
+}
+
+/**
+ * ISS-UAWEB-001. What a 401 means depends on who was asking.
+ *  - An API key: the key itself was refused, so the 401 ends that key's use (unchanged).
+ *  - The cookie session: a feature route can answer 401 to a person whose session is perfectly alive (key-bound routes such as
+ *    GET /meeting-bot/capture-readiness answer 401 to a keyless cookie principal). Only the session's own end signs them out:
+ *    `session_revoked` / `session_expired`, a 401 on GET /auth/session itself (the identity check), or any other 401 after the
+ *    identity check also answers 401. If that check says the session is alive, or cannot answer, the caller still gets its
+ *    ApiError (the feature shows unavailable) and the person stays signed in. A 403 never reaches here.
+ */
+async function onUnauthorized(path: string, apiKey: string, sentSession: object, code: string | undefined, message: string | undefined): Promise<void> {
+  if (apiKey !== SESSION_CREDENTIAL || code === "session_revoked" || code === "session_expired" || path.split("?")[0] === "/auth/session") {
+    invalidateAuth(apiKey, sentSession, message);
+    return;
+  }
+  const probe = probeSession(sentSession);
+  const answer = await probe.result;
+  if (answer.status === 401 && !probe.announced) { probe.announced = true; invalidateAuth(apiKey, sentSession, answer.message ?? message); } // once per probe, however many requests shared it
+}
+
+// One identity check serves every feature 401 that lands while it is in flight (a page fires several requests at once).
+interface SessionProbe { session: object; result: Promise<{ status: number | null; message?: string }>; announced: boolean }
+let sessionProbe: SessionProbe | null = null;
+
+/** GET /auth/session with the cookie. Never throws and never invalidates: `status` is null when no answer came back. */
+function probeSession(session: object): SessionProbe {
+  if (sessionProbe !== null && sessionProbe.session === session) return sessionProbe;
+  const result = (async () => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/auth/session`, { credentials: "same-origin" });
+      if (res.status !== 401) return { status: res.status };
+      let message: string | undefined;
+      try { const body = (await res.json()) as { message?: unknown }; if (typeof body.message === "string" && body.message !== "") message = body.message; } catch { /* not JSON */ }
+      return message === undefined ? { status: 401 } : { status: 401, message };
+    } catch {
+      return { status: null };
+    }
+  })();
+  const entry: SessionProbe = { session, result, announced: false };
+  sessionProbe = entry;
+  void result.then(() => { if (sessionProbe === entry) sessionProbe = null; });
+  return entry;
 }
 
 /** GET /auth/session for a fresh CSRF proof. True only when one was obtained; never throws, never invalidates auth. */

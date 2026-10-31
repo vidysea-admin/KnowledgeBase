@@ -17,6 +17,7 @@ import type { WriteJobFn } from "@lkb/ai";
 import { buildKnowledgeGraph, treeIndexRootFilter, type KnowledgeGraph } from "@lkb/index";
 import type { ApiKeyStore, VerifiedKey } from "./auth.js";
 import type { TreeStore } from "./routes/ask/ask.js";
+import { createKnowledgeVisibility } from "./visibility/knowledge.js";
 import type { EvalRunStore } from "./routes/compete/compete.js";
 import { createHash } from "node:crypto";
 import { createWatchedSource, listActive as listActiveWatchedSources, recordFetch as recordWatchedFetch } from "@lkb/db";
@@ -55,6 +56,26 @@ export function createMongoApiKeyStore(): ApiKeyStore {
       if (!doc || doc.revokedAt) return null;
       return { tenantId: doc.tenantId, scopes: doc.scopes ?? [], keyId: doc._id };
     },
+  };
+}
+
+/** W11/R-32 (G1): drops from the tree /ask and /route read every node whose evidence names a WhatsApp source or session not studentData "no" (or unresolvable). One visibility (one memo) per load. */
+export function createExternalModelTreeStore(inner: TreeStore, database: () => Parameters<typeof createKnowledgeVisibility>[0] = getDb): TreeStore {
+  const prune = async (tenantId: string, tree: TreeIndexNode | null): Promise<TreeIndexNode | null> => {
+    if (!tree) return tree;
+    const visibility = createKnowledgeVisibility(database());
+    const keep = async (node: TreeIndexNode): Promise<TreeIndexNode | null> => {
+      const ev = (node.evidence ?? {}) as Record<string, unknown>, many = ev.sessionRefs === undefined ? [] : Array.isArray(ev.sessionRefs) ? ev.sessionRefs : [null];
+      const checks = [...(String(node.level).startsWith('native-') ? [visibility.externalModelEligible(tenantId, ev.sourceId as string)] : []),
+        ...[...(ev.sessionRef === undefined ? [] : [ev.sessionRef]), ...many].map(ref => visibility.externalModelEligibleSession(tenantId, ref as string))];
+      if (!(await Promise.all(checks)).every(Boolean)) return null;
+      return { ...node, children: (await Promise.all(node.children.map(keep))).filter((child): child is TreeIndexNode => child !== null) };
+    };
+    return keep(tree);
+  };
+  return {
+    load: async (tenantId) => prune(tenantId, await inner.load(tenantId)),
+    ...(inner.loadWithExclusions ? { loadWithExclusions: async (tenantId: string) => { const r = await inner.loadWithExclusions!(tenantId); return { ...r, tree: await prune(tenantId, r.tree) }; } } : {}),
   };
 }
 

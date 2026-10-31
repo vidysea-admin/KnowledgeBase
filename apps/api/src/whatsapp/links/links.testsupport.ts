@@ -4,8 +4,9 @@
  * a recording archiver port. No real-Mongo claim: see links.mongo.test.ts for the gated real-database run.
  */
 import { randomBytes } from "node:crypto";
-import { LIVE_STATES, LiveLinkExistsError, type LinkRow, type LinksStore, type NewEvent, type Transition } from "./service.js";
+import { LIVE_STATES, LiveLinkExistsError, type LinkDataPort, type LinkRow, type LinksStore, type NewEvent, type Transition } from "./service.js";
 import { parseNotice } from "./notice.js";
+import type { EventsFeed } from "./events-router.js";
 
 export const NOTICE = parseNotice("# Notice\n\n- You are linking your own WhatsApp.\n- The KB archives groups you pick.\n");
 export const T1 = "tenant-1", T2 = "tenant-2";
@@ -54,6 +55,8 @@ export function memoryLinksStore(): MemStore {
       if (r.archiverOwnerId) return r.archiverOwnerId === ownerId ? "same" : "conflict";
       r.archiverOwnerId = ownerId; return "set";
     },
+    async touch(t, id, from) { const r = mine(t, id); if (!r || !from.includes(r.state)) return false; r.updatedAt = NOW; return true; },
+    async ownerInUseByOther(t, ownerId, except) { return [...rows.values()].some(r => r.tenantId === t && r._id !== except && r.archiverOwnerId === ownerId); },
     async appendEvent(t, e) {
       if (store.failEvents) throw new Error("mongo down");
       for (const v of Object.values(e.data ?? {})) if (typeof v !== "string" && typeof v !== "number") throw new Error("closed event data: scalars only");
@@ -67,4 +70,34 @@ export function memoryLinksStore(): MemStore {
 export function seed(store: MemStore, over: Partial<LinkRow> & Pick<LinkRow, "tenantId" | "state">): LinkRow {
   const row = { _id: randomBytes(12).toString("hex"), userId: "u-member", label: "Mine", live: LIVE_STATES.includes(over.state), studentData: "no", createdAt: NOW, updatedAt: NOW, ...over } as LinkRow;
   store.rows.set(row._id, row); return row;
+}
+
+export interface MemData extends LinkDataPort {
+  calls: Array<{ op: "quarantine" | "withdraw"; tenantId: string; linkId: string; ownerId: string | undefined; recordedBy?: string }>;
+  fail: { quarantine: boolean; withdraw: boolean };
+}
+/** Recording LinkDataPort double: the real Mongo port is exercised in review/link-data.test.ts (fixture db) and unlink.mongo.test.ts (real Mongo, gated). */
+export function memoryLinkData(): MemData {
+  const d: MemData = {
+    calls: [], fail: { quarantine: false, withdraw: false },
+    async quarantineCandidates(tenantId, linkId, ownerId) { d.calls.push({ op: "quarantine", tenantId, linkId, ownerId }); if (d.fail.quarantine) throw new Error("mongo down"); return 0; },
+    async withdrawSources(tenantId, linkId, ownerId, recordedBy) { d.calls.push({ op: "withdraw", tenantId, linkId, ownerId, recordedBy }); if (d.fail.withdraw) throw new Error("mongo down"); return 0; },
+  };
+  return d;
+}
+
+type FeedRow = { _id: string; tenantId: string; at: string } & Record<string, unknown>;
+/** EventsFeed double with the Mongo accessor's semantics (whatsAppLinkStores().events().list): tenant-scoped, `_id` order (never `at`: ISS-WAEF-001), an unknown cursor throws. `add` takes a stored row as is (a test may plant extra fields). */
+export function memoryEventsFeed(): EventsFeed & { rows: FeedRow[]; add(tenantId: string, e: Record<string, unknown>): FeedRow } {
+  const rows: FeedRow[] = []; let n = 0;
+  return {
+    rows,
+    add(tenantId, e) { n++; const row = { _id: n.toString(16).padStart(24, "0"), tenantId, at: new Date(Date.parse(NOW) + n * 1000).toISOString(), actorKind: "system", ...e } as FeedRow; rows.push(row); return structuredClone(row); },
+    async list(tenantId, o = {}) {
+      const mine = rows.filter(r => r.tenantId === tenantId).sort((a, b) => (a._id < b._id ? -1 : 1));
+      let from = 0;
+      if (o.afterId) { const i = mine.findIndex(r => r._id === o.afterId); if (i < 0) throw new Error("whatsapp_events: unknown cursor"); from = i + 1; }
+      return structuredClone(mine.slice(from, from + Math.min(Math.max(Math.trunc(o.limit ?? 100), 1), 500))) as never;
+    },
+  };
 }

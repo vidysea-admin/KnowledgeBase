@@ -1,0 +1,17 @@
+{
+  "tool": "playwright MCP browser_run_code_unsafe, route-intercepted stateful fake API (NOT the real API)",
+  "target": "vite dev server 127.0.0.1:5191 serving a git-archive copy of c772be75 apps/web",
+  "personas": ["T1 member", "T2 admin", "T3 member", "T5 viewer"],
+  "ok": true,
+  "steps_total": 38,
+  "steps_passed": 38,
+  "page_errors": 0,
+  "console_errors": "only the deliberately faked 404/409/503 responses",
+  "poll_gaps_ms": [3017, 3018, 3023],
+  "poll_requests_after_unmount_or_connected": 0,
+  "iss_wasel_002_sequence": ["PUT group {marked:true,trackAllSenders:false}", "PUT group people", "GET groups (capture read back)"],
+  "post_body_new_link_keys": ["label", "noticeVersion"],
+  "qr_payload_in_dom_or_storage_or_url": false,
+  "script": "scratchpad wwa/walk.js (checker-owned, outside the bound root)",
+  "gap": "fake API only; routers unmounted in production (ISS-WASEL-001), real-API walk not possible"
+}

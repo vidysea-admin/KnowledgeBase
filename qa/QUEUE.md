@@ -1229,3 +1229,16 @@ Current source-table tracker verification: `node scripts/tracker-audit.mjs --jso
 - IN PROGRESS: W7 `wa-isolation-read-side` (carries ISS-WAOWNER-002), W9 `wa-sync-scheduler` (carries ISS-WAOWNER-001). W5 waits on HUMAN_GATE H-4 (self-approval rule when Umesh is the only admin).
 - DONE 2026-10-30: W9 `wa-sync-scheduler` dual PASS cycle 1, merged b1b135cc; ISS-WASYNC-001..004 (001 medium: unlink retry inert until W8 schema field). IN PROGRESS: W7 (A PASS c1, B pending), W5 `wa-links-api` building. Gates H-4, H-9 answered.
 - DONE 2026-10-30: W7 `wa-isolation-read-side` dual PASS cycle 1, merged; ISS-WAIRS-001..005 (001 medium: repair loop has no production caller). Next: W8 after W5.
+
+## 2026-10-30 whatsapp-multiuser W6 + W10 close-out
+- W6 done: wa-selection-api dual PASS cycle 0, merged locally 886aeef7, not pushed. ISS-WASEL-001 (routers not mounted in production) stays open for the W5/W6 production-wiring unit.
+- W10 done: wa-web dual PASS cycle 0 (qa/verdicts/wa-web.md, wa-web.b.md), merged locally d35e4072, not pushed. Ledger rows ISS-WAWEB-001..005 in qa/issues.wa-web.jsonl (005 medium: restrictToPeople partial failure leaves the UI stale).
+- Push of these merges waits on a fresh 6c pre-push check.
+- W11B done: wa-student-data-gate dual PASS cycle 0 (verdicts 3a657d49, 9c00df05), merged locally, not pushed. Ledger qa/issues.wa-student-data-gate.jsonl ISS-WASDG-001..006 (001 medium perf: G1 prune Mongo fan-out; 002 medium: cache/answer replay after studentData flip). Gate H-14 asked: qa/gates/wa-revoked-link-eligibility.md.
+- W8 done: wa-unlink-consent dual PASS cycle 1 (verdicts fc8313f8, d419df81), merged locally ac60c0dc, not pushed. Ledger qa/issues.wa-unlink-consent.jsonl ISS-WAUNLINK-001..005 (001 medium: R-10 hook has no durable retry). 6c pre-push (full suite, .13-2a security units W8/W11B) dispatched on ac60c0dc.
+- QUEUE: wa-revoked-link-gate closed (dual PASS c0), merged 461e341e; ISS-WARLG-001 high security /route stale index next
+- 2026-10-30 wa-route-link-staleness closed (dual PASS cycle 0), ISS-WARLG-001 fixed; ISS-WARLS-001 medium cost filed; next: wa-events-feed dual check, then 6c full
+- 2026-10-30 wa-events-feed (W12) dual PASS cycle 0, merged; ISS-WAEF-001..005 filed (002 folds into ISS-WASEL-001 wiring); candidate.created per batch (gate answered)
+- 2026-10-30 wa-events-cursor merged 7178555a (ISS-WAEF-001 fixed; single PASS cycle 0; ISS-WAEC-001..004 low)
+- 2026-10-30 ua-web-401-signout merged c58061b9 (ISS-UAWEB-001 fixed; dual PASS cycle 0; ISS-UAW401-001 medium, 002..004 low)
+- 2026-10-30 wa-composition-wiring merged 8e2474ba (ISS-WASEL-001, ISS-WAEF-002 fixed; dual PASS cycle 0; ISS-WACW-001 medium, 002..004 low; gate wa-events-archiver-gate)

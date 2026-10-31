@@ -219,6 +219,10 @@ async function approve(f: Awaited<ReturnType<typeof fixture>>) {
   await f.json(await f.call("/whatsapp/ingest", "POST", { groupJid: GROUP }, ""), 401, "unauthenticated ingest refusal");
   const ingest = await f.json(await f.call("/whatsapp/ingest", "POST", { groupJid: GROUP }), 201, "actual reviewed message ingest");
   assert.equal(ingest.turnCount, 2); assert.equal(f.fx.rows("tree_index").length, 0);
+  // W11 (R-32): a real link stamps the source; the default studentData "no" (D-206, gate H-10) keeps approved text eligible for external models.
+  const stamped = f.fx.rows("sources").find((row: Row) => row._id === ingest.sourceId)!;
+  await f.fx.db.collection("sources").updateOne({ _id: ingest.sourceId, tenantId: TENANT } as never, { $set: { sourceMeta: { ...(stamped.sourceMeta as object), whatsappLinkId: "link-w" } } });
+  f.fx.put("whatsapp_links", { _id: "link-w", tenantId: TENANT, studentData: "no", state: "active", live: true });
   const pending = await f.json(await f.call("/whatsapp/review"), 200, "actual detector review queue");
   const candidate = pending.candidates.find((row: Row) => row.text === TEXT); assert.ok(candidate);
   assert.equal(candidate.status, "needs-review"); assert.equal(candidate.evidence[0].quote, TEXT);

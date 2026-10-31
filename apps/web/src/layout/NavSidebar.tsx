@@ -55,6 +55,7 @@ const NAV_ITEMS: NavItem[] = [
   { to: "/ingest", label: "Ingest", icon: <IngestIcon /> },
   { to: "/meeting-bot", label: "Meeting Bot", icon: <MeetingBotIcon /> },
   { to: "/whatsapp", label: "WhatsApp", icon: <WhatsAppIcon /> },
+  { to: "/whatsapp/links", label: "WhatsApp links", icon: <WhatsAppIcon /> },
   { to: "/settings", label: "Settings", icon: <SettingsIcon /> },
   { to: "/jobs", label: "Provider jobs", icon: <DocsIcon /> },
   { to: "/claims", label: "Claims", icon: <DocsIcon /> },

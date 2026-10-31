@@ -1,6 +1,6 @@
 /** Read-time knowledge eligibility. No writes, provider calls or durable eligibility cache. */
 import type { Db } from "mongodb";
-import type { Claims, Sessions, Sources, TreeIndexNode, TreeIndexRootDocument, Turns } from "@lkb/core";
+import type { Claims, Sessions, Sources, TreeIndexNode, TreeIndexRootDocument, Turns, WhatsappLinks } from "@lkb/core";
 import { assertValidTenantId, withTenant } from "@lkb/db";
 import { checkEvidence } from "../whatsapp/review/store.js";
 import type { WhatsAppReviewCandidate } from "../whatsapp/review/detection.js";
@@ -21,6 +21,9 @@ export interface KnowledgeVisibility {
   eligibleTurn(tenantId: string, sessionId: string, turnId: string, quote: string): Promise<boolean>;
   safeCitationSession(tenantId: string, sessionId: string, claim?: VisibilityClaim): Promise<Sessions | null>;
   trustedTree(tenantId: string, root: TreeIndexRootDocument | null): Promise<TreeIndexRootDocument | null>;
+  /** W11/R-32 external-model gate, live from the link row, memoised per instance (build one per request): false for a WhatsApp source whose link is yes/unknown/unresolvable. */
+  externalModelEligible(tenantId: string, sourceId: string): Promise<boolean>;
+  externalModelEligibleSession(tenantId: string, sessionId: string): Promise<boolean>;
 }
 type ReadDb = Pick<Db, "collection">;
 type Context = { session: Sessions; source: Sources };
@@ -46,13 +49,11 @@ export function createKnowledgeVisibility(db: ReadDb, nativeEvidence?: NativeEvi
     if (!session || session._id !== sessionId || !text(session.sourceId)) return null;
     const source = await one<Sources>("sources", tenantId, { _id: session.sourceId });
     if (!source || source._id !== session.sourceId || !sourceKinds.has(source.kind) || source.consent?.given === false) return null;
-    // Existing review provenance cannot be bypassed by relabelling its source or re-pointing its session.
-    if (source.kind !== "whatsapp-batch" && await one<WhatsAppReviewCandidate>("whatsapp_candidates", tenantId, { sessionId })) return null;
+    if (source.kind !== "whatsapp-batch" && await one<WhatsAppReviewCandidate>("whatsapp_candidates", tenantId, { sessionId })) return null; // review provenance cannot be bypassed by relabelling its source or re-pointing its session
     return { source, session };
   };
   const pending = async (tenantId: string, ctx: Context): Promise<boolean> => {
-    if (!text(ctx.source.path)) return true;
-    // A marker precedes raw ingest writes and survives any failed/dead invalidation run.
+    if (!text(ctx.source.path)) return true; // A marker precedes raw ingest writes and survives any failed/dead invalidation run.
     return (await db.collection<PendingReviewMarker>(WHATSAPP_REVIEW_LOG).findOne(withTenant<PendingReviewMarker>(tenantId,
       { kind: "pending-invalidation", groupJid: ctx.source.path }))) !== null;
   };
@@ -67,15 +68,11 @@ export function createKnowledgeVisibility(db: ReadDb, nativeEvidence?: NativeEvi
         || claim.text !== candidate.text || claim.waReview.kind !== candidate.kind
         || claim.waReview.approvedBy !== candidate.decision.actor || claim.waReview.approvedAt !== candidate.decision.at
         || evidenceKey(claim) !== JSON.stringify(candidate.evidence.map(e => [e.sessionId, e.turnId, e.quote]))) return null;
-    // checkEvidence's inspected read path uses only collection().findOne; the read capability supplies no session/client.
-    await checkEvidence(db as Db, tenantId, candidate);
-    for (const evidence of candidate.evidence) {
-      const effective = await currentTurn(tenantId, evidence.sessionId, evidence.turnId);
+    await checkEvidence(db as Db, tenantId, candidate); // its inspected read path uses only collection().findOne; the read capability supplies no session/client.
+    for (const evidence of candidate.evidence) { const effective = await currentTurn(tenantId, evidence.sessionId, evidence.turnId);
       if (!effective || effective.text !== evidence.quote || effective.speakerRef !== evidence.speakerRef
-          || effective.speakerLabel !== evidence.speakerLabel || effective.occurredAt !== evidence.occurredAt) return null;
-    }
-    const latest = await one<WhatsAppReviewCandidate>("whatsapp_candidates", tenantId, { _id: candidate._id });
-    // Recheck publication/decision after source validation: a withdrawn claim cannot survive as an earlier query snapshot.
+          || effective.speakerLabel !== evidence.speakerLabel || effective.occurredAt !== evidence.occurredAt) return null; }
+    const latest = await one<WhatsAppReviewCandidate>("whatsapp_candidates", tenantId, { _id: candidate._id }); // recheck publication/decision after source validation: a withdrawn claim cannot survive as an earlier query snapshot
     return latest && JSON.stringify(latest) === JSON.stringify(candidate) && await currentClaim(tenantId, claim)
       && !await pending(tenantId, ctx) ? candidate : null;
   };
@@ -90,10 +87,7 @@ export function createKnowledgeVisibility(db: ReadDb, nativeEvidence?: NativeEvi
     const rows = await many<Claims>("claims", tenantId, { source: WA_CLAIM_SOURCE, status: WA_APPROVED_CLAIM_STATUS,
       "evidence.sessionId": ctx.session._id, ...(turnId ? { "evidence.turnId": turnId } : {}) });
     const out: { claim: VisibilityClaim; candidate: WhatsAppReviewCandidate }[] = [];
-    for (const row of rows) {
-      const candidate = await approved(tenantId, row, ctx);
-      if (candidate) out.push({ claim: row, candidate });
-    }
+    for (const row of rows) { const candidate = await approved(tenantId, row, ctx); if (candidate) out.push({ claim: row, candidate }); }
     return out;
   };
   const currentTurn = async (tenantId: string, sessionId: string, turnId: string): Promise<Turns | null> => {
@@ -107,8 +101,7 @@ export function createKnowledgeVisibility(db: ReadDb, nativeEvidence?: NativeEvi
   const allowedTurn = async (tenantId: string, sessionId: string, turnId: string, quote: string, raw: boolean): Promise<boolean> => {
     if (!text(quote)) return false;
     const ctx = await context(tenantId, sessionId), turn = await currentTurn(tenantId, sessionId, turnId);
-    if (!ctx || !turn || !turn.text.includes(quote)) return false;
-    if (ctx.source.kind !== "whatsapp-batch") return true;
+    if (!ctx || !turn || !turn.text.includes(quote)) return false; if (ctx.source.kind !== "whatsapp-batch") return true;
     for (const { candidate } of await approvedClaims(tenantId, ctx, turnId)) {
       if (raw && candidate.text !== turn.text) continue; // Metadata-only approval cannot unlock an unreviewed message sibling.
       if (!candidate.text.includes(quote)) continue; // Cited text itself must be in the approved proposal, not just its wider source context.
@@ -123,19 +116,29 @@ export function createKnowledgeVisibility(db: ReadDb, nativeEvidence?: NativeEvi
     if (!hit) { hit = context(tenantId, sessionId); memo?.contexts.set(key, hit); }
     return hit;
   };
+  const extMemo = new Map<string, Promise<boolean>>(), extEligible = (tenantId: string, kind: "sources" | "sessions", id: string): Promise<boolean> => {
+    const key = JSON.stringify([tenantId, kind, id]);
+    if (!extMemo.has(key)) extMemo.set(key, guarded(false, async () => {
+      assertValidTenantId(tenantId, "knowledge.visibility");
+      const session = kind === "sessions" && text(id) ? await one<Sessions>("sessions", tenantId, { _id: id }) : null, sourceId = kind === "sessions" ? session?.sourceId : id;
+      const source = text(sourceId) ? await one<Sources>("sources", tenantId, { _id: sourceId }) : null;
+      const linkId = (source?.sourceMeta as Record<string, unknown> | undefined)?.whatsappLinkId, wa = /^whatsapp/.test(String(source?.kind)); // unstamped legacy source: no link to resolve, excluded
+      const link = wa && text(linkId) ? await one<WhatsappLinks>("whatsapp_links", tenantId, { _id: linkId }) : null;
+      return source !== null && (!wa || (link !== null && link._id === linkId && link.live === true && link.state !== "suspended" && link.studentData === "no")); // H-14: revoked/unlinked/rejected (live false) and suspended (live true by isLiveLinkState) fail closed
+    }));
+    return extMemo.get(key)!;
+  };
   const RAW_CHUNK = 500, CONTEXT_PARALLEL = 8;
   /** Batched equivalent of the former per-row loop (D-206 K1): same verdict per row, one `$in` read of raw turns, one effective pass,
    * source context once per DISTINCT session. A read error rejects into the caller's fail-closed `[]`; WhatsApp-batch rows keep the strict per-turn proof. */
   const filterBatch = async <T extends VisibilityTurn>(tenantId: string, rows: readonly T[], options: FilterTurnsOptions): Promise<T[]> => {
     const candidates = rows.filter(row => row.tenantId === tenantId && text(row.sessionId) && text(row._id));
     if (!candidates.length) return [];
-    const wanted = [...new Set(candidates.map(row => row._id))], raw = new Map<string, Turns>();
-    const turnsColl = db.collection<Turns>("turns");
+    const wanted = [...new Set(candidates.map(row => row._id))], raw = new Map<string, Turns>(), turnsColl = db.collection<Turns>("turns");
     for (let i = 0; i < wanted.length; i += RAW_CHUNK) {
       const ids = new Set(wanted.slice(i, i + RAW_CHUNK));
       const found = await turnsColl.find(withTenant<Turns>(tenantId, { _id: { $in: [...ids] } } as never)).toArray();
-      // Re-verify locally: a row outside this tenant or this id set is never trusted, whatever the store returned.
-      for (const turn of found) if (turn?.tenantId === tenantId && ids.has(turn._id)) raw.set(turn._id, turn);
+      for (const turn of found) if (turn?.tenantId === tenantId && ids.has(turn._id)) raw.set(turn._id, turn); // re-verify locally: a row outside this tenant or id set is never trusted
     }
     const pairs = candidates.filter(row => raw.get(row._id)?.sessionId === row.sessionId);
     const effective = new Map<string, Turns>();
@@ -152,8 +155,7 @@ export function createKnowledgeVisibility(db: ReadDb, nativeEvidence?: NativeEvi
     });
     const sessions = [...new Set(survivors.map(row => row.sessionId))], contexts = new Map<string, Context | null>();
     for (let i = 0; i < sessions.length; i += CONTEXT_PARALLEL) {
-      const slice = sessions.slice(i, i + CONTEXT_PARALLEL);
-      const resolved = await Promise.all(slice.map(id => memoContext(tenantId, id, options.memo)));
+      const slice = sessions.slice(i, i + CONTEXT_PARALLEL), resolved = await Promise.all(slice.map(id => memoContext(tenantId, id, options.memo)));
       slice.forEach((id, index) => contexts.set(id, resolved[index] ?? null));
     }
     const out: T[] = [];
@@ -166,8 +168,7 @@ export function createKnowledgeVisibility(db: ReadDb, nativeEvidence?: NativeEvi
   };
   const claimVisible = (tenantId: string, claim: VisibilityClaim): Promise<boolean> => guarded(false, async () => {
     assertValidTenantId(tenantId, "knowledge.visibility");
-    const current = await currentClaim(tenantId, claim);
-    if (!current) return false;
+    const current = await currentClaim(tenantId, claim); if (!current) return false;
     for (const evidence of current.evidence) {
       const ctx = await context(tenantId, evidence.sessionId), turn = await currentTurn(tenantId, evidence.sessionId, evidence.turnId);
       if (!ctx || !turn || (evidence.quote !== undefined && (!text(evidence.quote) || !turn.text.includes(evidence.quote)))) return false;
@@ -178,8 +179,7 @@ export function createKnowledgeVisibility(db: ReadDb, nativeEvidence?: NativeEvi
   });
   const safeCitationSession = (tenantId: string, sessionId: string, claim?: VisibilityClaim): Promise<Sessions | null> => guarded(null, async () => {
     assertValidTenantId(tenantId, "knowledge.visibility");
-    const ctx = await context(tenantId, sessionId);
-    if (!ctx) return null;
+    const ctx = await context(tenantId, sessionId); if (!ctx) return null;
     if (ctx.source.kind !== "whatsapp-batch") return ctx.session;
     const hasApproval = claim
       ? claim.tenantId === tenantId && claim.evidence.some(e => e.sessionId === sessionId) && Boolean(await approved(tenantId, claim, ctx))
@@ -193,6 +193,8 @@ export function createKnowledgeVisibility(db: ReadDb, nativeEvidence?: NativeEvi
   });
   return {
     claimVisible, safeCitationSession,
+    externalModelEligible: (tenantId, sourceId) => extEligible(tenantId, "sources", sourceId),
+    externalModelEligibleSession: (tenantId, sessionId) => extEligible(tenantId, "sessions", sessionId),
     eligibleTurn: (tenantId, sessionId, turnId, quote) => guarded(false, () => allowedTurn(tenantId, sessionId, turnId, quote, false)),
     sessionVisible: (tenantId, sessionId) => guarded(false, async () => {
       const ctx = await context(tenantId, sessionId); return ctx !== null && ctx.source.kind !== "whatsapp-batch";
@@ -219,8 +221,7 @@ export function createKnowledgeVisibility(db: ReadDb, nativeEvidence?: NativeEvi
       const bounded = (value: string) => { let output = ""; for (const point of value) { if (Buffer.byteLength(output + point, "utf8") > 768) break; output += point; } return output; };
       const prune = async (node: TreeIndexNode, inherited?: string, depth = 0, nativeBinding?: Record<string, unknown>): Promise<TreeIndexNode | null> => {
         if (!node || seen.has(node) || ids.has(node.node_id) || seen.size >= 10000 || depth > 64 || !Array.isArray(node.children)) throw new Error("Invalid knowledge tree");
-        seen.add(node);
-        ids.add(node.node_id);
+        seen.add(node); ids.add(node.node_id);
         if ((node.tenantId !== undefined && node.tenantId !== tenantId) || !text(node.node_id)
             || !(node.node_id === `tenant:${tenantId}` || node.node_id.startsWith(`${tenantId}/`) || node.node_id.startsWith(`tenant:${tenantId}/`))
             || !text(node.title) || typeof node.summary !== "string") return null;
@@ -283,8 +284,7 @@ export function createKnowledgeVisibility(db: ReadDb, nativeEvidence?: NativeEvi
         const sessionId = claim.evidence[0]?.sessionId;
         if (!sessionId) continue;
         const ctx = await context(tenantId, sessionId), candidate = ctx ? await approved(tenantId, claim, ctx) : null;
-        // The hydrator consumes real turns. A metadata-only candidate must not admit the unrelated source-message body.
-        if (!candidate || candidate.kind === "attachment" || !candidate.evidence.every(e => e.quote === candidate.text)) continue;
+        if (!candidate || candidate.kind === "attachment" || !candidate.evidence.every(e => e.quote === candidate.text)) continue; // the hydrator consumes real turns: a metadata-only candidate must not admit the unrelated source-message body
         const group = detached.get(sessionId) ?? { text: [], claimIds: [], turnIds: new Set<string>() };
         group.text.push(claim.text); group.claimIds.push(claim._id); candidate.evidence.forEach(e => group.turnIds.add(e.turnId));
         detached.set(sessionId, group);
