@@ -40,6 +40,31 @@ services:
       - ./schema:/app/schema:ro
     restart: "no"
 
+  # Indexing on a server that has only Docker (opt-in, never starts with `up`). Same `build` stage as migrate,
+  # which carries the workspace sources, tsx and scripts/. Usage (docs/DEVOPS-REDEPLOY-2026-11-01.md section 6):
+  #   docker compose run --rm indexer node scripts/webinar/sync-session.mjs <sessionId> --index-existing --grounded-notes --tenant toc --dry-run
+  indexer:
+    profiles: ["tools"]
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: build
+    working_dir: /app
+    command: ["node", "scripts/webinar/sync-session.mjs"]
+    environment:
+      MONGODB_URL: ${MONGODB_URL:?set MONGODB_URL (see .env's MONGODB_URL)}
+      MONGODB_DB: ${MONGODB_DB:?set MONGODB_DB explicitly (no default; lkb also needs LKB_I_KNOW_THIS_IS_PRODUCTION=1)}
+      LKB_I_KNOW_THIS_IS_PRODUCTION: ${LKB_I_KNOW_THIS_IS_PRODUCTION:-}
+      LKB_ALLOW_STAGING: ${LKB_ALLOW_STAGING:-}
+      OLLAMA_API_KEY: ${OLLAMA_API_KEY:?set OLLAMA_API_KEY}
+      OLLAMA_CLOUD_BASE_URL: ${OLLAMA_CLOUD_BASE_URL:-https://ollama.com}
+      OLLAMA_CLOUD_MODEL: ${OLLAMA_CLOUD_MODEL:-glm-5.3-flash}
+      OLLAMA_CLOUD_VERIFIER_MODEL: ${OLLAMA_CLOUD_VERIFIER_MODEL:-deepseek-v4.1-flash}
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+      # Value-less pass-through (same rule as api): absent from .env stays undefined. The script names its work DB from it.
+      MONGO_WORK_DB:
+    restart: "no"
+
   api:
     build:
       context: .

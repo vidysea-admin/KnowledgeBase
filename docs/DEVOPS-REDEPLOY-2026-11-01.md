@@ -97,21 +97,21 @@ Never leave a blank `NAME=` line for the pass-through names: comment it out. The
 
 ## 6. First admin and indexing (both write `lkb_prod`: get Umesh's yes first)
 
-Run from a repo checkout on the server with `pnpm install --frozen-lockfile` done. `MONGODB_URL` must be exported in that shell (do not echo it).
+Runs inside Docker through the opt-in `indexer` compose service (the `build` stage, which carries `scripts/`, the workspace sources and tsx), so the server needs no Node or pnpm. It reads `MONGODB_URL`, `MONGODB_DB`, `OLLAMA_API_KEY` and `GEMINI_API_KEY` from the server `.env`, like the api. Build it once after each pull: `docker compose build indexer`.
 
 ```sh
 read -rs ADMIN_PASSWORD; echo             # 12+ characters
-printf '%s' "$ADMIN_PASSWORD" | MONGODB_DB=lkb_prod node scripts/create-admin.mjs --tenant toc --email <admin-email> --i-know-this-is-production
+printf '%s' "$ADMIN_PASSWORD" | docker compose run --rm -T -e MONGODB_DB=lkb_prod indexer node scripts/create-admin.mjs --tenant toc --email <admin-email> --i-know-this-is-production
 unset ADMIN_PASSWORD                      # exit 0 = created or already admin; 3 = email exists, untouched; 1 = refused
 ```
 (create-admin.mjs header lines 1-14; UA 107-121.)
 
 Ask only answers from sessions that have a built tree. Legacy-seeded pages are excluded by the eligibility gate. Index each session, dry run first:
 ```sh
-node scripts/webinar/sync-session.mjs <sessionId> --index-existing --grounded-notes --tenant toc --dry-run
-MONGO_WORK_DB=lkb_prod MONGODB_DB=lkb_prod node scripts/webinar/sync-session.mjs <sessionId> --index-existing --grounded-notes --tenant toc --i-know-this-is-production
+docker compose run --rm indexer node scripts/webinar/sync-session.mjs <sessionId> --index-existing --grounded-notes --tenant toc --dry-run
+docker compose run --rm -e MONGO_WORK_DB=lkb_prod -e MONGODB_DB=lkb_prod indexer node scripts/webinar/sync-session.mjs <sessionId> --index-existing --grounded-notes --tenant toc --i-know-this-is-production
 ```
-(sync-session.mjs:30, 60-75; GL 447-468.) Needs a provider key in the shell: `OLLAMA_API_KEY` for summarize, claims and answer; `GEMINI_API_KEY` only for transcribe (config/ai-routing.yaml:3-14). Ask Umesh for the session ids. One session at a time. Always pass `--grounded-notes`: without it indexing is all-or-nothing and one rejected note fails the whole session. Grounded indexing is slow (about 35 min for a 64-turn session), so run it with no short timeout and never kill it mid-run: a killed run leaves the attempt `running` and the next run stops with `index_attempt_requires_recovery`. A stuck attempt: GL 493-502.
+(sync-session.mjs:30, 60-75; GL 447-468.) Needs a provider key in the server `.env`: `OLLAMA_API_KEY` for summarize, claims and answer; `GEMINI_API_KEY` only for transcribe (config/ai-routing.yaml:3-14). Ask Umesh for the session ids. One session at a time. Always pass `--grounded-notes`: without it indexing is all-or-nothing and one rejected note fails the whole session. Grounded indexing is slow (about 35 min for a 64-turn session), so run it with no short timeout and never kill it mid-run: a killed run leaves the attempt `running` and the next run stops with `index_attempt_requires_recovery`. A stuck attempt: GL 493-502.
 
 Ask uses a 20 s fast deadline by default and a real LLM answer can take about 26 s, which then shows as 'stale' with 0 sources (ISS-454). Compose now forwards `LKB_ASK_FAST_DEADLINE_MS` to the api (value-less, only when present in `.env`): set `LKB_ASK_FAST_DEADLINE_MS=150000` in the server `.env` and recreate the api, or ask in deep mode.
 

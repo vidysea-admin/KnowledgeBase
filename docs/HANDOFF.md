@@ -1,3 +1,50 @@
+# HANDOFF — 2026-11-02 (read this first in the next Claude Code session)
+
+## Where things stand
+- master = fc099756 has the go-live build (user accounts, Ask, compose fixes D-212/D-213, runbook
+  docs/DEVOPS-REDEPLOY-2026-11-01.md). Local real-stack E2E done (qa/evidence/e2e-local-2026-11-01/report.json).
+- LIVE is still the OLD build: bundle index-B4U1QW49.js, csrf 0, /links 0; vidysea.com/knowledgebase
+  -> 302 https://34.47.136.12:8081/. GitHub has NO deploy workflow, webhook, deployment or runner
+  (ci.yml/docker.yml only build+test, push:false). The "auto-deploy" must live on the server; nobody
+  in this session could find it. DevOps must redeploy (runbook sections 1-5) or show the server's deploy log.
+- Maker loop is PAUSED on purpose (qa/.paused, Umesh: stop over-engineering). /maker resume lifts it.
+
+## Reality check done 2026-11-02 (owner question: does it run on a server without Claude Code?)
+- It is a plain TypeScript/Node backend (Express api + worker, nginx web, MongoDB), shipped as Docker
+  images. NOT Python: `pip install -r requirements.txt` does nothing for the app (only
+  packages/meeting-bot/py and workers/transcribe have requirements.txt). Run it with docker compose.
+- No Claude Code at runtime: AI = HTTP calls with keys (config/ai-routing.yaml: Gemini transcribe/route,
+  Ollama Cloud for the rest). `claude-code` provider is registered (apps/api/src/composition/production.ts:89)
+  but no chain routes to it. No runtime code reads SKILL.md/.md prompts (prompts are TS constants).
+- Gaps found and FIXED on branch fix/server-docker-indexer (NOT on master yet, NOT verified in a built image):
+  1. Indexing could not run on a Docker-only server (scripts/ not in any image). Fix: Dockerfile build
+     stage COPYs scripts/; new opt-in compose service `indexer` (profile tools, target build);
+     runbook section 6 now uses `docker compose run --rm indexer node scripts/webinar/sync-session.mjs ...`
+     and create-admin via `docker compose run --rm -T indexer ...`.
+  2. docs/whatsapp/notice.md was not in the api image -> WhatsApp link requests 503. Fix: COPY into
+     /app/docs/whatsapp/notice.md (bundler resolves the path there; CONFIRM in the built image).
+  3. speakers chain = local ollama; without it the regex fallback runs (works, weaker names). No change.
+- Checked so far: `docker compose --profile tools config --services` lists indexer; node --test
+  scripts/operations/compose-t028-env.test.mjs 6/6.
+
+## Next steps for the new session (in order)
+1. Verify the branch in a real image (Docker Desktop must be running):
+   bash script idea: docker build --target api -t lkb-api:verify . ; docker build --target build -t lkb-build:verify . ;
+   docker run --rm --entrypoint node lkb-api:verify -e "require('fs').statSync('/app/docs/whatsapp/notice.md')" ;
+   docker run --rm -w /app lkb-build:verify node scripts/webinar/sync-session.mjs   (prints usage = imports OK).
+2. Review: senior-software-engineer + ai-engineer (handoff generator: D:/kb-scratch/e2e/tools/mk_docker_review.py <commit>,
+   prints COMPACT_HANDOFF lines; Agent calls need them, model sonnet, subagent_type general-purpose).
+3. One checker (Tier L config, no dual trigger), 6c scoped pre-push, then merge to master and push.
+4. After DevOps redeploys: live probe (bundle name changes; csrf and /links >= 1; no raw-IP redirect), smoke walk.
+5. Indexing/first admin on lkb_prod need Umesh's explicit yes.
+
+## Deferred (ledger, not launch blockers)
+ISS-443..451 web polish, ISS-453 8 web test reds, ISS-454 timeout labelled stale, ISS-455 strict-index error.
+Host notes: C: and D: are 91%/95% full; put temp on D:. Local-only files never to commit:
+apps/web/vite.e2e.local.config.mjs, .claude/launch.json.
+
+---
+
 # Session Handoff — KnowledgeBase machine migration — 2026-10-09 12:44:13 +0530
 
 > READ THIS FIRST when resuming. This checkpoint preserves work in progress for a second machine. Static rules are in AGENTS.md; verify runtime, paths and paused-unit conditions before acting.

@@ -34,6 +34,9 @@ COPY migrations ./migrations
 COPY scripts/qa/container-workflows ./scripts/qa/container-workflows
 COPY scripts/eval/extraction-authorized-import.mjs ./scripts/eval/extraction-authorized-import.mjs
 RUN pnpm --filter @lkb/api build
+# Operator scripts (indexing: scripts/webinar/sync-session.mjs) run from this stage through the compose
+# `indexer` service, so a server with only Docker can index. Copied after the build to keep its cache.
+COPY scripts ./scripts
 
 FROM manifests AS prod-deps
 RUN pnpm install --frozen-lockfile --prod --filter "@lkb/api..."
@@ -99,6 +102,9 @@ COPY --from=prod-deps /app/apps/api/node_modules ./apps/api/node_modules
 COPY --from=build /app/apps/api/dist ./apps/api/dist
 COPY schema ./schema
 COPY config ./config
+# The WhatsApp archiving notice is read at runtime (apps/api/src/whatsapp/links/notice.ts) and fails closed
+# with 503 when missing; the bundler resolves it to /app/docs/whatsapp/notice.md.
+COPY docs/whatsapp/notice.md ./docs/whatsapp/notice.md
 USER node
 CMD ["node", "apps/api/dist/source-worker.js"]
 
