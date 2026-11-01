@@ -32,7 +32,7 @@ value-less pass-through lines needed are:
   `APP_PUBLIC_ORIGIN:`, `APP_BASE_PATH:`, `TRUST_PROXY_HOPS:`
 - `web` service `environment`: `APP_USER_ACCOUNTS: ${APP_USER_ACCOUNTS:-}`
 
-`APP_BASE_PATH` is forwarded to `web` only today; the api builds the cookie `Path` from it, so
+`APP_BASE_PATH` was forwarded to `web` only before D-212; the api builds the cookie `Path` from it, so
 without the `api` forward the cookie lands on `/api` and is never sent to `/knowledgebase/api`.
 These lines are in `docker-compose.yml` since commit bc89648d (D-212, Approved-by: Umesh, 2026-11-01), together with the three `WHATSAPP_ARCHIVER_API_*` names for the api.
 
