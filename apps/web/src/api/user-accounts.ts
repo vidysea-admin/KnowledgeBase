@@ -37,15 +37,15 @@ export function parseSession(body: unknown): SessionInfo | null {
 
 // ---- public + self-service (/auth) -------------------------------------------------------------------------------------------------
 
-export type LoginResult = { kind: "session"; session: SessionInfo } | { kind: "blocked"; state: "rejected" | "disabled" };
+export type LoginResult = { kind: "session"; session: SessionInfo } | { kind: "blocked"; state: "rejected" | "disabled" | "unverified" };
 
-/** 200 {state:"rejected"|"disabled"} carries no session; any other 200 must be a full session body. */
+/** 200 {state:"rejected"|"disabled"|"unverified"} carries no session; any other 200 must be a full session body. */
 export async function login(email: string, password: string): Promise<LoginResult> {
   const body = await apiFetch<unknown>("/auth/login", S, { method: "POST", body: { email, password } });
   const session = parseSession(body);
   if (session) return { kind: "session", session };
   const state = (body as { state?: unknown } | null)?.state;
-  if (state === "rejected" || state === "disabled") return { kind: "blocked", state };
+  if (state === "rejected" || state === "disabled" || state === "unverified") return { kind: "blocked", state };
   throw new ApiError(502, "unexpected sign-in response");
 }
 

@@ -2736,3 +2736,13 @@ fourth would have left real decisions idle behind an unrelated unit.
 **Changes-authorized:**
 - none (no ARCHITECTURE.md or contracts/ edit)
 **Links:** D-206, D-210, plan.md H-5, H-13
+
+## D-212 | 2026-11-01 | type: decision | status: ACTIVE
+**Title:** docker-compose.yml forwards the user-accounts and WhatsApp-archiver env names (golive blocker)
+**What:** Adds value-less pass-through lines to docker-compose.yml so the variables set in the server .env reach the containers. api `environment`: AUTH_CSRF_SECRET, USER_SIGNUP_TENANT, USER_SIGNUP_DAILY_CAP, APP_PUBLIC_ORIGIN, APP_BASE_PATH, TRUST_PROXY_HOPS, WHATSAPP_ARCHIVER_API_URL, WHATSAPP_ARCHIVER_API_TOKEN, WHATSAPP_ARCHIVER_API_ALLOW_PRIVATE_HTTP. web `environment`: APP_USER_ACCOUNTS: ${APP_USER_ACCOUNTS:-}. The api lines are value-less (an absent name stays undefined, same rule as the T-028 names). No value, default or secret is added. Exactly the lines named in docs/user-accounts/ops.md section 1 plus the three archiver names (apps/api/src/whatsapp/archiver/config.ts).
+**Why:** Found 2026-11-01 while writing docs/DEVOPS-REDEPLOY-2026-11-01.md: master's compose lists none of these names, so even after a redeploy accounts stay off (no AUTH_CSRF_SECRET in the api), the sign-in UI stays hidden (no APP_USER_ACCOUNTS in web) and the cookie Path lands on /api instead of /knowledgebase/api (no APP_BASE_PATH in the api). docker-compose.yml is an enforcement path, so the change needs this entry.
+**Result:** One commit to docker-compose.yml; runbook BLOCKER section updated to "fixed in <commit>". Deploy still needs the server .env values and the redeploy (DevOps).
+**Changes-authorized:**
+- docker-compose.yml (api and web environment blocks only, the lines listed in What)
+**Approved-by:** Umesh (chat 2026-11-01: "Haan, Approved-by do", answering "docker-compose.yml mein accounts/WhatsApp env forward karne wala change approve karte ho?")
+**Links:** ISS-443..452 context, docs/DEVOPS-REDEPLOY-2026-11-01.md, docs/user-accounts/ops.md, D-210

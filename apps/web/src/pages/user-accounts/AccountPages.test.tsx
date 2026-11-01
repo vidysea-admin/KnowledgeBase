@@ -5,10 +5,12 @@ import { StrictMode, useEffect, type ReactNode } from "react";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 import { setCsrfToken } from "../../api/client.js";
+import { login } from "../../api/user-accounts.js";
 import { AuthProvider, useAuth } from "../../auth/AuthContext.js";
 import { AccountPage } from "./AccountPage.js";
 import { AuditPage } from "./AuditPage.js";
 import { ForgotPage } from "./ForgotPage.js";
+import { LoginPage } from "./LoginPage.js";
 import { ResetPage } from "./ResetPage.js";
 import { SignupPage } from "./SignupPage.js";
 import { UserDetailPage } from "./UserDetailPage.js";
@@ -60,6 +62,33 @@ describe("signup", () => {
     responder = () => json(400, { error: "invalid_request", message: "x", reasons: ["too_short", "common"] });
     await user.click(screen.getByRole("button", { name: "Create account" }));
     expect(await screen.findByRole("alert")).toHaveTextContent("use at least 12 characters; that password is too common");
+  });
+});
+
+/** App.tsx runs restoreSession() on mount; the sign-in form only renders once that settles. */
+function LoginAfterRestore(): ReactNode {
+  const { restoreSession } = useAuth();
+  useEffect(() => { void restoreSession(); }, [restoreSession]);
+  return <LoginPage />;
+}
+
+describe("sign-in of an unverified account (ISS-442)", () => {
+  test("login() maps the API's 200 {state:'unverified'} to a blocked result, not a thrown 502", async () => {
+    responder = (c) => (c.path === "/auth/login" ? json(200, { state: "unverified" }) : undefined);
+    await expect(login("n@x.org", "aaaaaaaaaaaa")).resolves.toEqual({ kind: "blocked", state: "unverified" });
+  });
+
+  test("the sign-in page says the email is not verified and to ask an admin for a link, with no session", async () => {
+    const user = userEvent.setup();
+    responder = (c) => (c.path === "/auth/login" ? json(200, { state: "unverified" }) : c.path === "/auth/session" ? json(401, { error: "unauthorized", message: "no session" }) : undefined);
+    page("/login", "/login", <LoginAfterRestore />);
+    await user.type(await screen.findByLabelText("Email"), "n@x.org");
+    await user.type(screen.getByLabelText("Password"), "aaaaaaaaaaaa");
+    await user.click(screen.getByRole("button", { name: "Sign in" }));
+    const alert = await screen.findByRole("alert");
+    expect(alert).toHaveTextContent("Your email is not verified yet. Ask an admin for a verification link.");
+    expect(alert).not.toHaveTextContent("Something went wrong");
+    expect(calls.some((c) => c.path === "/auth/session" && calls.indexOf(c) > calls.findIndex((x) => x.path === "/auth/login"))).toBe(false);
   });
 });
 

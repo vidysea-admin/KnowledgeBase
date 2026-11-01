@@ -1,0 +1,46 @@
+{
+  "walk": "e2e-local-2026-11-01",
+  "kind": "real-stack local browser walk (not a fake API)",
+  "stack": {
+    "head": "7388d5f0 (master a5e475e9 + qa-only commits)",
+    "api": "apps/api tsx src/index.ts :3300, NODE_ENV unset, user accounts on (AUTH_CSRF_SECRET set)",
+    "web": "apps/web vite dev :5173 behind a same-origin /api proxy that strips /api like apps/web/nginx.conf:24-26; config.js userAccounts:true",
+    "mongo": "throwaway mongod 127.0.0.1:27019 db lkb_e2e_20261101 (never production)",
+    "data": "21 TOC sessions via scripts/seed-toc.mjs --legacy-unbound per session; 8 sessions failed seed validation",
+    "whatsapp_archiver": "apps/api/src/whatsapp/archiver/fake-archiver.ts (test fake; driven via a local control port)",
+    "browser": "Claude desktop built-in browser (Chromium)"
+  },
+  "flows": [
+    {"id": "F01", "flow": "admin sign-in (cookie session)", "result": "PASS", "shot": "shots/01-admin-dashboard.jpg"},
+    {"id": "F02", "flow": "dashboard live counts", "result": "PASS-with-defect", "note": "21 sessions/21 sources live; red 'API keys unavailable (missing keys scope)' shown to every account user (GET /keys 403)", "defect": "E2E-D3"},
+    {"id": "F03", "flow": "Ask (cited answer)", "result": "BLOCKED-BY-DATA", "note": "POST /ask 404 'no tree index built': all 21 legacy-seeded pages excluded as unsupported-text (apps/api/src/indexing/eligible-tree.ts:85,100). Production path sync-session --index-existing is required; see ask_rerun", "shot": "shots/02-ask-unavailable.jpg"},
+    {"id": "F04", "flow": "search -> results -> open transcript at turn", "result": "PASS", "shot": "shots/03-search.jpg, shots/04-transcript-deeplink.jpg"},
+    {"id": "F05", "flow": "sessions list and session page (summary, speakers, decisions, review)", "result": "PASS", "note": "all session sub-requests 200; every session shows INDEX: PENDING (same root as F03)"},
+    {"id": "F06", "flow": "WhatsApp link request with notice", "result": "PASS-with-defect", "note": "POST /whatsapp/links 201; notice renders raw markdown (#, -)", "shot": "shots/05-wa-notice-raw-markdown.jpg", "defect": "E2E-D4"},
+    {"id": "F07", "flow": "admin approve link", "result": "PASS", "shot": "shots/06-wa-approved.jpg"},
+    {"id": "F08", "flow": "connect: QR shown, refreshes, then connected", "result": "PASS", "shot": "shots/07-wa-qr.jpg"},
+    {"id": "F09", "flow": "group selection reaches archiver", "result": "PASS-with-defect", "note": "PUT .../groups/<jid> 200; archiver tracked=[TOC Counsellors]; checkboxes have accessible name 'on'", "shot": "shots/08-wa-groups-selected.jpg", "defect": "E2E-D5"},
+    {"id": "F10", "flow": "admin events feed (API, no web UI)", "result": "PASS", "note": "200 with link.requested, link.approved (self_approved), link.connected, selection.changed"},
+    {"id": "F11", "flow": "links list", "result": "PASS-with-defect", "note": "owner shown as raw user UUID", "defect": "E2E-D6"},
+    {"id": "F12", "flow": "sign-up -> check-email page", "result": "PASS"},
+    {"id": "F13", "flow": "unverified user signs in", "result": "FAIL", "note": "API 200 {state:'unverified'}; web login() handles only rejected/disabled (apps/web/src/api/user-accounts.ts:43-50) and shows 'Something went wrong'", "shot": "shots/09-unverified-login-generic-error.jpg", "defect": "E2E-D1"},
+    {"id": "F14", "flow": "admin issues verification link -> user confirms -> pending -> admin approves as member", "result": "PASS"},
+    {"id": "F15", "flow": "member refused on admin pages and other users' links", "result": "PASS", "note": "admin/users 403, whatsapp/events 403, admin's link 404 (no existence leak), own links [] ; admin nav items still visible to members", "shot": "shots/10-member-admin-refused.jpg", "defect": "E2E-D7"},
+    {"id": "F16", "flow": "revoked session -> 401 -> sign-in page", "result": "PASS", "shot": "shots/11-revoked-session-signout.jpg"},
+    {"id": "F17", "flow": "admin sets role viewer -> viewer read-only", "result": "PASS", "note": "read-only banner; WhatsApp link request blocked", "shot": "shots/12-viewer-readonly.jpg"}
+  ],
+  "defects": [
+    {"id": "E2E-D1", "severity": "medium", "area": "apps/web user accounts", "summary": "Unverified (and likely pending-without-session) sign-in shows 'Something went wrong' instead of 'confirm your email / waiting for approval'. Every new sign-up hits this.", "where": "apps/web/src/api/user-accounts.ts:43-50"},
+    {"id": "E2E-D2", "severity": "medium", "area": "dev setup", "summary": "apps/web/.env.development forces VITE_API_BASE_URL=http://localhost:3300, so vite dev is cross-origin and cookie sign-in can never work locally (fetch credentials same-origin). Production build unaffected.", "where": "apps/web/.env.development"},
+    {"id": "E2E-D3", "severity": "low", "area": "apps/web dashboard", "summary": "Dashboard calls GET /keys for account users and shows a red scope error to everyone, including admins."},
+    {"id": "E2E-D4", "severity": "low", "area": "apps/web WhatsApp", "summary": "Archiving notice renders raw markdown."},
+    {"id": "E2E-D5", "severity": "low", "area": "apps/web WhatsApp a11y", "summary": "Group capture checkboxes have accessible name 'on', not the group name."},
+    {"id": "E2E-D6", "severity": "low", "area": "apps/web WhatsApp", "summary": "Admin links list shows owner as a raw UUID."},
+    {"id": "E2E-D7", "severity": "low", "area": "apps/web nav", "summary": "Admin-only nav items shown to member/viewer (API refuses correctly)."},
+    {"id": "E2E-D8", "severity": "medium", "area": "scripts/demo/seed-demo-server.mjs", "summary": "Writes a tree_index root without tenantId/indexRevision and bypasses the eligibility gate; any env seeded this way has a dead Ask. Unreferenced by docs; delete or route through indexSession."},
+    {"id": "E2E-D9", "severity": "medium", "area": "data/toc-migrated", "summary": "8 TOC sessions fail seed validation: brand-story, decoding-cast, dual-enrollment (turn timing), entrance-exams-part1, exploring-identity, uk-beyond-offer-letters, ashoka, in-focus-4."},
+    {"id": "E2E-D10", "severity": "low", "area": "local env", "summary": "qrcode-generator (in package.json + lockfile) was not installed in the shared checkout; vite dev crashed until pnpm install --frozen-lockfile."}
+  ],
+  "not_covered": ["real WhatsApp phone / real archiver (W2b not built)", "email delivery (server sends none by design)", "production nginx/base-path (covered by DevOps runbook smoke)", "AI counsellor and review UIs"],
+  "secrets": "test credentials live only in D:/kb-scratch/e2e/secrets.env (outside the repo)"
+}

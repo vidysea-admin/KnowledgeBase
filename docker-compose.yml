@@ -83,6 +83,18 @@ services:
       WHATSAPP_MONGO_URL:
       WHATSAPP_MONGO_DB:
       WHATSAPP_TENANT_OWNER_MAP:
+      # D-212: user accounts (docs/user-accounts/ops.md section 1) and the WhatsApp archiver client. Value-less, same rule
+      # as above: an absent name stays undefined. Accounts turn on only with AUTH_CSRF_SECRET + USER_SIGNUP_TENANT; the
+      # api builds the session cookie Path from APP_BASE_PATH, so it must match the web service value.
+      AUTH_CSRF_SECRET:
+      USER_SIGNUP_TENANT:
+      USER_SIGNUP_DAILY_CAP:
+      APP_PUBLIC_ORIGIN:
+      APP_BASE_PATH:
+      TRUST_PROXY_HOPS:
+      WHATSAPP_ARCHIVER_API_URL:
+      WHATSAPP_ARCHIVER_API_TOKEN:
+      WHATSAPP_ARCHIVER_API_ALLOW_PRIVATE_HTTP:
     # No env_file on purpose. (1) Passing the whole .env would leak MONGO_WORK_DB and the
     # LKB_I_KNOW_THIS_IS_PRODUCTION handling into the container. (2) The old optional .env.t028 file is retired: a
     # value-less environment entry that is unresolved renders as null and SHADOWS an env_file value, so the file
@@ -110,6 +122,8 @@ services:
       APP_BASE_PATH: ${APP_BASE_PATH:-/}
       APP_API_BASE: ${APP_API_BASE:-}
       API_UPSTREAM: ${API_UPSTREAM:-http://api:3300}
+      # D-212: shows the account sign-in UI (config.js userAccounts); exact 1 or true.
+      APP_USER_ACCOUNTS: ${APP_USER_ACCOUNTS:-}
     depends_on:
       - api
     ports:
