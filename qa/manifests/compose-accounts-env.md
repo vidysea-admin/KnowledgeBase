@@ -1,6 +1,6 @@
 # compose-accounts-env
 
-**Status:** ready-for-check
+**Status:** checked-PASS (qa/verdicts/compose-accounts-env.md, cycle 0, 2026-11-01)
 Policy-Version: proportional-verification/2026-10-19.17
 Tier: L (config: docker-compose.yml)
 Fix cycle: 0
