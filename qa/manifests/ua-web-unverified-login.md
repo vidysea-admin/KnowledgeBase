@@ -4,7 +4,7 @@
 **Date:** 2026-11-01
 **Policy-Version:** proportional-verification/2026-10-19.17
 **Tier:** H (sign-in path; auth trigger)
-**Status:** ready-for-check
+**Status:** checked-PASS (dual: qa/verdicts/ua-web-unverified-login.dual-a.md + .dual-b.md, cycle 0, 2026-11-01)
 **Handshake status:** ready-for-check
 **Fix cycle:** 0
 **Dual check:** required
