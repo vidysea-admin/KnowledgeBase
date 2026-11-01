@@ -2746,3 +2746,13 @@ fourth would have left real decisions idle behind an unrelated unit.
 - docker-compose.yml (api and web environment blocks only, the lines listed in What)
 **Approved-by:** Umesh (chat 2026-11-01: "Haan, Approved-by do", answering "docker-compose.yml mein accounts/WhatsApp env forward karne wala change approve karte ho?")
 **Links:** ISS-443..452 context, docs/DEVOPS-REDEPLOY-2026-11-01.md, docs/user-accounts/ops.md, D-210
+
+## D-213 | 2026-11-01 | type: decision | status: ACTIVE
+**Title:** docker-compose.yml forwards LKB_ASK_FAST_DEADLINE_MS to the api
+**What:** Adds one value-less pass-through line `LKB_ASK_FAST_DEADLINE_MS:` to the api `environment` block of docker-compose.yml, after WHATSAPP_ARCHIVER_API_ALLOW_PRIVATE_HTTP (commit fd62a5fd, +1/-0). The name is read at apps/api/src/answer-policy/application.ts:52-56; the code default stays 20 s (packages/ask/src/ask-v2.ts:29).
+**Why:** The local real-stack E2E on 2026-11-01 showed a real LLM Ask taking 26 s, so the 20 s fast deadline degraded the first Ask to status stale with 0 sources (ISS-454). Operators need to set LKB_ASK_FAST_DEADLINE_MS=150000 in the server .env, but compose did not forward the name, so the setting could never reach the container.
+**Result:** compose-t028-env.test.mjs 6/6 green (red-first 4/6 before the line); blind checker PASS (qa/verdicts/compose-ask-deadline-env.md). Deadline default and the ISS-454 stale-label bug are NOT changed here and stay filed.
+**Changes-authorized:**
+- docker-compose.yml (api environment block, the one line listed in What)
+**Approved-by:** Umesh (chat 2026-11-01: "Haan, jodo", answering "Compose mein LKB_ASK_FAST_DEADLINE_MS ki ek line jodun?")
+**Links:** ISS-454, D-212, docs/DEVOPS-REDEPLOY-2026-11-01.md, qa/manifests/compose-ask-deadline-env.md, D-210

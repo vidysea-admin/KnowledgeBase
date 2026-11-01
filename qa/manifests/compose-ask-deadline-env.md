@@ -1,6 +1,6 @@
-# compose-ask-deadline-env
+﻿# compose-ask-deadline-env
 
-**Status:** ready-for-check
+**Status:** checked-PASS
 Policy-Version: proportional-verification/2026-10-19.17
 Tier: L (config: docker-compose.yml)
 Fix cycle: 0
