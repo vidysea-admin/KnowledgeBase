@@ -108,10 +108,12 @@ unset ADMIN_PASSWORD                      # exit 0 = created or already admin; 3
 
 Ask only answers from sessions that have a built tree. Legacy-seeded pages are excluded by the eligibility gate. Index each session, dry run first:
 ```sh
-node scripts/webinar/sync-session.mjs <sessionId> --index-existing --tenant toc --dry-run
-MONGO_WORK_DB=lkb_prod MONGODB_DB=lkb_prod node scripts/webinar/sync-session.mjs <sessionId> --index-existing --tenant toc --i-know-this-is-production
+node scripts/webinar/sync-session.mjs <sessionId> --index-existing --grounded-notes --tenant toc --dry-run
+MONGO_WORK_DB=lkb_prod MONGODB_DB=lkb_prod node scripts/webinar/sync-session.mjs <sessionId> --index-existing --grounded-notes --tenant toc --i-know-this-is-production
 ```
-(sync-session.mjs:30, 60-75; GL 447-468.) Needs a provider key in the shell: `OLLAMA_API_KEY` for summarize, claims and answer; `GEMINI_API_KEY` only for transcribe (config/ai-routing.yaml:3-14). Ask Umesh for the session ids. One session at a time. A stuck attempt: GL 493-502.
+(sync-session.mjs:30, 60-75; GL 447-468.) Needs a provider key in the shell: `OLLAMA_API_KEY` for summarize, claims and answer; `GEMINI_API_KEY` only for transcribe (config/ai-routing.yaml:3-14). Ask Umesh for the session ids. One session at a time. Always pass `--grounded-notes`: without it indexing is all-or-nothing and one rejected note fails the whole session. Grounded indexing is slow (about 35 min for a 64-turn session), so run it with no short timeout and never kill it mid-run: a killed run leaves the attempt `running` and the next run stops with `index_attempt_requires_recovery`. A stuck attempt: GL 493-502.
+
+Ask uses a 20 s fast deadline by default and a real LLM answer can take about 26 s, which then shows as 'stale' with 0 sources (ISS-454). Set `LKB_ASK_FAST_DEADLINE_MS=150000` on the api (compose does not forward it yet; add it to the api environment and `.env`) or ask in deep mode.
 
 ## 7. Smoke checks (run from outside, then from the server)
 
