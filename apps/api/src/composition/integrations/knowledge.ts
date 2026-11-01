@@ -20,12 +20,27 @@ import { inspectSourceMediaRuntime } from "../../source-intake/media-runtime.js"
 import { createWhatsAppReviewWiring } from "../../whatsapp/review/compose.js";
 import { createDbBackedWhatsAppOwners, createWhatsAppRawAccess } from "../../whatsapp/owner-config.js";
 import { createMongoWhatsAppReviewSourceReader, createWhatsAppReviewSourceRouter } from "../../whatsapp-review/review-source.js";
+import { buildWhatsAppLinks, type LinksRouterDeps } from "../../whatsapp/links/router.js";
+import { buildWhatsAppEvents, type EventsRouterDeps } from "../../whatsapp/links/events-router.js";
+import { buildWhatsAppSelection, type SelectionRouterDeps } from "../../whatsapp/selection/router.js";
+import { loadArchiverConfig } from "../../whatsapp/archiver/config.js";
+import { logger, type Logger } from "../logger.js";
 
 export interface KnowledgeIntegrations {
   knowledge?: KnowledgeDeps;
   connectorWorkflow?: ConnectorWorkflowDeps;
   whatsappReview?: Router;
   whatsapp?: WhatsAppRouteDeps;
+  /** Multi-user WhatsApp (W5 links, W6 selection): present only when the archiver service API is configured; absent -> routes.ts answers 503. */
+  whatsappLinks?: LinksRouterDeps;
+  whatsappSelection?: SelectionRouterDeps;
+  /** W12 events: Mongo-only, always composed, archiver or not (qa/gates/wa-events-archiver-gate.md (a), ISS-WACW-001). */
+  whatsappEvents?: EventsRouterDeps;
+}
+
+/** The multi-user WhatsApp surfaces are live only with a valid archiver service API config (WHATSAPP_ARCHIVER_API_URL + _TOKEN). Neither set or an invalid pair -> not configured (fail closed). */
+export function whatsAppMultiUserConfigured(env: NodeJS.ProcessEnv, log: Pick<Logger, "warn">): boolean {
+  try { return loadArchiverConfig(env) !== null; } catch { log.warn("whatsapp multi-user: archiver service API config is invalid, links and selection answer 503"); return false; }
 }
 
 export function buildKnowledgeIntegrations(input: {
@@ -37,6 +52,7 @@ export function buildKnowledgeIntegrations(input: {
   sourceIntake?: SourceIntakeDeps;
   sourceJobs?: SourceJobStore;
   routing: IntegrationRouting;
+  log?: Logger;
 }): KnowledgeIntegrations {
   const configured = inspectSourceMediaRuntime(input.env);
   const intakeConfigured = configured.enabled && configured.transcriptionConfigured && Boolean(input.sourceIntake);
@@ -72,11 +88,15 @@ export function buildKnowledgeIntegrations(input: {
   const whatsappReview = Router();
   whatsappReview.use(createWhatsAppReviewSourceRouter(createMongoWhatsAppReviewSourceReader(input.db), whatsAppRawAccess));
   whatsappReview.use(reviewedWhatsApp.reviewRouter);
+  const log = input.log ?? logger;
+  const multiUser = whatsAppMultiUserConfigured(input.env, log);
   return {
     knowledge,
     ...(connectorWorkflow ? { connectorWorkflow } : {}),
     // Candidate-only ingestion has no direct indexer; approval remains a separate transaction.
     whatsapp: reviewedWhatsApp.whatsapp,
     whatsappReview,
+    whatsappEvents: buildWhatsAppEvents(input.db),
+    ...(multiUser ? { whatsappLinks: buildWhatsAppLinks(input.env, input.db, log), whatsappSelection: buildWhatsAppSelection(input.env, input.db, log) } : {}),
   };
 }

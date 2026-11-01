@@ -7,7 +7,7 @@ import { complete as routeComplete, parseRoutingYaml, GeminiProvider, ClaudeCode
 import { treeSearch } from "@lkb/index";
 import { getDb, listHeartbeats } from "@lkb/db";
 import type { ServerDeps } from "../server.js";
-import { createMongoApiKeyStore, createMongoEvalRunStore, createMongoJobWriter, createMongoTreeStore, createMongoBrainReadDeps,
+import { createMongoApiKeyStore, createMongoEvalRunStore, createMongoJobWriter, createMongoTreeStore, createExternalModelTreeStore, createMongoBrainReadDeps,
   createMongoWatchedSourceDeps, createMongoCitationsDeps, createMongoHealthDeps, createMongoGraphReadDeps, createGwsCalendarReadDeps, createMeetingCandidatesDeps, createMongoKeysDeps } from "../store.js";
 import { createMongoIngestDeps } from "../ingest-store.js";
 import { buildSourceIntakeDeps } from "../source-intake/wiring.js";
@@ -174,13 +174,13 @@ export function buildProductionDeps(options: { onIndexCommitted?: IndexCommitted
     // surface GET /watch-state serves (routes/watched-sources.ts).
     watchedSources: { ...createMongoWatchedSourceDeps(), ...createMongoWatchStateReadDeps() },
     search: createMongoSearchDeps({ nativeEvidence: native.resolver }),
-    route: createRouteDeps({ tree: createMongoTreeStore(native.resolver), complete: (job, tenantId) => routeComplete("route", job, { chains, providers, write: jobWrite, tenantId }) }), // D-206 vectorless /route, step B on the D-207 flash-lite chain
+    route: createRouteDeps({ tree: createExternalModelTreeStore(createMongoTreeStore(native.resolver)), complete: (job, tenantId) => routeComplete("route", job, { chains, providers, write: jobWrite, tenantId }) }), // D-206 vectorless /route, step B on the D-207 flash-lite chain
     // D-173: dormant semantic routes cannot be enabled through an old environment flag.
     semanticSearch: undefined,
     graph: createMongoGraphReadDeps(),
     calendar: worker?.calendar ?? createGwsCalendarReadDeps(),
     meetingCandidates: { ...createMeetingCandidatesDeps(undefined, undefined, undefined, undefined, worker?.listGmailCandidates, worker || process.env.LKB_JOIN_RULES_ENABLED === "1" ? {joinRules: capturePolicy.joinRules, ownedDomains: worker?.ownedDomains, gmailSummary: worker?.gmailSummary} : undefined), ...(publicWebinars.configured ? { discoverPublicWebinars: publicWebinars.discover } : {}) },
-    whatsapp: createMongoWhatsAppDeps(boundIndexer, { resolveOwners: createDbBackedWhatsAppOwners({ rawMap: process.env.WHATSAPP_TENANT_OWNER_MAP, db }) }) /* W4: links are authoritative; the env map only seeds legacy links */,
+    whatsapp: createMongoWhatsAppDeps(undefined, { resolveOwners: createDbBackedWhatsAppOwners({ rawMap: process.env.WHATSAPP_TENANT_OWNER_MAP, db }) }) /* W4: links are authoritative; the env map only seeds legacy links. W11 G4: no indexer is bound, WhatsApp text is never indexed by a model */,
     keys: createMongoKeysDeps(),
     ingest: createMongoIngestDeps(boundIndexer),
     // T-045: OFF unless LKB_SOURCE_INTAKE=1 (route absent otherwise); see source-intake-wiring.ts.
@@ -209,7 +209,7 @@ export function buildProductionDeps(options: { onIndexCommitted?: IndexCommitted
       return [...expanded];
     })(),
     ask: {
-      tree: createMongoTreeStore(native.resolver),
+      tree: createExternalModelTreeStore(createMongoTreeStore(native.resolver)), // W11/R-32 G1: WhatsApp nodes not studentData "no" never reach an external model
       requestDepsFor: createSourceRequestDepsFor({
         dispatch: (job, tenantId) => routeComplete(job.kind === "evaluator" ? "evaluator" : "ask", job, { chains, providers, write: jobWrite, tenantId }),
         treeSearchFn: treeSearch, tavilySearchFn, write: jobWrite,

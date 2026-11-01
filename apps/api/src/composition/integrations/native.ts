@@ -8,6 +8,7 @@ import { createNativeEvidenceResolver, type NativeEvidenceResolverDeps } from ".
 import { createNativeSourceHydrator, type ListNativeLocators } from "../../ask/native-source-context.js";
 import { createNativeSourceRevalidator } from "../../answer-policy/native-evidence.js";
 import { isValidTenantId } from "../../auth.js";
+import { createKnowledgeVisibility } from "../../visibility/knowledge.js";
 
 /** Trusted source-owner capability, never an immutable-message lookup or caller-supplied proof. */
 export interface NativeMessageAuthority {
@@ -63,9 +64,12 @@ export function buildNativeIntegrations(input: {
     return accepted;
   };
   return { headStore, resolver, listLocators,
-    nativeSources: (tenantId: string) => ({
-      hydrate: createNativeSourceHydrator(tenantId, { resolver, listLocators }),
-      revalidate: createNativeSourceRevalidator(tenantId, resolver),
-    }),
+    nativeSources: (tenantId: string) => {
+      const visibility = createKnowledgeVisibility(input.db as never); // W11/R-32: one memo per request (nativeSources is built per request)
+      return {
+        hydrate: createNativeSourceHydrator(tenantId, { resolver, listLocators, externalEligible: (t, s) => visibility.externalModelEligible(t, s) }),
+        revalidate: createNativeSourceRevalidator(tenantId, resolver),
+      };
+    },
   };
 }

@@ -8,10 +8,13 @@ import { detectWhatsAppReviewCandidates, type KnownWhatsAppContent } from "./det
 import { sha256Hex } from "../../hash.js";
 import { invalidateStaleWhatsAppCandidates, SnapshotShrinkError, WHATSAPP_REVIEW_LOG, whatsAppLogId } from "./invalidate.js";
 import type { WhatsAppReviewRepository } from "./store.js";
+import { emitBestEffort, type EventSink } from "../links/events-router.js";
 
 export interface ReviewIngestOptions { base: WhatsAppRouteDeps; appDb: () => Db; repository: WhatsAppReviewRepository; now?: () => string;
   /** Share of stored messages one snapshot may delete (default 0.5). */
   maxDeleteFraction?: number;
+  /** W12 (R-38): `candidate.created` sink; best effort, absent = no event. */
+  appendEvent?: EventSink;
   /** Runs one upstream ingest and reports the message ids of the authoritative fetched snapshot (undefined = unknown, fails closed). */
   withSnapshot: <T>(run: () => Promise<T>) => Promise<{ value: T; messageIds: ReadonlySet<string> | undefined }>;
 }
@@ -75,7 +78,8 @@ export function createReviewedWhatsAppDeps(options: ReviewIngestOptions): Review
         ...otherCandidates.map(c => ({ tenantId, id: c._id, text: c.text })),
       ];
       const candidates = detectWhatsAppReviewCandidates(tenantId, { source, session, turns, knownContent }, now());
-      await options.repository.insert(tenantId, candidates);
+      const created = await options.repository.insert(tenantId, candidates);
+      if (created > 0) await emitBestEffort(options.appendEvent, tenantId, { eventType: "candidate.created", actorKind: "system", ...(resolvedLinkId ? { linkId: resolvedLinkId } : {}), data: { count: created } });
       return result;
   };
   return { listGroups: options.base.listGroups, ingestGroup: (tenantId, groupJid, scope) => run(tenantId, groupJid, false, scope),

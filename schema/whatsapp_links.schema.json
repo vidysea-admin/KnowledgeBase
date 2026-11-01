@@ -33,6 +33,7 @@
     "revokedAt": { "type": "string", "format": "date-time" },
     "revokedBy": { "type": "string", "minLength": 1, "maxLength": 200 },
     "revokedReason": { "type": "string", "pattern": "^[a-z][a-z0-9_]{0,63}$" },
+    "archiverUnlinkPending": { "type": "boolean", "description": "R-7/R-8 follow-through: set together with the move to unlinked|revoked while the archiver unlinkSession step is still owed; unset once the archiver confirmed (or answered owner_not_found/owner_unlinked). Only meaningful on a terminal link; the sync scheduler retries every tenant that still has one (W9). Never set when another link carries the same archiverOwnerId." },
     "blocksNewRequests": { "type": "boolean", "description": "R-8: a revoked link sets this; the person cannot request a new link until an admin clears it." },
     "health": {
       "type": "object",
@@ -62,7 +63,8 @@
     { "anyOf": [ { "properties": { "state": { "not": { "enum": ["suspended"] } } } }, { "required": ["suspendedAt", "suspendedReason"] } ] },
     { "anyOf": [ { "properties": { "state": { "not": { "enum": ["rejected"] } } } }, { "required": ["rejectedAt", "rejectedBy"] } ] },
     { "anyOf": [ { "properties": { "state": { "not": { "enum": ["unlinked"] } } } }, { "required": ["unlinkedAt", "unlinkedBy", "unlinkedReason"] } ] },
-    { "anyOf": [ { "properties": { "state": { "not": { "enum": ["revoked"] } } } }, { "required": ["revokedAt", "revokedBy", "revokedReason"] } ] }
+    { "anyOf": [ { "properties": { "state": { "not": { "enum": ["revoked"] } } } }, { "required": ["revokedAt", "revokedBy", "revokedReason"] } ] },
+    { "anyOf": [ { "properties": { "state": { "enum": ["unlinked", "revoked"] } } }, { "properties": { "archiverUnlinkPending": { "enum": [false] } } } ] }
   ],
   "additionalProperties": false
 }

@@ -352,7 +352,7 @@ function mixedHydrationFixture(rows: Turns[], mutate?: (result: SourceHydration)
   const text = "Visa native guidance.";
   const locator: NativeSourceLocator = { kind: "document-page", documentId: "doc", documentSourceId: "bytes", headRevision: 1, sourceId: "native-source", revisionHash: sha("native-revision"), pageNumber: 1, passage: { start: 0, end: text.length, sha256: sha(text) } };
   const native: TreeIndexNode = { node_id: "native-passage", level: "native-passage", title: "Native", summary: "UNTRUSTED", children: [], evidence: { sourceId: locator.sourceId, revisionHash: locator.revisionHash, sourceLocator: locator } };
-  const nativeHydrate = createNativeSourceHydrator("toc", { listLocators: async () => [locator], resolver: {
+  const nativeHydrate = createNativeSourceHydrator("toc", { externalEligible: async () => true, listLocators: async () => [locator], resolver: {
     async resolve(_tenant, sourceLocator) { return { sourceLocator, quote: text }; }, async revalidate(_tenant, evidence) { return evidence; },
   } });
   const { db: original } = fakeDb({ turns: rows });

@@ -2727,3 +2727,12 @@ fourth would have left real decisions idle behind an unrelated unit.
 **Changes-authorized:**
 - .claude/CLAUDE.md (the new section only)
 **Links:** D-207, D-208
+
+## D-211 | 2026-10-30 | type: decision | status: ACTIVE
+**Title:** WhatsApp event feed boundary (plan H-5 item v), recorded before W12
+**What:** Records the event-feed boundary that docs/features/whatsapp-multiuser/plan.md H-5(v) requires as a DECISIONS entry before W12. The boundary is the one Umesh approved with the plan (qa/gates/plan-approved-whatsapp-multiuser.md, "Haan, approve"); this entry restates it and adds nothing. (1) Domain events go to whatsapp_events only (spec R-38). (2) Events carry ids, timestamps, counts and codes only; never message text, names, phone numbers, group subjects, jids, QR data or archiver owner ids (R-39; the schema's closed data allowlist enforces it). (3) Consumption is pull only: GET /whatsapp/events?after=&limit= for whatsapp-admin, cursor-based, at-least-once; no push, no webhooks, no consumer registry (R-40). (4) No hook calls WhatsApp or exports raw text outside the tenant; any future consumer that sends WhatsApp-derived content to an external AI or service needs its own per-use approval and its own decisions entry (R-41). (5) Per H-13 (qa/gates/wa-admin-alerts.md) the alert sink is in-app admin notifications backed by this feed, behind an interface; no email or Telegram sender is built. (6) Per D-210, W12 adds no consent events and does not touch consent code.
+**Why:** The plan names this entry as a precondition for W12; the fact pass of 2026-10-30 found it missing.
+**Result:** W12 (wa-events-feed) is unblocked.
+**Changes-authorized:**
+- none (no ARCHITECTURE.md or contracts/ edit)
+**Links:** D-206, D-210, plan.md H-5, H-13

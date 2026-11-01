@@ -146,12 +146,14 @@ test("rate limit on creation answers 429 with Retry-After; a failing store is a 
   } finally { await bad.close(); }
 });
 
-test("mount: without the dep the surface answers 503 (never a raw 404); the selection stub is an empty router for W6", async () => {
+test("mount: without the deps the links and selection surfaces answer 503 after the scope check (never a raw 404); the composed wiring is in whatsapp-wiring.test.ts", async () => {
   const rig = await setup({ noLinks: true }); try {
     assert.equal((await create(rig)).status, 503);
     assert.equal((await rig.call(as("u-viewer"), "GET", "/whatsapp/links")).status, 403);
+    assert.equal((await rig.call(as("u-member"), "GET", `/whatsapp/links/${"c".repeat(24)}/groups`)).status, 503, "selection is covered by the same unavailable fallback");
+    assert.equal((await rig.call(as("u-viewer"), "GET", `/whatsapp/links/${"c".repeat(24)}/groups`)).status, 403);
   } finally { await rig.close(); }
-  assert.equal(createWhatsAppSelectionRouter().stack.length, 0);
+  assert.equal(createWhatsAppSelectionRouter().stack.length, 0, "the router factory without deps is still an empty router");
 });
 
 test("adversarial (plan 6): id guessing, swapped tenant header, an all-scopes key, a tenant-B key, and mass assignment of archiverOwnerId", async () => {

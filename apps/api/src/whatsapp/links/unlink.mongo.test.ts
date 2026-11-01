@@ -1,0 +1,95 @@
+/**
+ * Real-Mongo proof for W8 (plan acceptance 6): unlink vs approve vs repeated unlink (the sync-driven retry) race on a real replica set.
+ * Opt-in: WA_REVIEW_TEST_MONGO_URL must point at a TEST replica set (transactions are required by the approval path). Creates the throwaway
+ * database `lkb_test_wa_unlink_<hex>`, applies the W1 + W8 migrations and drops it afterwards; no other database is touched. Without the variable the
+ * test is SKIPPED, which is a gap and not a pass.
+ */
+import assert from "node:assert/strict";
+import { randomBytes, randomUUID } from "node:crypto";
+import { createRequire } from "node:module";
+import test from "node:test";
+import { MongoClient, type Db } from "mongodb";
+import type { Sessions, Sources, Turns } from "@lkb/core";
+import { createArchiverClient } from "../archiver/client.js";
+import { loadArchiverConfig } from "../archiver/config.js";
+import { startFakeArchiver } from "../archiver/fake-archiver.js";
+import { detectWhatsAppReviewCandidates } from "../review/detection.js";
+import { materializeWhatsAppClaim, whatsAppClaimId } from "../review/materializer.js";
+import { createLinkDataPort, createMongoWhatsAppReviewRepository } from "../review/store.js";
+import { reviewInput, REVIEW_TIME } from "../review/test-fixtures.js";
+import { createMongoLinksStore } from "./router.js";
+import { createLinksService, type Principal } from "./service.js";
+import { NOTICE } from "./links.testsupport.js";
+
+const url = process.env.WA_REVIEW_TEST_MONGO_URL;
+const require = createRequire(import.meta.url);
+const m1 = require("../../../../../migrations/20261029120000-whatsapp-links.cjs") as { up(db: Db): Promise<void> };
+const m2 = require("../../../../../migrations/20261030120000-whatsapp-links-unlink-pending.cjs") as { up(db: Db): Promise<void> };
+const TENANT = `wa-unlink-${randomUUID()}`;
+const member = (userId: string): Principal => ({ tenantId: TENANT, kind: "session", userId, actor: `user:${userId}`, link: true, admin: false });
+const admin: Principal = { tenantId: TENANT, kind: "session", userId: "u-admin", actor: "user:u-admin", link: true, admin: true };
+const linkId = (r: unknown): string => ((r as { value: { link: { id: string } } }).value).link.id;
+
+test("W8 real-Mongo: unlink vs approval vs repeated unlink x20 - eligibility moves once, consent ends withdrawn, no claim is born from a withdrawn source", { skip: url ? false : "WA_REVIEW_TEST_MONGO_URL not set (needs a TEST replica set)", timeout: 180000 }, async () => {
+  const name = `lkb_test_wa_unlink_${randomBytes(4).toString("hex")}`;
+  assert.match(name, /^lkb_test_wa_unlink_[0-9a-f]{8}$/);
+  const client = await new MongoClient(url!).connect(), fake = await startFakeArchiver();
+  const tally = { approvalFirst: 0, unlinkFirst: 0 };
+  const saved = { w: process.env.MONGO_WORK_DB, u: process.env.MONGODB_URL, d: process.env.MONGODB_DB };
+  process.env.MONGO_WORK_DB = name; process.env.MONGODB_URL = url!; delete process.env.MONGODB_DB; // the migrations' work-database guard (kept intact): point it at this test's throwaway database
+  try {
+    const db = client.db(name);
+    assert.ok((await db.command({ hello: 1 })).setName, "replica set required; standalone is not acceptance");
+    await m1.up(db); await m2.up(db);
+    const archiver = createArchiverClient(loadArchiverConfig({ WHATSAPP_ARCHIVER_API_URL: fake.url, WHATSAPP_ARCHIVER_API_TOKEN: fake.token, WHATSAPP_ARCHIVER_API_ALLOW_PRIVATE_HTTP: "1" })!);
+    const store = createMongoLinksStore(db);
+    const svc = createLinksService({ store, archiver, data: createLinkDataPort(db), notice: () => NOTICE, countActiveAdmins: async () => 2, userStatus: async () => ({ status: "active", role: "member" }) });
+    const reviews = createMongoWhatsAppReviewRepository(db, { materialize: materializeWhatsAppClaim });
+    const bystander = linkId(await svc.request(member("u-bystander"), { label: "Other", noticeVersion: NOTICE.version }));
+
+    /** One owner, one candidate, one source. "race": approval vs three unlinks at once. "unlinkFirst" / "approvalFirst": forced order, so both linearizations are exercised on every run. */
+    const round = async (i: number, mode: "race" | "unlinkFirst" | "approvalFirst"): Promise<void> => {
+      const user = `u-${i}`, id = linkId(await svc.request(member(user), { label: "Phone", noticeVersion: NOTICE.version }));
+      assert.equal((await svc.approve(admin, id, {})).ok, true);
+      assert.equal(await store.setOwnerId(TENANT, id, randomBytes(12).toString("hex")), "set");
+      assert.ok(await store.transition(TENANT, id, { from: ["approved"], to: "active", set: { activatedAt: REVIEW_TIME }, require: ["owner_id"] }));
+      const base = reviewInput(`Scholarship ${i} closes Friday.`, TENANT), sourceId = `src-${i}`;
+      const input = { source: { ...base.source, _id: sourceId, captureMode: "provided", hash: randomUUID(), sourceMeta: { whatsappLinkId: id }, consent: { given: true, recordedBy: "test-owner" }, createdAt: REVIEW_TIME } as Sources,
+        session: { ...base.session, _id: `ses-${i}`, sourceId, title: "t", date: "2026-10-14", status: { transcribe: "done", index: "pending" } } as unknown as Sessions,
+        turns: base.turns.map(t => ({ ...t, _id: `turn-${i}`, sessionId: `ses-${i}` })) as unknown as Turns[] };
+      await db.collection<Sources>("sources").insertOne(input.source); await db.collection<Sessions>("sessions").insertOne(input.session); await db.collection<Turns>("turns").insertMany([...input.turns]);
+      const row = detectWhatsAppReviewCandidates(TENANT, input as never, REVIEW_TIME)[0]!;
+      await reviews.insert(TENANT, [row]);
+
+      let approvalOk: boolean;
+      if (mode === "unlinkFirst") { assert.equal((await svc.unlink(member(user), id, {})).ok, true); approvalOk = await decides(row._id, "reviewer"); }
+      else if (mode === "approvalFirst") { approvalOk = await decides(row._id, "reviewer"); assert.equal((await svc.unlink(member(user), id, {})).ok, true); }
+      else { const [a] = await Promise.allSettled([decides(row._id, "reviewer"), svc.unlink(member(user), id, {}), svc.unlink(admin, id, {}), svc.unlink(member(user), id, {})]); approvalOk = a!.status === "fulfilled" && a.value; }
+      const cand = (await db.collection("whatsapp_candidates").findOne({ _id: row._id as never }))!, claims = await db.collection("claims").countDocuments({ tenantId: TENANT, _id: whatsAppClaimId(row._id) } as never);
+      const link = (await store.get(TENANT, id))!, src = (await db.collection<Sources>("sources").findOne({ _id: sourceId, tenantId: TENANT }))!;
+      assert.equal(link.state, "unlinked"); assert.equal(link.live, false);
+      assert.equal(src.consent?.given, false, "consent always ends withdrawn");
+      assert.equal(await db.collection("whatsapp_events").countDocuments({ linkId: id, eventType: "link.unlinked" }), 1, "one transition, one event, however many unlinks raced");
+      if (cand["status"] === "approved") { tally.approvalFirst++; assert.equal(approvalOk, true); assert.equal(claims, 1, "approval committed before the withdrawal: the claim stays (Q6=6a)"); }
+      else { tally.unlinkFirst++; assert.equal(cand["status"], "rejected", "quarantined by the unlink"); assert.equal(approvalOk, false, "the racing approval lost"); assert.equal(claims, 0, "no claim from a withdrawn source"); }
+      if (mode === "unlinkFirst") assert.equal(cand["status"], "rejected", "forced unlink-first: the candidate is quarantined before any approval");
+      if (mode === "approvalFirst") assert.equal(cand["status"], "approved", "forced approval-first: the approval committed");
+      const before = JSON.stringify(await state(row._id));
+      let late: unknown; try { late = await reviews.decide(TENANT, row._id, "approved", "late-reviewer"); } catch { late = "threw"; }
+      assert.ok(late === "threw" || (late as { result?: string }).result !== "ok", "an approval after the unlink does not succeed (throws or reports a non-ok result)");
+      assert.equal(JSON.stringify(await state(row._id)), before, "a late approval changes nothing (candidate and claim count unchanged)");
+      assert.equal(((await svc.unlink(member(user), id, {})) as unknown as { value: { changed: boolean } }).value.changed, false, "repeat is idempotent");
+    };
+    const decides = async (candidateId: string, who: string): Promise<boolean> => (await reviews.decide(TENANT, candidateId, "approved", who) as { result?: string }).result === "ok";
+    const state = async (candidateId: string) => ({ cand: await db.collection("whatsapp_candidates").findOne({ _id: candidateId as never }), claims: await db.collection("claims").countDocuments({ tenantId: TENANT, _id: whatsAppClaimId(candidateId) } as never) });
+    await round(100, "unlinkFirst"); await round(101, "approvalFirst"); // deterministic: both directions on every run
+    assert.ok(tally.unlinkFirst >= 1 && tally.approvalFirst >= 1, JSON.stringify(tally));
+    for (let i = 0; i < 20; i++) await round(i, "race");
+    assert.equal((await store.get(TENANT, bystander))!.state, "requested", "an unrelated link is untouched");
+    assert.equal(JSON.stringify(await db.collection("whatsapp_events").find({}).toArray()).includes("Scholarship"), false, "no message text in events");
+    console.log(`W8 tally over 2 forced + 20 racing rounds: ${JSON.stringify(tally)}`);
+  } finally {
+    for (const [k, v] of [["MONGO_WORK_DB", saved.w], ["MONGODB_URL", saved.u], ["MONGODB_DB", saved.d]] as const) { if (v === undefined) delete process.env[k]; else process.env[k] = v; }
+    await client.db(name).dropDatabase(); await client.close(); await fake.stop();
+  }
+});

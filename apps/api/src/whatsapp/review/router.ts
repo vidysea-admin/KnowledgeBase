@@ -2,16 +2,18 @@
  * W7 (R-26, R-27, R-29, R-30): every route is owner-or-admin. The candidate's source is resolved to its link; the link's owner (a session whose userId
  * matches) or an admin (`whatsapp-admin`) is let through, everyone else -- another member, a viewer, a plain key, a legacy link, another tenant -- gets the
  * same 404 as a candidate that does not exist, before any evidence is read. An admin reading someone else's raw content writes an `admin.raw_read` event
- * first; if that write fails the read is refused. The recorded decision actor is `actorId` plus the link id. */
+ * first; if that write fails the read is refused. The recorded decision actor is `actorId` plus the link id.
+ * W12 (R-38): the one decision that wins the transition writes `candidate.approved` / `candidate.rejected` (candidate id only, best effort after the commit). */
 import { Router, type Request, type Response } from "express";
 import { requireScope, isValidTenantId } from "../../auth.js";
 import { actorBase, auditWho, callerOf, type WhatsAppRawAccess, type WhatsAppRawDecision } from "../owner-config.js";
+import { emitBestEffort, type EventSink } from "../links/events-router.js";
 import { isWhatsAppReviewId, type WhatsAppReviewAction, type WhatsAppReviewRepository } from "./store.js";
 
 export const reviewActor = (base: string, linkId: string | null): string => linkId ? `${base}@link:${linkId}` : base;
 export type Allowed = Extract<WhatsAppRawDecision, { allowed: true }>;
 
-export function createWhatsAppReviewRouter(repository: WhatsAppReviewRepository, access: WhatsAppRawAccess): Router {
+export function createWhatsAppReviewRouter(repository: WhatsAppReviewRepository, access: WhatsAppRawAccess, appendEvent?: EventSink): Router {
   const router = Router();
   router.use("/whatsapp/review", requireScope("whatsapp"), (req, res, next) => {
     if (!isValidTenantId(req.auth?.tenantId)) { res.status(401).json({ error: "unauthorized" }); return; }
@@ -76,6 +78,8 @@ export function createWhatsAppReviewRouter(repository: WhatsAppReviewRepository,
         if (result.result === "not_found") { res.status(404).json({ error: "not_found" }); return; }
         if (result.result === "publish_unavailable") { res.status(503).json({ error: "publish_unavailable" }); return; }
         if (result.result !== "ok") { res.status(409).json({ error: result.result }); return; }
+        if (result.changed) await emitBestEffort(appendEvent, req.auth!.tenantId, { eventType: action === "approved" ? "candidate.approved" : "candidate.rejected",
+          actorKind: req.auth?.principal === "session" ? "user" : "key", actorId: base, ...(allowed.linkId ? { linkId: allowed.linkId } : {}), data: { candidateId: id } });
         res.status(200).json({ candidate: result.candidate, changed: result.changed });
       } catch {
         res.status(502).json({ error: "review_failed", message: "Review decision was not confirmed; retry to verify its state" });

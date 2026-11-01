@@ -1,0 +1,6 @@
+# Checkpoint wa-route-link-staleness (checker a, cycle 0)
+Base 461e341e, Code head b2cdbe85, Branch head da6e7867. Bound root .worktrees/wa-route-link-staleness unchanged before this commit (git status clean).
+Evidence: route-store + persist 50/50; route + search-cache 103/103 (base 92/92) with @lkb resolving to the main tree; own reproductions from ISS-WARLG-001's row 8/8 refused (revoked, suspended, unlinked, rejected on fresh deps; persisted x2; stale-while-refresh x2) plus 7/7 predicate edges withheld and mixed-topic refs dropped, all in a git-archive copy (junctions removed with cmd /c rmdir).
+Mutation results: M1 gate removed RED(24), M3 injected visibility reused RED(6), M8 fail-open union RED(24), M9 empty frontier RED(30), M2 timeout counts eligible RED(1). Restores cmp equal, hash-object equals HEAD blob 0d71f163.
+Reachability: with the real sessionVisible (rejects whatsapp-batch) a live WhatsApp node never reaches step B; the fix is a defence-in-depth fence, tests inject a link-blind sessionVisible and still bind the gate (M1).
+Base reds: route-router pdfjs-dist install gap reproduced on base (env), tsc errors are junction resolution. Verdict: PASS, 1 medium PROPOSED-ISSUE (externalGate over all tenant sessions, +66 percent reads), 2 low notes. Consent untouched (D-210).

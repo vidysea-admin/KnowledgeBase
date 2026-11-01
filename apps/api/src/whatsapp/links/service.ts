@@ -1,13 +1,13 @@
 /**
  * WhatsApp link lifecycle service (whatsapp-multiuser W5; spec R-1..R-6, R-9..R-14, R-24 bind, R-44). Pure logic over ports:
  * a LinksStore (Mongo in router.ts, in-memory in tests) and the W3 archiver client. Every method authorises its own caller
- * (defence in depth beneath the router's scope checks) and takes the tenant from the Principal only. Unlink/revoke here move
- * KB eligibility only; quarantine, the consent CAS and the archiver unlink step belong to W8, which extends this file.
+ * (defence in depth beneath the router's scope checks) and takes the tenant from the Principal only. W8 (R-7, R-8, R-10): unlink and
+ * revoke move KB eligibility first (one CAS), then run the idempotent follow-through - quarantine the link's pending candidates, withdraw
+ * consent on each source it owns through the existing consent CAS (called, never changed here), and ask the archiver to unlink, owed via
+ * `archiverUnlinkPending` until confirmed. The Mongo LinksStore adapter lives in router.ts (this file is at the LOC budget).
  */
 import type { ArchiverClient } from "../archiver/client.js";
 import { isArchiverError } from "../archiver/errors.js";
-import { isLiveLinkState, whatsAppLinkStores } from "@lkb/db";
-import type { Db } from "mongodb";
 import type { Notice } from "./notice.js";
 
 export type LinkState = "requested" | "approved" | "active" | "suspended" | "rejected" | "unlinked" | "revoked";
@@ -24,7 +24,7 @@ export interface LinkRow {
   _id: string; tenantId: string; userId: string | null; label: string; state: LinkState; live: boolean; studentData: StudentData; createdAt: string; updatedAt: string;
   archiverOwnerId?: string; noticeVersion?: string; noticeShownAt?: string; requestedAt?: string; approvedBy?: string; approvedAt?: string; approvalExpiresAt?: string;
   activatedAt?: string; suspendedAt?: string; suspendedBy?: string; suspendedReason?: string; rejectedAt?: string; rejectedBy?: string; rejectedReason?: string;
-  unlinkedAt?: string; unlinkedBy?: string; unlinkedReason?: string; revokedAt?: string; revokedBy?: string; revokedReason?: string; blocksNewRequests?: boolean; health?: LinkHealth;
+  unlinkedAt?: string; unlinkedBy?: string; unlinkedReason?: string; revokedAt?: string; revokedBy?: string; revokedReason?: string; blocksNewRequests?: boolean; archiverUnlinkPending?: boolean; health?: LinkHealth;
 }
 export type EventType = "link.requested" | "link.approved" | "link.rejected" | "link.connected" | "link.suspended" | "link.resumed" | "link.unlinked" | "link.revoked";
 export interface NewEvent { eventType: EventType; actorKind: "user" | "key" | "system"; linkId: string; actorId?: string; data?: Record<string, string | number> }
@@ -43,8 +43,21 @@ export interface LinksStore {
   transition(tenantId: string, id: string, t: Transition): Promise<LinkRow | null>;
   setOwnerId(tenantId: string, id: string, ownerId: string): Promise<"set" | "same" | "conflict" | "gone">;
   appendEvent(tenantId: string, e: NewEvent): Promise<void>;
+  /** CAS no-op: true only while the link is still in one of `from` (it changes nothing but updatedAt). Used to re-check a link right before a QR is handed out. */
+  touch(tenantId: string, id: string, from: readonly LinkState[]): Promise<boolean>;
+  /** True when ANOTHER link row of this tenant carries the archiver owner id (the unique index makes it impossible; this is the explicit assertion, ISS-WASYNC-001). */
+  ownerInUseByOther(tenantId: string, ownerId: string, exceptLinkId: string): Promise<boolean>;
 }
-export type ArchiverPort = Pick<ArchiverClient, "ensureOwner" | "startSession" | "getSession" | "getQr">;
+export type ArchiverPort = Pick<ArchiverClient, "ensureOwner" | "startSession" | "getSession" | "getQr" | "unlinkSession">;
+/** The tenant-scoped data steps of R-7/R-8, implemented over Mongo in review/store.ts. Each is idempotent and returns a count. The link's sources are those stamped
+ * `sourceMeta.whatsappLinkId` (W7) plus unstamped legacy ones whose consent was recorded by its archiver owner. Consent is withdrawn through the existing CAS only. */
+export interface LinkDataPort {
+  quarantineCandidates(tenantId: string, linkId: string, archiverOwnerId: string | undefined): Promise<number>;
+  withdrawSources(tenantId: string, linkId: string, archiverOwnerId: string | undefined, recordedBy: string): Promise<number>;
+}
+/** Codes only (no ids, no text): what the follow-through of an unlink or revoke achieved. `archiver`: none = nothing owed, done, or pending (retried by the sync scheduler). */
+export interface FollowThrough { candidates: "done" | "failed"; consent: "done" | "failed"; archiver: "none" | "done" | "pending" }
+class LinkGoneError extends Error { constructor() { super("link_gone"); this.name = "LinkGoneError"; } }
 
 /** Who is asking, derived from req.auth only (router.principalOf). `actor` is actorId(): user:<id> for a session, the key id for a key. */
 export interface Principal { tenantId: string; kind: "session" | "key"; userId: string | null; actor: string | null; link: boolean; admin: boolean }
@@ -58,7 +71,7 @@ const ARCHIVER_DOWN = fail(503, "archiver_api_unavailable", "the WhatsApp archiv
 
 export interface ConnectView { state: string; linkState: LinkState; qr: string | null; expiresAt: string | null; accountHint: string | null }
 export interface LinksServiceDeps {
-  store: LinksStore; archiver: ArchiverPort | null; notice: () => Notice | null; countActiveAdmins: (tenantId: string) => Promise<number>;
+  store: LinksStore; archiver: ArchiverPort | null; data: LinkDataPort; notice: () => Notice | null; countActiveAdmins: (tenantId: string) => Promise<number>;
   userStatus: (tenantId: string, userId: string) => Promise<{ status: string; role?: string } | null>;
   now?: () => Date; log?: { warn(msg: string, f?: Record<string, unknown>): void; error(msg: string, f?: Record<string, unknown>): void };
   requestLimit?: { max: number; windowMs: number }; qrLimit?: { max: number; windowMs: number };
@@ -110,10 +123,11 @@ export function createLinksService(deps: LinksServiceDeps) {
   const view = (l: LinkRow, p: Principal, extra: Record<string, unknown> = {}): Result<Record<string, unknown>> => ({ ok: true, value: { link: toLinkView(l, p.admin), ...extra } });
 
   /** Admin-only CAS transition with one event; the shared body of reject / suspend / resume / revoke. */
-  async function adminMove(p: Principal, id: string, t: (l: LinkRow) => Transition | null, ev: EventType, reason?: string): Promise<Result<Record<string, unknown>>> {
+  async function adminMove(p: Principal, id: string, t: (l: LinkRow) => Transition | Fail | null | Promise<Transition | Fail | null>, ev: EventType, reason?: string): Promise<Result<Record<string, unknown>>> {
     if (!p.admin || !p.actor) return FORBIDDEN;
     const l = await load(p, id); if (!l) return NOT_FOUND;
-    const tr = t(l); if (!tr) return INVALID_STATE;
+    const tr = await t(l); if (!tr) return INVALID_STATE;
+    if ("ok" in tr) return tr;
     const next = await store.transition(p.tenantId, l._id, tr); if (!next) return INVALID_STATE;
     await emit(p, p.tenantId, { eventType: ev, linkId: l._id, data: { fromState: l.state, toState: next.state, ...(reason ? { reason } : {}) } });
     return view(next, p);
@@ -127,7 +141,12 @@ export function createLinksService(deps: LinksServiceDeps) {
       if (cur?.archiverOwnerId) return cur.archiverOwnerId;
       const rec = await archiver!.ensureOwner(linkId, { idempotencyKey: `ensure-${linkId}` });
       if (rec.state !== "active") throw new Error("owner_unavailable");
-      if ((await store.setOwnerId(p.tenantId, linkId, rec.ownerId)) === "conflict") throw new Error("owner_conflict");
+      const stored = await store.setOwnerId(p.tenantId, linkId, rec.ownerId);
+      if (stored === "gone") { // ISS-WALINKS-001: revoked/unlinked/suspended while ensureOwner ran; the new archiver owner has no KB record, so close it now (ownerRef = linkId keeps it recoverable)
+        await archiver!.unlinkSession(rec.ownerId, { idempotencyKey: `orphan-${linkId}` }).catch(() => deps.log?.error("whatsapp orphan archiver owner not closed", { code: "orphan_owner" }));
+        throw new LinkGoneError();
+      }
+      if (stored === "conflict") throw new Error("owner_conflict");
       return rec.ownerId;
     })().finally(() => inflight.delete(key));
     inflight.set(key, flight);
@@ -139,6 +158,51 @@ export function createLinksService(deps: LinksServiceDeps) {
     if (e.code === "rate_limited") return fail(429, "archiver_busy", "the archiver is busy, retry shortly", { retryAfterSec: e.retryAfterSec ?? 5 });
     if (e.code === "owner_not_found" || e.code === "owner_unlinked") return fail(409, "archiver_owner_unavailable", "the archiver session for this link is no longer available");
     return ARCHIVER_DOWN;
+  }
+
+  const owed = async (l: LinkRow): Promise<boolean> => !!l.archiverOwnerId && !(await store.ownerInUseByOther(l.tenantId, l.archiverOwnerId, l._id)); // ISS-WASYNC-001: never owe an unlink of an owner another link carries
+  const step = async <T>(code: string, run: () => Promise<T>): Promise<boolean> => { try { await run(); return true; } catch (e) { deps.log?.error("whatsapp unlink follow-through step failed", { code, name: e instanceof Error ? e.name : "unknown" }); return false; } };
+
+  /** R-7 steps 2-4 after the KB state already moved. Independent (one failing never skips the next), idempotent, codes only. */
+  async function followThrough(p: Principal, l: LinkRow): Promise<FollowThrough> {
+    const out: FollowThrough = { candidates: "done", consent: "done", archiver: "none" };
+    if (!(await step("quarantine_failed", () => deps.data.quarantineCandidates(l.tenantId, l._id, l.archiverOwnerId)))) out.candidates = "failed";
+    if (!(await step("consent_withdraw_failed", () => deps.data.withdrawSources(l.tenantId, l._id, l.archiverOwnerId, by(p))))) out.consent = "failed";
+    if (!l.archiverUnlinkPending || !l.archiverOwnerId) return out;
+    out.archiver = "pending";
+    if (!archiver) return out; // retried by the sync scheduler (W9) once the client is configured
+    const ownerId = l.archiverOwnerId;
+    const closed = await step("archiver_unlink_failed", async () => {
+      try { await archiver.unlinkSession(ownerId, { idempotencyKey: `unlink-${l._id}` }); }
+      catch (e) { if (!(isArchiverError(e) && (e.code === "owner_not_found" || e.code === "owner_unlinked"))) throw e; } // already gone upstream counts as done
+    });
+    if (closed && await step("pending_clear_failed", () => store.transition(l.tenantId, l._id, { from: [l.state], to: l.state, unset: ["archiverUnlinkPending"] }))) out.archiver = "done";
+    return out;
+  }
+  /** Shared body of unlink (R-7) and revoke (R-8): one CAS to the terminal state (KB eligibility is authoritative), one event, then the follow-through. Repeating it is a 200 that re-runs only what is still owed. */
+  async function terminate(p: Principal, l: LinkRow, to: "unlinked" | "revoked", reason: string): Promise<Result<Record<string, unknown>>> {
+    const finish = async (row: LinkRow, changed: boolean): Promise<Result<Record<string, unknown>>> => view(row, p, { changed, followThrough: await followThrough(p, row) });
+    if (l.state === to) return finish(l, false);
+    if (!LIVE_STATES.includes(l.state)) return INVALID_STATE;
+    const at = iso(), pending = await owed(l);
+    const set = to === "unlinked" ? { unlinkedAt: at, unlinkedBy: by(p), unlinkedReason: reason } : { revokedAt: at, revokedBy: by(p), revokedReason: reason, blocksNewRequests: true };
+    const next = await store.transition(p.tenantId, l._id, { from: LIVE_STATES, to, set: { ...set, ...(pending ? { archiverUnlinkPending: true } : {}) } });
+    if (!next) { const cur = await store.get(p.tenantId, l._id); return cur?.state === to ? finish(cur, false) : INVALID_STATE; }
+    await emit(p, p.tenantId, { eventType: to === "unlinked" ? "link.unlinked" : "link.revoked", linkId: l._id, data: { fromState: l.state, toState: to, reason } });
+    let row = next; // a provision may have stored the owner id between our read and the CAS: owe its unlink too
+    if (!pending && next.archiverOwnerId && await owed(next)) row = (await store.transition(p.tenantId, l._id, { from: [to], to, set: { archiverUnlinkPending: true } })) ?? next;
+    return finish(row, true);
+  }
+
+  /** W8 hook (R-10): suspends the user's ACTIVE links with a reason code; returns how many. Never resumes anything. */
+  async function suspendForAccount(tenantId: string, userId: string, reason: string): Promise<number> {
+    let n = 0;
+    for (const l of await store.listForUser(tenantId, userId)) {
+      if (l.state !== "active" || !REASON_RE.test(reason)) continue;
+      const next = await store.transition(tenantId, l._id, { from: ["active"], to: "suspended", set: { suspendedAt: iso(), suspendedBy: "system:account", suspendedReason: reason } });
+      if (next) { n++; await emit(null, tenantId, { eventType: "link.suspended", linkId: l._id, data: { fromState: "active", toState: "suspended", reason } }); }
+    }
+    return n;
   }
 
   return {
@@ -180,19 +244,22 @@ export function createLinksService(deps: LinksServiceDeps) {
     },
     reject: (p: Principal, id: string, input: { reason?: string }) => adminMove(p, id, l => (l.state === "requested" ? { from: ["requested"], to: "rejected", set: { rejectedAt: iso(), rejectedBy: by(p), rejectedReason: input.reason ?? "admin_decision" } } : null), "link.rejected", input.reason ?? "admin_decision"),
     suspend: (p: Principal, id: string, input: { reason?: string }) => adminMove(p, id, l => (l.state === "active" ? { from: ["active"], to: "suspended", set: { suspendedAt: iso(), suspendedBy: by(p), suspendedReason: input.reason ?? "admin_action" } } : null), "link.suspended", input.reason ?? "admin_action"),
-    resume: (p: Principal, id: string) => adminMove(p, id, l => (l.state === "suspended" ? { from: ["suspended"], to: "active", require: ["owner_id", "activated"], unset: ["suspendedAt", "suspendedBy", "suspendedReason"] } : null), "link.resumed"),
-    revoke: (p: Principal, id: string, input: { reason?: string }) => adminMove(p, id, l => (LIVE_STATES.includes(l.state) ? { from: LIVE_STATES, to: "revoked", set: { revokedAt: iso(), revokedBy: by(p), revokedReason: input.reason ?? "admin_revoked", blocksNewRequests: true } } : null), "link.revoked", input.reason ?? "admin_revoked"),
-    /** R-7 (KB eligibility only; W8 adds quarantine, the consent CAS and the archiver step). Owner or admin; repeating it is a 200 no-op. */
+    resume: (p: Principal, id: string) => adminMove(p, id, async l => {
+      if (l.state !== "suspended") return null;
+      const u = l.userId === null ? { status: "active", role: "member" } : await deps.userStatus(p.tenantId, l.userId); // ISS-WALINKS-006: a legacy link has no account to check
+      if (!u || u.status !== "active" || (u.role !== "member" && u.role !== "admin")) return fail(409, "account_inactive", "the owner's account is not active; re-enable it first");
+      return { from: ["suspended"], to: "active", require: ["owner_id", "activated"], unset: ["suspendedAt", "suspendedBy", "suspendedReason"] };
+    }, "link.resumed"),
+    /** R-8 (admin only): unlink plus revokedReason and the block on new requests. */
+    async revoke(p: Principal, id: string, input: { reason?: string }): Promise<Result<Record<string, unknown>>> {
+      if (!p.admin || !p.actor) return FORBIDDEN;
+      const l = await load(p, id); return l ? terminate(p, l, "revoked", input.reason ?? "admin_revoked") : NOT_FOUND;
+    },
+    /** R-7. Owner or an admin who has an actor id (ISS-WALINKS-008); another person's id is a 404; repeating it is a 200 that changes nothing once everything is done. */
     async unlink(p: Principal, id: string, input: { reason?: string }): Promise<Result<Record<string, unknown>>> {
-      if (!p.admin && !(p.kind === "session" && p.link)) return FORBIDDEN;
+      if ((!p.admin && !(p.kind === "session" && p.link)) || !p.actor) return FORBIDDEN;
       const l = await load(p, id); if (!l || !(p.admin || owns(p, l))) return NOT_FOUND;
-      if (l.state === "unlinked") return view(l, p, { changed: false });
-      if (!LIVE_STATES.includes(l.state)) return INVALID_STATE;
-      const reason = owns(p, l) ? "owner_request" : input.reason ?? "admin_request";
-      const next = await store.transition(p.tenantId, l._id, { from: LIVE_STATES, to: "unlinked", set: { unlinkedAt: iso(), unlinkedBy: by(p), unlinkedReason: reason } });
-      if (!next) { const cur = await store.get(p.tenantId, l._id); return cur?.state === "unlinked" ? view(cur, p, { changed: false }) : INVALID_STATE; }
-      await emit(p, p.tenantId, { eventType: "link.unlinked", linkId: l._id, data: { fromState: l.state, toState: "unlinked", reason } });
-      return view(next, p, { changed: true });
+      return terminate(p, l, "unlinked", owns(p, l) ? "owner_request" : input.reason ?? "admin_request");
     },
     /** R-24: an admin binds a LEGACY (userless) live link to an active member/admin of the same tenant; afterwards it follows the normal rules. */
     async bind(p: Principal, id: string, input: { userId: string }): Promise<Result<Record<string, unknown>>> {
@@ -206,16 +273,10 @@ export function createLinksService(deps: LinksServiceDeps) {
         return next ? view(next, p) : fail(409, "not_legacy", "only a live legacy link can be bound");
       } catch (e) { if (e instanceof LiveLinkExistsError) return fail(409, "link_exists", "that user already has a WhatsApp link"); throw e; }
     },
-    /** W8 hook (R-10): suspends the user's ACTIVE links with a reason code; returns how many. Never resumes anything. */
-    async suspendForAccount(tenantId: string, userId: string, reason: string): Promise<number> {
-      let n = 0;
-      for (const l of await store.listForUser(tenantId, userId)) {
-        if (l.state !== "active" || !REASON_RE.test(reason)) continue;
-        const next = await store.transition(tenantId, l._id, { from: ["active"], to: "suspended", set: { suspendedAt: iso(), suspendedBy: "system:account", suspendedReason: reason } });
-        if (next) { n++; await emit(null, tenantId, { eventType: "link.suspended", linkId: l._id, data: { fromState: "active", toState: "suspended", reason } }); }
-      }
-      return n;
-    },
+    suspendForAccount,
+    /** R-10 entry point for the account admin (disable / reject / demote to viewer): suspends the person's ACTIVE links with `account_inactive`. Re-enabling is deliberately not an input: it never resumes anything. */
+    accountChanged: (tenantId: string, userId: string, to: { status: string; role?: string }): Promise<number> =>
+      to.status === "active" && (to.role === "member" || to.role === "admin") ? Promise.resolve(0) : suspendForAccount(tenantId, userId, "account_inactive"),
     /** R-11..R-14. Only the owner's own session; anyone else's id is a 404 and never consumes the owner's rate-limit budget. */
     async connect(p: Principal, id: string): Promise<Result<ConnectView>> {
       if (p.kind !== "session" || !p.link || !p.userId) return FORBIDDEN;
@@ -235,7 +296,10 @@ export function createLinksService(deps: LinksServiceDeps) {
         const sess = await archiver.getSession(ownerId);
         let status: string = sess.status, qr: string | null = null, expiresAt: string | null = null;
         if (OPEN_STATES.includes(status)) status = (await archiver.startSession(ownerId, { idempotencyKey: `start-${l._id}-${Math.floor(now().getTime() / 60_000)}` })).status;
-        if (status === "awaiting_qr") { const q = await archiver.getQr(ownerId); status = q.status; qr = q.qr; expiresAt = q.expiresAt; } // never retried, cached or stored
+        if (status === "awaiting_qr") {
+          if (!(await store.touch(p.tenantId, l._id, ["approved", "active"]))) return INVALID_STATE; // ISS-WALINKS-001: revoked/suspended/unlinked mid-flight never receives a QR
+          const q = await archiver.getQr(ownerId); status = q.status; qr = q.qr; expiresAt = q.expiresAt; // never retried, cached or stored
+        }
         let linkState = l.state;
         if (status === "connected") {
           const at = iso(), health = { ...(l.health ?? {}), lastStatus: "connected", lastStatusAt: at, flags: (l.health?.flags ?? []).filter(f => f !== "needs-relink") };
@@ -244,46 +308,8 @@ export function createLinksService(deps: LinksServiceDeps) {
           linkState = ((next ?? await store.get(p.tenantId, l._id))?.state ?? l.state);
         }
         return { ok: true, value: { state: status, linkState, qr, expiresAt, accountHint: status === "connected" && sess.status === "connected" ? sess.accountHint : null } };
-      } catch (e) { return archiverFail(e); }
+      } catch (e) { return e instanceof LinkGoneError ? INVALID_STATE : archiverFail(e); }
     },
   };
 }
 export type LinksService = ReturnType<typeof createLinksService>;
-
-const isDupKey = (e: unknown): boolean => (e as { code?: unknown } | null)?.code === 11000;
-const GUARDS: Record<Guard, Record<string, unknown>> = { owner_id: { archiverOwnerId: { $type: "string" } }, activated: { activatedAt: { $type: "string" } }, needs_relink: { "health.flags": "needs-relink" }, legacy: { userId: null } };
-
-/** Mongo LinksStore over the W1 accessors (every query is tenant-scoped by scopedCollection). The unique partial indexes are the R-2 authority. */
-export function createMongoLinksStore(db: Pick<Db, "collection">): LinksStore {
-  const s = whatsAppLinkStores(db);
-  const get = async (t: string, id: string): Promise<LinkRow | null> => (await s.getLink(t, id)) as unknown as LinkRow | null;
-  const rows = async (c: ReturnType<ReturnType<typeof s.links>["find"]>): Promise<LinkRow[]> => (await c.toArray()) as unknown as LinkRow[];
-  return {
-    get,
-    async insert(t, row) {
-      const { _id, live: _l, studentData: _s, ...rest } = row as LinkRow;
-      try { return (await s.insertLink(t, { ...rest, ...(_id ? { _id } : {}) } as never)) as unknown as LinkRow; }
-      catch (e) { throw isDupKey(e) ? new LiveLinkExistsError() : e; }
-    },
-    listForUser: (t, userId) => rows(s.links(t).find({ userId } as never).sort({ createdAt: -1, _id: -1 }).limit(50)),
-    listAll: (t, limit) => rows(s.links(t).find({}).sort({ createdAt: -1, _id: -1 }).limit(limit)),
-    hasBlockingLink: async (t, userId) => (await s.links(t).findOne({ userId, state: "revoked", blocksNewRequests: true } as never)) !== null,
-    async transition(t, id, tr) {
-      const filter: Record<string, unknown> = { _id: id, state: { $in: [...tr.from] }, ...Object.assign({}, ...(tr.require ?? []).map(g => GUARDS[g])) };
-      const update: Record<string, unknown> = { $set: { ...tr.set, state: tr.to, live: isLiveLinkState(tr.to), updatedAt: new Date().toISOString() } };
-      if (tr.unset?.length) update.$unset = Object.fromEntries(tr.unset.map(k => [k, ""]));
-      try { if ((await s.links(t).updateOne(filter as never, update as never)).matchedCount !== 1) return null; }
-      catch (e) { throw isDupKey(e) ? new LiveLinkExistsError() : e; }
-      return get(t, id);
-    },
-    async setOwnerId(t, id, ownerId) {
-      try {
-        const r = await s.links(t).updateOne({ _id: id, state: { $in: ["approved", "active", "suspended"] }, archiverOwnerId: { $exists: false } } as never, { $set: { archiverOwnerId: ownerId, updatedAt: new Date().toISOString() } } as never);
-        if (r.matchedCount === 1) return "set";
-      } catch (e) { if (isDupKey(e)) return "conflict"; throw e; }
-      const cur = await get(t, id);
-      return !cur || !cur.archiverOwnerId ? "gone" : cur.archiverOwnerId === ownerId ? "same" : "conflict";
-    },
-    async appendEvent(t, e) { await s.events(t).insert(e as never); },
-  };
-}

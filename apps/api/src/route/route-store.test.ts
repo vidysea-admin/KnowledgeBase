@@ -8,7 +8,7 @@ import assert from "node:assert/strict";
 import type { CompleteResult, Job } from "@lkb/ai";
 import { createMongoSearchDeps } from "../search-store.js";
 import { createRouteDeps, RouteNoTree, RouteTimeout, type RouteStats } from "./route-store.js";
-import { NATURAL_QUESTIONS, fakeRouteDb, sessionIdOf, syntheticTree } from "./route.testsupport.js";
+import { NATURAL_QUESTIONS, WA_DEAD_LINKS, fakeRouteDb, sessionIdOf, setWaLink, syntheticTree } from "./route.testsupport.js";
 import { queryFacetTokens } from "./facets.js";
 import { createKnowledgeVisibility } from "../visibility/knowledge.js";
 
@@ -192,4 +192,66 @@ test("cycle 1 (C6 low): a request abort that lands while the step B frontier is 
   const deps = createRouteDeps({ db: f.db, tree: { load: async (t) => syntheticTree({ tenantId: t }) }, visibility, complete: async () => { started++; return reply([]); } });
   await assert.rejects(deps.route("toc", "campus orientation panel", 5, { deadlineAt: Date.now() + 60_000, signal: ctl.signal }), RouteTimeout);
   assert.equal(started, 0, "the model call must not start for an already-aborted request");
+});
+
+// ISS-WARLG-001 / gate H-14: step B is the only /route step that sends text to an external model. Its frontier must drop every session whose
+// WhatsApp link is not live, not suspended and studentData "no", re-checked on EVERY request, whatever index (fresh build, warm cache) served it.
+const WA = sessionIdOf(4), WA_NODE = sessionNode("toc", 4), STEP_B_QUERY = "campus orientation panel";
+/** The /route link-blind gate B described: `sessionVisible` ignores link state for the WhatsApp session; every other check is the real one. */
+function linkBlind(db: Parameters<typeof createKnowledgeVisibility>[0]) {
+  const real = createKnowledgeVisibility(db);
+  return { ...real, sessionVisible: async (t: string, id: string) => id === WA || real.sessionVisible(t, id) };
+}
+function linkWorld(kind: Parameters<typeof setWaLink>[2]) {
+  const f = fakeRouteDb(), jobs: Job[] = [], loads: string[] = [];
+  setWaLink(f.data as never, WA, kind);
+  const boot = () => createRouteDeps({ db: f.db, tree: { load: async (t) => { loads.push(t); return syntheticTree({ tenantId: t }); } }, visibility: linkBlind(f.db), persist: false,
+    complete: async (j) => { jobs.push(j); return reply([]); } });
+  const inJob = (i: number) => JSON.stringify(jobs[i]!.messages).includes(WA_NODE);
+  return { ...f, boot, jobs, loads, inJob };
+}
+
+test("ISS-WARLG-001 C2: a live eligible link keeps its WhatsApp node in the step B job; non-WhatsApp nodes are in it too", async () => {
+  const w = linkWorld("live");
+  await w.boot().route("toc", STEP_B_QUERY, 5, far());
+  assert.ok(w.inJob(0), "live link: node reaches step B as before");
+  assert.ok(JSON.stringify(w.jobs[0]!.messages).includes(sessionNode("toc", 5)), "a non-WhatsApp session is unaffected");
+});
+
+for (const dead of WA_DEAD_LINKS) {
+  test(`ISS-WARLG-001 C1: link ${dead} -> WhatsApp node is not in the step B job (fresh deps over the same db, and warm deps inside the TTL)`, async () => {
+    const warm = linkWorld("live");
+    const deps = warm.boot();
+    await deps.route("toc", STEP_B_QUERY, 5, far());
+    assert.ok(warm.inJob(0), "precondition: live link reaches step B");
+    setWaLink(warm.data as never, WA, dead);
+    await deps.route("toc", STEP_B_QUERY, 5, far()); // same deps: in-process index still warm
+    assert.equal(warm.loads.length, 1, "the second request was served from the warm in-process index");
+    assert.equal(warm.jobs.length, 2);
+    assert.ok(!warm.inJob(1), `warm index, link ${dead}: node must not reach step B`);
+    assert.ok(JSON.stringify(warm.jobs[1]!.messages).includes(sessionNode("toc", 5)), "non-WhatsApp nodes still reach step B");
+    await warm.boot().route("toc", STEP_B_QUERY, 5, far()); // fresh deps (empty cache) over the same db
+    assert.ok(!warm.inJob(2), `fresh deps, link ${dead}: node must not reach step B`);
+  });
+}
+
+test("ISS-WARLG-001 C3: a link read error fails closed (the WhatsApp node never reaches step B)", async () => {
+  const w = linkWorld("live"), real = w.db as { collection(n: string): unknown };
+  const broken = { collection: (n: string) => n === "whatsapp_links" ? { findOne: async () => { throw new Error("links read failed"); }, find: () => { throw new Error("links read failed"); } } : real.collection(n) };
+  const deps = createRouteDeps({ db: broken as never, tree: { load: async (t) => syntheticTree({ tenantId: t }) }, persist: false, visibility: linkBlind(w.db), complete: async (j) => { w.jobs.push(j); return reply([]); } });
+  await deps.route("toc", STEP_B_QUERY, 5, far());
+  assert.ok(w.jobs.length === 1 && !w.inJob(0), "read error: the WhatsApp node is withheld");
+  assert.ok(JSON.stringify(w.jobs[0]!.messages).includes(sessionNode("toc", 5)), "the failure is scoped to the unverifiable session");
+});
+
+test("ISS-WARLG-001 C3: a link read that never answers is cut at half the remaining budget and fails closed", async () => {
+  const w = linkWorld("live"), real = w.db as { collection(n: string): unknown };
+  const hang = { collection: (n: string) => n === "whatsapp_links" ? { findOne: () => new Promise<never>(() => undefined), find: () => ({ toArray: () => new Promise<never>(() => undefined) }) } : real.collection(n) };
+  const deps = createRouteDeps({ db: hang as never, tree: { load: async (t) => syntheticTree({ tenantId: t }) }, persist: false, visibility: linkBlind(hang as never), complete: async (j) => { w.jobs.push(j); return reply([]); } });
+  const t0 = Date.now();
+  await deps.route("toc", STEP_B_QUERY, 5, { deadlineAt: t0 + 1500 });
+  assert.ok(Date.now() - t0 < 1500, "answered inside the deadline instead of hanging on the link read");
+  assert.equal(w.jobs.length, 1);
+  assert.ok(!w.inJob(0), "the unverifiable WhatsApp node was withheld");
+  assert.ok(JSON.stringify(w.jobs[0]!.messages).includes(sessionNode("toc", 5)), "other sessions still reached step B");
 });

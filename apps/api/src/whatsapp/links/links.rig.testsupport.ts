@@ -7,7 +7,7 @@ import type { AddressInfo } from "node:net";
 import type { Users } from "@lkb/core";
 import { buildTestDeps, fakeKeyStore } from "../../fixtures.js";
 import type { VerifiedKey } from "../../auth.js";
-import { createServer } from "../../server.js";
+import { createServer, type ServerDeps } from "../../server.js";
 import { COOKIE_NAME_SECURE } from "../../user-accounts/cookie.js";
 import { csrfTokenFor } from "../../user-accounts/csrf.js";
 import { createSessionAuth } from "../../user-accounts/principal.js";
@@ -17,24 +17,25 @@ import { ORIGIN, SECRET, type Who } from "../../user-accounts/admin.testsupport.
 import { createArchiverClient } from "../archiver/client.js";
 import { loadArchiverConfig } from "../archiver/config.js";
 import { startFakeArchiver, type FakeArchiver } from "../archiver/fake-archiver.js";
+import type { EventsFeed } from "./events-router.js";
 import { createWhatsAppLinksRouter } from "./router.js";
 import { createLinksService, type LinksServiceDeps } from "./service.js";
-import { memoryLinksStore, NOTICE } from "./links.testsupport.js";
+import { memoryLinkData, memoryLinksStore, NOTICE } from "./links.testsupport.js";
 
-export async function linksRig(opts: { users: Users[]; keys?: Record<string, VerifiedKey>; fake?: FakeArchiver; linkDeps?: Partial<LinksServiceDeps>; noLinks?: boolean }) {
-  const clock = fakeClock(), mem = memorySessionStore(), lookup = memoryUsers(opts.users), store = memoryLinksStore();
+export async function linksRig(opts: { users: Users[]; keys?: Record<string, VerifiedKey>; fake?: FakeArchiver; linkDeps?: Partial<LinksServiceDeps>; noLinks?: boolean; events?: EventsFeed; deps?: Partial<ServerDeps> }) {
+  const clock = fakeClock(), mem = memorySessionStore(), lookup = memoryUsers(opts.users), store = memoryLinksStore(), data = memoryLinkData();
   const sessions = createSessionService({ store: mem.store, users: lookup, now: clock.now });
   const archiver = opts.fake ? createArchiverClient(loadArchiverConfig({ WHATSAPP_ARCHIVER_API_URL: opts.fake.url, WHATSAPP_ARCHIVER_API_TOKEN: opts.fake.token, WHATSAPP_ARCHIVER_API_ALLOW_PRIVATE_HTTP: "1" })!) : null;
   const logs: string[] = [];
   const log = { warn: (m: string, f?: unknown) => { logs.push(m + JSON.stringify(f ?? {})); }, error: (m: string, f?: unknown) => { logs.push(m + JSON.stringify(f ?? {})); } };
   const service = createLinksService({
-    store, archiver, notice: () => NOTICE, log, now: clock.now,
+    store, archiver, data, notice: () => NOTICE, log, now: clock.now,
     countActiveAdmins: async (t) => opts.users.filter(u => u.tenantId === t && u.status === "active" && u.role === "admin").length,
     userStatus: async (t, id) => { const u = opts.users.find(x => x._id === id && x.tenantId === t); return u ? { status: u.status, ...(u.role ? { role: u.role } : {}) } : null; },
     ...opts.linkDeps,
   });
   const userAccounts = { session: createSessionAuth({ sessions, cookie: { basePath: "", production: true }, csrf: { secret: SECRET, allowedOrigins: [ORIGIN] } }) };
-  const app = createServer(buildTestDeps({ keyStore: fakeKeyStore(opts.keys ?? {}), userAccounts, ...(opts.noLinks ? {} : { whatsappLinks: { service, notice: () => NOTICE } }) }));
+  const app = createServer(buildTestDeps({ keyStore: fakeKeyStore(opts.keys ?? {}), userAccounts, ...(opts.noLinks ? {} : { whatsappLinks: { service, notice: () => NOTICE } }), ...(opts.events ? { whatsappEvents: { feed: opts.events } } : {}), ...opts.deps }));
   const http = app.listen(0, "127.0.0.1"); await new Promise(r => http.once("listening", r));
   const base = `http://127.0.0.1:${(http.address() as AddressInfo).port}`;
   const live = new Map<string, { token: string; sessionId: string }>();
@@ -52,6 +53,6 @@ export async function linksRig(opts: { users: Users[]; keys?: Record<string, Ver
     try { json = JSON.parse(text) as Record<string, any>; } catch { /* not json */ }
     return { status: res.status, json, text, headers: res.headers };
   }
-  return { call, login, store, service, logs, clock, close: () => new Promise<void>(r => http.close(() => r())) };
+  return { call, login, store, data, service, logs, clock, close: () => new Promise<void>(r => http.close(() => r())) };
 }
 export { startFakeArchiver, NOTICE, createWhatsAppLinksRouter };

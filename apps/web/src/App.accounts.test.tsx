@@ -14,7 +14,7 @@ interface Req { method: string; path: string; body: unknown; auth: string | null
 
 function makeServer() {
   const users: U[] = [{ id: "u-admin", name: "Ada Admin", email: "ada@x.org", password: "correct horse battery", status: "active", role: "admin" }];
-  const st = { sid: null as string | null, revokedSid: null as string | null, logoutFails: false, cookiesWork: true, blockLogin: null as null | { status: number; body: unknown }, reqs: [] as Req[], tokens: new Map<string, string>(), n: 0 };
+  const st = { sid: null as string | null, revokedSid: null as string | null, logoutFails: false, cookiesWork: true, blockLogin: null as null | { status: number; body: unknown }, featureDenied: new Map<string, { status: number; body: unknown }>(), reqs: [] as Req[], tokens: new Map<string, string>(), n: 0 };
   const json = (status: number, body: unknown) => new Response(JSON.stringify(body), { status, headers: { "content-type": "application/json" } });
   const sessionUser = () => users.find((u) => st.sid && st.sid === `sid-${u.id}`);
   const sessionBody = (u: U) => ({ state: u.status, user: { id: u.id, displayName: u.name, role: u.role }, csrfToken: `csrf-${st.sid}` });
@@ -53,6 +53,8 @@ function makeServer() {
     if (method !== "GET" && h.get("x-lkb-csrf") !== `csrf-${st.sid}`) return json(403, { error: "csrf", message: "missing or invalid CSRF proof" });
     if (path === "/auth/logout") { if (st.logoutFails) return json(500, { error: "internal", message: "x" }); st.sid = null; return json(200, { ok: true }); }
     if (me.status !== "active") return json(403, { error: "account_not_active", message: "x" });
+    const denied = st.featureDenied.get(path); // a feature route that refuses a person whose session is alive (ISS-UAWEB-001)
+    if (denied) return json(denied.status, denied.body);
     if (me.role === "viewer" && method !== "GET") return json(403, { error: "read_only_role", message: "x" });
     if (path.startsWith("/admin/users") && method === "GET") {
       if (me.role !== "admin") return json(403, { error: "forbidden", message: "x" });
@@ -220,6 +222,58 @@ describe("revoked session (item 5)", () => {
     await new Promise((r) => setTimeout(r, 150));
     expect(server.st.reqs.length).toBe(calls); // quiet: nothing keeps retrying
     expect(paths().filter((p) => p === "GET /auth/session").length).toBeLessThanOrEqual(3);
+  });
+});
+
+describe("a feature route's 401/403 is not a sign-out (ISS-UAWEB-001, C1/C2)", () => {
+  test("C1: /meeting-bot answers 401 unauthorized for a live cookie session: the page shows the feature unavailable, the person stays signed in, and signing in at that URL does not bounce", async () => {
+    server.st.featureDenied.set("/meeting-bot/capture-readiness", { status: 401, body: { error: "unauthorized" } });
+    const user = userEvent.setup();
+    visit("/meeting-bot");
+    await signIn(user, "ada@x.org", "correct horse battery"); // signed out -> /login -> back to /meeting-bot
+    await waitFor(() => expect(paths()).toContain("GET /meeting-bot/capture-readiness"));
+    await waitFor(() => expect(paths()).toContain("GET /auth/session")); // the identity probe, answered 200: the session is alive
+    await screen.findByText(/Capture review is unavailable/);
+    expect(window.location.pathname).toBe("/meeting-bot");
+    expect(screen.queryByRole("button", { name: "Sign in" })).not.toBeInTheDocument();
+    expect(screen.queryByText(/signed out/i)).not.toBeInTheDocument();
+    const calls = server.st.reqs.length;
+    await new Promise((r) => setTimeout(r, 200));
+    expect(window.location.pathname).toBe("/meeting-bot"); // no bounce after the dust settles
+    expect(server.st.reqs.length).toBe(calls);
+    expect(server.st.sid).not.toBeNull(); // the cookie session was never touched
+  });
+
+  test("C1: a 403 from a feature route keeps the person signed in and shows the permission message", async () => {
+    server.st.featureDenied.set("/meeting-bot/capture-readiness", { status: 403, body: { error: "forbidden", message: "x" } });
+    const user = userEvent.setup();
+    visit("/meeting-bot");
+    await signIn(user, "ada@x.org", "correct horse battery");
+    await screen.findByText(/needs permission to review capture slots/);
+    expect(window.location.pathname).toBe("/meeting-bot");
+    expect(screen.queryByRole("button", { name: "Sign in" })).not.toBeInTheDocument();
+  });
+
+  test("C2: the session really ends (revoked) while on /meeting-bot: back to sign-in with the reason", async () => {
+    const user = userEvent.setup();
+    visit("/ask");
+    await signIn(user, "ada@x.org", "correct horse battery");
+    await screen.findAllByLabelText("Question");
+    server.jar.revoke();
+    await user.click(screen.getAllByRole("link", { name: "Your account" })[0]!);
+    await screen.findByRole("button", { name: "Sign in" });
+    expect(screen.getByRole("alert")).toHaveTextContent("this session has ended");
+  });
+
+  test("C2: the cookie is simply gone (the API answers 401 unauthorized on a feature route AND on /auth/session): signed out, to sign-in", async () => {
+    const user = userEvent.setup();
+    visit("/meeting-bot");
+    await signIn(user, "ada@x.org", "correct horse battery");
+    await waitFor(() => expect(paths()).toContain("GET /meeting-bot/capture-readiness"));
+    server.st.sid = null; // the server forgot the session without telling this tab
+    await user.click(screen.getAllByRole("link", { name: "Your account" })[0]!);
+    await screen.findByRole("button", { name: "Sign in" });
+    expect(screen.getByRole("alert")).toHaveTextContent("sign in required");
   });
 });
 

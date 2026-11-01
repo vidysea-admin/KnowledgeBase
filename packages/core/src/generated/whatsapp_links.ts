@@ -29,6 +29,16 @@ export type WhatsappLinks = (
     | {
         [k: string]: unknown;
       }
+  ) &
+  (
+    | {
+        state?: "unlinked" | "revoked";
+        [k: string]: unknown;
+      }
+    | {
+        archiverUnlinkPending?: false;
+        [k: string]: unknown;
+      }
   ) & {
     /**
      * Link id (24-hex, R-45). Also the archiver ownerRef (R-11).
@@ -84,6 +94,10 @@ export type WhatsappLinks = (
     revokedAt?: string;
     revokedBy?: string;
     revokedReason?: string;
+    /**
+     * R-7/R-8 follow-through: set together with the move to unlinked|revoked while the archiver unlinkSession step is still owed; unset once the archiver confirmed (or answered owner_not_found/owner_unlinked). Only meaningful on a terminal link; the sync scheduler retries every tenant that still has one (W9). Never set when another link carries the same archiverOwnerId.
+     */
+    archiverUnlinkPending?: boolean;
     /**
      * R-8: a revoked link sets this; the person cannot request a new link until an admin clears it.
      */

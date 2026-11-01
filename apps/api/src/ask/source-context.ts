@@ -106,11 +106,12 @@ export function createSourceHydrator(tenantId: string, deps: { db?: ReadDb; embe
     const refs = new Set(nodes.map((n) => n.evidence?.sessionRef));
     if ([...refs].some((r) => !nonempty(r)) || refs.size !== nodes.length) throw new BoundedAskError("ambiguous session source identity");
     const sessionIds = [...refs] as string[];
-    const db = deps.db ?? getDb();
+    const db = deps.db ?? getDb(), visibility = createKnowledgeVisibility(db);
     // Query both collections by exact admitted session IDs and tenant-scoped wrappers.
     const rawRows = await scopedCollection<Turns>(db as never, "turns")(tenantId).find({ sessionId: { $in: sessionIds } }).toArray();
     for (const row of rawRows) assertInScope(row, tenantId, new Set(sessionIds)); // typed scope refusal before any review-overlay read
-    const visibility = createKnowledgeVisibility(db);
+    // W11/R-32 G2: a session with text whose WhatsApp link is not studentData "no" (or unresolvable) never reaches an external model; the refusal carries no content.
+    if ((await Promise.all([...new Set(rawRows.map((row) => row.sessionId))].map((id) => visibility.externalModelEligibleSession(tenantId, id)))).includes(false)) throw new BoundedAskError("admitted session is unavailable for external-model use");
     const effective = await readEffectiveTurns(db, tenantId, rawRows);
     // D-153: the visibility gate only ever sees well-formed rows (it would silently drop malformed ones). A malformed
     // row is RETAINED, to be excluded with a per-turn warning below, only when its whole session is visible; a malformed

@@ -1,0 +1,65 @@
+# Manifest — wa-selection-api
+**Contract:** none specific; `docs/features/whatsapp-multiuser/plan.md` W6 (acceptance 1-6) and `spec.md` R-15..R-21. Gates: `wa-revoked-link-read-access` (only `active` links give their owner selection access; an admin passes), H-4 (`qa/gates/wa-self-approval.md`, not touched here).
+**Goal task:** whatsapp-multiuser W6 `wa-selection-api`
+**Date:** 2026-10-30
+**Policy-Version:** proportional-verification/2026-10-19.17
+**Status:** checked-PASS
+**Handshake status:** checked-PASS
+**Fix cycle:** 0
+**Dual check:** required
+dual-trigger: tenancy apps/api/src/whatsapp/selection/service.ts:54
+**Persona walk:** skip (API only; the screens are W10)
+**Issues addressed:** none
+**Executor:** claude-sonnet (build unit, worktree `.worktrees/wa-selection-api`, branch `wave/wa-selection-api`, base 8ca1dcc5 = head of `wave/wa-links-api`)
+**Round:** one round, est 120 min, tier H by the tenancy trigger and because the selection decides what is captured.
+
+## Criteria
+- W6-1 Only the owner's session marks/unmarks; admin, other member, viewer, and any key are refused; an admin can read the marked list but not change it (R-20).
+- W6-2 The KB makes **no write to the archiver database** (grep-asserted in the test; the Mongo credential in the test is read-only and a write attempt through it fails); all selection writes go through the client; the KB stores no copy of the selection (no collection or field holds it).
+- W6-3 `jid` and `personId` validated before the call; a jid not in the owner's `listGroups` is 404.
+- W6-4 Each change writes one `selection.changed` event carrying counts only; payload test (R-39).
+- W6-5 With the archiver API down: 503 `archiver_api_unavailable`, no partial local state.
+- W6-6 Idempotent: marking an already-marked group changes nothing and returns 200.
+
+## What changed (base 8ca1dcc5, head 1d557bbf)
+- `apps/api/src/whatsapp/selection/router.ts` (94 lines, fills the W5 stub): `GET /whatsapp/links/:id/groups` (owner or admin), `PUT /whatsapp/links/:id/groups/:jid`, `GET` and `PUT /whatsapp/links/:id/groups/:jid/people` (owner only, `whatsapp-link` scope); strict bodies (unknown field -> 400), no-store, generic 503 on a thrown error; `buildWhatsAppSelection(env, db, log)` production factory (link lookup = the W5 store used read-only via `get`, archiver client from env, the only KB write is the event insert). With no deps it returns the EMPTY router W5 mounted and pinned (`links/router.test.ts:154`), so nothing changes until the composition wires it (open point 1).
+- NEW `apps/api/src/whatsapp/selection/service.ts` (153): authority in one place (`access`, line 54): tenant-scoped link lookup; the owner of an ACTIVE link reads and writes; an admin who is not the owner reads the MARKED groups only and is refused every write (403) and the people routes (403); anyone else gets 404; a key never writes; `archiverOwnerId` is read from the link row only; `listGroups` is called before every write so a jid outside the owner's list is 404 and `groupCount/markedCount` come with no extra call; a no-op request short-circuits (200, `changed:false`, no write, no event); archiver errors map to a closed set (429 `archiver_busy`, 409 `archiver_owner_unavailable`, 404 `group_not_found`/`person_not_found`, else 503 `archiver_api_unavailable`); the event is written after the change and a failure is logged by code only.
+- NEW `apps/api/src/whatsapp/selection/router.test.ts` (366): 17 tests over the REAL `createServer` (requireAuth, CSRF, viewer read-only) with the selection router in the `whatsappReview` slot (the same post-auth mount point), an in-memory links store, and the in-repo fake archiver through the real W3 client.
+- Not touched: `links/*`, `routes.ts`, `server.ts`, W7 files, `owner-config.ts`, `sync-links.mjs`, `docker-compose.yml`.
+
+## Evidence
+Pre-check[W6-1]: 1d557bbf node --test --import tsx src/whatsapp/selection/router.test.ts -> 17 passed, 0 failed
+Pre-check[W6-2]: 1d557bbf node --test --import tsx src/whatsapp/selection/router.test.ts -> 17 passed, 0 failed
+Pre-check[W6-3]: 1d557bbf node --test --import tsx src/whatsapp/selection/router.test.ts -> 17 passed, 0 failed
+Pre-check[W6-4]: 1d557bbf node --test --import tsx src/whatsapp/selection/router.test.ts -> 17 passed, 0 failed
+Pre-check[W6-5]: 1d557bbf node --test --import tsx src/whatsapp/selection/router.test.ts -> 17 passed, 0 failed
+Pre-check[W6-6]: 1d557bbf node --test --import tsx src/whatsapp/selection/router.test.ts -> 17 passed, 0 failed
+Regression: 1d557bbf node --test --import tsx src/whatsapp/selection/router.test.ts src/whatsapp/links/router.test.ts src/whatsapp/links/service.test.ts -> 41 passed, 0 failed (W5's own router test pins the empty stub and still passes); tsc --noEmit -p apps/api exit 0; node scripts/lint-loc.mjs --all ok; pnpm lint:structure OK (10 stages, 0 failed)
+Tests[W6-1]: apps/api/src/whatsapp/selection/router.test.ts — owner mark/unmark through the archiver; refusal matrix (admin 403, other member 404, viewer 403, pending 403, other-tenant admin and member 404, four keys 403, anonymous 401) with zero archiver writes and zero events; admin marked-only read with canEdit false; the active-only gate over six non-active states plus an admin-owner on a suspended link; the CSRF matrix (no token, forged, foreign origin, no origin) on both PUT routes; strict-body and mass-assignment matrix
+Tests[W6-2]: apps/api/src/whatsapp/selection/router.test.ts — link rows byte-identical before and after selection traffic, every write recorded at the client spy with the link row's owner id, and a source assertion (no Mongo write verb, no driver import in the service, no archiver DB name or collection in router.ts or service.ts)
+Tests[W6-3]: apps/api/src/whatsapp/selection/router.test.ts — malformed jid and link-id matrix (400/404, zero archiver writes), person id matrix (non-hex, duplicate, 1001, non-array -> 400), a jid of another owner in the same tenant -> 404 on both owners' links, unknown person -> 404, unmarked group -> 409
+Tests[W6-4]: apps/api/src/whatsapp/selection/router.test.ts — exact event shape and actor; data keys limited to groupCount, markedCount, count and all integers; canary jid, subject, person label, phone, person id, owner id and archiver token absent from events and logs; a failing event write is logged by code and does not fail or undo the change; a write the archiver reports unchanged writes no event (service-level stub)
+Tests[W6-5]: apps/api/src/whatsapp/selection/router.test.ts — dead archiver (unreachable port) on all four routes, fake store_unavailable, and no archiver client configured; link rows byte-identical, zero events, no upstream text in the body
+Tests[W6-6]: apps/api/src/whatsapp/selection/router.test.ts — second mark and second unmark return 200 changed false; the spy shows one archiver write per real change and the event count stays at one per change
+Falsification[W6-1]: per mutation via scripts/lib/mutate.mjs (apply, edit, run, restore), with git hash-object equal to git rev-parse HEAD after each. Removed the admin-write refusal -> `C1 refusals` and `C1 gate` red; removed the not-owner-not-admin 404 -> `C1 refusals`, `C1 admin reads`, `C3` red; removed the key/session write guard -> `C1 refusals` red; dropped the owner non-active gate for reads -> `C1 gate` red; removed the separate write gate for an admin-owner -> SURVIVED the first suite, so the `admin who OWNS a non-active link` test was added, then red; tenant taken from a constant -> `C1 admin reads` and `C1 refusals` red; admin view returns unmarked groups -> `C1 admin reads` red; router accepts tenantId and archiverOwnerId in the body -> `C1/C3 validation` red. All restored, hashes equal HEAD.
+Falsification[W6-2]: the criterion is a set of absence claims. Not mutated for the source assertion (it fails if a Mongo write verb or a driver import is introduced; checked by reading, not by a mutant). The client-spy and byte-identity tests redden if a write bypasses the client or a link row stores selection. NOT shown: the read-only-credential failed-write probe (open point 2).
+Falsification[W6-3]: skipped the in-list group check -> `C3 a jid that is not in THIS owner's group list` red (the archiver would also 404, the spy catches the extra call); person id check relaxed to string-only -> `C1/C3 validation` red; removed the marked-group requirement for people -> `C3 people` red.
+Falsification[W6-4]: put jid into the event data -> `C4/C6 events` red; emitted the event on every call regardless of changed -> SURVIVED until the service-level `unchanged write writes no event` test was added, then red.
+Falsification[W6-5]: changed the ARCHIVER_DOWN status from 503 to 500 -> `C5 archiver down` red. A mutant swallowing the archiver error as success was not applied (its multi-line pattern did not match under CRLF); the dead-archiver and store_unavailable cases assert the error code and the unchanged rows instead.
+Falsification[W6-6]: removed the `same` short-circuit -> `C4/C6 events` red (extra archiver write seen by the spy); restored, hash equal HEAD.
+
+Mutation method (D-020 and the 2026-09-28 amendment): 17 mutant runs, each applied and restored on its own through scripts/lib/mutate.mjs (restore is a git checkout of the committed file, never a run-scoped backup, no trap EXIT), a 120 s timeout on every test run, `git hash-object` equal to `git rev-parse HEAD:` after each, and `mutate.mjs assert-clean` reported "none outstanding" at the end. Four further attempts matched no text and changed nothing.
+Order note: the implementation was written before the tests in this unit (not strict TDD); the tests were then falsified by the mutants above, and the two gaps they exposed were closed with added tests.
+Real-Mongo: not used. This unit adds no Mongo query beyond the W5 store's `get` (read) and the W1 events `insert`, both covered by the W1/W5 real-Mongo suites that this environment skips. No production data was touched.
+
+## Open points (declared, not defects)
+1. **Not wired in production, and routes.ts is not W6-owned.** `composition/integrations/routes.ts:74` still calls `createWhatsAppSelectionRouter()` with no argument, which returns the empty router, so `/whatsapp/links/:id/groups*` answer 404 in a running server. Wiring is two small edits outside W6: pass a new optional `IntegratedWorkflows` field (type `SelectionRouterDeps`, built by `buildWhatsAppSelection(env, db, log)` in the composition that calls `buildWhatsAppLinks`) into `createWhatsAppSelectionRouter(...)`, and update the W5 pin `links/router.test.ts:154` (`createWhatsAppSelectionRouter().stack.length === 0`), which holds only while unwired. The tests here mount the real router through the `whatsappReview` slot of `createServer`, the same post-auth point.
+2. **The read-only credential probe (W6 criterion 2, second half) is not shown.** It needs a real Mongo with a read-only user; none exists in this environment and the only reachable Mongo is production (untouched). What IS shown: no write verb, driver import or archiver DB name in the selection source, link rows unchanged by traffic, every write observed at the client. The failed-write probe belongs with the R-43 startup probe (W13/W14).
+3. **`selection.changed` is not in `links/service.ts` `EventType`.** W6 defines its own `SelectionEvent` and inserts through the W1 events accessor (the closed schema and `EVENT_DATA_KEYS` already allow the type and groupCount, markedCount, count). W12 may want one event writer; unifying is for W12.
+4. **Decisions made where the plan was silent [ASSUMPTION]:** an admin sees only the MARKED groups (jid, subject, counts) and never the people routes; an admin who owns a non-active link gets the admin read only; a non-active link answers its owner 409 `link_not_active` (not 404) because the owner can already see that state on `GET /whatsapp/links/:id`; the people routes require the group to be marked (409 `group_not_marked`).
+5. **Truncated group list.** The archiver caps `listGroups` at 2000; a jid beyond the cap reads as 404 `group_not_found`. Acceptable at the stated N <= 10 owners; flagged for W10.
+6. **Small TOCTOU.** Link state is read, then the archiver is called; a suspend or unlink landing between the two lets one in-flight change through. W8's `unlinkSession` disables capture at the archiver, which bounds it.
+7. **The event write is best-effort after the change** (same rule as W5): state is authoritative in the archiver, so a failed `selection.changed` write is logged by code and the change stands; a no-op request writes no event.
+8. **No KB-side rate limit** on selection calls; the archiver's own per-owner limits surface as 429 `archiver_busy` with Retry-After.
+9. **The fake archiver proves the KB side of the contract only**; nothing here claims archiver-side behaviour (per-owner group scoping, idempotency by key) beyond what the contract document states.
+10. No checkers or reviewers were dispatched by this unit; the maker owns that.

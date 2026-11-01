@@ -7,10 +7,11 @@
 import { AsyncLocalStorage } from "node:async_hooks";
 import type { Db } from "mongodb";
 import type { Router } from "express";
-import { getDb } from "@lkb/db";
+import { getDb, whatsAppLinkStores } from "@lkb/db";
 import type { WhatsAppRouteDeps } from "../../routes/whatsapp.js";
 import { createMongoWhatsAppDeps, fetchWhatsAppMessages, type WhatsAppStoreOptions } from "../store.js";
 import { createWhatsAppRawAccess, WhatsAppAmbiguousLinkError, WhatsAppGroupNotFoundError, type WhatsAppRawAccess } from "../owner-config.js";
+import type { EventSink } from "../links/events-router.js";
 import { createReviewedWhatsAppDeps } from "./ingest.js";
 import { WHATSAPP_REVIEW_LOG } from "./invalidate.js";
 import { materializeWhatsAppClaim } from "./materializer.js";
@@ -27,8 +28,10 @@ export interface WhatsAppReviewWiring {
   forceIngestGroup: WhatsAppRouteDeps["ingestGroup"];
 }
 
-export function createWhatsAppReviewWiring(options: WhatsAppStoreOptions & { now?: () => string; maxDeleteFraction?: number; access?: WhatsAppRawAccess }): WhatsAppReviewWiring {
+export function createWhatsAppReviewWiring(options: WhatsAppStoreOptions & { now?: () => string; maxDeleteFraction?: number; access?: WhatsAppRawAccess; appendEvent?: EventSink }): WhatsAppReviewWiring {
   const appDb: () => Db = options.appDb ?? getDb;
+  // W12 (R-38): candidate events go to the append-only whatsapp_events by default (best effort, tenant-scoped by the accessor).
+  const appendEvent: EventSink = options.appendEvent ?? (async (tenantId, event) => { await whatsAppLinkStores(appDb()).events(tenantId).insert(event); });
   const repository = createMongoWhatsAppReviewRepository(appDb(), { materialize: materializeWhatsAppClaim, ...(options.now ? { now: options.now } : {}) });
   // No indexer is passed: WhatsApp content reaches claims only through per-candidate approval.
   // The fetched snapshot is the authority for upstream deletions; capture it per ingest call without touching the base store.
@@ -41,11 +44,11 @@ export function createWhatsAppReviewWiring(options: WhatsAppStoreOptions & { now
     return messages;
   };
   const base = createMongoWhatsAppDeps(undefined, { ...options, appDb, fetchMessages });
-  const reviewed = createReviewedWhatsAppDeps({ base, appDb, repository, ...(options.now ? { now: options.now } : {}), ...(options.maxDeleteFraction !== undefined ? { maxDeleteFraction: options.maxDeleteFraction } : {}),
+  const reviewed = createReviewedWhatsAppDeps({ base, appDb, repository, appendEvent, ...(options.now ? { now: options.now } : {}), ...(options.maxDeleteFraction !== undefined ? { maxDeleteFraction: options.maxDeleteFraction } : {}),
     async withSnapshot(run) { const store: { ids?: Set<string> } = {}; const value = await snapshot.run(store, run); return { value, messageIds: store.ids }; } });
   return {
     whatsapp: { listGroups: reviewed.listGroups, ingestGroup: reviewed.ingestGroup }, forceIngestGroup: reviewed.forceIngestGroup,
-    reviewRouter: createWhatsAppReviewRouter(repository, options.access ?? createWhatsAppRawAccess(appDb())), repository,
+    reviewRouter: createWhatsAppReviewRouter(repository, options.access ?? createWhatsAppRawAccess(appDb()), appendEvent), repository,
     async repairPendingInvalidations(tenantId) {
       const log = appDb().collection<{ _id: string; groupJid: string; tenantId: string; linkId?: unknown }>(WHATSAPP_REVIEW_LOG);
       const markers = await log.find({ tenantId, kind: "pending-invalidation" } as never).toArray();

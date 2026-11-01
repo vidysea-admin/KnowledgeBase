@@ -151,7 +151,7 @@ function matchesDoc(doc: Doc, filter: Doc): boolean {
     if (k === "$or") return (v as Doc[]).some((f) => matchesDoc(doc, f));
     const d = doc[k];
     if (v && typeof v === "object" && !Array.isArray(v) && Object.keys(v).some((x) => x.startsWith("$"))) {
-      return Object.entries(v as Doc).every(([op, arg]) => op === "$exists" ? (d !== undefined) === arg : op === "$ne" ? d !== arg : op === "$gt" ? d > arg : op === "$gte" ? d >= arg : op === "$lt" ? d < arg : (() => { throw new Error(`unsupported ${op}`); })());
+      return Object.entries(v as Doc).every(([op, arg]) => op === "$exists" ? (d !== undefined) === arg : op === "$in" ? (arg as unknown[]).includes(d) : op === "$ne" ? d !== arg : op === "$gt" ? d > arg : op === "$gte" ? d >= arg : op === "$lt" ? d < arg : (() => { throw new Error(`unsupported ${op}`); })());
     }
     return JSON.stringify(d) === JSON.stringify(v);
   });
@@ -161,6 +161,7 @@ function accountsDb() {
   const rows = (n: string): Doc[] => { let r = store.get(n); if (!r) store.set(n, r = []); return r; };
   const db = { collection: (name: string) => ({
     findOne: async (f: Doc) => rows(name).find((d) => matchesDoc(d, f)) ?? null,
+    find: (f: Doc) => { const chain = { sort: () => chain, limit: () => chain, toArray: async () => rows(name).filter((d) => matchesDoc(d, f)).map((d) => ({ ...d })) }; return chain; },
     insertOne: async (d: Doc) => { rows(name).push({ ...d }); return { insertedId: d._id }; },
     updateOne: async (f: Doc, u: Doc) => { const d = rows(name).find((x) => matchesDoc(x, f)); if (!d) return { matchedCount: 0, modifiedCount: 0 };
       Object.assign(d, u.$set ?? {}); for (const k of Object.keys(u.$unset ?? {})) delete d[k]; return { matchedCount: 1, modifiedCount: 1 }; },
@@ -175,9 +176,9 @@ function accountsDb() {
 
 const UA_ENV = { AUTH_CSRF_SECRET: "s".repeat(48), USER_SIGNUP_TENANT: "toc", APP_PUBLIC_ORIGIN: "https://kb.example.org", APP_BASE_PATH: "/knowledgebase", NODE_ENV: "production" };
 
-async function adminRig() {
+async function adminRig(onAccountChange?: Parameters<typeof buildUserAccounts>[3]) {
   const { db, rows } = accountsDb();
-  const ua = buildUserAccounts(UA_ENV, db, { warn: () => {} });
+  const ua = buildUserAccounts(UA_ENV, db, { warn: () => {}, error: () => {} }, ...(onAccountChange ? [onAccountChange] as const : []));
   assert.ok(ua?.adminRouter && ua.auth, "user accounts composed");
   const now = new Date().toISOString(), base = { tenantId: "toc", createdAt: now, updatedAt: now, displayName: "x", statusChangedAt: now };
   rows("users").push({ ...base, _id: "admin1", emailNormalized: "admin@example.org", status: "active", role: "admin" });
@@ -220,5 +221,31 @@ test("P-3 ISS-UAADMIN-005: A4 failed logins lock an address; the buildUserAccoun
     const link = await r.post("/admin/users/target1/issue-link", { session: true, body: { purpose: "password_reset" } });
     assert.equal(link.status, 200, JSON.stringify(link.json));
     assert.ok(String(link.json!.link).startsWith("https://kb.example.org/knowledgebase/"), `link origin + base path: ${String(link.json!.link).replace(/#.*/, "")}`);
+  } finally { await r.close(); }
+});
+
+test("R-10 composition: buildUserAccounts wires the admin router to the WhatsApp links coupling by default - disabling the owner through /admin suspends their ACTIVE link, enabling resumes nothing", async () => {
+  const r = await adminRig(); // no hook injected: the composition default is what runs
+  try {
+    const now = new Date().toISOString();
+    r.rows("whatsapp_links").push({ _id: "lnk-1", tenantId: "toc", userId: "target1", state: "active", live: true, label: "Mine", studentData: "no", createdAt: now, updatedAt: now },
+      { _id: "lnk-2", tenantId: "toc", userId: "admin1", state: "active", live: true, label: "Admin's", studentData: "no", createdAt: now, updatedAt: now });
+    const off = await r.post("/admin/users/target1/disable", { session: true });
+    assert.equal(off.status, 200, JSON.stringify(off.json));
+    const link = r.rows("whatsapp_links").find((l) => l._id === "lnk-1")!;
+    assert.deepEqual([link.state, link.live, link.suspendedReason, link.suspendedBy], ["suspended", true, "account_inactive", "system:account"]);
+    assert.equal(r.rows("whatsapp_links").find((l) => l._id === "lnk-2")!.state, "active", "another user's link is untouched");
+    assert.deepEqual(r.rows("whatsapp_events").map((e) => [e.eventType, e.linkId, e.tenantId]), [["link.suspended", "lnk-1", "toc"]]);
+    assert.equal((await r.post("/admin/users/target1/enable", { session: true })).status, 200);
+    assert.equal(link.state, "suspended", "re-enabling the account resumes nothing");
+  } finally { await r.close(); }
+});
+
+test("R-10 composition: an injected onAccountChange replaces the default and receives the post-change account", async () => {
+  const seen: unknown[][] = [];
+  const r = await adminRig(async (...a) => { seen.push(a); });
+  try {
+    assert.equal((await r.post("/admin/users/target1/role", { session: true, body: { role: "viewer" } })).status, 200);
+    assert.deepEqual(seen, [["toc", "target1", { status: "active", role: "viewer" }]]);
   } finally { await r.close(); }
 });

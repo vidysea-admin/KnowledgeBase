@@ -3,17 +3,19 @@
  * requireAuth + rate limiter, so req.auth is verified and the session guards (CSRF on every unsafe method, non-active,
  * viewer read-only) have already run on the full path. This file checks scopes, shapes strict bodies (unknown fields -> 400,
  * no tenant or owner id from a body), maps Result -> HTTP and never echoes provider text. All responses are no-store: link rows
- * are personal and /connect carries the pairing QR, a capture credential (R-13).
+ * are personal and /connect carries the pairing QR, a capture credential (R-13). Since W8 this file also holds the Mongo LinksStore adapter and
+ * wires the link data port (moved out of service.ts, which sits at the 300-line budget).
  */
 import { Router, type NextFunction, type Request, type RequestHandler, type Response } from "express";
-import { findUserById, users } from "@lkb/db";
+import { findUserById, isLiveLinkState, users, whatsAppLinkStores } from "@lkb/db";
 import type { Db } from "mongodb";
 import { actorId, isValidTenantId, requireScope } from "../../auth.js";
 import type { Logger } from "../../composition/logger.js";
 import { createArchiverClient } from "../archiver/client.js";
 import { loadArchiverConfig } from "../archiver/config.js";
 import { tryLoadNotice, type Notice } from "./notice.js";
-import { createLinksService, createMongoLinksStore, REASON_RE, type LinksService, type LinksServiceDeps, type Principal, type Result, type StudentData } from "./service.js";
+import { createLinkDataPort } from "../review/store.js";
+import { createLinksService, LiveLinkExistsError, REASON_RE, type Guard, type LinkRow, type LinksService, type LinksServiceDeps, type LinksStore, type Principal, type Result, type StudentData } from "./service.js";
 
 const hasControl = (s: string): boolean => [...s].some(c => { const n = c.charCodeAt(0); return n < 32 || (n >= 127 && n <= 159) || n === 0x2028 || n === 0x2029; });
 const USER_ID_RE = /^[A-Za-z0-9_.:@-]{1,200}$/;
@@ -111,11 +113,59 @@ export function buildWhatsAppLinks(env: Record<string, string | undefined>, db: 
   try { const cfg = loadArchiverConfig(env); archiver = cfg ? createArchiverClient(cfg) : null; } catch { log.warn("whatsapp links: archiver service API config is invalid, connect answers 503"); }
   const notice = tryLoadNotice(undefined, env);
   if (!notice) log.warn("whatsapp links: notice file unreadable, link requests answer 503");
-  const service = createLinksService({
-    store: createMongoLinksStore(db), archiver, notice: () => notice, log,
-    countActiveAdmins: (tenantId) => users(tenantId, db).countDocuments({ status: "active", role: "admin" }),
-    userStatus: async (tenantId, userId) => { const u = await findUserById(tenantId, userId, db); return u ? { status: u.status, ...(u.role ? { role: u.role } : {}) } : null; },
-    ...overrides,
-  });
+  const service = createLinksService({ store: createMongoLinksStore(db), archiver, data: createLinkDataPort(db), notice: () => notice, log, ...mongoUserDeps(db), ...overrides });
   return { service, notice: () => notice };
+}
+
+const mongoUserDeps = (db: Db): Pick<LinksServiceDeps, "countActiveAdmins" | "userStatus"> => ({
+  countActiveAdmins: (tenantId) => users(tenantId, db).countDocuments({ status: "active", role: "admin" }),
+  userStatus: async (tenantId, userId) => { const u = await findUserById(tenantId, userId, db); return u ? { status: u.status, ...(u.role ? { role: u.role } : {}) } : null; },
+});
+
+/**
+ * R-10 production hook (W8): the account admin calls it after a disable / reject / role change. It suspends the user's ACTIVE links over the same Mongo store
+ * as the links router. It needs no archiver and no notice (suspending touches only the link row and its event), so nothing here starts a connect surface.
+ */
+export function buildAccountCoupling(db: Db, log: Pick<Logger, "warn" | "error">): (tenantId: string, userId: string, to: { status: string; role?: string }) => Promise<number> {
+  return createLinksService({ store: createMongoLinksStore(db), archiver: null, data: createLinkDataPort(db), notice: () => null, log, ...mongoUserDeps(db) }).accountChanged;
+}
+
+const isDupKey = (e: unknown): boolean => (e as { code?: unknown } | null)?.code === 11000;
+const GUARDS: Record<Guard, Record<string, unknown>> = { owner_id: { archiverOwnerId: { $type: "string" } }, activated: { activatedAt: { $type: "string" } }, needs_relink: { "health.flags": "needs-relink" }, legacy: { userId: null } };
+
+/** Mongo LinksStore over the W1 accessors (every query is tenant-scoped by scopedCollection). The unique partial indexes are the R-2 authority. */
+export function createMongoLinksStore(db: Pick<Db, "collection">): LinksStore {
+  const s = whatsAppLinkStores(db);
+  const get = async (t: string, id: string): Promise<LinkRow | null> => (await s.getLink(t, id)) as unknown as LinkRow | null;
+  const rows = async (c: ReturnType<ReturnType<typeof s.links>["find"]>): Promise<LinkRow[]> => (await c.toArray()) as unknown as LinkRow[];
+  return {
+    get,
+    async insert(t, row) {
+      const { _id, live: _l, studentData: _s, ...rest } = row as LinkRow;
+      try { return (await s.insertLink(t, { ...rest, ...(_id ? { _id } : {}) } as never)) as unknown as LinkRow; }
+      catch (e) { throw isDupKey(e) ? new LiveLinkExistsError() : e; }
+    },
+    listForUser: (t, userId) => rows(s.links(t).find({ userId } as never).sort({ createdAt: -1, _id: -1 }).limit(50)),
+    listAll: (t, limit) => rows(s.links(t).find({}).sort({ createdAt: -1, _id: -1 }).limit(limit)),
+    hasBlockingLink: async (t, userId) => (await s.links(t).findOne({ userId, state: "revoked", blocksNewRequests: true } as never)) !== null,
+    async transition(t, id, tr) {
+      const filter: Record<string, unknown> = { _id: id, state: { $in: [...tr.from] }, ...Object.assign({}, ...(tr.require ?? []).map(g => GUARDS[g])) };
+      const update: Record<string, unknown> = { $set: { ...tr.set, state: tr.to, live: isLiveLinkState(tr.to), updatedAt: new Date().toISOString() } };
+      if (tr.unset?.length) update.$unset = Object.fromEntries(tr.unset.map(k => [k, ""]));
+      try { if ((await s.links(t).updateOne(filter as never, update as never)).matchedCount !== 1) return null; }
+      catch (e) { throw isDupKey(e) ? new LiveLinkExistsError() : e; }
+      return get(t, id);
+    },
+    async setOwnerId(t, id, ownerId) {
+      try {
+        const r = await s.links(t).updateOne({ _id: id, state: { $in: ["approved", "active", "suspended"] }, archiverOwnerId: { $exists: false } } as never, { $set: { archiverOwnerId: ownerId, updatedAt: new Date().toISOString() } } as never);
+        if (r.matchedCount === 1) return "set";
+      } catch (e) { if (isDupKey(e)) return "conflict"; throw e; }
+      const cur = await get(t, id);
+      return !cur || !cur.archiverOwnerId ? "gone" : cur.archiverOwnerId === ownerId ? "same" : "conflict";
+    },
+    async appendEvent(t, e) { await s.events(t).insert(e as never); },
+    async touch(t, id, from) { return (await s.links(t).updateOne({ _id: id, state: { $in: [...from] } } as never, { $set: { updatedAt: new Date().toISOString() } } as never)).matchedCount === 1; },
+    async ownerInUseByOther(t, ownerId, exceptLinkId) { return (await s.links(t).findOne({ archiverOwnerId: ownerId, _id: { $ne: exceptLinkId } } as never)) !== null; },
+  };
 }

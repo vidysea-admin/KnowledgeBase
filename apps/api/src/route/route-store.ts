@@ -156,6 +156,15 @@ export function createRouteDeps(deps: RouteStoreDeps): RouteDeps {
       return new Set(checked.filter(([, ok]) => ok).map(([id]) => id));
     };
 
+    // H-14 / ISS-WARLG-001: step B sends routing text to an EXTERNAL model, and the index (fresh, warm in-process or persisted) is blind to link
+    // transitions, so eligibility is re-read per request here. A fresh `createKnowledgeVisibility` (never `deps.visibility`, whose memo could outlive a
+    // request); it reads the live whatsapp_links row. Fail closed: a throw, a read error or the half of the remaining budget it is allowed means "not eligible".
+    const external = createKnowledgeVisibility(db);
+    const externalGate = async (ids: readonly string[]): Promise<Set<string>> => {
+      const checked = await Promise.all(ids.map(async (id) => { const r = await settle(() => external.externalModelEligibleSession(tenantId, id), Math.floor(left() / 2)); return [id, r.ok && r.value === true] as const; }));
+      return new Set(checked.filter(([, ok]) => ok).map(([id]) => id));
+    };
+
     const index = await indexFor(tenantId, ctl.deadlineAt);
     check();
     const a = routeStepA(index, query);
@@ -164,7 +173,7 @@ export function createRouteDeps(deps: RouteStoreDeps): RouteDeps {
     if (!a.confident && deps.complete && left() > 100) {
       usedLlm = true;
       try {
-        const root = frontierRoot(index, a, await gate(index.sessionIds), tenantId);
+        const root = frontierRoot(index, a, await externalGate([...await gate(index.sessionIds)]), tenantId);
         check(); // a request abort that landed during the gate must not start the model call (the listener below would never fire)
         if (!root.children.length) llmFailed = true;
         else {

@@ -1,0 +1,62 @@
+import assert from "node:assert/strict";
+import { test } from "node:test";
+import type { TreeIndexNode } from "@lkb/core";
+import { createKnowledgeVisibility } from "./knowledge.js";
+import { createExternalModelTreeStore } from "../store.js";
+import { indexSession } from "../indexing/session.js";
+import { TENANT, WA_SESSION, WA_SOURCE, PUB_SESSION, PUB_SOURCE, waWorld } from "./wa-quarantine.testsupport.js";
+import { LINK_ID, linkCase } from "./external-model.testsupport.js";
+
+const elig = async (w: ReturnType<typeof waWorld>) => createKnowledgeVisibility(w.db).externalModelEligible(TENANT, WA_SOURCE);
+test("P1 studentData spelling variants are all excluded", async () => {
+  for (const v of ["No", "NO", " no", "no ", "no\n", "", undefined, null, true, 0, ["no"], { v: "no" }]) {
+    const w = waWorld("approved"); linkCase(w, "no"); (w.data.whatsapp_links![0] as never as Record<string, unknown>).studentData = v;
+    assert.equal(await elig(w), false, JSON.stringify(v));
+  }
+});
+test("P1 stamp variants: operator object, array, number, empty are excluded", async () => {
+  for (const v of [{ $ne: null }, [LINK_ID], 7, "", " ", null]) {
+    const w = waWorld("approved"); linkCase(w, "no"); (w.data.sources!.find(r => r._id === WA_SOURCE) as Record<string, unknown>).sourceMeta = { whatsappLinkId: v };
+    assert.equal(await elig(w), false, JSON.stringify(v));
+  }
+});
+test("P1 link row carrying a different _id than the stamp (loose-match fake) is excluded", async () => {
+  const w = waWorld("approved"); linkCase(w, "no"); (w.data.sources!.find(r => r._id === WA_SOURCE) as Record<string, unknown>).sourceMeta = { whatsappLinkId: "other" };
+  assert.equal(await elig(w), false);
+});
+test("P1 legacy kind 'whatsapp' unstamped is excluded; stamped+no is eligible", async () => {
+  const w = waWorld("approved"); linkCase(w, "legacy"); (w.data.sources!.find(r => r._id === WA_SOURCE) as Record<string, unknown>).kind = "whatsapp";
+  assert.equal(await elig(w), false);
+});
+test("P1 revoked/suspended link with studentData no is still eligible (observation: state ignored)", async () => {
+  for (const st of ["revoked", "unlinked", "suspended", "rejected"]) {
+    const w = waWorld("approved"); linkCase(w, "no"); (w.data.whatsapp_links![0] as never as Record<string, unknown>).state = st;
+    console.error(`CHK-A OBS link state=${st} eligible=${await elig(w)}`);
+  }
+});
+const node = (id: string, level: string, evidence: unknown, children: TreeIndexNode[] = []) => ({ node_id: id, level, title: id, summary: "s " + id, evidence, children }) as unknown as TreeIndexNode;
+test("P2 tree adversarial under a yes link", async () => {
+  const w = waWorld("approved"); linkCase(w, "yes");
+  const tree = node(`tenant:${TENANT}`, "tenant", {}, [
+    node("deep", "year", {}, [node("m", "month", {}, [node("nat", "native-source", { sourceId: WA_SOURCE }, [node("natp", "native-passage", { sourceId: WA_SOURCE })])])]),
+    node("nat-noev", "native-source", undefined), node("nat-null", "native-source", null), node("nat-str", "native-source", "x"),
+    node("sess-str", "topic", { sessionRefs: WA_SESSION }), node("sess-empty", "session", { sessionRef: "" }), node("sess-num", "session", { sessionRef: 5 }),
+    node("sess-null", "session", { sessionRef: null }),
+    node("nonnative-sourceid", "topic", { sourceId: WA_SOURCE }),
+    node("nonnative-sourceid-with-pub-session", "topic", { sourceId: WA_SOURCE, sessionRef: PUB_SESSION }),
+    node("sessionRefs-arr-with-obj", "topic", { sessionRefs: [PUB_SESSION, { $ne: null }] }),
+    node("pub", "session", { sessionRef: PUB_SESSION }), node("pub-native", "native-source", { sourceId: PUB_SOURCE }),
+  ]);
+  const out = await createExternalModelTreeStore({ load: async () => tree }, () => w.db as never).load(TENANT);
+  const kept = (n: TreeIndexNode | null): string[] => n ? [n.node_id, ...n.children.flatMap(kept)] : [];
+  console.error("CHK-A KEPT " + JSON.stringify(kept(out)));
+});
+test("P5 indexSession on kind 'whatsapp' and stamped sources never calls the model", async () => {
+  for (const kind of ["whatsapp", "whatsapp-batch"]) for (const link of ["no", "yes"] as const) {
+    const w = waWorld("approved"); linkCase(w, link); (w.data.sources!.find(r => r._id === WA_SOURCE) as Record<string, unknown>).kind = kind;
+    let calls = 0, emb = 0;
+    const r = await indexSession(TENANT, WA_SESSION, { db: w.db as never, retrievalMode: "vector", complete: async () => { calls++; return { text: "{}" } as never; }, embed: async () => { emb++; return { vectors: [], model: "m" } as never; } } as never).then(() => "OK", e => String(e).slice(0, 60));
+    console.error(`CHK-A G4 kind=${kind} link=${link} result=${r} complete=${calls} embed=${emb}`);
+    assert.equal(calls + emb, 0);
+  }
+});

@@ -1,0 +1,25 @@
+#!/bin/bash
+# usage: mut.sh <label> <file> <old> <new> <tests...>
+S=/d/KnowledgeBase/.worktrees/_chk-a-scratch
+BW=/d/KnowledgeBase/.worktrees/wa-student-data-gate
+label="$1"; file="$2"; old="$3"; new="$4"; shift 4
+cd "$S" || exit 1
+bak="$S/.mutbak.$(echo $label | tr -c 'A-Za-z0-9' _)"
+cp -p "$file" "$bak"
+OLD="$old" NEW="$new" F="$file" python - <<'PY'
+import os,sys
+f=os.environ['F']; s=open(f,'rb').read().decode('utf8'); o=os.environ['OLD']; n=os.environ['NEW']
+c=s.count(o)
+if c!=1: print("MUTATION-APPLY-FAIL count=%d"%c); sys.exit(3)
+open(f,'wb').write(s.replace(o,n).encode('utf8'))
+PY
+rc=$?
+if [ $rc -ne 0 ]; then cp -p "$bak" "$file"; echo "[$label] apply failed"; exit 3; fi
+out=$(timeout 280 node --test --import tsx "$@" 2>&1); trc=$?
+cp -p "$bak" "$file"
+cmp -s "$bak" "$file" && c1=cmp-equal || c1=CMP-DIFF
+h1=$(git hash-object "$file"); h2=$(git -C "$BW" rev-parse HEAD:"$file")
+[ "$h1" = "$h2" ] && c2=head-equal || c2=HEAD-DIFF
+echo "[$label] timeout_rc=$trc $(echo "$out" | grep -E '^ℹ (pass|fail) ' | tr '\n' ' ') $c1 $c2"
+echo "$out" | grep -E "^✖" | head -6
+rm -f "$bak"
