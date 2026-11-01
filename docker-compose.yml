@@ -95,6 +95,7 @@ services:
       WHATSAPP_ARCHIVER_API_URL:
       WHATSAPP_ARCHIVER_API_TOKEN:
       WHATSAPP_ARCHIVER_API_ALLOW_PRIVATE_HTTP:
+      LKB_ASK_FAST_DEADLINE_MS:
     # No env_file on purpose. (1) Passing the whole .env would leak MONGO_WORK_DB and the
     # LKB_I_KNOW_THIS_IS_PRODUCTION handling into the container. (2) The old optional .env.t028 file is retired: a
     # value-less environment entry that is unresolved renders as null and SHADOWS an env_file value, so the file

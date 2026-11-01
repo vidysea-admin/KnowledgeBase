@@ -113,7 +113,7 @@ MONGO_WORK_DB=lkb_prod MONGODB_DB=lkb_prod node scripts/webinar/sync-session.mjs
 ```
 (sync-session.mjs:30, 60-75; GL 447-468.) Needs a provider key in the shell: `OLLAMA_API_KEY` for summarize, claims and answer; `GEMINI_API_KEY` only for transcribe (config/ai-routing.yaml:3-14). Ask Umesh for the session ids. One session at a time. Always pass `--grounded-notes`: without it indexing is all-or-nothing and one rejected note fails the whole session. Grounded indexing is slow (about 35 min for a 64-turn session), so run it with no short timeout and never kill it mid-run: a killed run leaves the attempt `running` and the next run stops with `index_attempt_requires_recovery`. A stuck attempt: GL 493-502.
 
-Ask uses a 20 s fast deadline by default and a real LLM answer can take about 26 s, which then shows as 'stale' with 0 sources (ISS-454). Set `LKB_ASK_FAST_DEADLINE_MS=150000` on the api (compose does not forward it yet; add it to the api environment and `.env`) or ask in deep mode.
+Ask uses a 20 s fast deadline by default and a real LLM answer can take about 26 s, which then shows as 'stale' with 0 sources (ISS-454). Compose now forwards `LKB_ASK_FAST_DEADLINE_MS` to the api (value-less, only when present in `.env`): set `LKB_ASK_FAST_DEADLINE_MS=150000` in the server `.env` and recreate the api, or ask in deep mode.
 
 ## 7. Smoke checks (run from outside, then from the server)
 

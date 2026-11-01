@@ -1,4 +1,4 @@
-// T-028 / WhatsApp compose env (gate answer: "main .env mai hi rakho"). The api service forwards the 8 names from the
+// T-028 / WhatsApp compose env (gate answer: "main .env mai hi rakho"). The api service forwards the 9 names from the
 // main .env by value-less pass-through, so a name ABSENT from .env stays UNDEFINED in the container (never "").
 // Compose renders an unresolved value-less entry as null and omits it from the container environment; an empty
 // string would be a DEFINED value, which the API treats as misconfiguration.
@@ -12,7 +12,9 @@ import { join } from "node:path";
 const COMPOSE = new URL("../../docker-compose.yml", import.meta.url);
 const T028 = ["LKB_HOSTING_STATE_DIR", "LKB_COUNSELLOR_STATE_DIR", "LKB_HOSTING_ENCRYPTION_KEY", "LKB_HOSTING_BOOTSTRAP_ADMINS", "LKB_HOSTING_WEBHOOK_ORIGINS"];
 const WA = ["WHATSAPP_MONGO_URL", "WHATSAPP_MONGO_DB", "WHATSAPP_TENANT_OWNER_MAP"];
-const ALL = [...T028, ...WA];
+// Ask fast-path deadline override (packages/ask/src/ask-v2.ts default 20 s; apps/api/src/answer-policy/application.ts reads it). Operators set 150000.
+const ASK = ["LKB_ASK_FAST_DEADLINE_MS"];
+const ALL = [...T028, ...WA, ...ASK];
 
 function apiBlock() {
   const text = readFileSync(COMPOSE, "utf8").replace(/\r\n/g, "\n"), start = text.indexOf("\n  api:\n");
@@ -23,14 +25,14 @@ function apiBlock() {
 // api service lines without comment-only lines.
 const lines = () => apiBlock().split("\n").filter(l => !/^\s*#/.test(l));
 
-test("C1/C2 static: the 8 names are value-less pass-through entries in the api environment map", () => {
+test("C1/C2 static: the 9 names are value-less pass-through entries in the api environment map", () => {
   const env = lines(), at = env.findIndex(l => /^    environment:\s*$/.test(l));
   assert.ok(at >= 0, "environment map present");
   const tail = env.slice(at + 1), stop = tail.findIndex(l => /^    \S/.test(l)), map = stop < 0 ? tail : tail.slice(0, stop);
   for (const name of ALL) assert.equal(map.filter(l => new RegExp(`^      ${name}:\\s*$`).test(l)).length, 1, `${name} is a value-less map entry`);
 });
 
-test("C1/C2 static: none of the 8 names carries a value or ${VAR:-} default (that would define an empty string)", () => {
+test("C1/C2 static: none of the 9 names carries a value or ${VAR:-} default (that would define an empty string)", () => {
   for (const l of lines()) for (const name of ALL) if (l.includes(name)) assert.doesNotMatch(l, new RegExp(`${name}\\s*:\\s*\\S`), `${name} has a value: ${l}`);
 });
 
@@ -56,12 +58,12 @@ function config(envLines) {
 }
 const setLines = names => names.map(n => `${n}=fake-${n}\n`).join("");
 
-test("C1/C2 behaviour: all 8 set in .env -> forwarded verbatim", { skip: !docker }, () => {
+test("C1/C2 behaviour: all 9 set in .env -> forwarded verbatim", { skip: !docker }, () => {
   const env = config(setLines(ALL));
   for (const n of ALL) assert.equal(env[n], `fake-${n}`);
 });
 
-test("C1/C2 behaviour: none set in .env -> all 8 stay UNDEFINED (null/absent, never a string)", { skip: !docker }, () => {
+test("C1/C2 behaviour: none set in .env -> all 9 stay UNDEFINED (null/absent, never a string)", { skip: !docker }, () => {
   const env = config("");
   for (const n of ALL) assert.equal(env[n] ?? null, null, `${n} must be unset`);
 });
