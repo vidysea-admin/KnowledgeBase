@@ -31,6 +31,12 @@ export function safeFrom(state: unknown, signedInUserId?: string | null): string
   return typeof from === "string" && /^\/(?![/\\])/.test(from) ? from : "/";
 }
 
+const BLOCKED_MESSAGE = {
+  rejected: "This account was not approved. Contact an admin.",
+  disabled: "This account is disabled. Contact an admin.",
+  unverified: "Your email is not verified yet. Ask an admin for a verification link.",
+} as const;
+
 export function LoginPage(): ReactNode {
   const { apiKey, accountState, authError, restoring, adoptSession, user } = useAuth();
   const location = useLocation();
@@ -38,7 +44,7 @@ export function LoginPage(): ReactNode {
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [blocked, setBlocked] = useState<"rejected" | "disabled" | null>(null);
+  const [blocked, setBlocked] = useState<"rejected" | "disabled" | "unverified" | null>(null);
 
   if (restoring) return <AuthCard title="Living Knowledge Base"><p role="status">Checking your session…</p></AuthCard>;
   if (apiKey) return <Navigate to={accountState === "pending" ? "/pending" : safeFrom(location.state, user?.id)} replace />;
@@ -67,7 +73,7 @@ export function LoginPage(): ReactNode {
     <AuthCard title="Living Knowledge Base" intro="Sign in with your account.">
       {authError && <p role="alert" className="error-note">{authError}</p>}
       {error && <p role="alert" className="error-note">{error}</p>}
-      {blocked && <p role="alert" className="error-note">{blocked === "rejected" ? "This account was not approved. Contact an admin." : "This account is disabled. Contact an admin."}</p>}
+      {blocked && <p role="alert" className="error-note">{BLOCKED_MESSAGE[blocked]}</p>}
       <form onSubmit={(e) => void submit(e)}>
         <Field label="Email" type="email" autoComplete="username" value={email} onChange={(e) => setEmail(e.target.value)} required />
         <Field label="Password" type="password" autoComplete="current-password" value={password} onChange={(e) => setPassword(e.target.value)} required />
