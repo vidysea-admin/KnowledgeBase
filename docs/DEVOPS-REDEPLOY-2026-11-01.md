@@ -11,21 +11,14 @@ Longer background: `docs/GO-LIVE-UBUNTU.md` (GL), `docs/user-accounts/ops.md` (U
 - `master` is at `a5e475e9` (PR #34 merged), plus later qa-only commits. Deploy `master`, any commit at or after `a5e475e9`.
 - Production Mongo `13.202.206.101:27017` timed out from outside today. Mongo security (H1) is not confirmed.
 
-## BLOCKER to read first: compose does not pass the account and archiver variables
+## Compose env forwarding: fixed in bc89648d (D-212)
 
-`docker-compose.yml` on `master` passes only the names it lists (api: lines 50-85; web: lines 109-112). It does NOT list:
-`AUTH_CSRF_SECRET`, `USER_SIGNUP_TENANT`, `USER_SIGNUP_DAILY_CAP`, `APP_PUBLIC_ORIGIN`, `TRUST_PROXY_HOPS` and `APP_BASE_PATH` for the **api**,
-`APP_USER_ACCOUNTS` for the **web**, and `WHATSAPP_ARCHIVER_API_URL` / `WHATSAPP_ARCHIVER_API_TOKEN` for the api.
-(`git log --all -S AUTH_CSRF_SECRET -- docker-compose.yml` finds nothing.) Setting them in `.env` alone does nothing.
-`docker-compose.yml` is a protected file: the change needs Umesh's `Approved-by` (UA section 1 lines 27-37; DEVOPS-HANDOVER section 4b).
-Two ways, both need Umesh's yes first:
-
-- A (preferred): Umesh approves a commit adding these value-less lines, then you pull it.
-  api `environment`: `AUTH_CSRF_SECRET:` `USER_SIGNUP_TENANT:` `USER_SIGNUP_DAILY_CAP:` `APP_PUBLIC_ORIGIN:` `APP_BASE_PATH:` `TRUST_PROXY_HOPS:` `WHATSAPP_ARCHIVER_API_URL:` `WHATSAPP_ARCHIVER_API_TOKEN:`
-  web `environment`: `APP_USER_ACCOUNTS: ${APP_USER_ACCOUNTS:-}`
-- B (stop-gap): an untracked `docker-compose.override.yml` on the server with the same lines. Compose merges it automatically. Tell Umesh it exists.
-
-Without this, the site still deploys and runs, but accounts stay OFF and the cookie path is wrong. Everything else in this file still works.
+Earlier, `docker-compose.yml` passed none of the account or archiver variables, so `.env` values never reached the containers.
+Commit `bc89648d` (D-212, approved by Umesh 2026-11-01) adds value-less pass-through lines:
+api: `AUTH_CSRF_SECRET` `USER_SIGNUP_TENANT` `USER_SIGNUP_DAILY_CAP` `APP_PUBLIC_ORIGIN` `APP_BASE_PATH` `TRUST_PROXY_HOPS` `WHATSAPP_ARCHIVER_API_URL` `WHATSAPP_ARCHIVER_API_TOKEN` `WHATSAPP_ARCHIVER_API_ALLOW_PRIVATE_HTTP`;
+web: `APP_USER_ACCOUNTS`.
+Deploy a commit that contains `bc89648d` (check: `git merge-base --is-ancestor bc89648d HEAD && echo OK`). No override file is needed.
+Until that commit is on `master`, it lives on branch `docs/devops-golive-2026-10-26`; ask Umesh which ref to deploy.
 
 ## 1. Pre-checks (10 min)
 
@@ -37,7 +30,7 @@ Without this, the site still deploys and runs, but accounts stay OFF and the coo
 | Back up the state volumes | `docker run --rm -v lkb-hosting-state:/v -v "$PWD":/b alpine tar czf /b/hosting-state.tgz -C /v .` and the same for `lkb-counsellor-state`, `lkb-join-rules-state` | compose 192-196, GL 433 |
 | Back up Mongo (run on the app host; URL stays in a variable, never echoed) | `mongodump --uri "$MONGODB_URL" --db lkb_prod --out /backup/pre-2026-11-01` | GL 375 |
 | Fetch and pick the target | `git fetch origin && git checkout master && git pull --ff-only && git log -1 --oneline` | |
-| Confirm it contains PR #34 | `git merge-base --is-ancestor a5e475e9 HEAD && echo OK` must print `OK` | |
+| Confirm it contains PR #34 and the compose fix | `git merge-base --is-ancestor a5e475e9 HEAD && git merge-base --is-ancestor bc89648d HEAD && echo OK` must print `OK` | |
 | No blank env lines for pass-through names | `grep -nE '^(LKB_HOSTING_[A-Z_]+\|LKB_COUNSELLOR_STATE_DIR\|WHATSAPP_[A-Z_]+)=$' .env` must print nothing | GL 95 |
 
 ## 2. H1: Mongo security (do this first; it is urgent)
@@ -85,7 +78,7 @@ Unknown to us: the proxy product and its config location. Check them; do not gue
 | Name | Where | Need | Note | Source |
 |---|---|---|---|---|
 | `MONGODB_URL`, `MONGODB_DB` (= `lkb_prod`), `OLLAMA_API_KEY` | api | required | no defaults | compose 51, 53, 60 |
-| `APP_BASE_PATH` (= `/knowledgebase`) | web AND api | required | api forward is the BLOCKER above | compose 110, UA 19 |
+| `APP_BASE_PATH` (= `/knowledgebase`) | web AND api | required | forwarded to api since bc89648d (D-212) | compose 110, UA 19 |
 | `WEB_PORT` | web | required | as in section 3 | compose 116 |
 | `CORS_ORIGINS` (= `https://vidysea.com`) | api | required | exact origin, no path | compose 58 |
 | `VITE_API_BASE_URL`, `APP_API_BASE` | build / web | leave EMPTY | same-origin proxy | GL 125-126 |

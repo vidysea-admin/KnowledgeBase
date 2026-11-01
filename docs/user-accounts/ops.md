@@ -34,7 +34,7 @@ value-less pass-through lines needed are:
 
 `APP_BASE_PATH` is forwarded to `web` only today; the api builds the cookie `Path` from it, so
 without the `api` forward the cookie lands on `/api` and is never sent to `/knowledgebase/api`.
-Until these lines are merged the variables never reach the containers.
+These lines are in `docker-compose.yml` since commit bc89648d (D-212, Approved-by: Umesh, 2026-11-01), together with the three `WHATSAPP_ARCHIVER_API_*` names for the api.
 
 Mail (verification, reset) needs a sender account that is not decided yet (plan Q-A, human item H-1).
 Without it, an admin issues one-time links from the admin page; see the A5 unit when it lands.
