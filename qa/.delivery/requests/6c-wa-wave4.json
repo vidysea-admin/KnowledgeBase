@@ -1,0 +1,36 @@
+{
+ "schema_version": "compact-handoff/1",
+ "shared_instructions": "You are /checker running a 6c pre-push integration check (Mode A, policy proportional-verification/2026-10-19.17, rules .13-1/.13-2). Project D:/KnowledgeBase, branch docs/devops-golive-2026-10-26 at HEAD (verify git rev-parse HEAD; expected 4e4d0767 or a later qa-only commit). Last 6c-checked head: cf244ceb (verdict qa/verdicts/prepush-wa-wave3.md, GO, push-gate stamp bd55f9cc; that head is pushed as PR #34). Committed since, not pushed: 4e4d0767 wa-events-without-archiver (apps/api/src/composition/integrations/knowledge.ts always composes whatsappEvents; whatsapp-wiring.test.ts; auth-trigger tier-L, dual PASS). Because it is an auth tier-L unit, .13-2(a) applies: run the FULL suite. Known baseline reds: see qa/checkpoints/baseline-reds.md and the reds classified in qa/verdicts/prepush-wa-wave3.md (activity-health .venv, KnowledgeSpeakerProfilePage sha pin, apps/web runtime.wiring.test.tsx timeout, qrcode-generator missing in shared checkout) - classify, do not fix. Put ALL scratch, TMP and TEMP under D:/kb-scratch/6c4/ (set TMP/TEMP there for every command). Run with exit codes recorded: (1) the root typecheck; (2) pnpm lint:structure; (3) full apps/api and full apps/web test suites through the repo's own runners (no -x/bail, wrap long runs in a timeout); Mongo-requiring suites that skip are reported as skipped; (4) production build of api and web as the Dockerfiles run it. Compare every red against baseline-reds.md and prepush-wa-wave3.md and, if needed, against cf244ceb in a detached scratch worktree under D:/kb-scratch/6c4 (git worktree add --detach; remove with git worktree remove; never rm -rf; remove node_modules junctions only with cmd /c rmdir first). The shared checkout has untracked files, so --stamp-6c-green refuses on it: if everything is green (or only baseline reds), create a clean detached worktree of HEAD under D:/kb-scratch/6c4, run node D:/ai_os/.claude/skills/maker/tools/tick.mjs --stamp-6c-green from inside it, copy the resulting qa/.6c-green content into D:/KnowledgeBase/qa/.6c-green, report the stamped tree hash, then git worktree remove it. You are the only one allowed to stamp. Do NOT push, merge, edit product code, touch .worktrees/*, touch any Mongo other than a throwaway local test instance you start and stop yourself, read/print .env, or touch consent code (D-210). Kill only PIDs you started. Write qa/verdicts/prepush-wa-wave4.md with VERDICT GO/NO-GO, the step table with exit codes, every red with file + first error line + baseline/new, and Metrics prepush_wall_min=<n> tests=<n> mode=full shards=<n>. Commit only that verdict with a narrow pathspec (commit message ends with: Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>). Return VERDICT, the table, reds, and the stamp line.",
+ "sources": [
+  {
+   "path": "qa/manifests/wa-events-without-archiver.md",
+   "sha256": "1d6e3a624a1ee28307967aa5cb208d7fe8368a9a6128f9b87cc200612c131a26",
+   "ranges": [
+    [
+     1,
+     43
+    ]
+   ]
+  }
+ ],
+ "task": {
+  "id": "6c-wa-wave4",
+  "owner": "6c-wa-wave4",
+  "purpose": "6c pre-push full-suite check of wa-events-without-archiver",
+  "dependencies": [],
+  "acceptance": [
+   "verdict committed",
+   "GO/NO-GO with exit codes"
+  ],
+  "checks": [
+   "no push",
+   "no prod writes",
+   "no secrets",
+   "no consent"
+  ]
+ },
+ "bounds": {
+  "max_source_bytes": 65536,
+  "max_prompt_bytes": 98304
+ }
+}
