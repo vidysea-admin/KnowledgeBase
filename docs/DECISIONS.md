@@ -2756,3 +2756,10 @@ fourth would have left real decisions idle behind an unrelated unit.
 - docker-compose.yml (api environment block, the one line listed in What)
 **Approved-by:** Umesh (chat 2026-11-01: "Haan, jodo", answering "Compose mein LKB_ASK_FAST_DEADLINE_MS ki ek line jodun?")
 **Links:** ISS-454, D-212, docs/DEVOPS-REDEPLOY-2026-11-01.md, qa/manifests/compose-ask-deadline-env.md, D-210
+
+## D-214 | 2026-11-13 | type: decision | status: ACTIVE
+**Title:** Go-live target is the existing GCP VM at https://kb.vidysea.com (full route), deployed by us without the vendor
+**What:** The KnowledgeBase goes live on vidysea-docker-vm (vidysea-prod, asia-south1-c, reserved IP 34.47.136.12) as a new compose project `kb` built from d521fec0 in /app/KnowledgeBase-d521fec0, web bound to 127.0.0.1:8082, api unpublished. Public hostname is kb.vidysea.com: Cloudflare A record kb -> 34.47.136.12 (DNS only), host nginx server block + Let's Encrypt certificate for that name, then the AWS ALB /knowledgebase* rule becomes a path-keeping 302 to https://kb.vidysea.com/#{path}?#{query}. APP_PUBLIC_ORIGIN=https://kb.vidysea.com. The old knowledgebase-master stack on 8081 keeps serving until the switch and is retired only with a separate yes. The quick route (repointing the 8081 IP site at 8082) is not taken. Cloud Run (vendor) is left alone.
+**Why:** The public link today 302s to a raw IP and drops the path, and the VM runs a 22 Oct build. A real hostname with a normal certificate and a path-keeping redirect fixes the deep links and cookie sign-in, which the IP-only quick route would not. Umesh chose it over the partial fix (chat 2026-11-13: "poora is better instead of some selective ones").
+**Result:** Decision only. Done so far: Phase 2 backups in /app/backup/2026-11-13 (verified), Phase 4a images kb-api/kb-web/kb-indexer built and checked on the VM. Blocked on: Cloudflare DNS edit and AWS ALB ModifyRule access (owner: Manish), the d521fec0 review/checker/6c chain before merge. Every server/DNS/LB step still runs dry run first, then Umesh's yes.
+**Links:** docs/DEVOPS-REDEPLOY-2026-11-01.md, D-213, docs/HANDOFF.md

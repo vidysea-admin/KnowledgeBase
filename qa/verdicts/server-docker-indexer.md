@@ -1,0 +1,30 @@
+# Verdict - server-docker-indexer (Mode A, one feature check)
+
+**VERDICT: PASS**
+**Cycle checked:** 0
+**Policy-Version:** proportional-verification/2026-10-19.17
+**Manifest:** qa/manifests/server-docker-indexer.md (Status ready-for-check, Fix cycle 0, Tier L)
+**Checked commit:** d521fec0 on fix/server-docker-indexer (parent fc099756 = origin/master)
+**Method:** fresh context, read-only. Read the diff of Dockerfile, docker-compose.yml, .dockerignore, docs/DEVOPS-REDEPLOY-2026-11-01.md at d521fec0 and the scripts the runbook invokes. Image-level evidence (built on vidysea-docker-vm) was NOT re-run: no ssh, no docker, no build. It is judged as recorded in the manifest and cross-checked against the code.
+
+## Per-criterion
+
+| # | Criterion | Result | Basis |
+|---|---|---|---|
+| C1 | build stage copies scripts/; api/web runtime change only by notice.md | PASS | Dockerfile:37-39 `COPY scripts ./scripts` sits in stage `build`, AFTER `RUN pnpm --filter @lkb/api build` (Dockerfile:36), so the bundle input and cache are untouched; the runtime api stage takes only `/app/apps/api/dist` from `build` (Dockerfile:~101), so scripts/ does not reach it. Dockerfile:105-107 `COPY docs/whatsapp/notice.md ./docs/whatsapp/notice.md` is the single runtime addition, in `worker-tools` (inherited by `api`). Path matches apps/api/src/whatsapp/links/notice.ts:23, which resolves `../../../../../docs/whatsapp/notice.md` relative to the bundle; manifest evidence shows `statSync('/app/docs/whatsapp/notice.md')` exit 0 in the built image. File is tracked at d521fec0 (`git ls-tree`). The `web` target is untouched (no diff lines in its stages). Scripts self-register tsx (sync-session.mjs `import { register } from "tsx/esm/api"`; create-admin.mjs loadDefaultDeps), and the manifest's import probe exits 0. |
+| C2 | opt-in `indexer` service, profile tools, target build, api's required env, no env_file/bind mounts | PASS | docker-compose.yml:43-66: `profiles: ["tools"]` (so `up -d api web` cannot start it), `target: build`, no `env_file`, no `volumes`, `restart: "no"`. Required env uses the same `:?` form as api: MONGODB_URL, MONGODB_DB, OLLAMA_API_KEY. `MONGO_WORK_DB` is value-less (undefined when absent), `LKB_I_KNOW_THIS_IS_PRODUCTION` defaults empty. Existing tests that slice the compose file still hold: scripts/lib/dbguard2.test.mjs:108-114 slices `migrate:` to `api:` (now includes indexer) and its three regexes (no `MONGODB_DB: lkb`, `${MONGODB_DB:?`, opt-in forward) are all satisfied by the indexer block as well. Not re-run (read by inspection). |
+| C3 | no secret or .env in any image layer | PASS | .dockerignore is unchanged by the commit (`git diff --stat fc099756 d521fec0 -- .dockerignore` is empty) and still excludes `.env`, `**/.env`, `.env.*` (except .env.example), `config/client_secret.json`, `**/client_secret*.json`, `**/*.pem`, `**/*.key`, `**/credentials*.json`. `docs/HANDOFF.md`, `qa`, `data`, `.claude` also excluded. `git ls-files scripts` matches no secret/key/credential/.env name. Indexer env is injected at run time from the compose environment, not baked. |
+| C4 | runbook commands match service name, flags, env names; prod writes still gated | PASS | docs/DEVOPS-REDEPLOY-2026-11-01.md section 6: service `indexer` and the `tools` profile match compose. create-admin: `-T` plus piped stdin matches scripts/create-admin.mjs (stdin password; refuses a TTY), `-e MONGODB_DB=lkb_prod` plus `--i-know-this-is-production` matches its header (lines 8-10: flag AND MONGODB_DB=lkb\|lkb_prod). sync-session dry run exits before any DB guard or connection (sync-session.mjs INDEX_EXISTING + DRY_RUN branch, `process.exit(0)`), so it needs no MONGO_WORK_DB. The prod run passes `-e MONGO_WORK_DB=lkb_prod -e MONGODB_DB=lkb_prod` plus `--i-know-this-is-production`, exactly the three-part D-204 opt-in in sync-session.mjs guardDatabase (productionOptIn). Heading still says both write lkb_prod and need Umesh's yes. No guard code is in the diff. |
+
+## Evidence assessment
+The manifest's pre-check evidence is image-level, specific (image ids, exit codes, archive sha256) and consistent with the code I read: refusal path for create-admin without the opt-in (exit 1, no Mongo connect), usage exit for sync-session, notice.md present, imports OK. I could not re-run it and did not need to for a verdict, since each criterion is also satisfied by static inspection. Falsification was not run (stated in the manifest); no test asserts the indexer shape or notice.md in the image, which is recorded below as a note only.
+
+## ISSUES-WRITTEN: none
+
+## EXPLANATION (notes only, not filed; low severity per repo rule)
+1. LKB_ALLOW_STAGING is forwarded as `${LKB_ALLOW_STAGING:-}` (docker-compose.yml:~59), defining an empty string in the container. This is the same form the existing migrate service uses and the fail-closed direction; it only matters for a lkb_staging rehearsal, not production. Already noted by the review.
+2. Runbook section 6 could say to run the ~35 min grounded index under tmux/screen/nohup (a dropped SSH session kills `docker compose run` and leaves the attempt `running`). Already noted by the review.
+3. Residual not covered by recorded evidence: the full non-dry-run `--index-existing` execution path (productionIndexer / configuredNativeArchiveService with ROOT=/app) was proven only by import and refusal probes, not by a run against a database. That run is the human-gated production step in section 6 and is the right place to confirm it.
+4. `COPY scripts ./scripts` copies the working tree, not git-tracked files only. An untracked secret placed under scripts/ on the server checkout would enter the build layer unless it matches a .dockerignore pattern. None is tracked today; consider a one-line `scripts/**/.env*` style guard only if that ever becomes a habit.
+5. `docker compose build indexer` (runbook) relies on compose enabling a profile for a service named explicitly; the manifest evidence used `--profile tools build indexer`. Both work on current Compose v2; no change needed.
+6. Consent is out of scope (D-210); nothing consent-related was examined.
