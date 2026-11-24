@@ -35,6 +35,9 @@ importers:
 
   apps/api:
     dependencies:
+      '@asamuzakjp/css-color':
+        specifier: 3.2.0
+        version: 3.2.0
       '@csstools/css-tokenizer':
         specifier: 3.0.4
         version: 3.0.4

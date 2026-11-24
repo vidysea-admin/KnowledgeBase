@@ -125,6 +125,29 @@ test("the publisher read withholds evidence when a linked stylesheet is missing 
   }
 });
 
+test("zero-alpha text colors and inherited text fill withhold both discovery and saved citations", async () => {
+  const url = "https://observatory.example/notice", sentence = "Registration opens on Tuesday.";
+  let property = "color", color = "rgb(20 40 60 / 100%)";
+  const reader = createPublisherEvidenceReader({ resolve: async () => ["93.184.216.34"], request: async target => ({
+    status: 200, location: null, body: target === url
+      ? '<html><head><title>Notice</title><link rel="stylesheet" href="/colors.css"></head><body><section><p>' + sentence + '</p></section></body></html>'
+      : `section { ${property}: ${color} }`,
+  }) });
+  const source = await reader.resolve("Registration", url);
+  assert.deepEqual(source, { title: "Notice", url, content: sentence });
+  const bindings = [{ id: "web:0", origin: "web" as const, source: source!, fingerprint: digest(source), excerpt: sentence }];
+  for (property of ["color", "-webkit-text-fill-color"]) {
+    for (color of ["transparent", "#0000", "#192f4700", "rgba(20,40,60,0)", "rgb(20 40 60 / 0%)", "hsla(60, 90%, 50%, 0)", "color(display-p3 .1 .2 .3 / 0)", "color-mix(in srgb, transparent, transparent)", "var(--unknown, red)"]) {
+      assert.equal(await reader.resolve("Registration", url), null, property + " " + color);
+      assert.equal(await reader.verify("toc", bindings), false, property + " " + color);
+    }
+    for (color of ["rgb(20 40 60 / 100%)", "rgba(20,40,60,.5)", "#192f47ff", "black"]) {
+      assert.deepEqual(await reader.resolve("Registration", url), source);
+      assert.equal(await reader.verify("toc", bindings), true);
+    }
+  }
+});
+
 test("stylesheets share the document's byte and time limits and the stylesheet count is bounded", async () => {
   const page = "https://observatory.example/page", css = "p { color: rebeccapurple }", sentence = "Titan has a dense nitrogen atmosphere.";
   const html = (hrefs: string[]) => `<title>Observatory</title>${hrefs.map(href => `<link rel="stylesheet" href="${href}">`).join("")}`

@@ -1,4 +1,5 @@
 import { createHash } from "node:crypto";
+import { convert as cssColor } from "@asamuzakjp/css-color";
 import type { AskV2Result, NativeSourceQuote } from "@lkb/ask";
 import type { Turns } from "@lkb/core";
 import type { Db } from "mongodb";
@@ -59,7 +60,13 @@ function conceals(decl: Declaration): boolean {
   if (prop === "content-visibility") return !/^(?:visible|auto|initial|inherit|unset)$/.test(value);
   if (prop === "opacity") return !/^(?:0?\.\d*[1-9]\d*|1(?:\.0+)?)$/.test(value);
   if (/^(?:-webkit-)?(?:clip-path|mask(?:-image)?)$/.test(prop) || prop === "clip") return !/^(?:none|auto|initial)$/.test(value);
-  if (prop === "color" || prop === "-webkit-text-fill-color") return value === "transparent";
+  if (prop === "color" || prop === "-webkit-text-fill-color") {
+    if (/^(?:currentcolor|inherit|initial|unset)$/.test(value)) return false;
+    // Unknown dynamic colors cannot establish visibility. An inherited color is checked on its ancestor.
+    if (value.length > 512 || /\b(?:var|env|attr)\(/.test(value)) return true;
+    const alpha = cssColor.colorToRgb(value)[3];
+    return !(Number.isFinite(alpha) && alpha > 0);
+  }
   if (prop === "font-size") return /^(?:0+|0*\.0+)(?:[a-z]+|%)?$/.test(value);
   if (prop === "filter") return /\bopacity\(\s*0+(?:\.0+)?%?\s*\)/.test(value);
   return false;
