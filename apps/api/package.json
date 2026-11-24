@@ -12,6 +12,7 @@
     "typecheck": "tsc --noEmit -p tsconfig.json"
   },
   "dependencies": {
+    "@csstools/css-tokenizer": "3.0.4",
     "@lkb/core": "workspace:*",
     "@lkb/ai": "workspace:*",
     "@lkb/ask": "workspace:*",

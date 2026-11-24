@@ -76,6 +76,8 @@ export function httpRequest(
     const req = send(
       {
         protocol: target.protocol,
+        // A previously pooled socket would skip this request's vetted-address lookup.
+        agent: false,
         hostname: target.hostname,
         port: target.port || (isHttps ? 443 : 80),
         path: `${target.pathname}${target.search}`,

@@ -54,6 +54,17 @@ test("ISS-016: a redirect is returned UNFOLLOWED, with no body read", async () =
   } finally { await s.close(); }
 });
 
+test("each pinned read opens a fresh connection for its own DNS decision", async () => {
+  const ports = new Set<number | undefined>();
+  const server = await serve((req, res) => { ports.add(req.socket.remotePort); res.end("publisher"); });
+  try {
+    const url = `http://publisher.invalid:${server.port}/`;
+    const opts = { address: "127.0.0.1", timeoutMs: 3000, maxBytes: 1000 };
+    for (let i = 0; i < 2; i++) assert.equal((await httpRequest(url, opts)).body, "publisher");
+    assert.equal(ports.size, 2);
+  } finally { await server.close(); }
+});
+
 test("ISS-016: an oversized response is aborted mid-stream, not measured after the fact", async () => {
   const s = await serve((_req, res) => {
     res.writeHead(200);

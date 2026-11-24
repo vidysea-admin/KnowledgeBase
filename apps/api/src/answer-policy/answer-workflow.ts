@@ -139,19 +139,19 @@ export function createAnswerWorkflow(policies: AnswerPolicyService, store: Answe
         failure("invalid_state", "A reviewed source preference changed; generate a new answer after resolving conflicts.");
     }
   };
-  const published = async (t: string, run: AnswerRun, fresh = false): Promise<PublishedAnswer> => {
+  const published = async (t: string, run: AnswerRun, initialMode?: "fast" | "deep"): Promise<PublishedAnswer> => {
     const conflicts = await store.conflicts(t, run.id);
     // A saved answer is a release of the same candidate under the same policy,
     // not a permanent authorization to bypass later policy/evidence revisions.
     let current = true, inheritedConflict = false, whyNot: string | undefined;
-    const freshEmptyRefusal = fresh && run.state === "refused" && run.reason === "no-sources"
+    const freshEmptyRefusal = initialMode !== undefined && run.state === "refused" && run.reason === "no-sources"
       && run.candidate.insufficient_coverage && !run.candidate.web_used && !run.evidence.length
       && !run.candidate.sources.internal.length && !run.candidate.sources.web.length
       && !conflicts.length && !run.parentRunId && !run.resolutionId;
     try { await snapshotFreshness(t, run, freshEmptyRefusal); } catch {
       current = false;
       // The diagnosis re-runs the verifier; if it throws too, degrade to the generic stale wording (as deep does), never a 500 after the run is persisted.
-      if (fresh && !freshEmptyRefusal) try { whyNot = await whyUnverified(t, run.evidence, verify); } catch { whyNot = undefined; }
+      if (initialMode === "fast" && !freshEmptyRefusal) try { whyNot = await whyUnverified(t, run.evidence, verify); } catch { whyNot = undefined; }
     }
     if (run.parentRunId && run.resolutionId) {
       try {
@@ -220,7 +220,7 @@ export function createAnswerWorkflow(policies: AnswerPolicyService, store: Answe
         reason: evaluation.reason, candidate, candidateDigest: digest(candidate), evidenceDigest: digest(evidence), evidence, policy: selected, feedback: [],
         ...(parentRunId ? { parentRunId, resolutionId: input.resolutionId } : {}) };
       // History is part of a successful request: storage failure must not advertise a saved answer.
-      await store.create(t, run); return published(t, run, input.mode !== "deep");
+      await store.create(t, run); return published(t, run, input.mode ?? "fast");
     },
     async history(t: string) { tenant(t); const runs = await store.list(t, 100); return Promise.all(runs.map(async (run) => ({ id: run.id, query: run.query, createdAt: run.createdAt, questionClass: run.questionClass, filters: run.filters, evidenceMode: run.evidenceMode, reason: run.reason, result: await published(t, run) }))); },
     async get(t: string, id: string) {

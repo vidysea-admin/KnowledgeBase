@@ -35,6 +35,9 @@ importers:
 
   apps/api:
     dependencies:
+      '@csstools/css-tokenizer':
+        specifier: 3.0.4
+        version: 3.0.4
       '@langchain/langgraph':
         specifier: 1.4.18
         version: 1.4.18(@langchain/core@1.1.49(ws@8.21.3))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(zod@4.6.5)

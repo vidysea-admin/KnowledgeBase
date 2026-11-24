@@ -126,16 +126,21 @@ test("[C7] deep mode keeps the previous stale wording (unchanged behavior)", asy
 });
 
 test("fresh refusal reports search failure separately from empty evidence and redacts diagnostics", async () => {
-  for (const unavailable of [true, false]) {
-    const r = rig({ arms: false, verify: async () => false });
-    r.deps.tavilySearchFn = async () => { if (unavailable) throw new Error("fixture-private-detail"); return []; };
-    const out = await run(r);
-    assert.equal(out.state, "refused");
-    assert.match(out.reason, unavailable ? /web search was unavailable/i : /no matching evidence/i);
-    assert.equal(out.answer, ""); assert.deepEqual(out.sourceEvidence, []); assert.deepEqual(out.auditLog, []);
-    assert.deepEqual(out.scored, []); assert.equal(out.confidence.score, null);
-    assert.doesNotMatch(JSON.stringify(out), /fixture-private-detail/);
-    assert.equal((await r.workflow.get("tenant-a", out.runId)).result.state, "stale");
+  for (const mode of ["fast", "deep"]) {
+    for (const unavailable of [true, false]) {
+      const r = rig({ arms: false, verify: async () => false });
+      r.tree.children = [];
+      r.deps.treeSearchFn = () => [];
+      r.deps.complete = async () => result({ node_ids: [] });
+      r.deps.tavilySearchFn = async () => { if (unavailable) throw new Error("fixture-private-detail"); return []; };
+      const out = await run(r, { filters: { sessionIds: [], sources: "all", mode } });
+      assert.equal(out.state, "refused");
+      assert.match(out.reason, unavailable ? /web search was unavailable/i : /no matching evidence/i);
+      assert.equal(out.answer, ""); assert.deepEqual(out.sourceEvidence, []); assert.deepEqual(out.auditLog, []);
+      assert.deepEqual(out.scored, []); assert.equal(out.confidence.score, null);
+      assert.doesNotMatch(JSON.stringify(out), /fixture-private-detail/);
+      assert.equal((await r.workflow.get("tenant-a", out.runId)).result.state, "stale");
+    }
   }
 });
 
