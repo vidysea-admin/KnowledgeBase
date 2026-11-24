@@ -1,42 +1,37 @@
-# HANDOFF — 2026-11-02 (read this first in the next Claude Code session)
+# HANDOFF — 2026-11-24 (read this first in the next Claude Code session)
 
 ## Where things stand
-- master = fc099756 has the go-live build (user accounts, Ask, compose fixes D-212/D-213, runbook
-  docs/DEVOPS-REDEPLOY-2026-11-01.md). Local real-stack E2E done (qa/evidence/e2e-local-2026-11-01/report.json).
-- LIVE is still the OLD build: bundle index-B4U1QW49.js, csrf 0, /links 0; vidysea.com/knowledgebase
-  -> 302 https://34.47.136.12:8081/. GitHub has NO deploy workflow, webhook, deployment or runner
-  (ci.yml/docker.yml only build+test, push:false). The "auto-deploy" must live on the server; nobody
-  in this session could find it. DevOps must redeploy (runbook sections 1-5) or show the server's deploy log.
-- Maker loop is PAUSED on purpose (qa/.paused, Umesh: stop over-engineering). /maker resume lifts it.
+- master = ce5cef49 and it DOES contain d521fec0 (git merge-base --is-ancestor d521fec0 origin/master: yes). It has the go-live build:
+  user accounts, Ask, compose fixes D-212/D-213, Docker-only indexer fix (d521fec0).
+- The public link is DOWN. The vendor stopped VM 34.47.136.12 on 2026-11-23. www.vidysea.com/knowledgebase still 302s to
+  https://34.47.136.12:8081/ (dead). kb.vidysea.com has no DNS.
+- The vendor's Cloud Run service vidysea-knowledgebase (vidysea-prod, asia-south1) is API-only: "Internal preview build" pages,
+  every app route 401, and on 2026-11-13 it ran lkb_staging with CORS localhost and no account env.
+- Maker loop stays PAUSED (qa/.paused) until go-live passes. Builds resume afterwards (ISS-362 first needs Approved-by).
 
-## Reality check done 2026-11-02 (owner question: does it run on a server without Claude Code?)
-- It is a plain TypeScript/Node backend (Express api + worker, nginx web, MongoDB), shipped as Docker
-  images. NOT Python: `pip install -r requirements.txt` does nothing for the app (only
-  packages/meeting-bot/py and workers/transcribe have requirements.txt). Run it with docker compose.
-- No Claude Code at runtime: AI = HTTP calls with keys (config/ai-routing.yaml: Gemini transcribe/route,
-  Ollama Cloud for the rest). `claude-code` provider is registered (apps/api/src/composition/production.ts:89)
-  but no chain routes to it. No runtime code reads SKILL.md/.md prompts (prompts are TS constants).
-- Gaps found and FIXED on branch fix/server-docker-indexer (NOT on master yet, NOT verified in a built image):
-  1. Indexing could not run on a Docker-only server (scripts/ not in any image). Fix: Dockerfile build
-     stage COPYs scripts/; new opt-in compose service `indexer` (profile tools, target build);
-     runbook section 6 now uses `docker compose run --rm indexer node scripts/webinar/sync-session.mjs ...`
-     and create-admin via `docker compose run --rm -T indexer ...`.
-  2. docs/whatsapp/notice.md was not in the api image -> WhatsApp link requests 503. Fix: COPY into
-     /app/docs/whatsapp/notice.md (bundler resolves the path there; CONFIRM in the built image).
-  3. speakers chain = local ollama; without it the regex fallback runs (works, weaker names). No change.
-- Checked so far: `docker compose --profile tools config --services` lists indexer; node --test
-  scripts/operations/compose-t028-env.test.mjs 6/6.
+## Decision
+- D-215 (2026-11-24) supersedes D-214: go-live on that Cloud Run service as ONE service, TWO containers (web ingress + api sidecar
+  on 127.0.0.1:3300), built from the root Dockerfile by the vendor's Cloud Build trigger from master. Public host
+  https://kb.vidysea.com through a Google HTTPS load balancer; after our checks the AWS ALB /knowledgebase* becomes a 302 to it.
+  No code change. Runbook: docs/DEVOPS-REDEPLOY-2026-11-01.md, section "Cloud Run go-live (D-215...)". Topology: docs/HLD.md section 5.
 
-## Next steps for the new session (in order)
-1. Verify the branch in a real image (Docker Desktop must be running):
-   bash script idea: docker build --target api -t lkb-api:verify . ; docker build --target build -t lkb-build:verify . ;
-   docker run --rm --entrypoint node lkb-api:verify -e "require('fs').statSync('/app/docs/whatsapp/notice.md')" ;
-   docker run --rm -w /app lkb-build:verify node scripts/webinar/sync-session.mjs   (prints usage = imports OK).
-2. Review: senior-software-engineer + ai-engineer (handoff generator: D:/kb-scratch/e2e/tools/mk_docker_review.py <commit>,
-   prints COMPACT_HANDOFF lines; Agent calls need them, model sonnet, subagent_type general-purpose).
-3. One checker (Tier L config, no dual trigger), 6c scoped pre-push, then merge to master and push.
-4. After DevOps redeploys: live probe (bundle name changes; csrf and /links >= 1; no raw-IP redirect), smoke walk.
-5. Indexing/first admin on lkb_prod need Umesh's explicit yes.
+## Next steps (in order)
+1. Show Umesh the vendor reply mail first; send only on his yes.
+2. We supply the names and values through an agreed secure channel; the vendor applies them in Cloud Run and Secret Manager
+   (lkb_prod, accounts on, CORS and origin = https://kb.vidysea.com; AUTH_CSRF_SECRET is generated by the vendor directly in Secret Manager).
+3. We run the smoke checks on the run.app URL (runbook checks 1-7).
+4. Vendor builds the LB, serverless NEG and certificate; Cloudflare A record kb -> LB IP (DNS only). LB redirects / to /knowledgebase/.
+5. First admin from a laptop (create-admin.mjs), then sign-in check and the forged X-Forwarded-For loop; this sets TRUST_PROXY_HOPS.
+6. Index sessions from the laptop (sync-session.mjs --index-existing --grounded-notes, about 35 min each).
+7. Smoke checks again on kb.vidysea.com; then, on Umesh's yes, the vendor flips the AWS ALB rule and locks ingress to internal + Cloud Load Balancing.
+8. /maker resume, then the deferred list.
+
+## Gates that need Umesh
+- Merging to master triggers the vendor's Cloud Build deploy; do not merge or push to master without Umesh's yes and a heads-up to the vendor.
+- Every vendor mail, and every DNS / LB / ALB / server step: dry run first, then his yes.
+- First admin, the sign-in check with the forged X-Forwarded-For loop, and indexing all write lkb_prod: explicit yes each. Session ids to index: ask Umesh.
+- The ALB flip and the ingress lock come last, only after the checks pass.
+- ISS-362 needs an Approved-by entry before builds resume.
 
 ## Deferred (ledger, not launch blockers)
 ISS-443..451 web polish, ISS-453 8 web test reds, ISS-454 timeout labelled stale, ISS-455 strict-index error.
