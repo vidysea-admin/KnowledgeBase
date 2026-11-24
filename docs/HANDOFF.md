@@ -5,7 +5,7 @@
   user accounts, Ask, compose fixes D-212/D-213, Docker-only indexer fix (d521fec0).
 - The public link is DOWN. The vendor stopped VM 34.47.136.12 on 2026-11-23. www.vidysea.com/knowledgebase still 302s to
   https://34.47.136.12:8081/ (dead). kb.vidysea.com has no DNS.
-- The Knowledge Base default Cloud Run revision is API-only. The separate `kb-login-test` tag serves both web and API with sign-in against `lkb_prod`. The signed-in UC retest on `00020-7ss` returned exactly the matching speaker and turn, but broadened a school-specific waiver. The external NASA answer passed on `00019-jvc`. The current release evidence and test link are in [the Cloud Run runbook](DEVOPS-REDEPLOY-2026-11-01.md).
+- The Knowledge Base default Cloud Run revision is API-only. The separate `kb-login-test` tag serves both web and API with sign-in against `lkb_prod`. The signed-in UC retest on `00020-7ss` returned exactly the matching speaker and turn, but broadened a school-specific waiver. The external NASA answer passed on `00019-jvc`. Wording candidate `def9078d` is local and failed the final independent check. See D-218 before another release or live Ask. The current release evidence and test link are in [the Cloud Run runbook](DEVOPS-REDEPLOY-2026-11-01.md).
 - Maker loop stays PAUSED (qa/.paused) until go-live passes. Builds resume afterwards (ISS-362 first needs Approved-by).
 
 ## Decision

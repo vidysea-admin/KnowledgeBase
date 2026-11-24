@@ -73,3 +73,38 @@ Protocol: proportional-verification/2026-11-22.19; maker cb660ebcf3c729ad0f4b9a7
 Cloud Build 02eae3b2-77e0-4fe8-af3e-048e8ec9c4b0 succeeded. The tag now serves vidysea-knowledgebase-00020-7ss. Both deployed image digests matched the build. The tagged login and JavaScript bundle returned 200. The default stays at 100% on 00015-rbd.
 
 Public UC retest 67847e2e-51e9-4512-8b24-641af3696dc7 made one authorized POST. HTTP 200, allowed, exactly one internal source, Vaishnavi t042 at 2124 to 2297 seconds. The displayed identity and times and linked transcript text matched. No t022. Logout returned 200. The separate English-waiver claim in this answer failed scope verification against the 1024-character quoted source prefix. No audio or video element was visible in the cited-turn view.
+
+## Local follow-up on the English proficiency waiver
+
+The next unit concerns answer scope on a correctly cited statement. The test tag continues to serve 00020-7ss at a9bbeb98. The local branch repair/kb-school-waiver-scope contains candidate 93be5cd999c838aabdb8671a29e292d6c4d21cd1.
+Status: ready-for-check
+Fix cycle: 1
+Tier: 3, T-056.
+Pre-check[C1]: On a replay of the four sentences in public run 67847e2e-51e9-4512-8b24-641af3696dc7 using a fixture judge that accepts all, the prior code returned the unqualified waiver. The new code removed that sentence and retained the other three. The cited 1024-character prefix of t042 matched its actual SHA256 and contained both the school and instructional-language condition. Across six focused test files, 79 passed and one optional external-publisher test was skipped. Ask and API typechecks, the API bundle, and diff check passed. This is local maker evidence only.
+Plan review: qa/.delivery/517a230d5155a324b84bff3c4ad46f6cecf38a1877b9e9f9768ea2c273160ef2.log. The managed maker wrote the two changed files and timed out. The release operator completed the scoped query rule and prompt and re-ran the checks before independent review.
+
+## Waiver repair cycle 2
+
+The first checker blocked 93be5cd9 on ordinary universal paraphrases; the engineering review blocked a partial quotation and a false rejection when a following orientation sentence mentioned English. A separate verbatim visa-fee control was incorrectly withheld. The checker reports are recorded in the evidence. Umesh approved a tagged deployment on independent PASS and one further UC retest. Requests under that approval used so far: 0.
+Status: ready-for-check
+Fix cycle: 2
+Candidate: eb74df3a6dbcb309a3ecef5ae61c66a606a62e72
+Pre-check[C1]: All three newly added regression groups failed against cycle one. At this candidate, eight focused test files reported 107 passed and one public-publisher test skipped. Both API and Ask typechecks, the API production build and diff check passed. Replaying the four live sentences with the actual t042 excerpt retained the three related remarks and removed the generalized waiver.
+
+## Source passage release, owner-authorized cycle 3
+
+Both independent reviewers rejected cycle 2: a reversed formulation of English proficiency, a fee-only source and an adjacent qualifier still produced a wrong or withheld answer. No GCP build/deployment and zero user Ask requests for the wording change through cycle 2. Umesh authorized a final source-based implementation: show the complete grounded passage or hold the question for review.
+Status: STALLED
+Fix cycle: 3
+Candidate: def9078d19f312c58a40b27defcbb410e4e231cd
+The admitted source and query choose the scoped path. For the UC admissions question the model sees a complete verified SAT/ACT admissions statement, which is selected from a cited source before the independent grounding call. School-specific conditions use the complete bounded source passage; an incomplete or over-budget selection becomes an ordinary durable review candidate. The API hides held answer text and does not launch a web retry. A scoped deep result binds only its verified quotes.
+Pre-check[C1]: nine focused files returned 132 passed, 0 failed, and 1 optional public publisher test skipped. API and Ask typechecks, API build, diff check and contract validator passed. The verifier currently has no frozen contracts. The fully mocked four-sentence replay of the 00020 public result now keeps the exact archived sentence on SAT/ACT admission and scholarships, and withholds the unqualified waiver. Fresh acceptance is pending. The owner-approved single live test has not been spent.
+
+
+## Final local cycle outcome
+
+The fresh checker returned FAIL and engineering returned BLOCK on def9078d. The 14 archived waiver variants stayed private in review, and the correct SAT/ACT line kept Vaishnavi and t042. In a different source the phrase "scores demonstrating their English ability" did not activate the grade-school scope check and an all-applicants claim reached public history. A transfer-only or recruited-athlete SAT rule lost its adjacent exception. A source that only asked the question could be published as an answer. A long exact school quotation could error before the review path. A supported TOEFL-related fee paraphrase could be withheld. Fast and deep have different treatment of a partly supported source-controlled result. No GCP build, deployment, or live Ask for the wording unit. The one post-PASS UC request remains unused.
+
+The two retained verdicts are qa/.delivery/cb83c01058334c10d11177acc9b90af6d4a10005aba1d2484c96f1b80acd1c3b.log and qa/.delivery/f7db56dfd2f94ac9ff5bd34e7a7cfaeca1b89df561976f4ec31a001edef2741b.log. The operator held the release under the user-approved PASS condition. The separate prior citation repair remains on tagged revision 00020-7ss, with its successful single public UC test.
+
+A subsequent repair should start from the question being asked rather than depending on which vocabulary the retrieved transcript uses. A SAT admission sentence alone is insufficient when the surrounding excerpt limits the group covered. When the full applicable context cannot be bound, send the case to review. Include the actual counterexamples above and the long-quote review path in the acceptance suite before considering another release.

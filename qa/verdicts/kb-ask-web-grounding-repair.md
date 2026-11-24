@@ -70,3 +70,11 @@ Engineering review: APPROVE. 99 offline tests and four additional probes passed.
 
 Checker log: qa/.delivery/c2f4db6646efa06edd92b167e81f06bbb23504b603993c9f502dda50f82af0fe.log
 Engineering log: qa/.delivery/19882385608f6a476105cc63fd0eedfa89b595f13a6b8e6ffba1de41f8fb948c.log
+
+## School policy wording follow-up
+Cycle checked: 3
+Verdict: FAIL
+Candidate: def9078d19f312c58a40b27defcbb410e4e231cd
+Independent check: qa/.delivery/cb83c01058334c10d11177acc9b90af6d4a10005aba1d2484c96f1b80acd1c3b.log
+Engineering review: qa/.delivery/f7db56dfd2f94ac9ff5bd34e7a7cfaeca1b89df561976f4ec31a001edef2741b.log
+The Inside UC t042 source case passed all 14 replays. Distinct source wording bypassed scope protection and the SAT selector discarded an adjacent eligibility restriction. Both could reach public allow and remain present in history. The test-tag release and its one approved live question were held.
