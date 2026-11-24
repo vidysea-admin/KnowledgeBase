@@ -2775,3 +2775,17 @@ fourth would have left real decisions idle behind an unrelated unit.
 - docs/HANDOFF.md (top section)
 - docs/HLD.md (section 5, deployment topology)
 **Links:** D-214, D-212, D-213, INC-2164, INC-2170, INC-2169, docs/DEVOPS-REDEPLOY-2026-11-01.md, docs/HANDOFF.md
+
+## D-216 | 2026-11-24 | type: session | status: ACTIVE
+**Title:** KB Ask preview repair and UCAS indexing preflight
+**What:** Prepared an isolated KB Ask release using Ollama web discovery, Gemini fallback, publisher evidence checks and scoped-answer generation. Ran the existing production indexer on the approved 10 August UCAS session. Rehearsed nine transcript proposals locally.
+**Why:** The preview had previously returned a school-specific waiver without its qualification and returned a stale result when its web provider hit a quota limit. Phase 1 requires attributable answers across all 23 original sessions.
+**Result:** Release candidate f445c61a passed 108 affected backend checks and its frontend passed 43 checks. Independent engineering passed C1, C3 and C4. Independent publisher review held C2 because zero-alpha CSS colors could admit invisible citations. The production default remained on 00015-rbd and the existing test tag on 00018-6cx. New candidate live Ask retests used: zero of two. The UCAS run failed timestamp validation. The 230-turn import and production differed only at the shared boundary between turns 113 and 114. Locally restoring the 1853-second boundary passed the canonical validator. Nine local staging packages reconciled 1448 passages into 1400 turns and 48 non-speech/media markers. The task tracker carries the outstanding checks.
+**Links:** T-043, T-056, D-215, qa/manifests/kb-ask-web-grounding-repair.md, qa/verdicts/kb-ask-web-grounding-repair.md, qa/verdicts/kb-ask-web-grounding-repair.b.md, qa/evidence/phase1-toc-index-readiness-20261124.json, qa/evidence/phase1-toc-content-proposals/verification.json
+
+## D-217 | 2026-11-24 | type: session | status: ACTIVE
+**Title:** Knowledge Base test release and signed-in citation verification
+**What:** Released the independently checked publisher and Ask changes on the GCP Knowledge Base test tag, then narrowed default fast citations to the quotes retained by grounded sentences. Kept default traffic on the fixed API revision.
+**Why:** Two signed-in questions on 00019-jvc returned supported primary evidence. The UC result also exposed an unrelated same-session financial-aid quote. A local controlled run reproduced the extra quote and confirmed it could incorrectly make history stale.
+**Result:** At a9bbeb989cfea3e28862ea0dcbb538fe5a3fd631 the independent checker passed 60 offline checks; engineering approved with 99 tests and four separate probes. Cloud Build 02eae3b2-77e0-4fe8-af3e-048e8ec9c4b0 succeeded. Tagged revision 00020-7ss matched both immutable images, served the web app, and used lkb_prod. The single authorized UC test returned exactly Vaishnavi t042, 2124 to 2297 seconds. Citation card and transcript link matched; logout returned 200. The answer broadened a school-specific English proficiency waiver even though its actual excerpt included the restriction. That answer-quality issue is open. The prior NASA test on 00019-jvc passed. The default service still directs 100 percent to 00015-rbd; no domain switch.
+**Links:** D-216, D-215, T-043, T-056, qa/evidence/phase1-toc-index-readiness-20261124.json, qa/manifests/kb-ask-web-grounding-repair.md, qa/verdicts/kb-ask-web-grounding-repair.md, docs/DEVOPS-REDEPLOY-2026-11-01.md
