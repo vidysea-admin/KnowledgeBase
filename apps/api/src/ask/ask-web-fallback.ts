@@ -128,7 +128,7 @@ async function geminiGroundedSearch(apiKey: string, model: string, query: string
   let res: Response;
   try {
     res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`, {
-      method: "POST",
+      method: "POST", redirect: "error", signal: AbortSignal.timeout(10_000),
       headers: { "content-type": "application/json", "x-goog-api-key": apiKey },
       // Only the query text leaves the process: no tenant id, student id, session or filter data.
       body: JSON.stringify({ contents: [{ role: "user", parts: [{ text: query }] }], tools: [{ google_search: {} }] }),
@@ -138,12 +138,12 @@ async function geminiGroundedSearch(apiKey: string, model: string, query: string
   }
   if (!res.ok) {
     let parsed: unknown;
-    try { parsed = await res.json(); } catch { parsed = undefined; }
+    try { parsed = await readSearchJson(res); } catch { parsed = undefined; }
     const freeTier = detectGeminiFreeTier(res.status, parsed);
     if (freeTier) throw freeTier;
     throw new GeminiWebSearchError(res.status, "");
   }
-  return mapGroundedResponse((await res.json()) as GeminiGroundedResponse);
+  return mapGroundedResponse((await readSearchJson(res)) as GeminiGroundedResponse);
 }
 
 /** ALWAYS returns a real function (ISS-274 reachability): with GEMINI_API_KEY it runs a grounded
@@ -158,4 +158,81 @@ export function createGeminiWebSearchFn(): (query: string) => Promise<WebSource[
   }
   const model = process.env.LKB_WEB_GROUNDING_MODEL?.trim() || WEB_GROUNDING_DEFAULT_MODEL;
   return (query: string) => geminiGroundedSearch(apiKey, model, query);
+}
+
+type PublisherSource = { url: string; title: string; content: string };
+type ReadPublisher = (query: string, url: string) => Promise<PublisherSource | null>;
+
+async function ollamaSearch(apiKey: string, query: string): Promise<WebSource[]> {
+  const response = await fetch("https://ollama.com/api/web_search", {
+    method: "POST", redirect: "error", signal: AbortSignal.timeout(6_000),
+    headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
+    body: JSON.stringify({ query, max_results: 4 }),
+  });
+  if (!response.ok) {
+    await response.body?.cancel();
+    throw new Error(`Ollama web search HTTP ${response.status}`);
+  }
+  const json = await readSearchJson(response) as { results?: unknown } | null;
+  return Array.isArray(json?.results) ? json.results.filter((item): item is WebSource => item !== null && typeof item === "object") : [];
+}
+
+/** Discovery results provide URLs. Only an excerpt read from the publisher can enter Ask. */
+export function createPublisherWebSearch(read: ReadPublisher, env = process.env): (query: string) => Promise<WebSource[]> {
+  const ollamaKey = env.OLLAMA_API_KEY?.trim();
+  const geminiKey = env.GEMINI_API_KEY?.trim();
+  const model = env.LKB_WEB_GROUNDING_MODEL?.trim() || WEB_GROUNDING_DEFAULT_MODEL;
+  const providers: { name: string; search: (query: string) => Promise<WebSource[]> }[] = [];
+  if (ollamaKey) providers.push({ name: "Ollama", search: query => ollamaSearch(ollamaKey, query) });
+  if (geminiKey) providers.push({ name: "Gemini", search: query => geminiGroundedSearch(geminiKey, model, query) });
+  return async query => {
+    if (!providers.length) throw new TavilyUnavailableError("no web search provider configured");
+    const failures: string[] = [];
+    for (const provider of providers) {
+      let hits: WebSource[];
+      try { hits = await provider.search(query); }
+      catch (error) {
+        const status = error instanceof GeminiWebSearchError ? error.status :
+          error instanceof Error ? /^Ollama web search HTTP (\d{3})$/.exec(error.message)?.[1] : undefined;
+        failures.push(status ? `${provider.name} HTTP ${status}` : `${provider.name} unavailable`);
+        continue;
+      }
+      const urls = new Set<string>();
+      for (const hit of hits) {
+        if (typeof hit.url !== "string" || hit.url.length > 4096) continue;
+        urls.add(hit.url);
+        if (urls.size === 4) break;
+      }
+      const results = await Promise.all(Array.from(urls, async url => {
+        try { return await read(query, url); } catch { return null; }
+      }));
+      const sources = new Map<string, PublisherSource>();
+      for (const source of results) if (source && !sources.has(source.url)) sources.set(source.url, source);
+      if (sources.size) return [...sources.values()].slice(0, 3);
+    }
+    if (failures.length) throw new TavilyUnavailableError(failures.join(", "));
+    return [];
+  };
+}
+
+/** Limit discovery responses before parsing, including errors from the Gemini quota classifier. */
+async function readSearchJson(response: Response): Promise<unknown> {
+  const limit = 512 * 1024;
+  const reader = response.body?.getReader();
+  if (!reader) throw new Error("empty web search response");
+  let bytes = 0;
+  const chunks: Uint8Array[] = [];
+  try {
+    for (;;) {
+      const part = await reader.read();
+      if (part.done) break;
+      bytes += part.value.length;
+      if (bytes > limit) throw new Error("web search response too large");
+      chunks.push(part.value);
+    }
+    return JSON.parse(Buffer.concat(chunks).toString("utf8")) as unknown;
+  } finally {
+    await reader.cancel().catch(() => {});
+    reader.releaseLock();
+  }
 }

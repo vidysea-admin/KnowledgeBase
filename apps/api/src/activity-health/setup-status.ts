@@ -19,8 +19,7 @@ export function readSetupStatus(env: NodeJS.ProcessEnv): SetupStatusBody {
   return {
     configured: {
       gemini: present(env, "GEMINI_API_KEY"),
-      // D-202: the /ask web fallback is Gemini + Google Search grounding on the same GEMINI_API_KEY.
-      webSearch: present(env, "GEMINI_API_KEY"),
+      webSearch: present(env, "OLLAMA_API_KEY") || present(env, "GEMINI_API_KEY"),
       // Same three variables the sink in packages/ai/src/trace-langfuse/sink.ts requires.
       langfuse: present(env, "LANGFUSE_BASE_URL") && present(env, "LANGFUSE_PUBLIC_KEY") && present(env, "LANGFUSE_SECRET_KEY"),
     },

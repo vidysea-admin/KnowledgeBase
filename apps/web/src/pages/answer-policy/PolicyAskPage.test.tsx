@@ -29,6 +29,17 @@ beforeEach(() => {
 });
 afterEach(() => { cleanup(); vi.restoreAllMocks(); localStorage.clear(); });
 
+test.each(["Web search was unavailable and no internal source supported an answer.", "No matching evidence was found for this question."])(
+  "a refused answer shows its safe reason: %s", async reason => {
+    vi.spyOn(client, "askWithPolicy").mockResolvedValue({ ...response("refused"), reason, sources: { internal: [], web: [] }, insufficient_coverage: true });
+    mount();
+    await screen.findByRole("option", { name: "fees v3 (fees)" });
+    fireEvent.click(screen.getByRole("button", { name: "Ask" }));
+    expect(await screen.findByRole("heading", { name: "Answer status: refused" })).toBeInTheDocument();
+    expect(screen.getByText("Candidate withheld: refused. " + reason)).toBeInTheDocument();
+    expect(screen.queryByText("Web fallback not used.")).not.toBeInTheDocument();
+  });
+
 test("URL handoff is prefill only; explicit current-key Ask submits selected immutable version and effective filters", async () => {
   const ask = vi.spyOn(client, "askWithPolicy").mockResolvedValue(response()); mount();
   await screen.findByRole("option", { name: "fees v3 (fees)" });

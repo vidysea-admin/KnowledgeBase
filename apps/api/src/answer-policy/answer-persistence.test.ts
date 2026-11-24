@@ -2,7 +2,8 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
 import type { AskV2Result } from "@lkb/ask";
-import { answerEvidence, createMongoEvidenceVerifier, digest } from "./answer-evidence.js";
+import { resolveAll } from "@lkb/ingest";
+import { answerEvidence, createMongoEvidenceVerifier, createPublisherEvidenceReader, digest } from "./answer-evidence.js";
 import { createMongoAnswerRecordStore, ANSWER_RUNS } from "./answer-mongo-store.js";
 import { answerTestDb } from "./answer-testdb.js";
 import type { AnswerRun, SourceConflict } from "./answer-records.js";
@@ -10,6 +11,70 @@ import { headId, type ReviewHead } from "../transcript-review/store.js";
 
 const text = "Fee is 100.", sha = (value: string) => createHash("sha256").update(value).digest("hex");
 const actor = { actor: "api-key:tenant-a" };
+
+test("publisher evidence preserves final URL, page title and visible quotation on each fresh read", async () => {
+  let html = '<html><head><title>Observatory</title><style>.suppressed{visibility:hidden}</style></head><body><section class="suppressed"><p>Titan Titan Saturn secret.</p></section><p hidden>Titan Saturn hidden.</p><div style="display:none"><p>Another hidden Titan.</p></div><p>Titan is a moon of Saturn.</p></body></html>';
+  const final = "https://observatory.example/titan";
+  const hosts: string[] = [];
+  const reader = createPublisherEvidenceReader({ resolve: async host => { hosts.push(host); return ["93.184.216.34"]; },
+    request: async url => url === final ? { status: 200, body: html, location: null } : { status: 302, body: "", location: final } });
+  const source = await reader.resolve("Titan Saturn", "https://discovery.example/page");
+  assert.deepEqual(source, { url: final, title: "Observatory", content: "Titan is a moon of Saturn." });
+  assert.deepEqual(hosts, ["discovery.example", "observatory.example"]);
+  const bind = (s: Record<string, unknown>) => ({ id: "web:0", origin: "web" as const, source: s, fingerprint: digest(s), excerpt: String(s.content) });
+  for (const off of [{ title: "Changed publisher" }, { content: "Titan Saturn hidden." }, { snippet: "extra" }, { url: "https://discovery.example/page" }]) {
+    assert.equal(await reader.verify("tenant-a", [bind({ ...source, ...off })]), false);
+  }
+  assert.equal(await reader.verify("tenant-a", [bind(source!)]), true);
+  html = html.replace("Titan is a moon of Saturn.", "The page has been revised.");
+  assert.equal(await reader.verify("tenant-a", [bind(source!)]), false);
+});
+
+test("publisher redirects keep the original deadline and enforce HTTPS at each hop", async () => {
+  let clock = 0, location = "https://redirect.example/final";
+  const calls: string[] = [], budgets: number[] = [];
+  const reader = createPublisherEvidenceReader({ now: () => clock, timeoutMs: 100,
+    resolve: async (_host, opts) => { budgets.push(opts!.timeoutMs); clock += 30; return ["93.184.216.34"]; },
+    request: async url => { calls.push(url); clock += 24; return { status: 302, location, body: "" }; } });
+  assert.equal(await reader.resolve("planet", "https://publisher.example/page"), null);
+  assert.deepEqual(budgets, [100, 46]); assert.equal(calls.length, 2);
+  for (location of ["http://other.example/page", "https://other.example:8443/page", "https://user@other.example/page"]) {
+    calls.length = 0;
+    assert.equal(await reader.resolve("planet", "https://publisher.example/page"), null);
+    assert.deepEqual(calls, ["https://publisher.example/page"]);
+  }
+});
+
+test("substantial publisher pages favor article evidence and omit animated or conditionally hidden passages", async () => {
+  const url = "https://observatory.example/report", sentence = "The largest moon is larger than the planet Mercury.";
+  const body = '<html><head><title>Observatory</title><style>@keyframes mask{to{opacity:0}}.animated{animation:mask 2s}.tab:not(.active){display:none}.tool[hidden]{display:none}</style></head>'
+    + "<body><!--" + " ".repeat(300_000) + "--><div>Which is the largest moon and planet?</div><main><article>"
+    + '<div class="tab"><p>Wrong hidden planet and moon.</p></div><div class="animated">Wrong animated planet and moon.</div>'
+    + '<p>' + sentence + '</p></article></main></body></html>';
+  const r = createPublisherEvidenceReader({ resolve: async () => ["93.184.216.34"], request: async () => ({ status: 200, body, location: null }) });
+  const s = await r.resolve("Which planet is the largest moon larger than?", url);
+  assert.deepEqual(s, { title: "Observatory", url, content: sentence });
+});
+
+test("redirected publisher DNS lookup is cancelled at the original deadline before a second connection", async () => {
+  const calls: string[] = [], budgets: number[] = [];
+  let cancelled = false;
+  const reader = createPublisherEvidenceReader({ timeoutMs: 160,
+    resolve: async (host, opts) => {
+      budgets.push(opts!.timeoutMs);
+      if (host === "first.example") return ["93.184.216.34"];
+      return resolveAll(host, { timeoutMs: opts!.timeoutMs, resolver: {
+        resolve4: () => new Promise(() => {}), resolve6: () => new Promise(() => {}),
+        cancel: () => { cancelled = true; },
+      } });
+    },
+    request: async url => { calls.push(url); await new Promise(done => setTimeout(done, 35)); return { status: 302, location: "https://second.example/page", body: "" }; } });
+  const start = performance.now();
+  assert.equal(await reader.resolve("saturn", "https://first.example/page"), null);
+  assert.equal(cancelled, true); assert.deepEqual(calls, ["https://first.example/page"]);
+  assert.ok(budgets[1]! < budgets[0]! - 15);
+  assert.ok(performance.now() - start < 500, "lookup must return after its guard deadline");
+});
 function fixture() {
   const db = answerTestDb(), quote = { id: "q1", nodeId: "n1", sessionRef: "s1", turnId: "t1", speakerRef: "spk:0", tStart: 10, tEnd: 20,
     charStart: 0, charEnd: text.length, byteStart: 0, byteEnd: Buffer.byteLength(text), turnTextSHA256: sha(text), sliceSHA256: sha(text), quote: text, origin: "speech" };

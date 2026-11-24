@@ -123,9 +123,9 @@ export function PolicyAskPage(): React.ReactElement {
       <p>{result.policy ? `Applied ${result.policy.policyId} v${result.policy.version}: ${result.policy.mode}, ${result.policy.style}, ${result.policy.onInsufficient}.` : "No matching saved policy; conservative citations-required default."}</p>
       <p>Retrieval verdict: {result.verdict}. Coverage: {result.insufficient_coverage ? "insufficient" : "supported by retrieved context"}.</p>
       <p>Retrieval confidence: {result.confidence.score === null ? "unavailable" : result.confidence.score.toFixed(3)} ({result.confidence.basis}; uncalibrated, not factual certainty).</p>
-      <p>{result.web_used ? "Web fallback used." : result.auditLog.some((a) => a.step.startsWith("web_fallback_unavailable")) ? "Web fallback unavailable." : "Web fallback not used."}</p>
+      {(result.answer || result.auditLog.length > 0) && <p>{result.web_used ? "Web fallback used." : result.auditLog.some((a) => a.step.startsWith("web_fallback_unavailable")) ? "Web fallback unavailable." : "Web fallback not used."}</p>}
       <AiUsageSummary entries={result.auditLog} />
-      {result.answer ? <p style={{ whiteSpace: "pre-wrap" }}>{result.answer}</p> : <p>Candidate withheld: {result.state}. Authorized review or a new query with supported evidence is required.</p>}
+      {result.answer ? <p style={{ whiteSpace: "pre-wrap" }}>{result.answer}</p> : <p>Candidate withheld: {result.state}. {result.state === "refused" || result.state === "stale" ? result.reason : "Authorized review or a new query with supported evidence is required."}</p>}
     </section><AnswerSources answer={result} excerpts={evidenceMode} />
       <section className="card"><h2>Follow-up questions</h2>{result.followUps.map((q) => <button key={q} disabled={busy} onClick={() => setQuery(q)}>{q}</button>)}</section>
       <WriteScope><section className="card"><h2>Feedback for this answer</h2><label htmlFor="answer-feedback">Feedback note</label><input id="answer-feedback" maxLength={500} value={feedback} disabled={busy} onChange={(e) => setFeedback(e.target.value)} />

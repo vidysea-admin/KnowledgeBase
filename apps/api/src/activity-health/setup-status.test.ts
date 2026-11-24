@@ -6,7 +6,7 @@ import { fileURLToPath } from "node:url";
 import { startTestServer } from "../testUtils.js";
 import { buildTestDeps } from "../fixtures.js";
 
-const SECRETS = { GEMINI_API_KEY: "AIzaFAKE-gemini-secret-123", TAVILY_API_KEY: "tvly-FAKE-secret-456", LANGFUSE_SECRET_KEY: "sk-lf-FAKE-789", LANGFUSE_PUBLIC_KEY: "pk-lf-FAKE-012", LANGFUSE_BASE_URL: "https://fake-langfuse.example" };
+const SECRETS = { OLLAMA_API_KEY: "fake-ollama-key", GEMINI_API_KEY: "AIzaFAKE-gemini-secret-123", TAVILY_API_KEY: "tvly-FAKE-secret-456", LANGFUSE_SECRET_KEY: "sk-lf-FAKE-789", LANGFUSE_PUBLIC_KEY: "pk-lf-FAKE-012", LANGFUSE_BASE_URL: "https://fake-langfuse.example" };
 const NAMES = Object.keys(SECRETS) as Array<keyof typeof SECRETS>;
 
 async function withEnv(set: Partial<Record<keyof typeof SECRETS, string>>, fn: (url: string) => Promise<void>) {
@@ -64,7 +64,10 @@ test("source shape: mounted after requireAuth; reads only env presence, no reque
   assert.doesNotMatch(route, /req\.(query|body|params|headers)/);
 });
 
-test("[C5] webSearch follows GEMINI_API_KEY alone (Gemini grounded web fallback); a Tavily key no longer counts", async () => {
+test("[C5] either active search provider configures web search", async () => {
+  await withEnv({ OLLAMA_API_KEY: SECRETS.OLLAMA_API_KEY }, async (url) => {
+    assert.deepEqual(await (await get(url, "good-ask-key")).json(), { configured: { gemini: false, webSearch: true, langfuse: false } });
+  });
   await withEnv({ GEMINI_API_KEY: SECRETS.GEMINI_API_KEY }, async (url) => {
     assert.deepEqual(await (await get(url, "good-ask-key")).json(), { configured: { gemini: true, webSearch: true, langfuse: false } });
   });

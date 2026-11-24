@@ -15,7 +15,7 @@ import { fileURLToPath } from "node:url";
 import { GeminiFreeTierQuotaError } from "@lkb/ai";
 
 import {
-  createGeminiWebSearchFn, createTavilySearchFn, GeminiWebSearchError, TavilyUnavailableError, WEB_GROUNDING_DEFAULT_MODEL,
+  createGeminiWebSearchFn, createPublisherWebSearch, createTavilySearchFn, GeminiWebSearchError, TavilyUnavailableError, WEB_GROUNDING_DEFAULT_MODEL,
 } from "./ask-web-fallback.js";
 
 test("createTavilySearchFn always returns a function, even with no TAVILY_API_KEY (ISS-274)", () => {
@@ -127,7 +127,54 @@ const groundedBody = {
     },
   }],
 };
-const okJson = (body: unknown) => (async () => ({ ok: true, status: 200, json: async () => body }) as Response) as typeof fetch;
+const jsonResponse = (body: unknown, status = 200): typeof fetch => async () => Response.json(body, { status });
+const okJson = jsonResponse;
+
+test("Ollama discovery sends only the question to the fixed host and publishes independently read text", async () => {
+  const url = "https://publisher.example/saturn", calls: string[] = [];
+  const publisher = { url, title: "Saturn", content: "Titan is a moon of Saturn." };
+  await withGemini({}, async (input, init) => {
+    calls.push(String(input));
+    assert.equal(init?.redirect, "error"); assert.equal(new Headers(init?.headers).get("authorization"), "Bearer fixture-only");
+    assert.deepEqual(JSON.parse(String(init?.body)), { query: "What is Titan?", max_results: 4 });
+    return Response.json({ results: [{ url, title: "Search suggestion", content: "Unverified provider assertion" }, { url }] });
+  }, async () => {
+    const search = createPublisherWebSearch(async (query, candidate) => {
+      assert.equal(query, "What is Titan?"); assert.equal(candidate, url); return publisher;
+    }, { OLLAMA_API_KEY: "fixture-only", GEMINI_API_KEY: "unused-fixture" });
+    assert.deepEqual(await search("What is Titan?"), [publisher]);
+  });
+  assert.deepEqual(calls, ["https://ollama.com/api/web_search"]);
+});
+
+test("Gemini discovery takes over after failed or unusable Ollama results and uses the same publisher reader", async () => {
+  for (const status of [200, 429]) {
+    const calls: string[] = [];
+    await withGemini({}, async (input, init) => {
+      calls.push(new URL(String(input)).hostname);
+      if (calls.length === 1) return Response.json({ results: [{ url: "https://removed.example/page" }] }, { status });
+      assert.equal(new Headers(init?.headers).has("authorization"), false);
+      return Response.json(groundedBody);
+    }, async () => {
+      const search = createPublisherWebSearch(async (_q, url) => url === "https://a.example/fees"
+        ? { url, title: "Publisher fees", content: "Original publisher text" } : null,
+      { OLLAMA_API_KEY: "o-test", GEMINI_API_KEY: "g-test" });
+      assert.deepEqual(await search("fees"), [{ url: "https://a.example/fees", title: "Publisher fees", content: "Original publisher text" }]);
+    });
+    assert.deepEqual(calls, ["ollama.com", "generativelanguage.googleapis.com"]);
+  }
+});
+
+test("search handles missing keys, bounded discovery responses and sanitized provider outages", async () => {
+  await assert.rejects(createPublisherWebSearch(async () => null, {})("q"), /no web search provider/);
+  await withGemini({}, async () => new Response("x".repeat(512 * 1024 + 1)), async () => {
+    await assert.rejects(createPublisherWebSearch(async () => null, { OLLAMA_API_KEY: "o-test" })("q"), /Ollama unavailable/);
+  });
+  await withGemini({}, async () => Response.json({ private: "fixture-secret" }, { status: 429 }), async () => {
+    const search = createPublisherWebSearch(async () => null, { OLLAMA_API_KEY: "o-test", GEMINI_API_KEY: "g-test" });
+    await assert.rejects(search("q"), (e: Error) => /Ollama HTTP 429, Gemini HTTP 429/.test(e.message) && !e.message.includes("fixture-secret"));
+  });
+});
 
 test("[C1] Gemini fn calls generateContent with the google_search tool, default model gemini-2.5-flash, key in a header not the URL", async () => {
   let url = "", init: RequestInit | undefined, calls = 0;
@@ -151,9 +198,9 @@ test("[C1] LKB_WEB_GROUNDING_MODEL overrides the model", async () => {
   assert.match(url, /models\/gemini-9-test:generateContent$/);
 });
 
-test("[C1] production composition wires the Gemini fn, not Tavily (source shape)", () => {
+test("[C1] production composition wires publisher-verified search", () => {
   const src = readFileSync(fileURLToPath(new URL("../composition/production.ts", import.meta.url)), "utf8").replace(/\/\*[\s\S]*?\*\//g, "").replace(/\/\/.*$/gm, "");
-  assert.match(src, /createGeminiWebSearchFn\(\)/);
+  assert.match(src, /createPublisherWebSearch\(resolvePublisherSource\)/);
   assert.doesNotMatch(src, /createTavilySearchFn\(\)/);
 });
 
@@ -188,7 +235,7 @@ test("[C3] no GEMINI_API_KEY: rejects with the unavailable error, no network cal
 });
 
 test("[C3] HTTP errors throw a typed GeminiWebSearchError carrying the status and never the key", async () => {
-  const resp = (status: number, body: unknown) => (async () => ({ ok: false, status, json: async () => body, text: async () => JSON.stringify(body) }) as Response) as typeof fetch;
+  const resp = (status: number, body: unknown) => jsonResponse(body, status);
   for (const status of [400, 403, 500, 503]) {
     await withGemini({ key: SECRET_KEY }, resp(status, { error: { message: `bad key ${SECRET_KEY}` } }), async () => {
       const err = await createGeminiWebSearchFn()("q").then(() => null, (e: unknown) => e) as Error;
@@ -201,7 +248,7 @@ test("[C3] HTTP errors throw a typed GeminiWebSearchError carrying the status an
 
 test("[C3] free-tier 429 maps to GeminiFreeTierQuotaError (gemini-quota semantics); plain 429 is a typed error", async () => {
   const free = { error: { details: [{ violations: [{ quotaId: "GenerateRequestsPerDayPerProjectPerModel-FreeTier", quotaMetric: "m" }] }] } };
-  const mk = (b: unknown) => (async () => ({ ok: false, status: 429, json: async () => b }) as Response) as typeof fetch;
+  const mk = (b: unknown) => jsonResponse(b, 429);
   await withGemini({ key: SECRET_KEY }, mk(free), async () => {
     await assert.rejects(() => createGeminiWebSearchFn()("q"), GeminiFreeTierQuotaError);
   });
@@ -222,7 +269,7 @@ test("[C3] a network failure whose message embeds the key is rethrown without th
 test("[C3] the error text ask-graph records on degrade carries the status and not the key", async () => {
   // Uses the real graph catch path (packages/ask/src/ask-graph.ts web-fallback node) with the real
   // Gemini fn and a mocked failing fetch. Skipped shape check: only asserts what leaves the seam.
-  const failing = (async () => ({ ok: false, status: 503, json: async () => ({ error: { message: `x ${SECRET_KEY}` } }) }) as Response) as typeof fetch;
+  const failing = jsonResponse({ error: { message: SECRET_KEY } }, 503);
   await withGemini({ key: SECRET_KEY }, failing, async () => {
     const err = await createGeminiWebSearchFn()("q").then(() => null, (e: unknown) => e) as Error;
     const audited = `web_fallback_unavailable: ${err.message}`; // exactly what ask-graph.ts records

@@ -114,7 +114,7 @@ test("[C7] a verification failure surfaces its real reason instead of a generic 
   const web = rig({ arms: false, verify: async (_t, b) => b.every((e) => e.origin === "internal") });
   const webOut = await run(web);
   assert.equal(webOut.state, "stale");
-  assert.match(webOut.reason, /web evidence/i); assert.match(webOut.reason, /verif/i);
+  assert.match(webOut.reason, /publisher evidence/i); assert.match(webOut.reason, /verif/i);
   const none = rig({ arms: false }); none.deps.tavilySearchFn = undefined;
   assert.doesNotMatch((await run(none)).reason, /cannot be verified/i, "an honest empty result is not reported as a verification failure");
 });
@@ -123,6 +123,20 @@ test("[C7] deep mode keeps the previous stale wording (unchanged behavior)", asy
   const deep = rig({ verify: async () => false });
   const out = await run(deep, { filters: { sessionIds: [], sources: "all", mode: "deep" } });
   assert.equal(out.reason, "Stored candidate, policy or source evidence changed, was withdrawn, or cannot be verified.");
+});
+
+test("fresh refusal reports search failure separately from empty evidence and redacts diagnostics", async () => {
+  for (const unavailable of [true, false]) {
+    const r = rig({ arms: false, verify: async () => false });
+    r.deps.tavilySearchFn = async () => { if (unavailable) throw new Error("fixture-private-detail"); return []; };
+    const out = await run(r);
+    assert.equal(out.state, "refused");
+    assert.match(out.reason, unavailable ? /web search was unavailable/i : /no matching evidence/i);
+    assert.equal(out.answer, ""); assert.deepEqual(out.sourceEvidence, []); assert.deepEqual(out.auditLog, []);
+    assert.deepEqual(out.scored, []); assert.equal(out.confidence.score, null);
+    assert.doesNotMatch(JSON.stringify(out), /fixture-private-detail/);
+    assert.equal((await r.workflow.get("tenant-a", out.runId)).result.state, "stale");
+  }
 });
 
 test("[F4] sources.internal is what the answer cites: one uncited chunk that fails verification does not wipe the cited, valid one", async () => {

@@ -122,9 +122,9 @@ export function createAnswerWorkflow(policies: AnswerPolicyService, store: Answe
     if ([...kept].some((key) => rejected.has(key))) failure("invalid_state", "Reviewed source preferences contradict one another; ask again with a new evidence selection.");
     return { snapshot: digest([...conflicts].sort((a, b) => a.id < b.id ? -1 : a.id > b.id ? 1 : 0)), rejected, ids, sessions, urls };
   };
-  const snapshotFreshness = async (t: string, run: AnswerRun): Promise<void> => {
+  const snapshotFreshness = async (t: string, run: AnswerRun, freshEmptyRefusal = false): Promise<void> => {
     if (run.candidateDigest !== digest(run.candidate) || run.evidenceDigest !== digest(run.evidence)
-      || !(await verify(t, run.evidence))) failure("stale_answer", "Source evidence changed or cannot be verified; ask again.");
+      || (!freshEmptyRefusal && !(await verify(t, run.evidence)))) failure("stale_answer", "Source evidence changed or cannot be verified; ask again.");
     const lookup = await lookupEffectivePolicy(policies, t, { questionClass: run.questionClass,
       ...(run.policy ? { policyId: run.policy.policyId, expectedVersion: run.policy.version } : {}) });
     if (lookup.status !== (run.policy ? "active" : "none")) failure("policy_conflict", "The effective policy changed; ask again before review.");
@@ -144,10 +144,14 @@ export function createAnswerWorkflow(policies: AnswerPolicyService, store: Answe
     // A saved answer is a release of the same candidate under the same policy,
     // not a permanent authorization to bypass later policy/evidence revisions.
     let current = true, inheritedConflict = false, whyNot: string | undefined;
-    try { await snapshotFreshness(t, run); } catch {
+    const freshEmptyRefusal = fresh && run.state === "refused" && run.reason === "no-sources"
+      && run.candidate.insufficient_coverage && !run.candidate.web_used && !run.evidence.length
+      && !run.candidate.sources.internal.length && !run.candidate.sources.web.length
+      && !conflicts.length && !run.parentRunId && !run.resolutionId;
+    try { await snapshotFreshness(t, run, freshEmptyRefusal); } catch {
       current = false;
       // The diagnosis re-runs the verifier; if it throws too, degrade to the generic stale wording (as deep does), never a 500 after the run is persisted.
-      if (fresh) try { whyNot = await whyUnverified(t, run.evidence, verify); } catch { whyNot = undefined; }
+      if (fresh && !freshEmptyRefusal) try { whyNot = await whyUnverified(t, run.evidence, verify); } catch { whyNot = undefined; }
     }
     if (run.parentRunId && run.resolutionId) {
       try {
@@ -160,8 +164,12 @@ export function createAnswerWorkflow(policies: AnswerPolicyService, store: Answe
       }
     }
     const state = !current ? "stale" : conflicts.length || inheritedConflict ? "conflicted" : run.state;
-    const scores = run.candidate.scored.map((s) => s.score).filter((s): s is number => typeof s === "number" && Number.isFinite(s));
-    return { ...run.candidate, ...(!current ? { sources: { internal: [], web: [] }, scored: [], auditLog: [], reason: whyNot ?? "Stored candidate, policy or source evidence changed, was withdrawn, or cannot be verified." } : {}),
+    const emptyReason = run.candidate.auditLog.some(entry => entry.jobKind === "ask.web_fallback_unavailable")
+      ? "Web search was unavailable and no internal source supported an answer."
+      : "No matching evidence was found for this question.";
+    const redact = !current || freshEmptyRefusal;
+    const scores = redact ? [] : run.candidate.scored.map((s) => s.score).filter((s): s is number => typeof s === "number" && Number.isFinite(s));
+    return { ...run.candidate, ...(redact ? { sources: { internal: [], web: [] }, scored: [], auditLog: [], reason: current ? emptyReason : whyNot ?? "Stored candidate, policy or source evidence changed, was withdrawn, or cannot be verified." } : {}),
       answer: state === "allowed" || state === "approved" ? run.candidate.answer : "", runId: run.id, state,
       policy: run.policy ? { policyId: run.policy.policyId, version: run.policy.version, questionClass: run.policy.questionClass,
         mode: run.policy.mode, style: run.policy.style, onInsufficient: run.policy.onInsufficient, citations: run.policy.citations } : null,

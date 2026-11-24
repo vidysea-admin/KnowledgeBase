@@ -82,7 +82,7 @@ export function buildItems(p: SetupProbes): SetupItem[] {
     action: "Confirm the provider and model configured for the intended job, then verify an authorized sample job. A configured key alone does not establish readiness.",
     source: "not tested by these setup endpoints",
   });
-  items.push(integ("web-search", "Gemini web search configured (optional)", "webSearch", false, "Ask can fall back to Gemini web search (Google Search grounding) using the Gemini key (its value is never shown). This does not verify quota or model access.", "No Gemini key: Ask cannot fall back to Gemini web search.", "Optional: set GEMINI_API_KEY in .env (optionally LKB_WEB_GROUNDING_MODEL), restart the API, then Re-check."));
+  items.push(integ("web-search", "Web search configured (optional)", "webSearch", false, "A search key is configured. Ask checks publisher pages before citing them.", "Ask needs a search provider to find external sources.", "Set OLLAMA_API_KEY or GEMINI_API_KEY in .env, restart the API, then Re-check."));
   items.push(integ("langfuse", "Langfuse configured (optional)", "langfuse", false, "All Langfuse tracing variables are set (values never shown).", "Langfuse tracing is off.", "Optional: set LANGFUSE_BASE_URL, LANGFUSE_PUBLIC_KEY and LANGFUSE_SECRET_KEY in .env, restart the API, then Re-check."));
 
   const jr = p.joinRules;

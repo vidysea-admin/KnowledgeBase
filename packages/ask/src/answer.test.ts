@@ -39,6 +39,31 @@ function run(decisions: unknown) {
 }
 const dec = (id: number, supported: unknown, answersQuery: unknown) => ({ id: "sentence-" + id, supported, answersQuery });
 
+test("grounding withholds broadened school, audience, jurisdiction and time claims and keeps the supported sentence", async () => {
+  for (const [limit, rule] of [
+    ["At Maple School", "the SAT fee can be waived."],
+    ["For current final-year pupils", "advising is available."],
+    ["In Ontario", "this credit counts toward the diploma."],
+    ["For the 2026 intake", "applications close in May."],
+  ]) {
+    const qualified = limit + ", " + rule;
+    const evidence: ContextSource[] = [{ id: "policy", origin: "speech", text: qualified }];
+    const complete: CompleteFn = async job => {
+      const instructions = job.messages.filter(m => m.role === "system").map(m => m.content).join(" ");
+      assert.match(instructions, /school, audience, jurisdiction, effective date/);
+      const payload = JSON.parse(job.messages.find(m => m.role === "user")!.content);
+      if (job.kind === "ask.answer") return result({ sentences: [rule, qualified].map(text => ({ text, sourceIds: ["policy"] })) });
+      assert.match(instructions, /Mark supported false when any omitted condition/);
+      const decisions = payload.sentences.map((s: { text: string; id: string }) => ({
+        id: s.id, supported: s.text === qualified && JSON.stringify(payload.context.strips).includes(qualified), answersQuery: true,
+      }));
+      return result({ decisions });
+    };
+    const out = await answer("What is the rule?", JSON.stringify(contextStrips(evidence)), {}, complete, { boundedSources: evidence });
+    assert.equal(out.text, qualified); assert.equal(out.removedSentences, 1);
+  }
+});
+
 test("mixed decisions keep only supported+relevant sentences and count the rest", async () => {
   const r = await run({ decisions: [dec(0, true, true), dec(1, false, true), dec(2, true, false)] });
   assert.equal(r.text, "Sentence about A.");
