@@ -119,7 +119,7 @@ export function userAction(id: string, a: UserAction): Promise<Record<string, un
 // ---- messages ---------------------------------------------------------------------------------------------------------------------
 
 const POLICY_TEXT: Record<string, string> = {
-  too_short: "use at least 12 characters", too_long: "use at most 128 characters", common: "that password is too common",
+  too_short: "use at least 8 characters", too_long: "use at most 128 characters", common: "that password is too common",
   contains_email: "do not include your email name", invalid: "that password cannot be used",
 };
 

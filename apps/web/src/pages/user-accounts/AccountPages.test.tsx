@@ -61,7 +61,7 @@ describe("signup", () => {
     await user.type(screen.getByLabelText("Confirm password"), "aaaaaaaaaaaa");
     responder = () => json(400, { error: "invalid_request", message: "x", reasons: ["too_short", "common"] });
     await user.click(screen.getByRole("button", { name: "Create account" }));
-    expect(await screen.findByRole("alert")).toHaveTextContent("use at least 12 characters; that password is too common");
+    expect(await screen.findByRole("alert")).toHaveTextContent("use at least 8 characters; that password is too common");
   });
 });
 

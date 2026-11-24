@@ -40,7 +40,7 @@ Not present and therefore new: password hashing, session store, mail sender, use
 - **UA-2 Email normalisation.** `trim`, Unicode NFKC, lowercase, max 254 chars, exactly one `@`, no
   control characters. Uniqueness is on the normalised value, enforced by a unique index (an index,
   not an application check). One email = one user = one tenant (v1).
-- **UA-3 Password policy.** 12..128 characters, any characters allowed (spaces, Unicode), no
+- **UA-3 Password policy.** 8..128 characters, any characters allowed (spaces, Unicode), no
   composition rules, rejected if it contains the email local part or is in a bundled deny list of
   common passwords [ASSUMPTION: top 10,000 list as a checked-in data file]. Never logged, never
   echoed, never stored except as a hash (UA-10).

@@ -8,7 +8,7 @@ import test from "node:test";
 import { fileURLToPath } from "node:url";
 import { BOOTSTRAP_ACTOR, main, passwordFromStdinText } from "./create-admin.mjs";
 
-const PW = "correct horse battery staple 42";
+const PW = "58049162"; // Isolated test credential at the accepted minimum.
 const WORK = { MONGO_WORK_DB: "lkb_work_test", MONGODB_URL: "mongodb://127.0.0.1:1/x" };
 
 function fakes(over = {}) {
@@ -18,7 +18,7 @@ function fakes(over = {}) {
     requireScriptDatabase: (await_env, argv, opts) => over.guard ? over.guard(await_env, argv, opts) : { url: await_env.MONGODB_URL, dbName: await_env.MONGO_WORK_DB },
     assertValidTenantId: (t) => { if (!/^[a-z][a-z0-9_-]{0,31}$/.test(t)) throw new Error(`invalid tenant id`); },
     normalizeEmail: (e) => (typeof e === "string" && /^[^@\s]+@[^@\s]+$/.test(e.trim()) ? e.trim().toLowerCase() : null),
-    checkPassword: (p) => (p.length >= 12 ? { ok: true } : { ok: false, reasons: ["too_short"] }),
+    checkPassword: (p) => (p.length >= 8 ? { ok: true } : { ok: false, reasons: ["too_short"] }),
     hash: async (p) => { calls.hash++; return `$argon2id$v=19$m=19456,t=2,p=1$c29tZXNhbHQ$${Buffer.from(p).toString("base64url").slice(0, 20)}`; },
     readStdin: async () => { calls.stdin++; return over.stdin ?? `${PW}\n`; },
     connect: async () => { calls.connect++; },

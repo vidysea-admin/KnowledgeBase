@@ -1,7 +1,7 @@
 /**
  * apps/api/src/user-accounts/password-policy.ts -- unit `ua-credentials`, spec UA-3.
  *
- * 12..128 characters (code points, after NFKC), any characters allowed (spaces, Unicode), NO composition
+ * 8..128 characters (code points, after NFKC), any characters allowed (spaces, Unicode), NO composition
  * rules. Rejected when it is on the bundled deny list, when it is a deny-list word plus a trailing run of
  * digits/symbols ("password2026!!"), or when it contains the email local part. The password is never logged
  * or echoed: the result carries closed-vocabulary reason codes only.
@@ -14,7 +14,7 @@
 import { readFileSync } from "node:fs";
 import { normalizeEmail, emailLocalPart, hasLoneSurrogate } from "./email.js";
 
-export const PASSWORD_MIN = 12;
+export const PASSWORD_MIN = 8;
 export const PASSWORD_MAX = 128;
 const LOCAL_PART_MIN = 3;
 const BASE_MIN = 6;

@@ -29,7 +29,7 @@ export function ResetPage(): ReactNode {
     );
   }
   return (
-    <AuthCard title="Choose a new password" intro="At least 12 characters.">
+    <AuthCard title="Choose a new password" intro="At least 8 characters.">
       {token === "" && <p role="alert" className="error-note">This link is missing its code. Ask an admin for a new one.</p>}
       {error && <p role="alert" className="error-note">{error}</p>}
       <form onSubmit={(e) => void submit(e)}>

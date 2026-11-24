@@ -14,7 +14,7 @@ import { createSessionService } from "./sessions.js";
 import { fakeClock, memorySessionStore } from "./sessions.testsupport.js";
 import type { IpLimits } from "./throttle.js";
 
-const ORIGIN = "https://kb.example.org", SECRET = "k".repeat(48), PW = "correct horse battery staple", PW2 = "another long passphrase 2026";
+const ORIGIN = "https://kb.example.org", SECRET = "k".repeat(48), PW = "correct horse battery staple", PW2 = "58049162";
 const COOKIE = { basePath: "/knowledgebase", production: true }, CSRF = { secret: SECRET, allowedOrigins: [ORIGIN] };
 
 async function rig(o: { tenant?: string | undefined; ip?: Partial<IpLimits>; real?: boolean; failStore?: boolean } = {}) {
@@ -52,8 +52,8 @@ const STRICT = (r: { token?: string; csrf?: string }) => ({ cookie: r.token, csr
 
 test("A4 #1 signup over HTTP: new and existing email give a byte-equal body; unknown field and tenant-in-body are 400 and create nothing; no tenant configured is 503", async () => {
   const r = await rig(); try {
-    const first = await r.call("POST", "/auth/signup", { body: { email: "new@x.org", password: PW, displayName: "N" } });
-    const second = await r.call("POST", "/auth/signup", { body: { email: "NEW@x.org", password: PW2, displayName: "M" } });
+    const first = await r.call("POST", "/auth/signup", { body: { email: "new@x.org", password: PW2, displayName: "N" } });
+    const second = await r.call("POST", "/auth/signup", { body: { email: "NEW@x.org", password: PW, displayName: "M" } });
     assert.equal(first.status, 202); assert.equal(second.status, 202); assert.equal(first.text, second.text); assert.deepEqual(first.setCookie, []);
     assert.equal(r.a.users.size, 1);
     for (const extra of [{ tenantId: "tB" }, { role: "admin" }, { status: "active" }, { __proto__: null, x: 1 }]) {

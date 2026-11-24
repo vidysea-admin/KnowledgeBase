@@ -116,7 +116,7 @@ printf '%s' "$ADMIN_PASSWORD" | node scripts/create-admin.mjs --tenant toc --ema
 Add `--display-name "<name>"` if wanted. For the production database the script also requires
 `--i-know-this-is-production` and `MONGODB_DB=lkb` or `lkb_prod`; that run is a human-approved act.
 Type the password at the host's prompt in a way that keeps it out of shell history (for example
-`read -rs ADMIN_PASSWORD` first). Minimum 12 characters; spaces and non-ASCII are fine. Exit 0 means
+`read -rs ADMIN_PASSWORD` first). Minimum 8 characters; spaces and non-ASCII are fine. Exit 0 means
 created or already an admin (the password is not changed); exit 3 means the email exists in another
 state and was left alone; exit 1 means refused. The script never prints the password.
 

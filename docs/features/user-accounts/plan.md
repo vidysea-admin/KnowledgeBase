@@ -66,7 +66,7 @@ File ownership is exclusive per wave; two units never edit one file in the same 
 2. Stored value is PHC-formatted, salted (two hashes of one password differ), contains no password.
 3. Email normaliser: table-driven tests for case, NFKC (`ＡＢ@x` forms), whitespace, control chars,
    two `@`, over-length; idempotent.
-4. Policy: rejects < 12, > 128, deny-list hits, local-part containment; accepts passphrases with
+4. Policy: rejects < 8, > 128, deny-list hits, local-part containment; accepts passphrases with
    spaces and non-ASCII.
 5. Token generator yields 256 random bits, returns the raw value once, and stores/compares only
    sha256 with `timingSafeEqual`.

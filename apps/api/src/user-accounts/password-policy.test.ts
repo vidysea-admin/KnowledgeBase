@@ -12,22 +12,23 @@ const reasons = (pw: unknown, email?: string) => {
   return r.ok ? [] : r.reasons;
 };
 
-test("bounds are 12..128 characters", () => {
-  assert.equal(PASSWORD_MIN, 12);
+test("bounds are 8..128 characters", () => {
+  assert.equal(PASSWORD_MIN, 8);
   assert.equal(PASSWORD_MAX, 128);
 });
 
-test("rejects shorter than 12 and longer than 128, accepts exactly 12 and exactly 128", () => {
-  assert.deepEqual(reasons("Tr0ub4dor&3"), ["too_short"]);
+test("rejects shorter than 8 and longer than 128, accepts an eligible eight-digit password and exactly 128 characters", () => {
+  assert.deepEqual(reasons("5804916"), ["too_short"]);
   assert.deepEqual(reasons(""), ["too_short"]);
   assert.deepEqual(reasons("x".repeat(129)), ["too_long"]);
-  assert.deepEqual(reasons("zq7vk3mw9pl4"), []);
+  assert.deepEqual(reasons("58049162"), []);
+  assert.deepEqual(reasons("12345678"), ["common"]);
   assert.equal(checkPassword("zq7vk3mw9pl4".padEnd(128, "k")).ok, true);
 });
 
 test("length counts characters (code points), not UTF-16 units or bytes", () => {
-  assert.deepEqual(reasons("\u{1F600}".repeat(11)), ["too_short"]);
-  assert.deepEqual(reasons("\u{1F600}".repeat(12)), []);
+  assert.deepEqual(reasons("\u{1F600}".repeat(7)), ["too_short"]);
+  assert.deepEqual(reasons("\u{1F600}".repeat(8)), []);
   assert.deepEqual(reasons("\u{1F600}".repeat(128)), []);
   assert.deepEqual(reasons("\u{1F600}".repeat(129)), ["too_long"]);
 });

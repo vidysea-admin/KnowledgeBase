@@ -100,7 +100,7 @@ Never leave a blank `NAME=` line for the pass-through names: comment it out. The
 Runs inside Docker through the opt-in `indexer` compose service (the `build` stage, which carries `scripts/`, the workspace sources and tsx), so the server needs no Node or pnpm. It reads `MONGODB_URL`, `MONGODB_DB`, `OLLAMA_API_KEY` and `GEMINI_API_KEY` from the server `.env`, like the api. Build it once after each pull: `docker compose build indexer`.
 
 ```sh
-read -rs ADMIN_PASSWORD; echo             # 12+ characters
+read -rs ADMIN_PASSWORD; echo             # 8+ characters
 printf '%s' "$ADMIN_PASSWORD" | docker compose run --rm -T -e MONGODB_DB=lkb_prod indexer node scripts/create-admin.mjs --tenant toc --email <admin-email> --i-know-this-is-production
 unset ADMIN_PASSWORD                      # exit 0 = created or already admin; 3 = email exists, untouched; 1 = refused
 ```

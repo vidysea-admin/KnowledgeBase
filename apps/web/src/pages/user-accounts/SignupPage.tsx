@@ -29,7 +29,7 @@ export function SignupPage(): ReactNode {
   }
 
   return (
-    <AuthCard title="Create an account" intro="Use at least 12 characters; a phrase with spaces is fine. An admin approves new accounts.">
+    <AuthCard title="Create an account" intro="Use at least 8 characters; a phrase with spaces is fine. An admin approves new accounts.">
       {error && <p role="alert" className="error-note">{error}</p>}
       <form onSubmit={(e) => void submit(e)}>
         <Field label="Your name" autoComplete="name" value={displayName} onChange={(e) => setDisplayName(e.target.value)} maxLength={200} required />
