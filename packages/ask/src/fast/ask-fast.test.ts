@@ -129,6 +129,37 @@ test("[F4] sources.internal is the chunks the answer cites; an uncited retrieved
   assert.ok(!out.sources.internal.some((s) => s.node_id === nodeA.node_id));
 });
 
+test("[F4] a UC answer publishes only the cited turns within the same session", async () => {
+  const session = mk("inside-the-uc");
+  const sessionTree = { ...tree, children: [session] };
+  function turn(id: string, speaker: string, start: number, end: number, quote: string): SourceQuote {
+    return { ...quoteFor(session), id: `quote-${id}`, turnId: id, speakerRef: speaker, tStart: start, tEnd: end,
+      charEnd: quote.length, byteEnd: Buffer.byteLength(quote), turnTextSHA256: sha(quote), sliceSHA256: sha(quote), quote };
+  }
+  const admission = turn("t042", "Vaishnavi", 2124, 2297, "UC does not consider SAT scores for admission or scholarships.");
+  const aid = turn("t022", "Beauty", 1008, 1080, "The California Dream Act application is for financial aid.");
+  const snapshot = sha("UC");
+  const evidence = { ...session.evidence, sourceSnapshotSHA256: snapshot, sourceQuotes: [admission, aid] };
+  const fixtureNode = { ...session, evidence, summary: JSON.stringify(evidence.sourceQuotes) };
+  const drafts = [
+    { sentences: [{ text: admission.quote, sourceIds: [admission.id] }], kept: [true], expected: [admission] },
+    { sentences: [{ text: aid.quote, sourceIds: [aid.id] }], kept: [true], expected: [aid] },
+    { sentences: [{ text: aid.quote, sourceIds: [aid.id] }, { text: admission.quote, sourceIds: [admission.id] }],
+      kept: [false, true], expected: [admission] },
+    { sentences: [{ text: aid.quote, sourceIds: [aid.id] }, { text: admission.quote, sourceIds: [admission.id] }],
+      kept: [true, true], expected: [admission, aid] },
+  ];
+  for (const { sentences, kept, expected } of drafts) {
+    const provider = scripted(() => ({ sentences }), (id) => kept[Number(id.slice("sentence-".length))] === true);
+    const f = fixture({ complete: provider.complete, extraCandidateArmsFn: async () => ({ arms: [[session]], degraded: null }),
+      sourceContext: { hydrate: async () => ({ nodes: [fixtureNode], snapshotSHA256: snapshot, sourceBytes: 150 }) } });
+    const out = await askFastV2("What did the UC panel say?", sessionTree, f.deps);
+    assert.deepEqual(out.sources, { internal: [{ node_id: session.node_id, evidence: { ...evidence, sourceQuotes: expected } }], web: [] });
+    assert.deepEqual(fixtureNode.evidence.sourceQuotes, [admission, aid]);
+    assert.deepEqual(provider.kinds, ["ask.answer", "ask.answer_grounding"]);
+  }
+});
+
 test("[F1] topic/native-passage nodes (not reachable by the session arms) reach the default path through the injected non-LLM tree arm, via treeSearchFn", async () => {
   const native: TreeIndexNode = { node_id: "tenant:t/topic:p1", title: "Visa forms", level: "topic", summary: TEXT,
     evidence: { sessionRef: "p1" }, children: [] };

@@ -124,7 +124,11 @@ export async function askFastV2(query: string, tree: TreeIndexNode, deps: AskV2D
     const cited = s.citedSourceIds;
     if (cited && s.result) {
       const ids = new Set(cited);
-      const internal = s.candidates.filter((n) => sourceQuotes(n).some((q) => ids.has(q.id))).map(internalSource);
+      const internal = s.candidates.flatMap((node) => {
+        const quotes = sourceQuotes(node).filter((quote) => ids.has(quote.id));
+        if (!quotes.length) return [];
+        return [{ node_id: node.node_id, evidence: { ...node.evidence, sourceQuotes: quotes } }];
+      });
       const webCited = web.filter((_w, i) => ids.has(`web-${i}`));
       s.result = { ...s.result, sources: { internal, web: webCited } };
     }
