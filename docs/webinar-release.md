@@ -1,5 +1,18 @@
 # Webinar → Knowledge Base operational release
 
+## Recorder verification on November 25, 2026
+
+The November 24 Meet produced three failed WebM files of zero bytes. All three session IDs matched consent receipts for the supplied meeting URL. Two attempts stopped at the browser profile ownership check. The third reported that Windows could not inspect the recorder's process group. The assisted request then reached the lobby. At 15:51 IST Meet displayed "You can't join this video call" and the recorder saw zero audio/video tracks. The next real capture needs a meeting that admits the recorder.
+
+On November 25 the Windows setup doctor passed. With a new temporary profile, the installed recorder ownership code verified the actual Chrome process, cleaned up after both a normal exit and a controller interruption, and preserved an unrecognised profile. That test used a blank page.
+
+| Retained Windows test | Playback observation |
+|---|---|
+| One-hour synthetic capture | 3602.050 s of VP8/Opus. One-second samples starting at 1, 1801 and 3600 s showed 8, 20 and 20 distinct frames. Audio peaked at -18.3 dB in each sample. |
+| Interrupted synthetic capture | 30.492 s of VP8/Opus. Audio was present at 1, 15 and 28 s. The recording had a 1.576 s gap between video frames at 0.496 and 2.072 s, and moving video at 15 and 28 s. |
+
+The earlier debugging VM was stopped when checked. The release still needs an identified Ubuntu graphical host and service owner, an independent playback/restart result on that host, and confirmation that the designated operator received an alert. The work mailbox receipt could not be verified in this run. See D-225 in the decision log for evidence locations.
+
 ## Ubuntu supervisor interface (T-051)
 
 On the target Ubuntu graphical user session, run
