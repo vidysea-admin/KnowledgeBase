@@ -136,4 +136,4 @@ Run by whoever has the tagged URL and the accounts; nothing below was run here.
   3. In the same window, one request as B: expect 200.
   4. With more than one instance and no 429 for A, record NOT-MEASURED, not PASS.
 
-## Status: ready-for-check
+## Status: checked-PASS (qa/verdicts/golive-launch-prep.md + qa/verdicts/golive-launch-prep.b.md, cycle 0, 2026-11-25)
