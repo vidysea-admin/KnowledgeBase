@@ -7,28 +7,14 @@
  */
 import type { TreeIndexNode } from "@lkb/core";
 import { recordJob } from "@lkb/ai";
-import { ASK_GRAPH, askFailure, askGraphV2, boundedSourcesOf, gatherCandidates, initAskGraphState } from "./ask-graph.js";
+import { ASK_GRAPH, askFailure, askGraphV2, boundedSourcesOf, gatherCandidates, holdForReview, initAskGraphState, judgeCitedTurns, transcriptQuotes } from "./ask-graph.js";
 import { contextStrips } from "./bounded-refine.js";
 import { internalSource, type AskResult, type WebSource } from "./router.js";
-import { AnswerAbstainError, sourceQuotes, isNativeSourceQuote, type LiveSourceTurn, type SourceQuote } from "./source-context.js";
-import { AnswerHoldError, conditionHold, evidenceTurns, wholeTurnSources, type EvidenceTurn } from "./answer.js";
+import { AnswerAbstainError, sourceQuotes, type LiveSourceTurn } from "./source-context.js";
+import { AnswerHoldError, evidenceTurns, wholeTurnSources, type EvidenceTurn } from "./answer.js";
 import type { AskV2Deps, AskV2Result } from "./ask-shared.js";
 export type { AuditEntry, AskV2Deps, AskV2Result } from "./ask-shared.js";
 
-/** F1 (ask-condition-fidelity): the existing hold path. "ambiguous" + insufficient coverage is what the answer policy routes to
- * review; the workflow then stores the candidate in state review and publishes an empty answer (C3). The reason never quotes
- * the held answer. */
-function holdForReview(result: AskV2Result, why: string): AskV2Result {
-  return { ...result, verdict: "ambiguous", insufficient_coverage: true, reason: `held for review: ${why}`,
-    auditLog: [...result.auditLog, { jobKind: "ask.condition_held", step: `condition_held: ${why}` }] };
-}
-/** Transcript quotes of hydrated or released internal sources (native passages have no speaker turn). */
-function transcriptQuotes(nodes: { evidence?: unknown }[]): SourceQuote[] {
-  return nodes.flatMap((n) => {
-    const quotes = (n.evidence as { sourceQuotes?: unknown } | undefined)?.sourceQuotes;
-    return Array.isArray(quotes) ? (quotes as Parameters<typeof isNativeSourceQuote>[0][]).filter((q): q is SourceQuote => !!q && !isNativeSourceQuote(q)) : [];
-  });
-}
 /** Hydration observer: records the live turn text a hydrator supplies (SourceHydration.liveTurns) without changing the result. */
 function observeHydration(deps: AskV2Deps): { deps: AskV2Deps; liveTurns: () => LiveSourceTurn[] | undefined } {
   let live: LiveSourceTurn[] | undefined;
@@ -46,14 +32,8 @@ function observeHydration(deps: AskV2Deps): { deps: AskV2Deps; liveTurns: () => 
  * are explicit and recorded; legacy callers retain their original behavior (see askGraphV2).
  */
 export async function askV2(query: string, tree: TreeIndexNode, deps: AskV2Deps): Promise<AskV2Result> {
-  if (!deps.sourceContext) return askGraphV2(query, tree, deps);
-  // F1 deep gate: the graph's refine/answer nodes (ask-graph.ts) are unchanged; the released answer is checked against the
-  // cited turns (whole when the hydrator proves them) and held for review when it drops a stated condition.
-  const observed = observeHydration(deps);
-  const result = await askGraphV2(query, tree, observed.deps);
-  if (result.web_used || result.insufficient_coverage || !result.answer.trim()) return result;
-  const why = conditionHold(result.answer, evidenceTurns(transcriptQuotes(result.sources.internal), observed.liveTurns()).map((t) => t.text));
-  return why ? holdForReview(result, why) : result;
+  // F1B-C3: the deep refine/answer nodes (ask-graph.ts) feed generation whole turns and hold the answer through `judgeCitedTurns`.
+  return askGraphV2(query, tree, deps);
 }
 
 /** ask-fast-rag C6: total wall-clock budget of the default path (D-203). */
@@ -188,12 +168,7 @@ export async function askFastV2(query: string, tree: TreeIndexNode, deps: AskV2D
     // F1-C2/C3 gate (deterministic, no extra call): an answer citing a turn that is not whole, or dropping a condition its
     // cited turn states, is held through the review path; no web retry follows a hold.
     if (heldWhy) s.result = holdForReview(s.result!, heldWhy);
-    else if (deps.sourceContext && !web.length && cited) {
-      const citedTurns = turns.filter((t) => t.quoteIds.some((id) => citedIds.has(id)));
-      const partial = citedTurns.find((t) => !t.whole);
-      const why = partial ? `cited turn ${partial.turnId}: ${partial.incomplete}` : conditionHold(s.result!.answer, citedTurns.map((t) => t.text));
-      if (why) s.result = holdForReview(s.result!, why);
-    }
+    else if (deps.sourceContext && cited) s.result = judgeCitedTurns(s.result!, turns, cited, observed.liveTurns() !== undefined);
     return s.result!;
   };
   let timer: ReturnType<typeof setTimeout> | undefined;

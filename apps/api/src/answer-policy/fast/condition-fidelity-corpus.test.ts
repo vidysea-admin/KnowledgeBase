@@ -264,3 +264,116 @@ test("[F1-C4][F1-I2] release gate leaves bindings and digests byte-identical for
   const askHeld = candidate(c4.draft, c4.source, [{ jobKind: "ask.condition_held", step: "condition_held: x" }]);
   assert.deepEqual(answerEvidence(askHeld), plainShape(askHeld), "Ask's own hold stays reviewable: no release marker");
 });
+
+// ---- F1B (unit f1-whole-turn-hydration): the REAL hydrator, fake model. The hydrator hands whole cited turns to generation ---------------------
+import { createSourceHydrator } from "../../ask/source-context.js";
+
+const sessionTurns: Row[] = rows.filter((r) => r.sessionId === session);
+/** Same harness as check(), but retrieval is the production hydrator over the archived session (all its turns), not a fixture hydrator. The fake
+ * model cites the source that carries the archived turn t042 (found by its turn identity), whatever excerpt the hydrator chose. */
+async function checkReal(query: string, drafts: Draft[], opt: { mode?: "deep"; turns?: Row[]; webAllowed?: boolean } = {}) {
+  const db = answerTestDb(), store = createInMemoryAnswerRecordStore();
+  db.rows("sessions").push({ _id: session, tenantId: tenant, sourceId: "rec" });
+  db.rows("sources").push({ _id: "rec", tenantId: tenant, kind: "recording" });
+  for (const r of opt.turns ?? sessionTurns) db.rows("turns").push({ ...r });
+  const node: TreeIndexNode = { node_id: "session-node", title: "Inside the UC", level: "session", summary: "", evidence: { sessionRef: session }, children: [] };
+  const tree: TreeIndexNode = { node_id: "root", title: "Tenant", level: "tenant", summary: "", children: [node] };
+  const hydrate = createSourceHydrator(tenant, { db: db.db });
+  let hydration: Awaited<ReturnType<typeof hydrate>> | undefined, web = 0; const calls: string[] = []; let presented: { sourceId: string; turnId?: string; text: string }[] = [];
+  const deps: AskV2Deps = { tenantId: tenant, scoreFn: () => [0.99, "offline"], lower: 0.5, upper: 0.8, write: async () => {},
+    treeSearchFn: (r, ids) => r.children.filter((n) => ids.includes(n.node_id)), extraCandidateArmsFn: async () => ({ arms: [[node]], degraded: null }),
+    tavilySearchFn: async () => { web++; return [{ url: "https://example.test/evidence", content: "Fixture only." }]; },
+    sourceContext: { hydrate: async (q, nodes) => (hydration = await hydrate(q, nodes)) },
+    complete: async (job) => {
+      calls.push(job.kind);
+      if (job.kind === "ask.select_nodes") return result({ node_ids: [node.node_id] });
+      const data = JSON.parse(job.messages.find((m) => m.role === "user")!.content);
+      if (job.kind === "ask.answer") {
+        const ctx = data.context as { strips: { sourceIndex: number; text: string }[]; sources: { sourceId: string; source?: { turnId: string } }[] };
+        presented = ctx.strips.map((s) => ({ sourceId: ctx.sources[s.sourceIndex]!.sourceId, turnId: ctx.sources[s.sourceIndex]!.source?.turnId, text: s.text }));
+        const cite = ctx.sources.find((s) => s.source?.turnId === A.turnId)?.sourceId ?? ctx.sources[0]!.sourceId;
+        return result({ sentences: drafts.map((d) => ({ text: d.text, sourceIds: [cite] })) });
+      }
+      if (job.kind === "ask.answer_grounding") return result({ decisions: data.sentences.map((s: { id: string }) => ({ id: s.id, supported: true, answersQuery: true })) });
+      throw new Error(job.kind);
+    } } as AskV2Deps;
+  const wf = createAnswerWorkflow(createAnswerPolicyService(createInMemoryAnswerPolicyStore()), store, createMongoEvidenceVerifier(db.db));
+  const out = await wf.execute(tenant, { query, questionClass: "admissions", evidenceMode: true, filters: { sessionIds: [], sources: "all", ...(opt.mode ? { mode: opt.mode } : {}) } },
+    { actor: "api-key:fixture" }, tree, deps);
+  const record = (await store.get(tenant, out.runId))!, reopen = (await wf.get(tenant, out.runId)).result;
+  const history = (await wf.history(tenant)).find((h) => h.id === out.runId)!;
+  if (!opt.webAllowed) assert.equal(web, 0);
+  return { out, record, reopen, history, ids: [] as string[], tuples: [] as (string | number)[][], calls, presented, hydration: hydration!, evidence: [{ id: "t042", text: raw.text }] as Src[] };
+}
+const RECORDED_SCOPE = /limits this rule to "[^"]*school[^"]*"/;
+const probeDrafts = (claim: string, q: string): Draft[] => q === SAT ? [draft(P.adm, "t042"), draft(claim, "t042")] : [draft(claim, "t042")];
+
+test("[F1B-C1][F1B-C2] real hydrator, fast: the archived t042 turn (over 1024 bytes) reaches generation whole, with its own turn identity", async () => {
+  assert.ok(Buffer.byteLength(raw.text) > 1024);
+  const r = await checkReal(SAT, [draft(P.verbatimSat, "t042")]);
+  assert.deepEqual(r.hydration.liveTurns!.filter((t) => t.turnId === A.turnId), [{ sessionId: session, turnId: A.turnId, text: raw.text }]);
+  const t042 = r.presented.filter((s) => s.turnId === A.turnId);
+  assert.ok(t042.length > 0, "t042 is among the hydrated sources");
+  assert.equal(norm(t042.map((s) => s.text).join(" ")), norm(raw.text), "generation reads the complete turn, not a 1024-byte slice");
+});
+
+test("[F1B-C2] real hydrator, fast: an answer that keeps the school-specific condition is released; one that drops it is held for review", async () => {
+  const kept = await checkReal(SAT, [draft(P.verbatimSat, "t042")]);
+  assert.equal(kept.out.state, "allowed", kept.out.reason); assert.equal(kept.out.answer, P.verbatimSat); assert.doesNotMatch(kept.out.reason, /held/);
+  assert.equal(kept.history.result.answer, P.verbatimSat);
+  const ds = probeDrafts(P.claims[0], SAT);
+  assertWithheld(await checkReal(SAT, ds), ds, RECORDED_SCOPE);
+});
+
+for (const mode of ["fast", "deep"] as const) {
+  test(`[F1B-C3][F1B-C5] ISS-F1WAIVERCONDITION-002 the 14 archived UC probes, real hydrator, ${mode}: each is held by the recorded school scope (n/14, per probe)`, async () => {
+    const outcome: string[] = []; let heldByScope = 0, i = 0;
+    for (const claim of P.claims as string[]) for (const q of [SAT, ENGLISH]) {
+      const r = await checkReal(q, probeDrafts(claim, q), mode === "deep" ? { mode } : {});
+      const ok = r.out.state === "review" && r.out.answer === "" && r.history.result.answer === "" && RECORDED_SCOPE.test(r.out.reason);
+      outcome.push(`${i++}:${q === SAT ? "SAT" : "EN"}:${ok ? "held-by-school-scope" : "NOT(" + r.out.state + ": " + r.out.reason.slice(0, 80) + ")"}`);
+      if (ok) heldByScope++;
+    }
+    console.log(`F1B-PROBES mode=${mode} held-by-recorded-scope=${heldByScope}/14 ${JSON.stringify(outcome)}`);
+    assert.equal(heldByScope, 14);
+  });
+}
+
+test("[F1B-C3] real hydrator, deep: generation reads the whole t042 turn; the verbatim answer is released, and deep needs no call beyond the two answer calls", async () => {
+  const r = await checkReal(SAT, [draft(P.verbatimSat, "t042")], { mode: "deep" });
+  assert.equal(r.out.state, "allowed", r.out.reason); assert.equal(r.out.answer, P.verbatimSat);
+  assert.equal(norm(r.presented.filter((s) => s.turnId === A.turnId).map((s) => s.text).join(" ")), norm(raw.text));
+  assert.deepEqual(r.calls, ["ask.select_nodes", "ask.answer", "ask.answer_grounding"]);
+});
+
+test("[F1B-C1] real hydrator: a turn over the 16 KiB cap is left out of liveTurns, so none of its slices reaches generation or a released source (CORE-REQUEST-1: it is excluded, not held)", async () => {
+  const big = "Every applicant must submit an official transcript. ".repeat(400);
+  assert.ok(Buffer.byteLength(big) > 16 * 1024);
+  const row: Row = { _id: "fixture-big", tenantId: tenant, sessionId: session, speakerRef: "Presenter", tStart: 5, tEnd: 900, text: big };
+  const r = await checkReal(ENGLISH, [draft("Every applicant must submit an official transcript.", "big")], { turns: [row], webAllowed: true });
+  assert.equal(r.hydration.liveTurns!.length, 0, "the over-cap turn is left out of liveTurns");
+  assert.ok(r.presented.every((s) => s.turnId !== "fixture-big"), "no slice of the over-cap turn reaches generation");
+  assert.deepEqual(r.out.sources.internal, [], "and none is released as a source");
+});
+
+// ---- F1B-C4 / ISS-F1WAIVERCONDITION-005: one judgment, on whole turns; web_used answers are still checked on internal sources -------------
+test("[F1B-C4] the release check does not run again on slices when Ask judged the whole turns (marker), and still runs when it did not", () => {
+  // slice = only the question; the whole turn (judged by Ask, released) also states the answer: a slice-only judgment would hold it
+  const slice = "Does UC consider SAT or ACT scores for admission or scholarships?";
+  const answer = "UC does not review SAT or ACT scores for admission or scholarships.";
+  const unchecked = candidate(answer, slice);
+  assert.match(conditionReleaseHold(unchecked) ?? "", /only asks this question/, "control: judged on the slice alone it would be held");
+  const checked = candidate(answer, slice, [{ jobKind: "ask.condition_checked", step: "condition_checked: whole turns" }]);
+  assert.equal(conditionReleaseHold(checked), null);
+  assert.equal(answerEvidence(checked).every((b) => !("conditionHeld" in (b.source as object))), true);
+});
+
+test("[F1B-C4] a web_used answer is still checked, never skipped, on its internal sources only; web sources are not turns", () => {
+  const internal = candidate(c4.draft, c4.source).sources.internal;
+  const web = { ...candidate(c4.draft, c4.source), web_used: true, sources: { internal,
+    web: [{ url: "https://example.test/x", content: "Only Maple School pupils may omit English proficiency scores; UC lets all other pupils too." }] } } as unknown as AskV2Result;
+  assert.match(conditionReleaseHold(web) ?? "", /maple school/, "the internal source judgment is not skipped for web_used");
+  const webOnly = { ...web, sources: { internal: [], web: web.sources.web } } as unknown as AskV2Result;
+  assert.equal(conditionReleaseHold(webOnly), null, "web text alone is never judged as a turn");
+  assert.equal(answerEvidence(web).filter((b) => b.origin === "web").every((b) => !("conditionHeld" in (b.source as object))), true, "web bindings never carry a condition hold");
+});

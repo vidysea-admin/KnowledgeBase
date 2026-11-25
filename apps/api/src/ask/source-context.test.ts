@@ -396,3 +396,67 @@ test("mixed hydration refuses forged child proof identity foreign source and alt
     await assert.rejects(f.deps.sourceContext!.hydrate("visa", [node, f.native]), /hydration identity|native source quote/);
   }
 });
+
+// ---- F1B (ask-condition-fidelity, unit f1-whole-turn-hydration): the hydrator hands whole cited turns to answer generation ----------------
+const nodeOf = (sessionId: string): TreeIndexNode => ({ ...node, node_id: "tenant:toc/session:" + sessionId, evidence: { sessionRef: sessionId } });
+const quotesOf = (nodes: TreeIndexNode[]) => nodes.flatMap((n) => n.evidence!.sourceQuotes as { turnId: string; quote: string; charStart: number; charEnd: number; byteEnd: number }[]);
+
+test("[F1B-C1] liveTurns carries each cited turn whole, byte for byte, next to the unchanged slices; a turn over the 16 KiB cap is left out, never cut", async () => {
+  const mid = "Visa forms open in October, café déjà vu. ".repeat(80);      // about 3.4 KB of multibyte text
+  const big = "Visa forms open in October. ".repeat(720);                   // 20,160 bytes
+  assert.ok(Buffer.byteLength(mid) >= 3000 && Buffer.byteLength(mid) < 16384); assert.ok(Buffer.byteLength(big) > 16384);
+  const a = source(mid, { _id: "a-t1", sessionId: "a" }), b = source(big, { _id: "b-t1", sessionId: "b" });
+  const { db } = fakeDb({ turns: [a, b] });
+  const admitted = [nodeOf("a"), nodeOf("b")];
+  const hydrated = await createSourceHydrator("toc", { db })("visa October", admitted);
+  // the slices stay exactly as before: bounded excerpts of the turn, never the turn
+  const quotes = quotesOf(hydrated.nodes);
+  assert.ok(quotes.some((q) => q.turnId === "a-t1") && quotes.some((q) => q.turnId === "b-t1"), "both turns are cited");
+  assert.ok(quotes.every((q) => Buffer.byteLength(q.quote) <= 1024 && q.quote.length < (q.turnId === "a-t1" ? mid : big).length));
+  assert.deepEqual(hydrated.liveTurns, [{ sessionId: "a", turnId: "a-t1", text: mid }]);
+  assert.equal(Buffer.from(hydrated.liveTurns![0]!.text, "utf8").equals(Buffer.from(mid, "utf8")), true, "byte for byte");
+  // an over-cap turn is never judged on slices: its quotes do not survive validation (a missing live turn is a stale proof)
+  const kept = validateHydration(hydrated, admitted);
+  assert.deepEqual([...new Set(quotesOf(kept).map((q) => q.turnId))], ["a-t1"]);
+  assert.ok(hydrated.excludedTurns!.some((e) => e.turnId === "b-t1"));
+});
+
+test("[F1B-I1] liveTurns adds no read: the store is read the same number of times as before, with the same filters", async () => {
+  const { db, filters } = fakeDb({ turns: [source("Visa forms open in October. ".repeat(60)), source("Another speaker.", { _id: "s-t2", tStart: 30, tEnd: 40 })] });
+  const hydrated = await createSourceHydrator("toc", { db })("visa October", [node]);
+  assert.ok(hydrated.liveTurns!.length > 0);
+  // measured at the branch point f7eb479f with this same fixture (hydrator unchanged there): the scoped read of the admitted sessions, then the visibility gate's read by id
+  assert.deepEqual(filters, BASE_READS);
+  assert.ok(filters.every((f) => f.filter.tenantId === "toc"), "every read is tenant scoped");
+});
+const BASE_READS = [{ name: "turns", filter: { sessionId: { $in: ["s"] }, tenantId: "toc" } }, { name: "turns", filter: { _id: { $in: ["s-t1", "s-t2"] }, tenantId: "toc" } }];
+
+test("[F1B-I1] two tenants: a turn of tenant B, a foreign turn smuggled into the session, and a turn the visibility gate drops never appear in liveTurns", async () => {
+  const own = source("Visa forms open in October. Only the team of tenant A sees this.");
+  const foreign = source("TENANT-B SECRET visa forms close in May.", { _id: "b-t1", tenantId: "other", sessionId: "s" });
+  const hiddenRow = source("WITHHELD visa forms are cancelled.", { _id: "s-hidden", tStart: 30, tEnd: 40 });
+  const rows = [own, foreign, hiddenRow];
+  const { db: plain } = fakeDb({ turns: rows });
+  // the visibility gate re-reads raw turns by id; a turn it cannot confirm for this caller is dropped
+  const gated = { collection: (name: string) => { const c = plain.collection(name) as unknown as { find: (f: Record<string, unknown>) => unknown } & Record<string, unknown>;
+    return name !== "turns" ? c : { ...c, find: (f: Record<string, unknown>) => (f._id as { $in?: string[] } | undefined)?.$in
+      ? { limit() { return this; }, toArray: async () => rows.filter((r) => (f._id as { $in: string[] }).$in.includes(r._id) && r._id !== "s-hidden" && r.tenantId === f.tenantId) }
+      : c.find(f) }; } } as unknown as typeof plain;
+  const hydrated = await createSourceHydrator("toc", { db: gated })("visa forms October", [node]);
+  const everything = JSON.stringify(hydrated);
+  assert.deepEqual(hydrated.liveTurns!.map((t) => t.turnId), ["s-t1"]);
+  for (const leak of ["TENANT-B SECRET", "WITHHELD"]) assert.equal(everything.includes(leak), false, leak);
+  // with no tenant enforcement in the store, a foreign row in scope refuses the request instead of reaching liveTurns
+  const { db: lax } = fakeDb({ turns: [own, foreign] }, false);
+  await assert.rejects(createSourceHydrator("toc", { db: lax })("visa", [node]), /invalid scoped source row/);
+});
+
+test("[F1B-C1] the mixed transcript plus native hydration passes the transcript liveTurns through", async () => {
+  const nativeNode: TreeIndexNode = { node_id: "native", title: "Native", level: "topic", summary: "", children: [], evidence: { sourceId: "source", revisionHash: "a".repeat(64) } };
+  const turn = source("Visa forms open in October."); const { db } = fakeDb({ turns: [turn] });
+  const deps = createSourceRequestDepsFor({ db, dispatch: async () => completion({}), treeSearchFn: () => [], write: async () => {},
+    nativeSources: () => ({ async hydrate(_q, admitted) { return { nodes: [], snapshotSHA256: "b".repeat(64), sourceBytes: 1 }; }, async revalidate() {} }) })("toc");
+  const mixed = await deps.sourceContext!.hydrate("visa October", [node, nativeNode]);
+  assert.equal(mixed.nodes.length, 1);
+  assert.deepEqual(mixed.liveTurns, [{ sessionId: "s", turnId: "s-t1", text: turn.text }]);
+});

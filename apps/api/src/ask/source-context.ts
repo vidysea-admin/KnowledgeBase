@@ -15,6 +15,7 @@ import { createKnowledgeVisibility } from '../visibility/knowledge.js';
 import { chunkContentMatches } from '../indexing/chunk-integrity.js';
 import { createGraphContextFor, hasGraphSelection, graphTurnKey, type GraphContextDeps, type GraphContextSelection, type GraphContextSnapshot } from "./graph-context.js";
 import { speakerTranscriptHash } from "../../../../packages/index/src/pipeline/speaker-profiles/profile.js";
+import { TURN_EVIDENCE_LIMITS } from "../../../../packages/ask/src/answer.js";
 
 type ReadDb = Pick<Db, "collection">;
 const sha = (text: string) => createHash("sha256").update(text, "utf8").digest("hex");
@@ -244,7 +245,12 @@ export function createSourceHydrator(tenantId: string, deps: { db?: ReadDb; embe
           sourceSnapshotSHA256: snapshotSHA256, sourceMode: "exact-scoped-turn-excerpts" },
       });
     }
-    return { nodes: result, snapshotSHA256, sourceBytes: Buffer.byteLength(bytes, "utf8"), ...(degraded ? { degraded } : {}), ...(excludedTurns.length ? { excludedTurns } : {}) };
+    // F1B-C1: the whole text of every cited turn, taken from the row already read above (same tenant, visibility and review overlay,
+    // no new read), next to the excerpts. A turn over the per-turn cap is left out, never cut, so a quote of it is never judged on a slice.
+    const liveTurns = [...new Map(result.flatMap((n) => (n.evidence!.sourceQuotes as SourceQuote[]).map((q) => byTurn.get(q.turnId)!))
+      .map((t) => [t._id, { sessionId: t.sessionId, turnId: t._id, text: t.text }] as const)).values()]
+      .filter((t) => Buffer.byteLength(t.text, "utf8") <= TURN_EVIDENCE_LIMITS.turnBytes);
+    return { nodes: result, liveTurns, snapshotSHA256, sourceBytes: Buffer.byteLength(bytes, "utf8"), ...(degraded ? { degraded } : {}), ...(excludedTurns.length ? { excludedTurns } : {}) };
   };
 }
 
@@ -295,7 +301,7 @@ export function createSourceRequestDepsFor(options: RequestAskOptions) {
         const snapshotSHA256 = sha(JSON.stringify([transcript.snapshotSHA256, other.snapshotSHA256]));
         const nodes = proven.map(node => { const copy = structuredClone(node); return { ...copy, evidence: { ...copy.evidence, sourceSnapshotSHA256: snapshotSHA256 } }; });
         const excludedTurns = [...(transcript.excludedTurns ?? []), ...(other.excludedTurns ?? [])];
-        return { nodes, snapshotSHA256, sourceBytes: transcript.sourceBytes + other.sourceBytes, ...(excludedTurns.length ? { excludedTurns } : {}),
+        return { nodes, ...(transcript.liveTurns ? { liveTurns: transcript.liveTurns } : {}), snapshotSHA256, sourceBytes: transcript.sourceBytes + other.sourceBytes, ...(excludedTurns.length ? { excludedTurns } : {}),
           degraded: [transcript.degraded, other.degraded].filter(Boolean).join("; ") || undefined };
       }, ...(nativeSource ? { revalidate: (nodes: TreeIndexNode[]) => nativeSource.revalidate(nodes.filter(isNative)) } : {}) },
     };

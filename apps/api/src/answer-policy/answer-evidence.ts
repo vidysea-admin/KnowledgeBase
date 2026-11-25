@@ -20,9 +20,10 @@ import type { SourceQuote } from "../../../../packages/ask/src/source-context.js
  * condition stated in its cited quotes, and that Ask did not already hold for review, gets a `conditionHeld` reason inside each
  * internal binding's source (the stored evidence schema allows source fields only). The verifier then refuses it on every read,
  * so the workflow publishes it stale, with answer and sources withheld, at execute time and in history. Bindings of an answer
- * that carries no dropped condition are byte-identical to before (C4). */
+ * that carries no dropped condition are byte-identical to before (C4). F1B-C4: an answer Ask already judged on whole turns
+ * (`ask.condition_checked`) is not judged again here on slices; a `web_used` answer is judged on its internal sources only. */
 export function conditionReleaseHold(result: AskV2Result): string | null {
-  if (result.auditLog?.some((e) => e.jobKind === "ask.condition_held") || typeof result.answer !== "string" || !result.answer.trim()) return null;
+  if (result.auditLog?.some((e) => e.jobKind === "ask.condition_held" || e.jobKind === "ask.condition_checked") || typeof result.answer !== "string" || !result.answer.trim()) return null;
   const quotes = result.sources.internal.flatMap((n) => {
     const qs = n.evidence?.sourceQuotes;
     return Array.isArray(qs) ? (qs as Record<string, unknown>[]).filter((q) => !!q && typeof q.turnId === "string" && typeof q.quote === "string" && !("sourceLocator" in q)) as unknown as SourceQuote[] : [];

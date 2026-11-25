@@ -17,8 +17,8 @@ import { LOWER_THRESHOLD, UPPER_THRESHOLD, type ScoreFn } from "./evaluator.js";
 import { selectNodes, type CompleteFn } from "./select-nodes.js";
 import { rrfMerge } from "./merge.js";
 import { refine, type RefinableDoc } from "./refine.js";
-import { answer as generateAnswer } from "./answer.js";
-import { sourceCatalog, validateHydration, sourceQuotes, isNativeSourceQuote, completionBudget, BoundedAskError, SOURCE_LIMITS } from "./source-context.js";
+import { answer as generateAnswer, conditionHold, evidenceTurns, wholeTurnSources, type EvidenceTurn } from "./answer.js";
+import { sourceCatalog, validateHydration, sourceQuotes, isNativeSourceQuote, completionBudget, BoundedAskError, SOURCE_LIMITS, type LiveSourceTurn, type SourceQuote } from "./source-context.js";
 import { boundedRefine, contextStrips, type ContextSource } from "./bounded-refine.js";
 import type { AskV2Deps, AskV2Result, AuditEntry } from "./ask-shared.js";
 import { completionAudit } from "./usage-audit.js";
@@ -41,6 +41,9 @@ export interface AskGraphState {
   refinedContext?: string;
   /** Bounded answers only: source IDs cited by the sentences that survived grounding (read by the fast path). */
   citedSourceIds?: string[];
+  /** F1B: the live whole-turn text the hydrator supplied (SourceHydration.liveTurns), and the speaker turns behind the bounded sources. */
+  liveTurns?: LiveSourceTurn[];
+  turns?: EvidenceTurn[];
   /** Fast path only: the answer prompt tells the model it may abstain (`sentences: []`). */
   abstainable?: boolean;
   result?: AskV2Result;
@@ -69,6 +72,35 @@ function collectNodesById(root: TreeIndexNode): Map<string, TreeIndexNode> {
     for (const c of n.children ?? []) stack.push(c);
   }
   return byId;
+}
+
+/** F1 (ask-condition-fidelity): the existing hold path. "ambiguous" + insufficient coverage is what the answer policy routes to
+ * review; the workflow then stores the candidate in state review and publishes an empty answer (C3). The reason never quotes
+ * the held answer. */
+export function holdForReview(result: AskV2Result, why: string): AskV2Result {
+  return { ...result, verdict: "ambiguous", insufficient_coverage: true, reason: `held for review: ${why}`,
+    auditLog: [...result.auditLog, { jobKind: "ask.condition_held", step: `condition_held: ${why}` }] };
+}
+/** Transcript quotes of hydrated or released internal sources (native passages have no speaker turn). */
+export function transcriptQuotes(nodes: { evidence?: unknown }[]): SourceQuote[] {
+  return nodes.flatMap((n) => {
+    const quotes = (n.evidence as { sourceQuotes?: unknown } | undefined)?.sourceQuotes;
+    return Array.isArray(quotes) ? (quotes as Parameters<typeof isNativeSourceQuote>[0][]).filter((q): q is SourceQuote => !!q && !isNativeSourceQuote(q)) : [];
+  });
+}
+/** F1B-C3/C4: the ONE condition judgment, over the turns the answer cites (fast and deep share it). A cited turn that is not whole holds
+ * the answer; otherwise `conditionHold` judges the whole turns, with no model call. Web sources are not turns and never enter it. When the
+ * hydrator supplied the whole turns (`live`), the judged answer carries the `ask.condition_checked` marker, so the release gate does not
+ * judge it again on slices. */
+export function judgeCitedTurns(result: AskV2Result, turns: EvidenceTurn[], cited: string[] | undefined, live: boolean): AskV2Result {
+  if (!cited) return result;
+  const ids = new Set(cited.flatMap((id) => turns.find((t) => t.whole && t.quoteIds.includes(id))?.quoteIds ?? [id]));
+  const citedTurns = turns.filter((t) => t.quoteIds.some((id) => ids.has(id)));
+  if (!citedTurns.length) return result;
+  const partial = citedTurns.find((t) => !t.whole);
+  const why = partial ? `cited turn ${partial.turnId}: ${partial.incomplete}` : conditionHold(result.answer, citedTurns.map((t) => t.text));
+  return why ? holdForReview(result, why) : !live ? result
+    : { ...result, auditLog: [...result.auditLog, { jobKind: "ask.condition_checked", step: "condition_checked: whole turns" }] };
 }
 
 /** Bounded answer context: exact source quotes of the admitted nodes (tuple identity attached) plus unverified web text. */
@@ -121,6 +153,7 @@ export async function gatherCandidates(s: AskGraphState, treeCandidates: TreeInd
           step: `warning: ${hydrated.excludedTurns.length} invalid source turn(s) excluded from this answer: ` + hydrated.excludedTurns.map((e) => `session ${e.sessionId} turn ${e.turnId} (${e.reason})`).join("; ") });
       }
       auditLog.push({ jobKind: "ask.source_hydrated", step: `${candidates.length} source nodes; snapshot ${hydrated.snapshotSHA256}; ${hydrated.sourceBytes} source bytes` });
+      s.liveTurns = hydrated.liveTurns;
     }
     return limit !== undefined && !deps.sourceContext ? candidates.slice(0, limit) : candidates;
 }
@@ -180,7 +213,12 @@ const refineNode: AskGraphNode = {
     const { query, deps, auditLog } = s;
     const askResult = s.askResult!;
     const goodDocNodes: TreeIndexNode[] = askResult.scored.filter((x) => x.score >= s.lower).map((x) => x.node);
-    const boundedSources: ContextSource[] = deps.sourceContext ? boundedSourcesOf(goodDocNodes, askResult.sources.web) : [];
+    let boundedSources: ContextSource[] = deps.sourceContext ? boundedSourcesOf(goodDocNodes, askResult.sources.web) : [];
+    // F1B-C3: generation reads each cited speaker turn whole (proven by its turn hash), never an excerpt that cuts a sentence.
+    if (deps.sourceContext) {
+      s.turns = evidenceTurns(transcriptQuotes(goodDocNodes), s.liveTurns);
+      boundedSources = wholeTurnSources(boundedSources, s.turns);
+    }
     s.boundedSources = boundedSources;
     if (deps.sourceContext && !boundedSources.length) {
       s.result = { ...askResult, answer: "No supported internal source was retrieved. Web fallback is unavailable or returned no evidence.", auditLog };
@@ -209,8 +247,10 @@ const answerNode: AskGraphNode = {
     const answerResult = await generateAnswer(s.query, s.refinedContext!, askResult.sources, s.loggingComplete("answer"), s.deps.sourceContext ? { boundedSources: s.boundedSources, abstain: s.abstainable, onCited: (ids) => { s.citedSourceIds = ids; } } : undefined);
     s.budget?.assertHealthy();
     if (nativeNodes.length) await revalidate!(nativeNodes);
-    s.result = { ...askResult, answer: answerResult.text, auditLog: s.auditLog,
+    const answered: AskV2Result = { ...askResult, answer: answerResult.text, auditLog: s.auditLog,
       ...(answerResult.removedSentences ? { removedSentences: answerResult.removedSentences } : {}) };
+    // F1B-C3: deep applies the same hold as fast, over the turns the answer cites (no extra model call).
+    s.result = s.deps.sourceContext && s.turns ? judgeCitedTurns(answered, s.turns, s.citedSourceIds, s.liveTurns !== undefined) : answered;
   },
 };
 
