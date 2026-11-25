@@ -11,6 +11,7 @@ import {existsSync, mkdtempSync, readFileSync, rmSync, statSync, writeFileSync} 
 import {join} from 'node:path';
 import {tmpdir} from 'node:os';
 import {runPipelineTick} from '../run-pipeline.mjs';
+import {runSchedulerCycle} from './dispatch.mjs';
 import {event, withFixture, completed} from '../run-pipeline-fixtures.mjs';
 const {webinarIdentity, webinarSessionKey} = await import('../../../packages/meeting-bot/src/calendar/auto-record-policy.ts');
 const {raiseAlert} = await import('../../../packages/meeting-bot/src/autojoin/alerts.ts');
@@ -212,10 +213,10 @@ test('H1-C6: with the first rejoin still running, four cycles and three alert re
 }, true));
 
 test('H1-C6: a rejoin that finds the capture lock held fails as an attempt that counts, and starts nothing beside the holder', () => withFixture(async f => {
-  serviceFixture(f); seed(f, {[ID]: crashRow()}); let holderKilled = false;
+  serviceFixture(f); seed(f, {[ID]: crashRow()});
   f.deps.launch = async args => {f.calls.push(args); throw new Error('capture lock held by a live process');};
   await restart(f);
-  assert.equal(launches(f).length, 1); assert.equal(readOps(f)[ID].status, 'failed'); assert.equal(readOps(f)[ID].attempts, 2); assert.equal(holderKilled, false);
+  assert.equal(launches(f).length, 1); assert.equal(readOps(f)[ID].status, 'failed'); assert.equal(readOps(f)[ID].attempts, 2); // the lock holder is a fake that this test never touches; "starts nothing beside the holder" is the single launch above
   await restart(f); // own-error rejoin (D-244 default): attempt 3, fails again
   assert.equal(readOps(f)[ID].attempts, 3);
   await restart(f); assert.equal(launches(f).length, 2, 'the attempt limit bounds the loop'); assert.equal(readOps(f)[ID].reason, 'retry-limit');
@@ -313,6 +314,45 @@ test('H1-C10: a link in a title is removed from the interruption subject by the 
     const [mail] = calls.map(decodeMail); assert.match(mail.subject, /\[link removed\]/);
     assert.ok(!`${mail.subject}${mail.body}`.includes('FAKEPWD99'));
   } finally {rmSync(dir, {recursive: true, force: true});}
+});
+
+const STOP = {tenantId: 'fixture', sessionId: ID, generation: '11111111-1111-4111-8111-111111111111', reason: 'cancelled', requestedAt: '2026-09-30T12:10:00.000Z'};
+test('H1-C7: a row that already carries a stop request is never rejoined (a rejoin could not be stopped again); it keeps today handling and alert', () => withFixture(async f => {
+  for (const [name, row] of [['recording + cancelled stop', crashRow({stopDisposition: STOP})],
+    ['recording + controller-disconnected stop, acknowledged', crashRow({stopDisposition: {...STOP, reason: 'controller-disconnected', acknowledged: 'accepted'}})],
+    ['failed + stop', crashRow({status: 'failed', reason: 'Recording pipeline exited 1', stopDisposition: STOP})]]) {
+    f.calls.length = 0; forget(f); serviceFixture(f); seed(f, {[ID]: row}); stubLaunch(f);
+    await restart(f);
+    assert.equal(launches(f).length, 0, name); assert.equal(readOps(f)[ID].status, 'action_required', name);
+    assert.equal(readOps(f)[ID].reason, 'interrupted-no-recording-artifact', name); assert.ok(readOps(f)[ID].stopDisposition, name);
+    assert.equal(readOps(f)[ID].interruption, undefined, name);
+    assert.ok(!f.mails().some(mail => /rejoining/.test(mail.body)), name);
+  }
+}, true));
+
+test('H1-C7: a stop-requested row with a surviving recording is finalized as today, never rejoined', () => withFixture(async f => {
+  serviceFixture(f); stubLaunch(f); const saved = join(f.root, 'stopped-partial.webm'); writeFileSync(saved, 'media');
+  seed(f, {[ID]: crashRow({stopDisposition: STOP, artifact: saved})}); await restart(f);
+  assert.deepEqual(f.calls.map(args => args[0]), ['finalize']);
+}, true));
+
+test('H1-C7: a monitoring gap of the dead process is not a stop request; the rejoin starts a fresh capture and the gap is not carried onto it', () => withFixture(async f => {
+  serviceFixture(f); stubLaunch(f);
+  seed(f, {[ID]: crashRow({monitorGap: {tenantId: 'fixture', sessionId: ID, reason: 'discovery-unavailable', checkedAt: '2026-09-30T12:05:00.000Z'}})});
+  await restart(f);
+  assert.equal(launches(f).length, 1); assert.equal(readOps(f)[ID].monitorGap, undefined); assert.equal(readOps(f)[ID].status, 'ready');
+}, true));
+
+test('H1-I5: the recovery loop itself leaves a row of another tenant alone (called directly, past the state reader that would reject it first)', async () => {
+  const operations = {'foreign-rec': crashRow({tenantId: 'foreign'}), 'foreign-failed': crashRow({tenantId: 'foreign', status: 'failed', reason: 'Recording pipeline exited 1'})};
+  const before = JSON.stringify(operations), state = {operations}, updated = []; let launched = 0;
+  const c = {state, tenantId: 'fixture', slots: [], now: () => RUNNING, env: {}, signal: undefined, refresh: async () => ({}), register: async () => {},
+    select: () => ({toSchedule: [], skipped: []}), setPreview: () => {}, notify: () => {}, update: id => {updated.push(id);},
+    priority: () => 1, validId: () => true, reconsider: () => false, complete: () => false, execute: async () => {launched++;},
+    prepareCapture: async () => {}, safeText: String, log: () => {}, graphEnabled: () => false, root: tmpdir(),
+    deps: {refreshSchedulerPolicy: async () => true, captureSlotSupports: () => true, validateCaptureSlot: async () => {}, validateTenant: async () => {}}};
+  await runSchedulerCycle(c);
+  assert.deepEqual(updated, []); assert.equal(launched, 0); assert.equal(JSON.stringify(operations), before);
 });
 
 test('H1-I5: a row of another tenant is left exactly as found', () => withFixture(async f => {

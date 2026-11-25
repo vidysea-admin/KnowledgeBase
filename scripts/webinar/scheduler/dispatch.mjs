@@ -14,7 +14,8 @@ const ATTEMPT_LIMIT = 3;
  */
 function interruptionOutcome(c, row, locate, indexed) {
   const attempts = row.attempts ?? 0, previous = row.interruption?.n ?? 0, end = Date.parse(row.endTime);
-  if (!Number.isFinite(end)) return undefined;
+  // A stop request on the row (cancel, reschedule, controller disconnect) is never rejoined: capture-stop.mjs:7 and run-pipeline.mjs:171 skip a new stop while one is on the row, so a rejoin could not be stopped again (D-245).
+  if (!Number.isFinite(end) || row.stopDisposition) return undefined;
   const running = end > Date.parse(c.now());
   if (row.status === 'recording') {
     if (attempts >= ATTEMPT_LIMIT || (previous > 0 && previous >= attempts)) return 'stopped';
@@ -68,7 +69,7 @@ export async function runSchedulerCycle(c) {
       const n = (row.interruption?.n ?? 0) + 1, interruption = {n, outcome};
       if (outcome === 'rejoining') {
         // The old file is neither finalized nor deleted (H1-C8); it stays findable on the row. The new capture writes its own `artifact`.
-        update(id, {status: 'queued', reason: 'interrupted-rejoining', interruption, artifact: undefined, ...(hasFile ? {interruptedArtifact: artifact} : {})});
+        update(id, {status: 'queued', reason: 'interrupted-rejoining', interruption, artifact: undefined, monitorGap: undefined, ...(hasFile ? {interruptedArtifact: artifact} : {})});
         rejoined.add(id);
       } else update(id, {status: 'action_required', reason: outcome === 'ended' ? 'interrupted-ended' : 'retry-limit', interruption});
       continue;
