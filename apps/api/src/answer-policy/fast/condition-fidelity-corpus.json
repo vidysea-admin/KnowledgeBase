@@ -1,0 +1,83 @@
+{
+  "contract": "qa/contracts/ask-condition-fidelity.md F1-C5 (D-015: recorded inputs, verbatim)",
+  "provenance": {
+    "verdict": "qa/verdicts/kb-ask-web-grounding-repair.md lines 75-80 (Cycle checked: 3, Verdict: FAIL, candidate def9078d19f312c58a40b27defcbb410e4e231cd)",
+    "independentCheckLog": {
+      "path": "qa/.delivery/cb83c01058334c10d11177acc9b90af6d4a10005aba1d2484c96f1b80acd1c3b.log",
+      "sha256": "cb83c01058334c10d11177acc9b90af6d4a10005aba1d2484c96f1b80acd1c3b",
+      "inputs": "probe constants lines 1739-1754; verdict-case table lines 1795-1802; recorded results lines 2013-2016; finding text lines 2979-2985"
+    },
+    "engineeringLog": {
+      "path": "qa/.delivery/f7db56dfd2f94ac9ff5bd34e7a7cfaeca1b89df561976f4ec31a001edef2741b.log",
+      "sha256": "f7db56dfd2f94ac9ff5bd34e7a7cfaeca1b89df561976f4ec31a001edef2741b",
+      "inputs": "case table lines 2140-2150; recorded results lines 2159-2164; finding table lines 2302-2308"
+    },
+    "archivedTurn": {
+      "path": "data/toc-migrated/2026-07-03-inside-the-uc-session/turns.json",
+      "turnId": "2026-07-03-inside-the-uc-session-t042",
+      "speakerRef": "Vaishnavi", "tStart": 2124, "tEnd": 2297,
+      "recordedExcerptChars": 1024,
+      "recordedExcerptSHA256": "6b98821e69a0828cf40ef5ddf41b41a752ec00f6b517260cc5f72a1807f62164",
+      "turnTextSHA256": "c8cc254ed168ca29fc8f4f7f4952bdd7a663a0c8966537aef7cb41e131335019"
+    }
+  },
+  "ucProbes": {
+    "note": "14 = 7 recorded claims x 2 recorded questions. Cited source 't042' = the archived turn's first 1024 chars (the recorded excerpt), plus the recorded uncited source. SAT question drafts [adm->t042, claim->t042]; English question drafts [claim->t042].",
+    "questions": {
+      "SAT": "In the Inside the UC session, how did the panel say SAT or ACT scores are considered for admission or scholarships?",
+      "English": "Who has to submit English proficiency test scores?"
+    },
+    "adm": "UC does not review SAT or ACT scores for admission or scholarships.",
+    "verbatimSat": "None of us are going to review your ACT or SAT scores, not for your admission purpose, not for your scholarship purpose.",
+    "uncited": "The office opens on Monday.",
+    "claims": [
+      "According to the panel, SAT and ACT scores are only relevant to satisfy the English language proficiency requirement, which was said to be waived and not required, so applicants don't need to send these scores.",
+      "Applicants can apply without TOEFL scores.",
+      "All UC applicants can apply without submitting TOEFL or IELTS scores.",
+      "No UC applicant has to take an English proficiency test.",
+      "For every UC applicant, submitting TOEFL results is entirely their choice.",
+      "All UC applicants can apply without proof of proficiency in English.",
+      "No UC applicant has to submit test scores to demonstrate proficiency in English."
+    ]
+  },
+  "verdictCases": [
+    { "id": "V-C1", "class": "SAT sentence lost an adjacent eligibility restriction", "recorded": "independentCheckLog line 2013 (state allowed)", "expect": "held",
+      "query": "In the Inside the UC session, how did the panel say SAT or ACT scores are considered for admission or scholarships?",
+      "source": "UC does not consider SAT or ACT scores for admission or scholarships. This rule applies only to transfer applicants. First-year applicants must submit their scores. The school has a separate TOEFL requirement.",
+      "draft": "UC does not review SAT or ACT scores for admission or scholarships.", "uncited": true },
+    { "id": "V-C2", "class": "SAT selector accepted a source's unanswered question", "recorded": "independentCheckLog line 2014 (state allowed)", "expect": "held",
+      "query": "In the Inside the UC session, how did the panel say SAT or ACT scores are considered for admission or scholarships?",
+      "source": "Does UC consider SAT or ACT scores for admission or scholarships? It depends on which program you apply to. The school has a separate TOEFL requirement.",
+      "draft": "UC does not review SAT or ACT scores for admission or scholarships.", "uncited": true },
+    { "id": "V-C3", "class": "distinct source wording bypassed scope protection", "recorded": "independentCheckLog line 2015 (state allowed)", "expect": "held",
+      "query": "Who has to submit English proficiency test scores?",
+      "source": "Only Maple School pupils may omit test results demonstrating their English ability. All other applicants must submit them.",
+      "draft": "All UC applicants can apply without proof of proficiency in English.", "uncited": true },
+    { "id": "V-C4", "class": "distinct source wording bypassed scope protection", "recorded": "independentCheckLog lines 2723, 2838, 2981 (published 'All UC applicants can apply without proof of proficiency in English.')", "expect": "held",
+      "query": "Who has to submit English proficiency test scores?",
+      "source": "UC lets only pupils from Maple School apply without scores demonstrating their English ability. All other UC applicants must submit those test results.",
+      "draft": "All UC applicants can apply without proof of proficiency in English.", "uncited": false },
+    { "id": "V-C5", "class": "false-hold regression (unconditional fee rule paraphrased)", "recorded": "independentCheckLog line 2016 (state review: a false hold) and line 2985", "expect": "allowed",
+      "query": "Who pays a lower visa fee?",
+      "source": "Applicants who submit TOEFL scores pay a reduced visa fee.",
+      "draft": "Submitting TOEFL scores lowers the visa fee.", "uncited": true }
+  ],
+  "engineeringCases": [
+    { "id": "V-E1", "class": "distinct source wording bypassed scope protection (fee waiver became a testing waiver)", "recorded": "engineeringLog lines 2147, 2160 (allowed)", "expect": "held",
+      "query": "Who has to submit English proficiency test scores?",
+      "source": "At Maple School the exam fee is waived. Every applicant still has to sit the exam.",
+      "draft": "All UC applicants can apply without submitting TOEFL or IELTS scores." },
+    { "id": "V-E2", "class": "SAT sentence lost an adjacent eligibility restriction", "recorded": "engineeringLog lines 2148, 2161 (allowed)", "expect": "held",
+      "query": "How are SAT or ACT scores considered for admission or scholarships?",
+      "source": "We use SAT or ACT scores for admission and scholarships. This applies only to recruited athletes. Maple School requires TOEFL scores.",
+      "draft": "We use SAT or ACT scores for admission and scholarships." },
+    { "id": "V-E3", "class": "SAT selector accepted a source's unanswered question", "recorded": "engineeringLog lines 2149, 2162 (allowed)", "expect": "held",
+      "query": "How are SAT or ACT scores considered for admission or scholarships?",
+      "source": "Do we use SAT or ACT scores for admission or scholarships? Maple School requires TOEFL scores.",
+      "draft": "We use SAT or ACT scores for admission and scholarships." },
+    { "id": "V-E4", "class": "over-budget exact quotation missed human review (thrown, zero history rows)", "recorded": "engineeringLog lines 2144, 2150, 2163 (source_context_unavailable, historyRows 0)", "expect": "held",
+      "query": "Who has to submit English proficiency test scores?",
+      "sourceRecipe": { "head": "At Maple School, pupils must submit TOEFL scores ", "repeat": "before the application deadline ", "times": 25, "tail": "this year." },
+      "draftIsSource": true }
+  ]
+}

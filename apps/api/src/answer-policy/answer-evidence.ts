@@ -13,6 +13,27 @@ import { readEffectiveTurns } from "../transcript-review/effective-reader.js";
 import { parseNativeSourceLocator, type NativeEvidenceResolver } from "../native-evidence/resolver.js";
 import { verifyNativeSourceQuotes } from "./native-evidence.js";
 import { passageLexicalScorer, slices } from "../ask/passage-lexical.js";
+import { conditionHold, evidenceTurns } from "../../../../packages/ask/src/answer.js";
+import type { SourceQuote } from "../../../../packages/ask/src/source-context.js";
+
+/** F1 release gate (ask-condition-fidelity C2/C3), defense in depth behind the Ask gate. A candidate whose answer drops a
+ * condition stated in its cited quotes, and that Ask did not already hold for review, gets a `conditionHeld` reason inside each
+ * internal binding's source (the stored evidence schema allows source fields only). The verifier then refuses it on every read,
+ * so the workflow publishes it stale, with answer and sources withheld, at execute time and in history. Bindings of an answer
+ * that carries no dropped condition are byte-identical to before (C4). */
+export function conditionReleaseHold(result: AskV2Result): string | null {
+  if (result.auditLog?.some((e) => e.jobKind === "ask.condition_held") || typeof result.answer !== "string" || !result.answer.trim()) return null;
+  const quotes = result.sources.internal.flatMap((n) => {
+    const qs = n.evidence?.sourceQuotes;
+    return Array.isArray(qs) ? (qs as Record<string, unknown>[]).filter((q) => !!q && typeof q.turnId === "string" && typeof q.quote === "string" && !("sourceLocator" in q)) as unknown as SourceQuote[] : [];
+  });
+  if (!quotes.length) return null;
+  return conditionHold(result.answer, evidenceTurns(quotes).map((t) => t.text));
+}
+const heldReason = (binding: EvidenceBinding): string | null => {
+  const held = (binding.source as { conditionHeld?: unknown } | undefined)?.conditionHeld;
+  return typeof held === "string" && held.trim() ? held : null;
+};
 
 function ordered(value: unknown): unknown {
   if (Array.isArray(value)) return value.map(ordered);
@@ -429,7 +450,9 @@ export const resolvePublisherSource = publisherEvidence.resolve;
 export const verifyPublisherEvidence: VerifyEvidence = publisherEvidence.verify;
 
 export function answerEvidence(result: AskV2Result): EvidenceBinding[] {
-  return [...result.sources.internal.map((source) => {
+  const held = conditionReleaseHold(result);
+  return [...result.sources.internal.map((plain) => {
+    const source = held ? { ...structuredClone(plain), conditionHeld: held } : plain;
     const quotes = source.evidence?.sourceQuotes;
     const excerpt = Array.isArray(quotes) ? quotes.map((q: { quote?: unknown }) => typeof q?.quote === "string" ? q.quote : "").join("\n") : "";
     return { id: `internal:${source.node_id}`, origin: "internal" as const, fingerprint: digest(source), source: { ...structuredClone(source) }, excerpt };
@@ -450,6 +473,7 @@ export function createMongoEvidenceVerifier(db: Db, web?: VerifyEvidence,
     if (!bindings.length) return false;
     const webBindings: EvidenceBinding[] = [];
     for (const binding of bindings) {
+      if (heldReason(binding)) return false; // F1 release gate: a condition-dropping answer is never verified for release.
       if (binding.fingerprint !== digest(binding.source) || !binding.excerpt.trim()) return false;
       if (binding.origin === "web") {
         if (!web) return false;
@@ -512,6 +536,8 @@ export function createMongoEvidenceVerifier(db: Db, web?: VerifyEvidence,
 export async function whyUnverified(tenantId: string, bindings: EvidenceBinding[], verify: VerifyEvidence): Promise<string> {
   const internal = bindings.filter((b) => b.origin === "internal"), web = bindings.filter((b) => b.origin === "web");
   if (!bindings.length) return "No supporting source was retrieved or cited, so there is nothing to verify.";
+  const held = bindings.map(heldReason).find((r): r is string => r !== null);
+  if (held) return `Held: ${held}; the answer and its sources are withheld.`;
   if (internal.length && !(await verify(tenantId, internal)))
     return "Internal source evidence changed, was withdrawn, or no longer matches the stored transcript turn; sources withheld.";
   if (web.length && !(await verify(tenantId, web)))
