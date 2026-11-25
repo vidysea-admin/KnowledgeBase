@@ -10,7 +10,24 @@ export interface CaptureSlotReadiness {
   observedAt: string; mediaStartedAt: number; admittedAt: number;
   observation: "admission-and-recorder-start"; evidenceKind: "browser" | "fixture"; evidenceHash: string;
 }
-export function captureSlotHostId(): string {
+/** Optional operator-asserted host id (cloud hosts change hostname per instance). Absent: the machine-derived id, exactly as before. */
+const HOST_ID_SETTING="LKB_CAPTURE_HOST_ID";
+let announcedHostId:string|undefined;
+const settingHostId=(value:string,platform:string)=>createHash("sha256").update(JSON.stringify(["lkb-capture-host-id",value,platform])).digest("hex");
+/** Start-time check for every process that computes the host id. Returns the validated setting, or undefined when absent. Throws, never echoing the raw value; no trimming, case-folding or truncation. */
+export function assertCaptureHostIdSetting(env: NodeJS.ProcessEnv = process.env): string | undefined {
+  const value=env[HOST_ID_SETTING];
+  if(value===undefined)return undefined;
+  const reason=value===""?"empty":value.trim()===""?"blank":value!==value.trim()?"whitespace":value.length>64?"too long":
+    !/^[A-Za-z0-9][A-Za-z0-9._-]*$/.test(value)?"bad character":undefined;
+  if(reason)throw new Error(`${HOST_ID_SETTING} refused: ${reason} (length ${value.length})`);
+  const id=settingHostId(value,process.platform);
+  if(announcedHostId!==id){announcedHostId=id;console.error(`[capture-host-id] ${HOST_ID_SETTING}=${value} hostId=${id}`);}
+  return value;
+}
+export function captureSlotHostId(env: NodeJS.ProcessEnv = process.env): string {
+  const setting=assertCaptureHostIdSetting(env);
+  if(setting!==undefined)return settingHostId(setting,process.platform);
   return createHash("sha256").update(JSON.stringify([hostname(),process.platform])).digest("hex");
 }
 function physical(directory: string): void {
@@ -52,24 +69,27 @@ export function readCaptureSlotObservation(workspace:CaptureWorkspace, platform?
 }
 /** Consumer must supply actual accepted host evidence; profile existence and a hash alone never establish readiness. */
 export function validateCaptureSlotReadiness(workspace:CaptureWorkspace, options:{platform:string;hostId?:string;now?:()=>number;acceptEvidence:(receipt:CaptureSlotReadiness)=>boolean}):CaptureSlotReadiness {
+  const hostId=options.hostId??captureSlotHostId();
   let receipt:CaptureSlotReadiness;
   try{receipt=readCaptureSlotObservation(workspace,options.platform);}
   catch(error){if((error as NodeJS.ErrnoException).code==="ENOENT")throw new Error("Capture slot has no accepted browser admission/readiness evidence");throw error;}
-  if(receipt.evidenceKind!=="browser"||receipt.platform!==options.platform||receipt.hostId!==(options.hostId??captureSlotHostId())||Date.parse(receipt.observedAt)>(options.now??Date.now)()||
+  if(receipt.evidenceKind!=="browser"||receipt.platform!==options.platform||receipt.hostId!==hostId||Date.parse(receipt.observedAt)>(options.now??Date.now)()||
     !options.acceptEvidence(receipt))throw new Error("Capture slot has no accepted browser admission/readiness evidence");
   return receipt;
 }
 /** The pool contains only observed meeting-platform capabilities; host OS is not a meeting platform. */
 export function listCaptureSlotReadiness(workspace:CaptureWorkspace, options:{hostId?:string;now?:()=>number;acceptEvidence:(receipt:CaptureSlotReadiness)=>boolean}):CaptureSlotReadiness[] {
+  const hostId=options.hostId??captureSlotHostId();
   physical(workspace.profileDir);physical(workspace.recordDir);
   const names=readdirSync(workspace.profileDir).filter(name=>/^\.lkb-capture-readiness-[a-z][a-z0-9-]{0,39}\.json$/.test(name));
   if(names.length>32)throw new Error("Capture readiness capabilities exceed bounds");
   return names.map(name=>readCaptureSlotObservation(workspace,name.slice(".lkb-capture-readiness-".length,-5))).filter(receipt=>
-    receipt.evidenceKind==="browser"&&receipt.hostId===(options.hostId??captureSlotHostId())&&Date.parse(receipt.observedAt)<=(options.now??Date.now)()&&options.acceptEvidence(receipt));
+    receipt.evidenceKind==="browser"&&receipt.hostId===hostId&&Date.parse(receipt.observedAt)<=(options.now??Date.now)()&&options.acceptEvidence(receipt));
 }
 /** Observations originate in the owned browser flow. They assert admission/capture, never a guessed signed-in identity. */
 export function createCaptureSlotReadinessObserver(workspace:CaptureWorkspace, owner:{sessionId:string;platform:string;startedAt:number;evidenceKind:"browser"|"fixture";generation?:string}, now:()=>number=Date.now) {
   if(!/^[a-z][a-z0-9-]{0,39}$/.test(owner.platform))throw new Error("Invalid readiness meeting platform");
+  if(workspace.slot)assertCaptureHostIdSetting();
   if(workspace.slot&&!/^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/.test(owner.generation??""))throw new Error("Capture receipt attempt generation required for slot readiness");
   const generation=owner.generation??"";let admittedAt:number|undefined,mediaStartedAt:number|undefined,failure:string|undefined,closed=false,published=false;
   const publish=()=>{
