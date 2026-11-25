@@ -27,6 +27,9 @@ const GCLOUD = String.raw`#!/bin/sh
 # stub gcloud: a local folder is the bucket; generations are integers; --if-generation-match is honoured atomically.
 echo "gcloud $*" >> "$STUB_LOG"
 R="$STUB_BUCKET_DIR"
+# a hung call: either every call once the hang file exists, or the calls that match STUB_HANG_MATCH once the pipeline stub is up
+if [ -e "$STUB_DIR/hang-gcloud" ]; then sleep 20; exit 1; fi
+if [ -n "\${STUB_HANG_MATCH:-}" ] && [ -e "$STUB_DIR/ready" ]; then case "$*" in *"$STUB_HANG_MATCH"*) sleep 20; exit 1 ;; esac; fi
 [ "$1" = storage ] || { echo "stub gcloud: only 'storage' is supported: $*" >&2; exit 2; }
 shift; sub="$1"; shift
 if [ "$sub" = objects ]; then sub="$1"; shift; fi
@@ -58,9 +61,15 @@ case "$sub" in
   cp)
     case "$a1" in
       gs://*) f="$(obj "$a1")"
-        if [ -n "\${STUB_FAIL_DOWNLOAD:-}" ]; then echo "ERROR: (gcloud.storage) HTTPError 503: backend error" >&2; exit 1; fi
-        [ -f "$f" ] || missing "$a1"; cp "$f" "$a2" ;;
+        case "$a2" in
+          gs://*) [ -f "$f" ] || missing "$a1"   # server-side copy, bucket to bucket
+            d="$(obj "$a2")"; mkdir -p "$(dirname "$d")"; cp "$f" "$d.tmp"; mv "$d.tmp" "$d"; g="$(next_gen)"; echo "$g" > "$d.gen" ;;
+          *) if [ -n "\${STUB_FAIL_DOWNLOAD:-}" ]; then echo "ERROR: (gcloud.storage) HTTPError 503: backend error" >&2; exit 1; fi
+             [ -f "$f" ] || missing "$a1"; cp "$f" "$a2" ;;
+        esac ;;
       *) case "$a2" in *"\${STUB_FAIL_UPLOAD:-@@none@@}"*) echo "ERROR: stub upload failure" >&2; exit 1 ;; esac
+         case "$a2" in */state.tar.gz) if [ -f "$STUB_DIR/grandchild.pid" ]; then
+           if kill -0 "$(cat "$STUB_DIR/grandchild.pid")" 2>/dev/null; then echo "GRANDCHILD alive-at-upload" >> "$STUB_LOG"; else echo "GRANDCHILD gone-at-upload" >> "$STUB_LOG"; fi; fi ;; esac
          f="$(obj "$a2")"
          if [ -n "$match" ] && [ "$match" != "$(gen_of "$f")" ]; then precond; fi
          mkdir -p "$(dirname "$f")"; cp "$a1" "$f.tmp"; mv "$f.tmp" "$f"; g="$(next_gen)"; echo "$g" > "$f.gen"
@@ -80,6 +89,11 @@ case "$*" in
   *setup.mjs*)
     m=no; [ -e "$LKB_BOT_PROFILE_DIR/marker.txt" ] && m=yes; p=no; [ -e "$LKB_RELEASE_DIR/live-proof.json" ] && p=yes
     echo "DOCTOR marker=$m live-proof=$p" >> "$STUB_LOG"
+    if [ -n "\${STUB_DOCTOR_STEAL_LEASE:-}" ]; then   # another instance takes the lease while the doctor gate runs
+      printf 'holder=intruder
+expires=%s
+' "$(( $(date +%s) + 3600 ))" > "$STUB_BUCKET_DIR/testbucket/recorder/lease"; echo 99999 > "$STUB_BUCKET_DIR/testbucket/recorder/lease.gen"
+    fi
     echo "\${STUB_DOCTOR_OUT:-DOCTOR OK}"; exit "\${STUB_DOCTOR_RC:-0}" ;;
 esac
 n=$(cat "$S/ticks" 2>/dev/null || echo 0); n=$((n+1)); echo "$n" > "$S/ticks"
@@ -91,9 +105,13 @@ mode="\${STUB_NODE_MODE:-exit}"
 if [ "$mode" = ignore-term ]; then
   trap 'echo "node ignoring TERM" >> "$STUB_LOG"' TERM
 else
-  trap 'echo "node got TERM" >> "$STUB_LOG"; [ -n "$SP" ] && kill "$SP" 2>/dev/null; rmdir "$S/running" 2>/dev/null; exit 143' TERM
+  trap 'echo "node got TERM" >> "$STUB_LOG"; if [ -n "\${STUB_HANG_ON_TERM:-}" ]; then : > "$S/hang-gcloud"; fi; [ -n "$SP" ] && kill "$SP" 2>/dev/null; rmdir "$S/running" 2>/dev/null; exit 143' TERM
 fi
 : > "$S/ready"
+if [ -n "\${STUB_GRANDCHILD:-}" ]; then   # a process the pipeline starts (as Chrome is started) that ignores SIGTERM
+  sh -c 'trap "" TERM; while :; do sleep 1; done' &
+  echo $! > "$S/grandchild.pid"
+fi
 if [ -n "\${STUB_TOUCH_LOCKS:-}" ]; then
   : > "$LKB_RELEASE_DIR/poller.lock"; : > "$LKB_BOT_PROFILE_DIR/.lkb-tab-capture.lock"; : > "$LKB_BOT_PROFILE_DIR/.lkb-recovery.lock"
 fi
@@ -116,8 +134,19 @@ exit "$rc"
 `.replaceAll('\\${', '${');
 
 const TAR_STUB = String.raw`#!/bin/sh
-case " $* " in *" -czf "*) if [ -n "\${STUB_TAR_FAIL:-}" ]; then echo "tar: stub failure" >&2; exit 2; fi ;; esac
+case " $* " in *" -czf "*)
+  if [ -n "\${STUB_TAR_FAIL:-}" ]; then echo "tar: stub failure" >&2; exit 2; fi
+  if [ -n "\${STUB_TAR_EXIT1:-}" ]; then "$REAL_TAR" "$@"; echo "tar: stub: a file changed as we read it" >&2; exit 1; fi
+  if [ -n "\${STUB_TAR_CORRUPT:-}" ]; then "$REAL_TAR" "$@"; printf 'this is not a gzip archive' > "$2"; exit 0; fi ;; esac
 exec "$REAL_TAR" "$@"
+`.replaceAll('\\${', '${');
+const CP_STUB = String.raw`#!/bin/sh
+if [ -n "\${STUB_CP_FAIL:-}" ] && [ "$1" = "-a" ]; then echo "cp: stub failure (no space left on device)" >&2; exit 1; fi
+exec "$REAL_CP" "$@"
+`.replaceAll('\\${', '${');
+const FIND_STUB = String.raw`#!/bin/sh
+case " $* " in *" -mindepth "*) if [ -n "\${STUB_FIND_FAIL:-}" ]; then echo "find: stub failure" >&2; exit 1; fi ;; esac
+exec "$REAL_FIND" "$@"
 `.replaceAll('\\${', '${');
 
 const QUIET = (name, body = 'exit 0') => `#!/bin/sh\n${body}\n`;
@@ -188,20 +217,23 @@ function world(extraStubs = {}) {
     c.on('close', (status) => resolve({status, out}));
   });
   // Starts the entrypoint, waits for the pipeline stub to signal readiness, sends SIGTERM (optionally twice), reports exit status and delay.
-  w.runWithTerm = (env, {second = false, pre = '0.3', timeout = 90000} = {}) => {
+  w.runWithTerm = (env, {second = false, pre = '0.3', timeout = 90000, waitEnds = 0} = {}) => {
     const drv = join(dir, 'driver.sh');
     writeFileSync(drv, `#!/bin/sh
 sh "$1" >"$OUTFILE" 2>&1 &
 EP=$!
 i=0; while [ ! -e "$READY" ] && [ "$i" -lt 300 ]; do sleep 0.1; i=$((i+1)); done
 sleep "$PRE"
+if [ "\${WAITENDS:-0}" -gt 0 ]; then   # wait for N finished node runs (a loaded machine runs fewer ticks in a fixed time)
+  i=0; while [ "$(grep -c '^node end rc=' "$STUB_LOG" 2>/dev/null || true)" -lt "$WAITENDS" ] && [ "$i" -lt 900 ]; do sleep 0.1; i=$((i+1)); done
+fi
 t0=$(date +%s%N); kill -TERM "$EP"
 if [ -n "\${SECOND:-}" ]; then sleep 0.3; kill -TERM "$EP" 2>/dev/null; fi
 rc=0; wait "$EP" || rc=$?
 t1=$(date +%s%N)
 echo "$rc" > "$RCFILE"; echo $(( (t1 - t0) / 1000000 )) > "$MSFILE"
 `);
-    const e = {...env, OUTFILE: w.posix('driver.out'), READY: w.posix('stub/ready'), PRE: pre, RCFILE: w.posix('driver.rc'), MSFILE: w.posix('driver.ms'), ...(second ? {SECOND: '1'} : {})};
+    const e = {...env, OUTFILE: w.posix('driver.out'), READY: w.posix('stub/ready'), PRE: pre, WAITENDS: String(waitEnds), RCFILE: w.posix('driver.rc'), MSFILE: w.posix('driver.ms'), ...(second ? {SECOND: '1'} : {})};
     const r = spawnSync(SH, [posix(drv), posix(ENTRY)], {env: e, encoding: 'utf8', timeout});
     const rd = (f) => existsSync(join(dir, f)) ? readFileSync(join(dir, f), 'utf8') : '';
     return {driverStatus: r.status, status: Number(rd('driver.rc').trim()), ms: Number(rd('driver.ms').trim()), out: rd('driver.out')};
@@ -220,7 +252,8 @@ const noPublicOrIam = (lines) => {
 const nodeCalls = (w) => w.log().filter((l) => /^node (scripts|--import)/.test(l));
 const calls = (w, re) => w.log().filter((l) => l.startsWith('gcloud ') && re.test(l));
 const stateUploads = (w) => calls(w, /^gcloud storage cp \S+ gs:\/\/testbucket\/recorder\/state\.tar\.gz/);
-const stateDownloads = (w) => calls(w, /^gcloud storage cp gs:\/\/testbucket\/recorder\/state\.tar\.gz/);
+const stateDownloads = (w) => calls(w, /^gcloud storage cp gs:\/\/testbucket\/recorder\/state\.tar\.gz (?!gs:)/);
+const statePrevCopies = (w) => calls(w, /^gcloud storage cp gs:\/\/testbucket\/recorder\/state\.tar\.gz gs:\/\/testbucket\/recorder\/state\.prev\.tar\.gz/);
 const histories = (w) => readdirSync(join(w.dir, 'bucket', BUCKET, PFX)).filter((n) => n.startsWith('state.tar.gz.hist-'))
   .sort((a, b) => Number(a.split('-')[1]) - Number(b.split('-')[1])).map((n) => readTgz(readFileSync(join(w.dir, 'bucket', BUCKET, PFX, n))));
 const names = (members) => members.map((m) => m.name.replace(/\/$/, '')).sort();
@@ -391,7 +424,7 @@ test('B4-C3(d) two entrypoints started together against one bucket (barrier at t
     assert.deepEqual(codes, [0, 75], `${a.out}\n---\n${b.out}`);
     assert.equal(w.log().filter((l) => l.includes('run-pipeline.mjs')).length, 1, 'only one pipeline');
     assert.equal(stateDownloads(w).length, 1, 'only one restore attempt');
-    assert.equal(calls(w, /--if-generation-match=0$/).length, 2, 'both tried create-if-absent');
+    assert.equal(calls(w, /recorder\/lease --if-generation-match=0$/).length, 2, 'both tried create-if-absent');
   } finally { w.cleanup(); }
 });
 
@@ -527,7 +560,7 @@ test('B4-C7 attendance loop: one tick per interval, never --watch, ticks never o
   const w = world();
   try {
     const r = w.runWithTerm(w.bucketEnv({LKB_ATTENDANCE_ACCOUNT: 'bot@example.org', LKB_ATTENDANCE_INTERVAL_S: '1', STUB_NODE_SLEEP: '1', STUB_FAIL_TICKS: '2',
-      STUB_TICK_WRITE: '1', LKB_LEASE_TTL_S: '60'}), {pre: '10'});
+      STUB_TICK_WRITE: '1', LKB_LEASE_TTL_S: '60'}), {pre: '0.5', waitEnds: 3, timeout: 150000});
     assert.ok(r.status === 0 || r.status === 143, `exit ${r.status}: ${r.out}`);
     assert.ok(r.ms < 14000, `stopped within the bound: ${r.ms} ms`);
     const log = w.log();
@@ -631,4 +664,255 @@ test('B4-I1/I4/I5/I6 login mode, Dockerfile and the script text: the VNC handlin
   assert.match(d, /google-cloud-cli/, 'the image installs the bucket client the entrypoint calls');
   assert.match(d, /if-generation-match/, 'the build fails if the client lacks the generation precondition');
   const lastUser = d.lastIndexOf('USER '); assert.equal(d.slice(lastUser, d.indexOf('\n', lastUser)), 'USER node');
+});
+
+// =========================================================================================================================
+// Pre-check repair (review findings, fix cycle 0): restore failures, snapshot validation and previous copy, generation
+// precondition on the state object, record-once copy failure, shutdown bounds, process group, lease renewal before start.
+const shOut = (cmd) => spawnSync(SH, ['-c', cmd], {encoding: 'utf8'}).stdout.trim();
+const alive = (pid) => spawnSync(SH, ['-c', `kill -0 ${Number(pid)}`]).status === 0;
+const prevTar = () => makeTgz([
+  {name: 'bot-profile/', type: '5', mode: 0o700}, {name: 'bot-profile/marker.txt', content: Buffer.from('marker-from-previous')},
+  {name: 'webinar-release/', type: '5', mode: 0o700}, {name: 'webinar-release/live-proof.json', content: Buffer.from('{"status":"prev"}')}]);
+const lastMatch = (line) => Number(/--if-generation-match=(\d+)$/.exec(line)?.[1]);
+const histCount = (w) => readdirSync(join(w.dir, 'bucket', BUCKET, PFX)).filter((n) => n.startsWith('state.tar.gz.hist-')).length;
+
+test('B4-C1 repair: a failing cp or a failing clear during restore ends the container non-zero; "state restored" is never logged, nothing runs, the lease is released', T, () => {
+  const realCp = shOut('command -v cp'), realFind = shOut('command -v find');
+  for (const [label, extra] of [['cp -a', {STUB_CP_FAIL: '1'}], ['clear (find)', {STUB_FIND_FAIL: '1'}]]) {
+    const w = world({cp: CP_STUB, find: FIND_STUB});
+    try {
+      seedLocal(w);
+      w.seed('state.tar.gz', stateTar());
+      const r = w.run(w.bucketEnv({REAL_CP: realCp, REAL_FIND: realFind, ...extra}));
+      assert.notEqual(r.status, 0, `${label}: the container must not run on a half-restored profile: ${r.out}`);
+      assert.match(r.out, /state restore failed/, label);
+      assert.doesNotMatch(r.out, /state restored/, label);
+      assert.ok(!w.log().some((l) => l.includes('setup.mjs') || l.includes('run-pipeline.mjs')), `${label}: nothing may run`);
+      assert.equal(existsSync(w.bucketFile('lease')), false, `${label}: the lease is released`);
+      assert.equal(stateUploads(w).length, 0, `${label}: nothing is snapshotted from a half-restored profile`);
+    } finally { w.cleanup(); }
+  }
+});
+
+test('B4-C1 repair: a corrupt or missing current archive falls back to state.prev.tar.gz and says so; both unusable, or a hostile current archive, is refused', T, () => {
+  const prev = prevTar(), whole = stateTar();
+  const truncated = whole.subarray(0, Math.floor(whole.length / 2));
+  { // current truncated, previous good
+    const w = world();
+    try {
+      seedLocal(w); w.seed('state.tar.gz', truncated, 5); w.seed('state.prev.tar.gz', prev, 6);
+      const r = w.run(w.bucketEnv());
+      assert.equal(r.status, 0, r.out);
+      assert.match(r.out, /failed validation/); assert.match(r.out, /state restored from gs:\/\/testbucket\/recorder\/state\.prev\.tar\.gz/);
+      assert.equal(readFileSync(w.profile('marker.txt'), 'utf8'), 'marker-from-previous');
+      assert.equal(readFileSync(w.release('live-proof.json'), 'utf8'), '{"status":"prev"}');
+      assert.ok(readFileSync(w.bucketFile('state.prev.tar.gz')).equals(prev), 'the corrupt current object is never copied over the good previous one');
+      const up = stateUploads(w);
+      assert.equal(up.length, 1); assert.equal(lastMatch(up[0]), 5, 'the replacement is conditional on the generation of the object it replaces');
+      assert.equal(statePrevCopies(w).length, 0);
+    } finally { w.cleanup(); }
+  }
+  { // current missing, previous good
+    const w = world();
+    try {
+      w.seed('state.prev.tar.gz', prev, 6);
+      const r = w.run(w.bucketEnv());
+      assert.equal(r.status, 0, r.out);
+      assert.match(r.out, /state restored from gs:\/\/testbucket\/recorder\/state\.prev\.tar\.gz/);
+      assert.equal(readFileSync(w.profile('marker.txt'), 'utf8'), 'marker-from-previous');
+      assert.equal(lastMatch(stateUploads(w)[0]), 0, 'the current object did not exist: create-if-absent');
+    } finally { w.cleanup(); }
+  }
+  { // both unusable
+    const w = world();
+    try {
+      seedLocal(w); w.seed('state.tar.gz', truncated, 5); w.seed('state.prev.tar.gz', truncated, 6);
+      const r = w.run(w.bucketEnv());
+      assert.notEqual(r.status, 0, r.out); assert.match(r.out, /refused/);
+      assert.equal(readFileSync(w.profile('marker.txt'), 'utf8'), 'local-profile-marker');
+      assert.ok(!w.log().some((l) => l.includes('run-pipeline.mjs')));
+    } finally { w.cleanup(); }
+  }
+  { // hostile current archive: refused, never papered over by the previous one
+    const w = world();
+    try {
+      seedLocal(w); w.seed('state.tar.gz', stateTar([{name: 'bot-profile/../../escape.txt', content: Buffer.from('x')}]), 5); w.seed('state.prev.tar.gz', prev, 6);
+      const r = w.run(w.bucketEnv());
+      assert.notEqual(r.status, 0, r.out); assert.match(r.out, /refused/);
+      assert.equal(readFileSync(w.profile('marker.txt'), 'utf8'), 'local-profile-marker');
+      assert.equal(existsSync(join(w.dir, 'escape.txt')), false);
+    } finally { w.cleanup(); }
+  }
+  { // the previous archive gets the same containment check
+    const w = world();
+    try {
+      seedLocal(w); w.seed('state.prev.tar.gz', stateTar([{name: 'bot-profile/evil', type: '2', linkname: '../../outside'}]), 6);
+      const r = w.run(w.bucketEnv());
+      assert.notEqual(r.status, 0, r.out); assert.match(r.out, /refused/);
+      assert.equal(existsSync(w.profile('evil')), false);
+    } finally { w.cleanup(); }
+  }
+});
+
+test('B4-C4 repair: a tar that exits 1 is logged as a warning and its checked archive is used; an archive that fails tar -t is not uploaded', T, () => {
+  const realTar = shOut('command -v tar');
+  { // exit 1
+    const w = world({tar: TAR_STUB});
+    try {
+      writeFileSync(w.profile('marker.txt'), 'm');
+      const r = w.run(w.bucketEnv({STUB_TAR_EXIT1: '1', REAL_TAR: realTar, LKB_LEASE_TTL_S: '60'}));
+      assert.equal(r.status, 0, r.out);
+      assert.match(r.out, /tar exited 1 \(a file changed while it was read\)/);
+      assert.equal(stateUploads(w).length, 1, 'the checked archive is uploaded');
+      assert.ok(names(histories(w).at(-1)).includes('bot-profile/marker.txt'));
+    } finally { w.cleanup(); }
+  }
+  { // corrupt output with exit 0
+    const w = world({tar: TAR_STUB});
+    try {
+      const previous = stateTar(); w.seed('state.tar.gz', previous, 5);
+      const r = w.run(w.bucketEnv({STUB_TAR_CORRUPT: '1', REAL_TAR: realTar, LKB_LEASE_TTL_S: '60'}));
+      assert.equal(r.status, 0, r.out);
+      assert.match(r.out, /new archive failed validation; nothing uploaded/);
+      assert.equal(stateUploads(w).length, 0, 'no upload of an archive that does not list');
+      assert.equal(statePrevCopies(w).length, 0, 'and the previous copy is not touched either');
+      assert.ok(readFileSync(w.bucketFile('state.tar.gz')).equals(previous));
+    } finally { w.cleanup(); }
+  }
+});
+
+test('B4-C4 repair: before the state object is replaced, the current one is copied to state.prev.tar.gz (server side); the upload is conditional on the generation it replaces', T, () => {
+  const w = world();
+  try {
+    const previous = stateTar();
+    w.seed('state.tar.gz', previous, 5);
+    writeFileSync(w.profile('marker.txt'), 'm');
+    const r = w.run(w.bucketEnv({LKB_LEASE_TTL_S: '60'}));
+    assert.equal(r.status, 0, r.out);
+    const log = w.log();
+    const iCopy = log.findIndex((l) => /state\.tar\.gz gs:\/\/testbucket\/recorder\/state\.prev\.tar\.gz$/.test(l)), iUp = log.findIndex((l) => /^gcloud storage cp \S+ gs:\/\/testbucket\/recorder\/state\.tar\.gz /.test(l));
+    assert.ok(iCopy >= 0 && iCopy < iUp, `previous copy before the upload (${iCopy}, ${iUp})`);
+    assert.ok(readFileSync(w.bucketFile('state.prev.tar.gz')).equals(previous), 'the previous archive is kept byte for byte');
+    assert.ok(!readFileSync(w.bucketFile('state.tar.gz')).equals(previous), 'the current object is the new snapshot');
+    assert.equal(lastMatch(stateUploads(w)[0]), 5);
+  } finally { w.cleanup(); }
+});
+
+test('B4-C4 repair: the generation is remembered across uploads (each match is the generation the last upload produced); a precondition refusal is logged and not retried', T, async () => {
+  const w = world();
+  try {
+    w.seed('state.tar.gz', stateTar(), 5);
+    const r = w.run(w.bucketEnv({LKB_SNAPSHOT_INTERVAL_S: '1', STUB_NODE_SLEEP: '6', LKB_LEASE_TTL_S: '60'}));
+    assert.equal(r.status, 0, r.out);
+    const up = stateUploads(w).map(lastMatch);
+    const gens = readdirSync(join(w.dir, 'bucket', BUCKET, PFX)).filter((n) => n.startsWith('state.tar.gz.hist-')).map((n) => Number(n.split('-')[1])).sort((a, b) => a - b);
+    assert.ok(up.length >= 3, `at least two periodic and one final upload, got ${up.length}`);
+    assert.equal(gens.length, up.length, 'every upload was accepted by the precondition');
+    assert.deepEqual(up, [5, ...gens.slice(0, -1)], 'upload n is conditional on the generation upload n-1 produced');
+  } finally { w.cleanup(); }
+  const w2 = world();
+  try {
+    const seeded = stateTar();
+    w2.seed('state.tar.gz', seeded, 5);
+    const p = w2.runAsync(w2.bucketEnv({LKB_SNAPSHOT_INTERVAL_S: '2', STUB_NODE_SLEEP: '6', LKB_LEASE_TTL_S: '60'}));
+    for (let i = 0; i < 100 && !existsSync(join(w2.dir, 'stub/ready')); i++) await sleep(100);
+    writeFileSync(w2.bucketFile('state.tar.gz') + '.gen', '99999');   // another writer replaced the object since this instance read it
+    const r2 = await p;
+    assert.equal(r2.status, 0, r2.out);
+    const up = stateUploads(w2);
+    assert.ok(up.length >= 2, `a periodic and the final attempt, got ${up.length}`);
+    assert.ok(up.every((l) => lastMatch(l) === 5), 'no attempt re-reads the generation and retries blindly');
+    assert.ok(readFileSync(w2.bucketFile('state.tar.gz')).equals(seeded), 'the other writer object is untouched');
+    assert.match(r2.out, /generation precondition/);
+    assert.equal(histCount(w2), 0, 'nothing was accepted');
+  } finally { w2.cleanup(); }
+});
+
+test('B4-C6 repair: record-once exits non-zero (74) when the recording was made but its copy failed; the record command own status wins; a clean copy still exits 0', T, () => {
+  const base = {BOT_MODE: 'record-once', LKB_RECORD_URL: 'https://meet.example.com/abc-defg', LKB_RECORD_UNTIL: '18:30', LKB_LEASE_TTL_S: '60'};
+  for (const [label, extra, want] of [['upload fails', {STUB_FAIL_UPLOAD: 'recordings/', STUB_WRITE_WEBM: '1'}, 74], ['record failed too', {STUB_FAIL_UPLOAD: 'recordings/', STUB_WRITE_WEBM: '1', STUB_NODE_RC: '7'}, 7],
+    ['upload works', {STUB_WRITE_WEBM: '1'}, 0], ['nothing recorded', {}, 0]]) {
+    const w = world();
+    try {
+      const r = w.run(w.bucketEnv({...base, ...extra}));
+      assert.equal(r.status, want, `${label}: ${r.out}`);
+      if (label === 'upload fails') {
+        assert.match(r.out, /recording copy failed/); assert.match(r.out, /could not be copied/);
+        assert.equal(existsSync(w.bucketFile('recordings/meeting.webm')), false);
+        assert.equal(stateUploads(w).length, 1, 'the final snapshot is still taken');
+        assert.equal(existsSync(w.bucketFile('lease')), false, 'and the lease released');
+      }
+    } finally { w.cleanup(); }
+  }
+});
+
+test('B4-C5 repair: LKB_STOP_WAIT_S defaults to 3 seconds (a pipeline that ignores SIGTERM is killed after about 3 s)', T, () => {
+  const w = world();
+  try {
+    const env = w.bucketEnv({STUB_NODE_MODE: 'ignore-term', LKB_LEASE_TTL_S: '60'});
+    delete env.LKB_STOP_WAIT_S;
+    const r = w.runWithTerm(env);
+    assert.ok(r.ms >= 2500 && r.ms < 9000, `killed after the default bound, exit took ${r.ms} ms`);
+    assert.match(r.out, /ignored SIGTERM for 3s/);
+  } finally { w.cleanup(); }
+});
+
+test('B4-C5 repair: a hung gcloud call during shutdown cannot use up the window: calls are bounded and share one deadline', T, () => {
+  const w = world();
+  try {
+    const r = w.runWithTerm(w.bucketEnv({STUB_NODE_MODE: 'hang', STUB_HANG_ON_TERM: '1', LKB_GCLOUD_TIMEOUT_S: '60', LKB_SHUTDOWN_BUDGET_S: '3', LKB_LEASE_TTL_S: '60'}), {timeout: 80000});
+    assert.equal(r.status, 143, r.out);
+    assert.ok(r.ms < 13000, `the shutdown ended in ${r.ms} ms although every bucket call hung`);
+    assert.match(r.out, /shutdown time budget used up/);
+  } finally { w.cleanup(); }
+});
+
+test('B4-C5 repair: a helper stuck in a hung upload at shutdown is ended after the bound, and so is its bucket call', T, () => {
+  const w = world();
+  try {
+    const r = w.runWithTerm(w.bucketEnv({STUB_NODE_MODE: 'hang', STUB_HANG_MATCH: 'gs://testbucket/recorder/state.tar.gz', LKB_SNAPSHOT_INTERVAL_S: '1', LKB_GCLOUD_TIMEOUT_S: '60', LKB_SHUTDOWN_BUDGET_S: '3', LKB_LEASE_TTL_S: '60'}), {pre: '3', timeout: 80000});
+    assert.equal(r.status, 143, r.out);
+    assert.ok(r.ms < 14000, `the shutdown ended in ${r.ms} ms although a periodic upload was hung`);
+    assert.match(r.out, /helper snap did not stop within 3s/);
+  } finally { w.cleanup(); }
+});
+
+test('B4-C5 repair: a process the pipeline started and that ignores SIGTERM (as Chrome might) is stopped before the final snapshot, on SIGTERM and on a normal exit', T, () => {
+  const runs = [['SIGTERM', (w) => w.runWithTerm(w.bucketEnv({STUB_NODE_MODE: 'hang', STUB_GRANDCHILD: '1', LKB_LEASE_TTL_S: '60'}))],
+    ['normal exit', (w) => w.run(w.bucketEnv({STUB_NODE_SLEEP: '1', STUB_GRANDCHILD: '1', LKB_LEASE_TTL_S: '60'}))]];
+  for (const [label, run] of runs) {
+    const w = world();
+    let pid = null;
+    try {
+      const r = run(w);
+      const pf = join(w.dir, 'stub/grandchild.pid');
+      assert.ok(existsSync(pf), `${label}: the stub started its helper process`);
+      pid = readFileSync(pf, 'utf8').trim();
+      const log = w.log();
+      assert.ok(log.includes('GRANDCHILD gone-at-upload'), `${label}: it must be gone when the final snapshot is taken: ${log.filter((l) => l.startsWith('GRANDCHILD'))}\n${r.out}`);
+      assert.equal(alive(pid), false, `${label}: it is gone when the container exits`);
+      assert.match(r.out, /still running; stopping them/);
+    } finally { if (pid && alive(pid)) spawnSync(SH, ['-c', `kill -KILL ${Number(pid)}`]); w.cleanup(); }
+  }
+});
+
+test('B4-C3 repair: the lease is renewed once right before the pipeline starts (after the doctor gate); a lease lost by then stops the start (75)', T, () => {
+  const w = world();
+  try {
+    const r = w.run(w.bucketEnv({LKB_LEASE_RENEW_S: '30', LKB_LEASE_TTL_S: '60'}));
+    assert.equal(r.status, 0, r.out);
+    const log = w.log();
+    const iDoc = log.findIndex((l) => l.startsWith('DOCTOR ')), iPipe = log.findIndex((l) => l.includes('run-pipeline.mjs'));
+    const iRenew = log.findIndex((l, i) => i > iDoc && /^gcloud storage cp \S+ gs:\/\/testbucket\/recorder\/lease --if-generation-match=[1-9]/.test(l));
+    assert.ok(iDoc >= 0 && iRenew > iDoc && iRenew < iPipe, `doctor ${iDoc}, renewal ${iRenew}, pipeline ${iPipe}`);
+  } finally { w.cleanup(); }
+  const w2 = world();
+  try {
+    const r2 = w2.run(w2.bucketEnv({STUB_DOCTOR_STEAL_LEASE: '1', LKB_LEASE_TTL_S: '60'}));
+    assert.equal(r2.status, 75, r2.out);
+    assert.match(r2.out, /lease lost before the pipeline could start/);
+    assert.ok(!w2.log().some((l) => l.includes('run-pipeline.mjs')));
+    assert.match(readFileSync(w2.bucketFile('lease'), 'utf8'), /holder=intruder/, 'the other holder lease is left alone');
+  } finally { w2.cleanup(); }
 });

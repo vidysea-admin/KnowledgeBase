@@ -17,11 +17,14 @@
 #   LKB_RELEASE_DIR         release state dir that holds poller.lock and live-proof.json (default $PWD/data/webinar-release)
 #   LKB_RECORD_DIR          recordings dir (image default /app/raw/webinars)
 #   LKB_SNAPSHOT_INTERVAL_S snapshot period (default 300)     LKB_LEASE_TTL_S (default 120)   LKB_LEASE_RENEW_S (default 30)
-#   LKB_STOP_WAIT_S         bound on the pipeline's own exit after SIGTERM, then SIGKILL (default 10)
+#   LKB_STOP_WAIT_S         whole seconds the pipeline (and each helper) gets to exit after SIGTERM, then SIGKILL (default 3)
+#   LKB_GCLOUD_TIMEOUT_S    bound on every single bucket call (default 120)
+#   LKB_SHUTDOWN_BUDGET_S   after SIGTERM, all bucket calls together must end within LKB_STOP_WAIT_S plus this (default 5)
 #   LKB_ATTENDANCE_ACCOUNT  attendance account (run mode)             LKB_ATTENDANCE_INTERVAL_S (default 300, POLL_MS)
 #   LKB_APP_DIR             working directory (default /app; tests only)
 # Objects: <prefix>/state.tar.gz (members <profile dir name>/ and <release dir name>/), <prefix>/lease,
-# <prefix>/recordings/<path under the recordings dir>.
+# <prefix>/state.prev.tar.gz (the archive before the latest snapshot), <prefix>/recordings/<path under the recordings dir>.
+# Exit statuses worth knowing: 75 lease held elsewhere or lost, 74 a recording was made but not copied to the bucket.
 set -eu
 cd "${LKB_APP_DIR:-/app}"
 MODE="${BOT_MODE:-run}"
@@ -53,7 +56,9 @@ RECORD_DIR="${LKB_RECORD_DIR:-/app/raw/webinars}"; RECORD_DIR="${RECORD_DIR%/}"
 SNAPSHOT_S="${LKB_SNAPSHOT_INTERVAL_S:-300}"
 LEASE_TTL="${LKB_LEASE_TTL_S:-120}"
 LEASE_RENEW_S="${LKB_LEASE_RENEW_S:-30}"
-STOP_WAIT="${LKB_STOP_WAIT_S:-10}"
+STOP_WAIT="${LKB_STOP_WAIT_S:-3}"; case "$STOP_WAIT" in ''|*[!0-9]*) STOP_WAIT=3 ;; esac
+GC_TIMEOUT="${LKB_GCLOUD_TIMEOUT_S:-120}"; case "$GC_TIMEOUT" in ''|*[!0-9]*|0) GC_TIMEOUT=120 ;; esac
+SHUT_BUDGET="${LKB_SHUTDOWN_BUDGET_S:-5}"; case "$SHUT_BUDGET" in ''|*[!0-9]*) SHUT_BUDGET=5 ;; esac
 ATTENDANCE_ACCOUNT=""; [ "$MODE" = "run" ] && ATTENDANCE_ACCOUNT="${LKB_ATTENDANCE_ACCOUNT:-}"
 ATTENDANCE_S="${LKB_ATTENDANCE_INTERVAL_S:-300}"
 SUPERVISE=0
@@ -62,11 +67,11 @@ if [ "$MODE" = "record-once" ] && { [ -z "${LKB_RECORD_URL:-}" ] || [ -z "${LKB_
   echo "record-once mode needs LKB_RECORD_URL and LKB_RECORD_UNTIL" >&2; exit 1
 fi
 
-STAGE=""; CHILD=""; WATCH_PID=""; RENEW_PID=""; SNAP_PID=""; NAP_PID=""
+STAGE=""; CHILD=""; CHILD_PG=""; WATCH_PID=""; RENEW_PID=""; SNAP_PID=""; NAP_PID=""; SHUT_DEADLINE=0
 PHASE=pre; STOPPING=0; SIGS=0; CHILD_RC=0; HAVE_LEASE=0; HOLDER=""
 LEASE_GEN=""; LEASE_HOLDER=""; LEASE_EXPIRES=0
 LT=main   # LT names the scratch files of the process that calls the lease helpers (main, renew, snap)
-STATE_URL="gs://$BUCKET/$PREFIX/state.tar.gz"; LEASE_URL="gs://$BUCKET/$PREFIX/lease"
+STATE_URL="gs://$BUCKET/$PREFIX/state.tar.gz"; STATE_PREV_URL="gs://$BUCKET/$PREFIX/state.prev.tar.gz"; LEASE_URL="gs://$BUCKET/$PREFIX/lease"
 log() { echo "[bot-state] $*"; }
 
 # ---- helpers (functions only; they run when called) ----------------------------------------------------------------
@@ -77,17 +82,40 @@ is_absent() {  # $1 stderr file of a failed gcloud call: was the object simply m
   grep -Eqi '404|No such object|not found|No URLs matched|matched no objects' "$1" 2>/dev/null
 }
 
+# Every bucket call goes through gc: it is bounded by timeout, and after SIGTERM all calls share one deadline, so a hung
+# call cannot use up the shutdown. The call runs in the background so a trapped signal never leaves it orphaned, and its
+# pid is kept in a file so stop_helpers can end a call that a helper is stuck in.
+gc() {
+  t="$GC_TIMEOUT"
+  if [ "$SHUT_DEADLINE" -gt 0 ]; then
+    left=$(( SHUT_DEADLINE - $(date +%s) ))
+    if [ "$left" -le 0 ]; then echo "skipped" >>"$STAGE/skipped"; return 124; fi
+    if [ "$left" -lt "$t" ]; then t="$left"; fi
+  fi
+  timeout -k 2 "$t" gcloud "$@" &
+  gcp=$!
+  echo "$gcp" >"$STAGE/gc-$LT.pid"
+  grc=0
+  while :; do
+    wait "$gcp" && grc=0 || grc=$?
+    if kill -0 "$gcp" 2>/dev/null; then continue; fi
+    break
+  done
+  rm -f "$STAGE/gc-$LT.pid"
+  return "$grc"
+}
+
 # Lease: one object holding holder= and expires= lines. Every take and replace is conditional on the object's
 # generation (create-if-absent is generation 0), so two instances cannot both win (B4-C3).
 lease_read() {  # sets LEASE_GEN LEASE_HOLDER LEASE_EXPIRES; 0 present, 1 absent, 2 error. Generation is read BEFORE the
   LEASE_GEN=""; LEASE_HOLDER=""; LEASE_EXPIRES=0   # body: a newer body with an older generation only makes a later replace fail.
-  if ! gcloud storage objects describe "$LEASE_URL" '--format=value(generation)' >"$STAGE/l-$LT.gen" 2>"$STAGE/l-$LT.err"; then
+  if ! gc storage objects describe "$LEASE_URL" '--format=value(generation)' >"$STAGE/l-$LT.gen" 2>"$STAGE/l-$LT.err"; then
     if is_absent "$STAGE/l-$LT.err"; then return 1; fi
     return 2
   fi
   LEASE_GEN="$(tr -d ' \r\n' <"$STAGE/l-$LT.gen")"
   [ -n "$LEASE_GEN" ] || return 2
-  if ! gcloud storage cat "$LEASE_URL" >"$STAGE/l-$LT.body" 2>"$STAGE/l-$LT.err"; then
+  if ! gc storage cat "$LEASE_URL" >"$STAGE/l-$LT.body" 2>"$STAGE/l-$LT.err"; then
     if is_absent "$STAGE/l-$LT.err"; then return 1; fi
     return 2
   fi
@@ -98,7 +126,7 @@ lease_read() {  # sets LEASE_GEN LEASE_HOLDER LEASE_EXPIRES; 0 present, 1 absent
 }
 lease_put() {  # $1 generation precondition (0 = create only if absent); 0 written, 1 precondition failed, 2 error
   printf 'holder=%s\nexpires=%s\n' "$HOLDER" "$(( $(date +%s) + LEASE_TTL ))" >"$STAGE/l-$LT.new"
-  if gcloud storage cp "$STAGE/l-$LT.new" "$LEASE_URL" "--if-generation-match=$1" >"$STAGE/l-$LT.out" 2>"$STAGE/l-$LT.err"; then return 0; fi
+  if gc storage cp "$STAGE/l-$LT.new" "$LEASE_URL" "--if-generation-match=$1" >"$STAGE/l-$LT.out" 2>"$STAGE/l-$LT.err"; then return 0; fi
   if grep -Eqi '412|precondition' "$STAGE/l-$LT.err"; then return 1; fi
   cat "$STAGE/l-$LT.err" >&2
   return 2
@@ -147,18 +175,18 @@ lease_release() {  # deletes the lease only if this instance still holds it
   HAVE_LEASE=0
   rc=0; lease_read || rc=$?
   if [ "$rc" -eq 0 ] && [ "$LEASE_HOLDER" = "$HOLDER" ]; then
-    if gcloud storage rm "$LEASE_URL" "--if-generation-match=$LEASE_GEN" >"$STAGE/l-$LT.out" 2>&1; then log "lease released"; else log "lease release failed (it will expire)"; fi
-  else
+    if gc storage rm "$LEASE_URL" "--if-generation-match=$LEASE_GEN" >"$STAGE/l-$LT.out" 2>&1; then log "lease released"; else log "lease release failed (it will expire)"; fi
+  elif [ "$rc" -eq 0 ]; then
     log "lease no longer ours; left in place"
+  else
+    log "lease could not be read; left in place (it will expire)"
   fi
   return 0
 }
 
 # Restore: validate the whole archive, extract it into the stage, and only then replace the local trees.
-tar_contained() {  # $1 archive. Every member must sit inside the two trees; no absolute or .. names; no link with an
-  tar -tzf "$1" >"$STAGE/tar.names" 2>/dev/null || { echo "archive is unreadable or truncated"; return 1; }   # absolute or .. target;
-  tar -tzvf "$1" >"$STAGE/tar.verbose" 2>/dev/null || { echo "archive listing failed"; return 1; }           # only file/dir/link types.
-  awk -v pb="$PROFILE_BASE" -v rb="$RELEASE_BASE" '
+tar_contained() {  # needs $STAGE/tar.names and tar.verbose. Every member must sit inside the two trees; no absolute or ..
+  awk -v pb="$PROFILE_BASE" -v rb="$RELEASE_BASE" '   # names; no link with an absolute or .. target; only file/dir/link types.
     function badname(p,   n, a, i) {
       if (p ~ /^\//) return "absolute path"
       n = split(p, a, "/")
@@ -191,29 +219,74 @@ tar_contained() {  # $1 archive. Every member must sit inside the two trees; no 
     END { exit bad ? 1 : 0 }
   ' "$STAGE/tar.names" "$STAGE/tar.verbose"
 }
+check_archive() {  # $1 archive. Prints the reason. 0 usable; 1 corrupt or truncated (the previous archive may stand in); 2 hostile (refuse)
+  tar -tzf "$1" >"$STAGE/tar.names" 2>/dev/null || { echo "archive is unreadable or truncated"; return 1; }
+  tar -tzvf "$1" >"$STAGE/tar.verbose" 2>/dev/null || { echo "archive listing failed"; return 1; }
+  tar_contained || return 2
+  return 0
+}
+fetch_archive() {  # $1 url, $2 destination. 0 fetched; 1 the object does not exist; 2 the bucket could not be read
+  rm -f "$2"
+  if gc storage cp "$1" "$2" >"$STAGE/restore.out" 2>"$STAGE/restore.err"; then return 0; fi
+  if is_absent "$STAGE/restore.err"; then return 1; fi
+  cat "$STAGE/restore.err" >&2
+  return 2
+}
+state_gen_read() {  # prints the generation of the state object (0 when it does not exist); non-zero when it cannot be read
+  if ! gc storage objects describe "$STATE_URL" '--format=value(generation)' >"$STAGE/sg-$LT.out" 2>"$STAGE/sg-$LT.err"; then
+    if is_absent "$STAGE/sg-$LT.err"; then echo 0; return 0; fi
+    return 1
+  fi
+  sg="$(tr -d ' \r\n' <"$STAGE/sg-$LT.out")"
+  case "$sg" in ''|*[!0-9]*) return 1 ;; esac
+  echo "$sg"
+}
 clear_dir() {  # empty a directory but keep the directory itself (it may be a mount point)
   find "$1" -mindepth 1 -maxdepth 1 -exec rm -rf {} +
 }
-restore_state() {  # 0 restored or first boot; 1 refused (local state untouched)
-  rm -f "$STAGE/restore.tar.gz"
-  if ! gcloud storage cp "$STATE_URL" "$STAGE/restore.tar.gz" >"$STAGE/restore.out" 2>"$STAGE/restore.err"; then
-    if is_absent "$STAGE/restore.err"; then log "no state object in the bucket (first boot): starting with empty state"; return 0; fi
-    cat "$STAGE/restore.err" >&2; echo "state restore failed: the bucket object could not be read" >&2; return 1
+restore_state() {  # 0 restored or first boot; 1 refused or failed (the caller ends the container). Every step reports its own failure:
+  # this runs in an `||` context where `set -e` is off, so nothing here may rely on it.
+  if ! sg0="$(state_gen_read)"; then echo "state restore failed: the generation of the state object could not be read" >&2; return 1; fi
+  printf '%s\n' "$sg0" >"$STAGE/state.gen" || return 1
+  rm -f "$STAGE/restore.tar.gz" "$STAGE/skip-prev-copy"
+  used=""; main_why=""
+  mrc=0; fetch_archive "$STATE_URL" "$STAGE/restore.tar.gz" || mrc=$?
+  if [ "$mrc" -eq 2 ]; then echo "state restore failed: the bucket object could not be read" >&2; return 1; fi
+  if [ "$mrc" -eq 0 ]; then
+    crc=0; main_why="$(check_archive "$STAGE/restore.tar.gz")" || crc=$?
+    if [ "$crc" -eq 0 ]; then used="$STATE_URL"
+    elif [ "$crc" -eq 2 ]; then echo "state restore refused: $main_why" >&2; return 1
+    else echo "[bot-state] the current state archive failed validation ($main_why); trying the previous archive" >&2
+    fi
   fi
-  why="$(tar_contained "$STAGE/restore.tar.gz")" || { echo "state restore refused: $why" >&2; return 1; }
-  rm -rf "$STAGE/x"; mkdir -p "$STAGE/x"
+  if [ -z "$used" ]; then
+    prc=0; fetch_archive "$STATE_PREV_URL" "$STAGE/restore.tar.gz" || prc=$?
+    if [ "$prc" -eq 2 ]; then echo "state restore failed: the previous archive could not be read" >&2; return 1; fi
+    if [ "$prc" -eq 1 ]; then
+      if [ "$mrc" -eq 0 ]; then echo "state restore refused: the current archive is unusable ($main_why) and there is no previous archive" >&2; return 1; fi
+      log "no state object in the bucket (first boot): starting with empty state"; return 0
+    fi
+    crc=0; prev_why="$(check_archive "$STAGE/restore.tar.gz")" || crc=$?
+    if [ "$crc" -ne 0 ]; then echo "state restore refused: the previous archive is unusable too ($prev_why)" >&2; return 1; fi
+    used="$STATE_PREV_URL"
+    : >"$STAGE/skip-prev-copy" || return 1   # the next snapshot must not copy the unusable current object over the good previous one
+  fi
+  rm -rf "$STAGE/x" || return 1
+  mkdir -p "$STAGE/x" || return 1
   if ! tar -xzf "$STAGE/restore.tar.gz" -C "$STAGE/x" --no-same-owner --exclude='Singleton*' --exclude=poller.lock --exclude=.lkb-tab-capture.lock 2>"$STAGE/restore.err"; then
     cat "$STAGE/restore.err" >&2; echo "state restore failed: extraction error" >&2; return 1
   fi
   for pair in "$PROFILE_BASE:$PROFILE_DIR" "$RELEASE_BASE:$RELEASE_DIR"; do
     base="${pair%%:*}"; dest="${pair#*:}"
-    clear_dir "$dest"
-    if [ -d "$STAGE/x/$base" ]; then cp -a "$STAGE/x/$base/." "$dest/"; fi
+    clear_dir "$dest" || { echo "state restore failed: could not empty $dest" >&2; return 1; }
+    if [ -d "$STAGE/x/$base" ]; then
+      cp -a "$STAGE/x/$base/." "$dest/" || { echo "state restore failed: could not copy the restored files into $dest" >&2; return 1; }
+    fi
   done
-  log "state restored from $STATE_URL"
+  log "state restored from $used"
   return 0
 }
-snapshot_state() {  # $1 label. Only while the lease is held; a failed tar or upload leaves the bucket object as it was.
+snapshot_state() {  # $1 label. Only while the lease is held; a failed tar, validation or upload leaves the bucket object as it was.
   if [ -z "$BUCKET" ]; then return 0; fi
   if ! lease_held; then echo "[bot-state] $1 snapshot skipped: lease not held" >&2; return 1; fi
   out="$STAGE/snap-$1.tar.gz"; rm -f "$out"
@@ -224,35 +297,81 @@ snapshot_state() {  # $1 label. Only while the lease is held; a failed tar or up
     cat "$STAGE/snap.err" >&2 || true
     echo "[bot-state] $1 snapshot: tar failed (exit $trc); nothing uploaded" >&2; rm -f "$out"; return 1
   fi
-  if gcloud storage cp "$out" "$STATE_URL" >"$STAGE/snap.out" 2>&1; then log "$1 snapshot uploaded"; rm -f "$out"; return 0; fi
+  if [ "$trc" -eq 1 ]; then echo "[bot-state] $1 snapshot: tar exited 1 (a file changed while it was read); the archive is checked and used" >&2; fi
+  if ! tar -tzf "$out" >/dev/null 2>"$STAGE/snap.err"; then
+    cat "$STAGE/snap.err" >&2 || true
+    echo "[bot-state] $1 snapshot: the new archive failed validation; nothing uploaded" >&2; rm -f "$out"; return 1
+  fi
+  gen="$(cat "$STAGE/state.gen" 2>/dev/null || true)"
+  case "$gen" in ''|*[!0-9]*) echo "[bot-state] $1 snapshot: the generation of the state object is not known; nothing uploaded" >&2; rm -f "$out"; return 1 ;; esac
+  if [ "$gen" != 0 ] && [ ! -e "$STAGE/skip-prev-copy" ]; then   # keep the archive that is about to be replaced (server-side copy)
+    if ! gc storage cp "$STATE_URL" "$STATE_PREV_URL" >"$STAGE/snap.out" 2>&1 && ! is_absent "$STAGE/snap.out"; then
+      cat "$STAGE/snap.out" >&2
+      echo "[bot-state] $1 snapshot: the previous archive could not be kept; upload skipped" >&2; rm -f "$out"; return 1
+    fi
+  fi
+  if gc storage cp "$out" "$STATE_URL" "--if-generation-match=$gen" >"$STAGE/snap.out" 2>&1; then
+    rm -f "$out" "$STAGE/skip-prev-copy"
+    if ng="$(state_gen_read)"; then printf '%s\n' "$ng" >"$STAGE/state.gen"; log "$1 snapshot uploaded"
+    else rm -f "$STAGE/state.gen"; echo "[bot-state] $1 snapshot uploaded, but its generation could not be read; no further snapshot is uploaded" >&2; fi
+    return 0
+  fi
   cat "$STAGE/snap.out" >&2
-  echo "[bot-state] $1 snapshot: upload failed; the previous object is kept" >&2; rm -f "$out"; return 1
+  if grep -Eqi '412|precondition' "$STAGE/snap.out"; then
+    echo "[bot-state] $1 snapshot refused: the state object changed since this instance last read it (generation precondition); not retried" >&2
+  else
+    echo "[bot-state] $1 snapshot: upload failed; the previous object is kept" >&2
+  fi
+  rm -f "$out"; return 1
 }
-copy_recordings() {  # non-empty .webm files not yet uploaded, each once; skipped unless the lease is held
+copy_recordings() {  # non-empty .webm files not yet uploaded, each once. 0 only if nothing failed or was skipped for lack of the lease
+  fails=0
   if [ -z "$BUCKET" ] || [ ! -d "$RECORD_DIR" ]; then return 0; fi
   if ! lease_held; then echo "[bot-state] recording copy skipped: lease not held" >&2; return 1; fi
   find "$RECORD_DIR" -type f -name '*.webm' >"$STAGE/rec.list"
   while IFS= read -r f; do
-    if [ -e "$STAGE/lease-lost" ]; then break; fi
+    if [ -e "$STAGE/lease-lost" ]; then echo "[bot-state] lease lost: the remaining recordings are not copied" >&2; fails=$((fails + 1)); break; fi
     if grep -qxF -- "$f" "$STAGE/uploaded.list" 2>/dev/null; then continue; fi
     if [ ! -s "$f" ]; then log "skipping empty recording $f"; continue; fi
     rel="${f#"$RECORD_DIR"/}"
-    if gcloud storage cp "$f" "gs://$BUCKET/$PREFIX/recordings/$rel" >"$STAGE/rec.out" 2>&1; then
+    if gc storage cp "$f" "gs://$BUCKET/$PREFIX/recordings/$rel" >"$STAGE/rec.out" 2>&1; then
       printf '%s\n' "$f" >>"$STAGE/uploaded.list"; log "recording copied: $rel"
     else
-      cat "$STAGE/rec.out" >&2; echo "[bot-state] recording copy failed: $rel" >&2
+      cat "$STAGE/rec.out" >&2; echo "[bot-state] recording copy failed: $rel" >&2; fails=$((fails + 1))
     fi
   done <"$STAGE/rec.list"
-  return 0
+  [ "$fails" -eq 0 ]
 }
 
 # ---- supervision: the pipeline runs as a child so the shell (and its trap) outlives it ---------------------------------
-start_watchdog() {  # $1 pid: SIGKILL it if it is still there after the bound (a child that ignores SIGTERM)
+# The child gets a process group of its own (setsid, else job control) so that what it starts, Chrome above all, can be
+# stopped with it. Without either, only the child itself can be signalled and a line says so.
+GROUP_MODE=none
+if command -v setsid >/dev/null 2>&1; then GROUP_MODE=setsid; else GROUP_MODE=monitor; fi
+signal_child() {  # $1 signal name: the child's whole process group when it has one, else the child alone
+  if [ -n "$CHILD_PG" ]; then kill -s "$1" -- "-$CHILD_PG" 2>/dev/null || true
+  elif [ -n "$CHILD" ]; then kill -s "$1" "$CHILD" 2>/dev/null || true
+  fi
+  return 0
+}
+reap_group() {  # the child has exited: stop whatever it left running, so nothing writes the profile during the final snapshot
+  if [ -z "$CHILD_PG" ]; then return 0; fi
+  if kill -s 0 -- "-$CHILD_PG" 2>/dev/null; then
+    echo "[bot-state] processes started by the pipeline are still running; stopping them" >&2
+    kill -s TERM -- "-$CHILD_PG" 2>/dev/null || true
+    ri=0
+    while [ "$ri" -lt 20 ] && kill -s 0 -- "-$CHILD_PG" 2>/dev/null; do sleep 0.1; ri=$((ri + 1)); done
+    if kill -s 0 -- "-$CHILD_PG" 2>/dev/null; then kill -s KILL -- "-$CHILD_PG" 2>/dev/null || true; fi
+  fi
+  CHILD_PG=""
+  return 0
+}
+start_watchdog() {  # SIGKILL the child's group if it is still there after the bound (a child that ignores SIGTERM)
   if [ -n "$WATCH_PID" ]; then return 0; fi
   (
     SP=""; trap 'if [ -n "$SP" ]; then kill "$SP" 2>/dev/null || true; fi; exit 0' TERM
     sleep "$STOP_WAIT" & SP=$!; wait "$SP" || true
-    : >"$STAGE/forced"; kill -KILL "$1" 2>/dev/null || true
+    : >"$STAGE/forced"; signal_child KILL
   ) &
   WATCH_PID=$!
   return 0
@@ -265,9 +384,10 @@ on_term() {
   SIGS=$((SIGS + 1))
   if [ "$STOPPING" = 1 ]; then return 0; fi   # a second SIGTERM changes nothing (no second final snapshot)
   STOPPING=1
+  SHUT_DEADLINE=$(( $(date +%s) + STOP_WAIT + SHUT_BUDGET ))   # every bucket call from here on ends by this time
   if [ "$PHASE" = pre ]; then exit 143; fi
   if [ -n "$NAP_PID" ]; then kill "$NAP_PID" 2>/dev/null || true; fi
-  if [ -n "$CHILD" ]; then kill -TERM "$CHILD" 2>/dev/null || true; start_watchdog "$CHILD"; fi
+  if [ -n "$CHILD" ]; then signal_child TERM; start_watchdog; fi
   return 0
 }
 wait_child() {  # sets CHILD_RC; survives trapped signals (a signal interrupts `wait` without reaping the child)
@@ -276,49 +396,100 @@ wait_child() {  # sets CHILD_RC; survives trapped signals (a signal interrupts `
     wait "$CHILD" || CHILD_RC=$?
     if [ "$SIGS" = "$seen" ]; then break; fi
   done
+  reap_group
   stop_watchdog
   if [ -e "$STAGE/forced" ]; then log "pipeline ignored SIGTERM for ${STOP_WAIT}s and was killed"; fi
   CHILD=""
   return 0
 }
-start_child() {  # $@ command; runs in the background as CHILD
-  "$@" &
-  CHILD=$!
+start_child() {  # $@ command; runs in the background as CHILD, in a process group of its own (CHILD_PG) when it can
+  CHILD_PG=""
+  if [ "$GROUP_MODE" = setsid ]; then
+    setsid "$@" &
+    CHILD=$!; CHILD_PG="$CHILD"
+  else
+    set -m 2>/dev/null || true
+    "$@" &
+    CHILD=$!
+    case "$-" in *m*) CHILD_PG="$CHILD" ;; esac
+    set +m 2>/dev/null || true
+    if [ -z "$CHILD_PG" ]; then echo "[bot-state] no process-group support: only the pipeline process itself can be stopped" >&2; fi
+  fi
   return 0
 }
 start_helpers() {  # lease renewal and periodic snapshots, each in its own subshell so neither delays the other
   if [ -z "$BUCKET" ]; then return 0; fi
   MAIN_PID=$$
   (
-    SP=""; LT=renew; trap 'if [ -n "$SP" ]; then kill "$SP" 2>/dev/null || true; fi; exit 0' TERM
+    SP=""; HSTOP=0; LT=renew
+    trap 'HSTOP=1; if [ -n "$SP" ]; then kill "$SP" 2>/dev/null || true; fi' TERM
+    trap ': >"$STAGE/helper-renew.done"' EXIT
     good_until=$(( $(date +%s) + LEASE_TTL ))
-    while :; do
-      sleep "$LEASE_RENEW_S" & SP=$!; wait "$SP" || true
+    while [ "$HSTOP" = 0 ]; do
+      sleep "$LEASE_RENEW_S" & SP=$!
+      if [ "$HSTOP" = 1 ]; then kill "$SP" 2>/dev/null || true; fi
+      wait "$SP" || true; SP=""
+      if [ "$HSTOP" = 1 ]; then break; fi
       rrc=0; lease_renew || rrc=$?
       if [ "$rrc" -eq 0 ]; then good_until=$(( $(date +%s) + LEASE_TTL )); continue; fi
       if [ "$rrc" -eq 2 ] && [ "$(date +%s)" -lt "$good_until" ]; then echo "[bot-state] lease renewal could not be confirmed; will retry" >&2; continue; fi
       echo "[bot-state] lease lost: stopping the pipeline, uploading nothing more" >&2
       : >"$STAGE/lease-lost"; kill -TERM "$MAIN_PID" 2>/dev/null || true
-      exit 0
+      break
     done
+    exit 0
   ) &
   RENEW_PID=$!
   (
-    SP=""; LT=snap; trap 'if [ -n "$SP" ]; then kill "$SP" 2>/dev/null || true; fi; exit 0' TERM
-    while :; do
-      sleep "$SNAPSHOT_S" & SP=$!; wait "$SP" || true
+    SP=""; HSTOP=0; LT=snap
+    trap 'HSTOP=1; if [ -n "$SP" ]; then kill "$SP" 2>/dev/null || true; fi' TERM
+    trap ': >"$STAGE/helper-snap.done"' EXIT
+    while [ "$HSTOP" = 0 ]; do
+      sleep "$SNAPSHOT_S" & SP=$!
+      if [ "$HSTOP" = 1 ]; then kill "$SP" 2>/dev/null || true; fi
+      wait "$SP" || true; SP=""
+      if [ "$HSTOP" = 1 ]; then break; fi
       snapshot_state periodic || true
     done
+    exit 0
   ) &
   SNAP_PID=$!
   return 0
 }
-stop_helpers() {  # an upload already under way is allowed to finish, so a stale periodic snapshot cannot land after the final one
+stop_helpers() {  # an upload already under way may finish, for at most STOP_WAIT seconds; then the helper and its bucket call are ended
   for p in "$RENEW_PID" "$SNAP_PID"; do
-    if [ -n "$p" ]; then kill -TERM "$p" 2>/dev/null || true; wait "$p" 2>/dev/null || true; fi
+    if [ -n "$p" ]; then kill -TERM "$p" 2>/dev/null || true; fi
+  done
+  hi=0; hlimit=$(( STOP_WAIT * 10 ))
+  while [ "$hi" -lt "$hlimit" ]; do
+    pending=0
+    if [ -n "$RENEW_PID" ] && [ ! -e "$STAGE/helper-renew.done" ]; then pending=1; fi
+    if [ -n "$SNAP_PID" ] && [ ! -e "$STAGE/helper-snap.done" ]; then pending=1; fi
+    if [ "$pending" = 0 ]; then break; fi
+    sleep 0.1; hi=$((hi + 1))
+  done
+  for pair in "$RENEW_PID:renew" "$SNAP_PID:snap"; do
+    p="${pair%%:*}"; hn="${pair#*:}"
+    if [ -z "$p" ]; then continue; fi
+    if [ ! -e "$STAGE/helper-$hn.done" ]; then
+      echo "[bot-state] helper $hn did not stop within ${STOP_WAIT}s; ending it and its bucket call" >&2
+      if [ -f "$STAGE/gc-$hn.pid" ]; then kill -TERM "$(cat "$STAGE/gc-$hn.pid")" 2>/dev/null || true; fi
+      kill -KILL "$p" 2>/dev/null || true
+    fi
+    wait "$p" 2>/dev/null || true
   done
   RENEW_PID=""; SNAP_PID=""
   stop_watchdog
+  return 0
+}
+renew_before_start() {  # a slow start (daemons, doctor gate) must not let another instance take the lease
+  if [ -z "$BUCKET" ]; then return 0; fi
+  rbrc=0; lease_renew || rbrc=$?
+  case "$rbrc" in
+    0) log "lease renewed before the pipeline starts" ;;
+    1) echo "lease lost before the pipeline could start; not starting it" >&2; exit 75 ;;
+    *) echo "[bot-state] lease renewal before the start could not be confirmed; continuing, the renewer retries" >&2 ;;
+  esac
   return 0
 }
 finish() {  # $1 pipeline status: stop the helpers, final snapshot, release the lease, exit
@@ -335,6 +506,7 @@ on_exit() {
   erc=$?; trap - EXIT
   stop_helpers
   lease_release || true
+  if [ -s "$STAGE/skipped" ]; then echo "[bot-state] shutdown time budget used up: some bucket calls were skipped" >&2; fi
   if [ -n "$STAGE" ]; then rm -rf "$STAGE"; fi
   exit "$erc"
 }
@@ -392,6 +564,7 @@ cat /tmp/doctor.log
 if [ "$doctor_rc" -ne 0 ]; then echo "doctor failed (exit $doctor_rc)" >&2; exit 1; fi
 if grep -q '^MISSING' /tmp/doctor.log; then echo "doctor failed (MISSING)" >&2; exit 1; fi
 [ "$MODE" = "doctor" ] && exit 0
+renew_before_start   # the slow part of the start is over; refresh the lease right before the pipeline and helpers start
 
 # record-once: the command and its flags. LKB_RECORD_ARGS is split on spaces (no globbing).
 if [ "$MODE" = "record-once" ]; then
@@ -402,7 +575,11 @@ if [ "$MODE" = "record-once" ]; then
   start_helpers
   wait_child
   REC_RC="$CHILD_RC"
-  copy_recordings || true
+  copy_rc=0; copy_recordings || copy_rc=$?
+  if [ "$REC_RC" -eq 0 ] && [ "$copy_rc" -ne 0 ]; then
+    echo "[bot-state] the recording finished but could not be copied to the bucket; exiting 74" >&2
+    REC_RC=74
+  fi
   finish "$REC_RC"
 fi
 

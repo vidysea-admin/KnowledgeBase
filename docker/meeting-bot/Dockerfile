@@ -11,7 +11,7 @@ ARG DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && apt-get install -y --no-install-recommends \
     python3 python3-venv python3-tk python3-xlib python3-dev \
     xvfb x11vnc x11-utils xauth xdotool scrot \
-    pulseaudio pulseaudio-utils ffmpeg tini tzdata ca-certificates curl procps unzip \
+    pulseaudio pulseaudio-utils ffmpeg tini tzdata ca-certificates curl procps util-linux unzip \
     libnss3 libgbm1 libasound2 libxss1 libgtk-3-0 libxtst6 libxkbcommon0 libatk-bridge2.0-0 \
     libcups2 libdrm2 libxcomposite1 libxdamage1 libxfixes3 libxrandr2 libpango-1.0-0 libcairo2 \
     libx11-xcb1 libxshmfence1 libnss3-tools \
