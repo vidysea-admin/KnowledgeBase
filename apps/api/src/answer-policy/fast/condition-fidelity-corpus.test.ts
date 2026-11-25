@@ -117,6 +117,9 @@ test("[F1-C5] corpus pins: archive path and turn hashes of the 14 UC probes, del
   assert.equal(sha(raw.text), A.turnTextSHA256);
   for (const log of [corpus.provenance.independentCheckLog, corpus.provenance.engineeringLog]) assert.ok(log.path.endsWith(`${log.sha256}.log`));
   assert.equal(P.claims.length * 2, 14);
+  // The recorded inputs themselves are pinned: substituting, rewording or dropping any case fails here (D-015).
+  assert.equal(sha(JSON.stringify({ ucProbes: corpus.ucProbes, verdictCases: corpus.verdictCases, engineeringCases: corpus.engineeringCases })),
+    "dff25270ef6d0eca90709c5fe55d7f16c4ce1774a6163cff9425b9ced8b5a67d");
 });
 
 test("[F1-C5][F1-C3][F1-C4] UC probes 14/14 as recorded (1024-char excerpt of t042): held, empty public answer, absent from history, <=2 calls, no web", async () => {
