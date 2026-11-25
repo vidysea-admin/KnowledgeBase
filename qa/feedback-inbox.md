@@ -642,3 +642,16 @@ Source: KB decision D-237 (the structure lint on branch `release/kb-golive` is r
 - [SL-5] `scripts/eval/extraction-authorized-import.mjs` is not moved, and every path a Dockerfile or `cloudbuild.yaml` copies still exists.
 Not in this unit: any change of a limit, any behaviour change, the two known baseline reds (`apps/api/src/activity-health/router.test.ts`, `apps/web` `KnowledgeSpeakerProfilePage.test.tsx`), and the documents that still cite the old paths (the launch-prep manifest and verdict), which are records of their own commit and are not edited.
 Stop rule: a finding outside these checks is filed and not built.
+
+## 2026-11-25 - Umesh (Approver), in chat, answers to four defaults (recorded in D-242)
+
+1. Default shown to him: "Recorder beech me crash ho jaye to? Agla capture apne aap shuru nahi hoga; pehle aapko alert jayega."
+   His answer, verbatim: "nhi apne aap heal ho jayee asap and alert bhi aa jaaye"
+2. Default shown to him: "4 credentials abhi saade settings me hain (OBS, WhatsApp Mongo, Langfuse ke 2). Abhi waise hi rahein, baad me Secret Manager me."
+   His answer, verbatim: "requirements.txt se setup krr skte hai naa server prr?"
+3. Default shown to him: "Bot public webinar ka registration form aapke naam se bhare? Haan. Ye 26 Sep ki line 'registration form insaan hi bharega' ko badalta hai. Pehla webinar aur naam/email aap chunoge."
+   His answer, verbatim: "human dependency khatam krni hai , chaiye hi nhi"
+4. Default shown to him: "Naya ya badla hua meeting hosted page par 10 minute ke andar dikhe. Ye nahi ki agla meeting 10 minute me shuru ho."
+   His answer, verbatim: "timeline ka issue ho hi naa, like time ki dikkat aa hi kyu rhi hai best tho tab hoga jab 2 meeting clasho ho and systm dono join krr lee, parallely"
+
+For the checker to fold into the meeting-bot contracts once the design entry lands: self-recovery after a crash plus an alert; registration with no per-webinar human step; two clashing meetings both joined and recorded.
