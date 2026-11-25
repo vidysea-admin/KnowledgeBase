@@ -2,7 +2,7 @@
 **Contract:** qa/contracts/wa-baileys-patch.md as amended at a37e9cc6 (patch-package clauses replaced by in-repo applier clauses; criteria and invariants on the Criteria line below, verbatim text in the contract); decisions D-227, archiver D-023/D-024/D-025, KB D-235, D-241 item 5
 **Goal task:** none
 **Date:** 2026-11-25
-**Status:** ready-for-check
+**Status:** checked-PASS (dual check at cycle 0: verdict A a64cb3ae, verdict B 37b6257b)
 **Fix cycle:** 0 of max 2
 **Hold fix cycles:** 0 of 2
 **Hold-reopens:** 0
