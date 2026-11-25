@@ -26,7 +26,8 @@
 - **[L2-I3]** The unit changes no other file's behaviour (full manifest because it touches auth; fresh checker; the maker supplies a `dual-trigger` line or records why none applies, policy .8-3).
 
 ## Out of scope
-A shared (cross-instance) limiter store; changing the number 60 or the window. Consent (D-210).
+A shared (cross-instance) limiter store; changing the number 60 or the window. A separate Ask-specific per-user cap: D-229 (Approved-by Umesh) ships Ask at launch with this per-user limit only and builds the cap in wave 2 with F4 as its own unit with its own check; the model-provider spend alert is a launch-day human-gated step, not a criterion of this unit. Consent (D-210).
 
 ## Amendment log
 - 2026-11-25 · routine · created. Maker reading [L2-a]->C1 (tightened: shared across sessions, not per session), [L2-b]->C2, [L2-c]->C3+C4 (tightened: forged-input test, unambiguous encoding); owner's check -> C5, C6 (added instance-count caveat) · folds inbox "unit-level checks for wave 1" (D-227)
+- 2026-11-25 · routine · out-of-scope line records D-229 (no separate Ask cap before launch; known cost: one approved user can send up to 60 Ask requests a minute); no criterion changed or weakened · folds D-229 read with inbox "go-live address is the Cloud Run service URL"
