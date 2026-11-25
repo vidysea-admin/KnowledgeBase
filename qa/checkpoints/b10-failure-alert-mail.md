@@ -1,0 +1,23 @@
+# Checkpoint — b10-failure-alert-mail (checker, Mode A, coordinator single)
+Verdict: CONTINUE-NEEDED (input change: code-review finding, repair pending). No verdict file for 6a2cbd7c. Cycle 0, resume 0 of 2 (not a budget exhaustion).
+Written 2026-11-25. Bound root: D:\KnowledgeBase\.worktrees\b10-failure-alert-mail, base 063a9b79, head judged so far 6a2cbd7c (manifest commit 51185fdd). Tier: M (route floor null, recomputed by checker: `tick.mjs --route 063a9b79..6a2cbd7c` -> {"floor":null,"dual":false,"rules_fired":[]}, exit 0).
+
+## Rulings (contract commit 1fffeefe on branch docs/cloud-run-golive, main tree, file qa/contracts/meeting-bot-failure-alert-mail.md only)
+(a) capture id in the mail: folded in. Premise was wrong (alerts.ts describeAlert and gws-channels.ts buildRawEmail do not print sessionKey; alerts.ts is byte-equal under B10-I1). B10-C3/C4 now assert the id on the alert input given to `raise`; credential handling of C3 untouched.
+(b) 35 s bound: folded in as the true ceiling of the existing retry code (3 attempts x 30 s = 90 s; measured 2 attempts = 60 s per tick); the test must assert the 3-attempt/90 s ceiling.
+(c) delimiter: hyphen removed from the delimiter class in C2, C7(b) and decision clauses 3 and 8; new negatives `rescheduled-completed`, `cancelled-by-host`, `retry-limit-reached`, `admission_denied-x`. Finding confirmed by the checker on a copy of 6a2cbd7c: `rescheduled-completed` -> `Coverage: rescheduled.`, `cancelled-by-host` -> `Coverage: cancelled.`, `retry-limit-reached` -> `Coverage: retry-limit.`, `admission_denied-x` -> `Coverage: admission_denied.`.
+
+## Evidence identity (every row at head 6a2cbd7c; INVALIDATED for the two changed source files by the repair)
+- cmd: node --test scripts/webinar/scheduler/lifecycle-alerts.test.mjs scripts/webinar/scheduler/alert-kinds.test.mjs (cwd worktree root) -> 19 pass / 0 fail; blobs lifecycle-alerts.mjs a62cbb163f95, lifecycle-alerts.test.mjs 67f1604; checker-run, node 22+, win32. Reusable only if both blobs unchanged: they will change.
+- cmd: node --test --import tsx src/autojoin/alerts.test.ts src/autojoin/alert-retries.test.ts src/capture/notify/telegram-channel.test.ts src/capture/reconnect-gaps.test.ts (cwd packages/meeting-bot) -> 47 pass / 0 fail; blobs reconnect-gaps.ts 84a7184122d2, reconnect-gaps.test.ts 5efc605. Invalidated by the repair.
+- cmd: node --test scripts/webinar/run-pipeline.test.mjs (cwd worktree root) -> 23 pass / 0 fail; blob run-pipeline.test.mjs 09ce21a; run-pipeline-deps.mjs and telegram-channel.ts byte-equal to base (B10-C6 unchanged-files half). Reusable if those files stay unchanged.
+- Diff scope (4c) at 6a2cbd7c: exactly 4 files (lifecycle-alerts.mjs, lifecycle-alerts.test.mjs, reconnect-gaps.ts, reconnect-gaps.test.ts); alerts.ts, gws-channels.ts, config.ts, telegram-channel.ts, deps-runtime.mjs, run-pipeline.mjs, run-pipeline-deps.mjs, cli.ts untouched; no deleted/weakened assertion (test diffs are additions plus import-line extensions). Re-do on the repaired range.
+- Sibling read: launchControlledRecording's other caller `manual-jobs/worker.ts` swallows the error (catch -> failed), so the new message and `code` do not reach it. Telegram: `notifiableReason` is a whitelist, so the longer reason still gives `pipeline-failed` as before (telegram-channel.ts:20).
+- Falsification: NOT RUN by the checker yet (runner prepared at scratchpad b10-check\mutate.mjs, 10 mutants C1..C7; one per changed criterion is the floor). The manifest's 8 recorded falsifications are builder claims only and are not credited. Must be run on the repaired SHA (both source files change). Copy: scratchpad b10-check\base2 (junctions unlinked).
+
+## Remaining on resume (repaired SHA)
+1. Re-read the repair diff in full (4c on Repair base 6a2cbd7c..new head); confirm the hyphen is dropped from BOTH classes (lifecycle-alerts.mjs reasonName and reconnect-gaps.ts captureFailureName) and the four hyphen negatives are tested in both files; confirm `name: text` and `name - text` still match and old exact names unchanged.
+2. Re-run the two changed-file suites (19+ lifecycle, 47+ meeting-bot) and run-pipeline.test.mjs once; tsc --noEmit -p packages/meeting-bot.
+3. Falsification floor on the repaired code: one per changed criterion (C2 and C7b are the ones the repair changes; plus C1, C3, C4, C5, C6, C7c, C7d at least once on the new blobs).
+4. B10-C5 test: confirm it asserts the 3-attempt / 90 s ceiling (it does at 6a2cbd7c: `tick <= 3*30000 && attempts <= 3`) and reports the measured 60 s. B10-C3: confirm an assertion on `inputs[0].sessionKey` exists (it does in the C4 test at 6a2cbd7c).
+5. Verdict at cycle 0 with `Cycle checked: 0`, narrow-pathspec commit in the worktree.
