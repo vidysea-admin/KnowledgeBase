@@ -105,13 +105,9 @@ export async function runSchedulerCycle(c) {
 
   if (rejoined.size) {
     // The first selection ran while these rows were still `recording`; schedule the rejoins in THIS cycle, never in a later interval (H1-C2).
-    // A rejoin is a join (H1-C7): the same join rules and opt-out decide it, so the fresh selection goes through them too.
-    let fresh = select();
-    if (deps.applyJoinRules) fresh = await deps.applyJoinRules(fresh, {readOnly: false, now: now(), selectWithRules: select, remote: Boolean(deps.calendarAttendance)});
-    if (stopped()) return;
-    const listed = new Set(selection.toSchedule.map(item => item.sessionKey));
-    selection = {...selection, toSchedule: [...selection.toSchedule, ...fresh.toSchedule.filter(item => rejoined.has(item.sessionKey) && !listed.has(item.sessionKey))],
-      skipped: [...selection.skipped, ...fresh.skipped.filter(item => rejoined.has(item.sessionKey))]};
+    // A rejoin is a join (H1-C7): the capture below re-runs validateTenant, applyJoinRules, opt-out and prepareCapture before it launches, exactly as for a first join.
+    const fresh = select(), listed = new Set(selection.toSchedule.map(item => item.sessionKey));
+    selection = {...selection, toSchedule: [...selection.toSchedule, ...fresh.toSchedule.filter(item => rejoined.has(item.sessionKey) && !listed.has(item.sessionKey))]};
     const decided = new Set([...fresh.toSchedule.map(item => item.sessionKey),
       ...fresh.skipped.filter(skipped => ['cancelled', 'past', ...REFUSAL_REASONS].includes(skipped.reason)).map(skipped => skipped.sessionKey)]);
     // A meeting that vanished from the selection (rescheduled, link no longer usable) cannot be rejoined: say so instead of leaving a "rejoining" row.
