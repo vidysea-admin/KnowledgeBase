@@ -8,6 +8,9 @@ export interface ExtractionCase extends Obj {
   filtered?: {claims: unknown; degraded: unknown}; labels?: unknown[];
   expectedFacts?: {id: string}[]; predictedEntities?: {id: string; kind: "topic" | "person"}[];
   entityLabels?: unknown[]; factLabels?: unknown[];
+  /** Optional gold fields read only by scoreGoldSet (D2H): topic/decision ids, decision labels, second-reviewer labels. */
+  goldTopics?: string[]; predictedDecisions?: {id: string}[]; decisionLabels?: {id: string; correct: boolean}[];
+  goldDecisions?: string[]; noDecisionSession?: boolean; secondLabels?: unknown[];
 }
 export interface StageReport {
   available: boolean; reason: string | null; rows: number | null; wellFormedClaims: number | null;
@@ -180,4 +183,60 @@ export function aggregateExtractionReports(reports: ExtractionReport[]) {
       factCoverage: rate(sum(r => r.semantic.factCoverage.numerator), sum(r => r.semantic.factCoverage.denominator)),
       counts: Object.fromEntries(["supported", "unsupported", "contradicted", "uncertain", "omitted"].map(k => [k, sum(r => r.semantic.counts[k] ?? 0)]))},
     unresolvedReferences: reports.flatMap(r => Object.values(r.stages).flatMap(s => s.issues.filter(i => i.code === "missing-turn").map(i => ({caseId: r.id, claimId: i.claimId, turnId: i.turnId, sessionId: i.sessionId}))))};
+}
+export type GoldMetricName = "fabricatedCitations" | "claimSupport" | "machineChecked" | "factCoverage" | "topicsPrecision" | "topicsRecall" | "decisionsPrecision" | "decisionsRecall" | "falseDecisions";
+/** Pinned denominators (D2H-C5): proposals for the owner's approval. "count" metrics compare the numerator, "rate" metrics the value. */
+export const GOLD_METRICS: Record<GoldMetricName, {kind: "count" | "rate"; definition: string}> = {
+  fabricatedCitations: {kind: "count", definition: "numerator = citations that do not resolve to a turn of the same tenant and session; denominator = all citations; stage = first available of persisted, filtered, parsed"},
+  claimSupport: {kind: "rate", definition: "numerator = claims labelled supported; denominator = all labelled claims (uncertain counts against, omitted facts excluded)"},
+  machineChecked: {kind: "rate", definition: "numerator = claims with no machine-check issue (citation, span, speaker, excerpt, owner); denominator = all claims of the same stage as fabricatedCitations"},
+  factCoverage: {kind: "rate", definition: "numerator = expected facts labelled covered; denominator = all expected facts; any unlabelled expected fact makes the metric not-measured"},
+  topicsPrecision: {kind: "rate", definition: "numerator = predicted topics labelled correct; denominator = labelled predicted topics"},
+  topicsRecall: {kind: "rate", definition: "numerator = gold topic ids present among predicted topic ids; denominator = gold topic ids"},
+  decisionsPrecision: {kind: "rate", definition: "numerator = predicted decisions labelled correct; denominator = labelled predicted decisions"},
+  decisionsRecall: {kind: "rate", definition: "numerator = gold decision ids present among predicted decision ids; denominator = gold decision ids"},
+  falseDecisions: {kind: "count", definition: "numerator = predicted decisions on sessions marked noDecisionSession; denominator = number of such sessions"}};
+export interface GoldMetric extends Rate { measured: boolean; reason: string | null; }
+export interface GoldScore {
+  cases: number; reports: ExtractionReport[]; metrics: Record<GoldMetricName, GoldMetric>;
+  reviewerAgreement: GoldMetric & {doubleLabelled: number; measure: string};
+}
+/** Score a human gold set (review-tooling export `cases`): every metric is a pooled ratio; absent inputs are not-measured, never 0 or 1. */
+export function scoreGoldSet(cases: ExtractionCase[]): GoldScore {
+  if (!Array.isArray(cases) || cases.length === 0 || cases.length > 500) throw new Error("Invalid gold set");
+  const reports = cases.map(evaluateExtractionCase), n = Object.fromEntries(Object.keys(GOLD_METRICS).map(k => [k, [0, 0]])) as Record<GoldMetricName, number[]>;
+  const ids = (v: unknown, what: string, key?: string) => {
+    const a = Array.isArray(v) ? v.map(x => key ? (object(x) ? x[key] : null) : x) : null;
+    if (!a || a.some(x => !text(x)) || new Set(a).size !== a.length) throw new Error("Invalid gold " + what); return a as string[];
+  };
+  let unlabelled = 0, double = [0, 0];
+  cases.forEach((c, i) => {
+    const r = reports[i]!, s = (["persisted", "filtered", "parsed"] as const).map(k => r.stages[k]).find(x => x.available), add = (k: GoldMetricName, a: number, b: number) => {n[k][0]! += a; n[k][1]! += b;};
+    if (s) {add("fabricatedCitations", s.invalidCitationRate.numerator, s.invalidCitationRate.denominator); add("machineChecked", s.rows! - s.affectedClaims, s.rows!);}
+    add("claimSupport", r.semantic.counts.supported!, r.semantic.labeled);
+    const covered = r.semantic.factCoverage.numerator - r.semantic.counts.omitted!; add("factCoverage", covered, r.semantic.factCoverage.denominator);
+    unlabelled += r.semantic.factCoverage.denominator - r.semantic.factCoverage.numerator;
+    add("topicsPrecision", r.entities.topic.precision.numerator, r.entities.topic.precision.denominator);
+    if (c.goldTopics !== undefined) {const g = ids(c.goldTopics, "topics"), p = new Set((c.predictedEntities ?? []).filter(e => e.kind === "topic").map(e => e.id)); add("topicsRecall", g.filter(x => p.has(x)).length, g.length);}
+    const pd = c.predictedDecisions === undefined ? undefined : ids(c.predictedDecisions, "decisions", "id");
+    if (c.decisionLabels !== undefined) {
+      const seen = new Set<string>(); if (!pd || !Array.isArray(c.decisionLabels)) throw new Error("Invalid gold decisions");
+      for (const l of c.decisionLabels) {if (!object(l) || !text(l.id) || !pd.includes(l.id) || seen.has(l.id) || typeof l.correct !== "boolean") throw new Error("Invalid gold decisions"); seen.add(l.id); add("decisionsPrecision", Number(l.correct), 1);}
+    }
+    if (c.goldDecisions !== undefined) {const g = ids(c.goldDecisions, "decisions"); if (!pd || c.noDecisionSession === true) throw new Error("Invalid gold decisions"); add("decisionsRecall", g.filter(x => pd.includes(x)).length, g.length);}
+    if (c.noDecisionSession !== undefined && typeof c.noDecisionSession !== "boolean") throw new Error("Invalid gold decisions");
+    if (c.noDecisionSession === true && pd) add("falseDecisions", pd.length, 1);
+    if (c.secondLabels !== undefined) {
+      if (!Array.isArray(c.secondLabels)) throw new Error("Invalid second label");
+      const first = new Map((c.labels ?? []).filter(object).filter(l => l.status !== "omitted").map(l => [l.stage + ":" + l.claimId, l] as const)), seen = new Set<string>();
+      for (const l of c.secondLabels) {
+        const k = object(l) ? l.stage + ":" + l.claimId : "", f = first.get(k);
+        if (!object(l) || !f || seen.has(k) || !text(l.reviewerId) || l.reviewerId === f.reviewerId || !["supported", "unsupported", "contradicted", "uncertain"].includes(String(l.status))) throw new Error("Invalid second label");
+        seen.add(k); double = [double[0]! + Number(l.status === f.status), double[1]! + 1];
+      }
+    }
+  });
+  const metric = (a: number, b: number, reason: string | null = null): GoldMetric => reason || !b ? {numerator: a, denominator: b, value: null, measured: false, reason: reason ?? "no-input-or-zero-denominator"} : {...rate(a, b), measured: true, reason: null};
+  const metrics = Object.fromEntries(Object.entries(n).map(([k, [a, b]]) => [k, metric(a!, b!, k === "factCoverage" && unlabelled > 0 ? "unlabelled-expected-facts:" + unlabelled : null)])) as Record<GoldMetricName, GoldMetric>;
+  return {cases: cases.length, reports, metrics, reviewerAgreement: {...metric(double[0]!, double[1]!), doubleLabelled: double[1]!, measure: "raw-percent-agreement: exact status match on claims labelled by two different reviewers (not chance-corrected)"}};
 }

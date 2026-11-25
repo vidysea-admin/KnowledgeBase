@@ -1,0 +1,16 @@
+{
+  "format": "extraction-thresholds-v1",
+  "status": "proposed",
+  "note": "PROPOSED for the owner's approval (contract extraction-scoring-harness, D2H-C2). Not approved: a run against this file is labelled bar: proposed and is never acceptance for launch row G14. Counts use max (numerator), rates use min (value).",
+  "thresholds": {
+    "fabricatedCitations": {"max": 0, "required": true},
+    "claimSupport": {"min": 0.95, "required": true},
+    "machineChecked": {"min": 0.98, "required": true},
+    "factCoverage": {"min": 0.70, "required": true},
+    "topicsPrecision": {"min": 0.90, "required": true},
+    "topicsRecall": {"min": 0.70, "required": true},
+    "decisionsPrecision": {"min": 0.85, "required": true},
+    "decisionsRecall": {"min": 0.70, "required": true},
+    "falseDecisions": {"max": 0, "required": true}
+  }
+}

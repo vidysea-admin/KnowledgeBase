@@ -3,7 +3,10 @@
  * Manifest v1: cases[{id,tenantId,sessionId,artifacts:{turns,persisted?,rawText?,parsed?,filtered?},
  * labels?,expectedFacts?,factLabels?,predictedEntities?,entityLabels?,mediaDuration?}], optional inventoryDirectory.
  * Artifact paths are relative to manifest; labels bind the case artifactHash in the report.
- * JSON only stdout. No provider, Mongo, dotenv, or quality thresholds. */
+ * JSON only stdout. No provider, Mongo, dotenv, or quality thresholds.
+ * Gold mode (D2H): node scripts/eval-extraction.mjs --gold export.json [--thresholds bar.json]
+ * export.json = the review tooling's extraction-authorized-export-v1 (apps/api/src/extraction-review), read only.
+ * Exit codes: 0 ok / meets bar / no bar, 1 a metric misses the bar, 2 invalid input, 3 not-measurable (required metric absent). */
 import { readFileSync, readdirSync, statSync, existsSync, writeFileSync } from "node:fs";
 import { spawnSync } from "node:child_process";
 import { dirname, resolve, relative, isAbsolute, sep } from "node:path";
@@ -11,7 +14,7 @@ import { fileURLToPath } from "node:url";
 import { createHash } from "node:crypto";
 import { register } from "tsx/esm/api";
 register();
-const {evaluateExtractionCase, aggregateExtractionReports} = await import("../packages/index/src/eval/extraction.ts");
+const {evaluateExtractionCase, aggregateExtractionReports, scoreGoldSet, GOLD_METRICS} = await import("../packages/index/src/eval/extraction.ts");
 const {buildReconciliationReport, findMissingArtifacts, renderReconciliationMarkdown} = await import("../packages/index/src/eval/corpus-reconcile.ts");
 const sha = bytes => createHash("sha256").update(bytes).digest("hex");
 const obj = v => v && typeof v === "object" && !Array.isArray(v);
@@ -129,8 +132,54 @@ export function reconcileMain(args) {
     console.log(JSON.stringify(report.summary, null, 2)); return 0;
   } catch (e) { console.log(JSON.stringify({version: 1, failure: "reconcile-failed", reason: String(e?.message).slice(0, 200)})); return 2; }
 }
+/** Validate a thresholds file (extraction-thresholds-v1). Counts use max (against the numerator), rates use min (against the value). */
+export function parseThresholds(v) {
+  if (!obj(v) || v.format !== "extraction-thresholds-v1" || !["proposed", "approved"].includes(v.status) || !obj(v.thresholds) || Object.keys(v.thresholds).length === 0) throw new Error("invalid-thresholds");
+  for (const [name, t] of Object.entries(v.thresholds)) {
+    const kind = GOLD_METRICS[name]?.kind, key = kind === "count" ? "max" : "min";
+    if (!kind || !obj(t) || !Number.isFinite(t[key]) || t[key] < 0 || (kind === "rate" && t[key] > 1) || (t.required !== undefined && typeof t.required !== "boolean") ||
+        Object.keys(t).some(k => k !== key && k !== "required")) throw new Error("invalid-thresholds");
+  }
+  return v;
+}
+/** Compare measured gold metrics with a bar. A proposed bar never yields "pass"; nothing measured is never a pass. */
+export function judgeGold(metrics, bar) {
+  const results = {};
+  for (const [name, t] of Object.entries(bar.thresholds)) {
+    const m = metrics[name], required = t.required === true, count = GOLD_METRICS[name].kind === "count";
+    results[name] = !m.measured ? {status: "not-measured", required, reason: m.reason, bar: t}
+      : {status: (count ? m.numerator <= t.max : m.value >= t.min) ? "meets" : "misses", required, measured: count ? m.numerator : m.value, bar: t};
+  }
+  const all = Object.values(results), misses = all.some(r => r.status === "misses");
+  const absent = all.some(r => r.status === "not-measured" && r.required) || !all.some(r => r.status !== "not-measured");
+  const proposed = bar.status === "proposed";
+  return {results, exitCode: misses ? 1 : absent ? 3 : 0,
+    verdict: misses ? (proposed ? "misses-proposed-bar" : "fail") : absent ? "not-measurable" : proposed ? "meets-proposed-bar" : "pass"};
+}
+/** Gold scoring. Reads the gold set and thresholds only; writes nothing (D2H-I1, D2H-I2). */
+export function goldMain(args) {
+  const fail = failure => {console.log(JSON.stringify({version: 1, complete: false, failure})); return 2;};
+  if (!(args.length === 2 || (args.length === 4 && args[2] === "--thresholds")) || !validText(args[1]) || (args.length === 4 && !validText(args[3]))) return fail("usage: --gold export.json [--thresholds bar.json]");
+  let gold, goldBytes, bar, barBytes;
+  try {
+    for (const p of args.length === 4 ? [args[1], args[3]] : [args[1]]) if (statSync(resolve(p)).size > 16 * 1024 * 1024) throw new Error("size");
+    goldBytes = readFileSync(resolve(args[1])); gold = JSON.parse(goldBytes.toString("utf8"));
+    if (!obj(gold) || gold.format !== "extraction-authorized-export-v1" || !Array.isArray(gold.cases)) throw new Error("format");
+  } catch { return fail("gold-set-invalid"); }
+  if (args.length === 4) {try {barBytes = readFileSync(resolve(args[3])); bar = parseThresholds(JSON.parse(barBytes.toString("utf8")));} catch {return fail("thresholds-invalid");}}
+  let score; try {score = scoreGoldSet(gold.cases);} catch {return fail("gold-set-invalid");}
+  const synthetic = gold.synthetic === true, judged = bar ? judgeGold(score.metrics, bar) : undefined;
+  console.log(JSON.stringify({version: 1, tool: "extraction-gold-scoring-v1", goldSha256: sha(goldBytes),
+    provenance: {format: gold.format, synthetic, humanGoldVerified: gold.humanGoldVerified === true, packetSha256: gold.packetSha256 ?? null, cases: score.cases},
+    measurementOfRealCorpus: !synthetic, bar: bar ? bar.status : "none", thresholdsStatus: bar ? bar.status : null, thresholdsSha256: bar ? sha(barBytes) : null,
+    verdict: judged ? judged.verdict : "no-bar", acceptanceForG14: !!bar && bar.status === "approved" && judged.verdict === "pass" && !synthetic,
+    ...(judged ? {results: judged.results} : {}), metrics: score.metrics, reviewerAgreement: score.reviewerAgreement,
+    definitions: Object.fromEntries(Object.entries(GOLD_METRICS).map(([k, v]) => [k, v.definition]))}, null, 2));
+  return judged ? judged.exitCode : 0;
+}
 export function main(args = process.argv.slice(2)) {
   if (args[0] === "reconcile") return reconcileMain(args);
+  if (args[0] === "--gold") return goldMain(args);
   if (args.length !== 2 || args[0] !== "--input" || !validText(args[1])) {
     console.log(JSON.stringify({version: 1, complete: false, failure: "usage: --input local-manifest.json"})); return 2;
   }
