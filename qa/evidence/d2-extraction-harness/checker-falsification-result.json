@@ -1,0 +1,344 @@
+[
+ {
+  "id": "D2H-C1",
+  "file": "packages/index/src/eval/extraction.ts",
+  "copyEqualsHeadBlob": true,
+  "occurrences": 1,
+  "before": [
+   {
+    "status": 0,
+    "tests": "1",
+    "pass": "1",
+    "fail": "0",
+    "failedNames": [],
+    "msgs": []
+   },
+   {
+    "status": 0,
+    "tests": "1",
+    "pass": "1",
+    "fail": "0",
+    "failedNames": [],
+    "msgs": []
+   }
+  ],
+  "after": [
+   {
+    "status": 1,
+    "tests": "1",
+    "pass": "0",
+    "fail": "1",
+    "failedNames": [
+     "D2H-C1 falsification: citations, support, recall and false decisions move the numbers",
+     "D2H-C1 falsification: citations, support, recall and false decisions move the numbers"
+    ],
+    "msgs": [
+     "AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:",
+     "expected",
+     "expected: [ 1, 4 ],"
+    ]
+   },
+   {
+    "status": 1,
+    "tests": "1",
+    "pass": "0",
+    "fail": "1",
+    "failedNames": [
+     "C1 falsification: a fabricated citation and an unsupported label move the metrics",
+     "C1 falsification: a fabricated citation and an unsupported label move the metrics"
+    ],
+    "msgs": [
+     "AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:",
+     "expected",
+     "expected: [ 1, 4 ],"
+    ]
+   }
+  ],
+  "mutatedDiffers": true
+ },
+ {
+  "id": "D2H-C2",
+  "file": "scripts/eval-extraction.mjs",
+  "copyEqualsHeadBlob": true,
+  "occurrences": 1,
+  "before": [
+   {
+    "status": 0,
+    "tests": "1",
+    "pass": "1",
+    "fail": "0",
+    "failedNames": [],
+    "msgs": []
+   }
+  ],
+  "after": [
+   {
+    "status": 1,
+    "tests": "1",
+    "pass": "0",
+    "fail": "1",
+    "failedNames": [
+     "C2 falsification: changing one number in the file flips the exit code",
+     "C2 falsification: changing one number in the file flips the exit code"
+    ],
+    "msgs": [
+     "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:",
+     "expected: 1,"
+    ]
+   }
+  ],
+  "mutatedDiffers": true
+ },
+ {
+  "id": "D2H-C3",
+  "file": "packages/index/src/eval/extraction.ts",
+  "copyEqualsHeadBlob": true,
+  "occurrences": 1,
+  "before": [
+   {
+    "status": 0,
+    "tests": "2",
+    "pass": "2",
+    "fail": "0",
+    "failedNames": [],
+    "msgs": [
+     "expected facts are not-measured instead of silently covered (3.157ms)"
+    ]
+   },
+   {
+    "status": 0,
+    "tests": "2",
+    "pass": "2",
+    "fail": "0",
+    "failedNames": [],
+    "msgs": []
+   }
+  ],
+  "after": [
+   {
+    "status": 1,
+    "tests": "2",
+    "pass": "1",
+    "fail": "1",
+    "failedNames": [
+     "D2H-C3 absent inputs are not-measured, never 0 or 1",
+     "D2H-C3 absent inputs are not-measured, never 0 or 1"
+    ],
+    "msgs": [
+     "expected facts are not-measured instead of silently covered (4.1636ms)",
+     "AssertionError [ERR_ASSERTION]: topicsRecall",
+     "expected: false,"
+    ]
+   },
+   {
+    "status": 1,
+    "tests": "2",
+    "pass": "0",
+    "fail": "2",
+    "failedNames": [
+     "C3: absent decision inputs are not-measured",
+     "C3: a zero denominator is not-measured; nothing measured is never a pass",
+     "C3: absent decision inputs are not-measured",
+     "C3: a zero denominator is not-measured; nothing measured is never a pass"
+    ],
+    "msgs": [
+     "AssertionError [ERR_ASSERTION]: decisionsPrecision",
+     "expected: false,",
+     "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:"
+    ]
+   }
+  ],
+  "mutatedDiffers": true
+ },
+ {
+  "id": "D2H-C4",
+  "file": "packages/index/src/eval/extraction.ts",
+  "copyEqualsHeadBlob": true,
+  "occurrences": 1,
+  "before": [
+   {
+    "status": 0,
+    "tests": "1",
+    "pass": "1",
+    "fail": "0",
+    "failedNames": [],
+    "msgs": []
+   },
+   {
+    "status": 0,
+    "tests": "1",
+    "pass": "1",
+    "fail": "0",
+    "failedNames": [],
+    "msgs": []
+   }
+  ],
+  "after": [
+   {
+    "status": 1,
+    "tests": "1",
+    "pass": "0",
+    "fail": "1",
+    "failedNames": [
+     "D2H-C4 reviewer agreement reports rate, double-labelled count and measure",
+     "D2H-C4 reviewer agreement reports rate, double-labelled count and measure"
+    ],
+    "msgs": [
+     "AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:",
+     "expected",
+     "expected: [ 1, 2, 2, 0.5 ],"
+    ]
+   },
+   {
+    "status": 1,
+    "tests": "1",
+    "pass": "0",
+    "fail": "1",
+    "failedNames": [
+     "C4: double-labelled claims give agreement, count and measure; none gives not-measured",
+     "C4: double-labelled claims give agreement, count and measure; none gives not-measured"
+    ],
+    "msgs": [
+     "AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:",
+     "expected",
+     "expected: [ 1, 2, 2 ],"
+    ]
+   }
+  ],
+  "mutatedDiffers": true
+ },
+ {
+  "id": "D2H-C5",
+  "file": "packages/index/src/eval/extraction.ts",
+  "copyEqualsHeadBlob": true,
+  "occurrences": 1,
+  "before": [
+   {
+    "status": 0,
+    "tests": "1",
+    "pass": "1",
+    "fail": "0",
+    "failedNames": [],
+    "msgs": []
+   }
+  ],
+  "after": [
+   {
+    "status": 1,
+    "tests": "1",
+    "pass": "0",
+    "fail": "1",
+    "failedNames": [
+     "C1: --gold reports every metric with numerator and denominator, labelled synthetic",
+     "C1: --gold reports every metric with numerator and denominator, labelled synthetic"
+    ],
+    "msgs": [
+     "AssertionError [ERR_ASSERTION]: D2H-C5 pinned definition for topicsRecall",
+     "expected: /^numerator = .+; denominator = .+/,"
+    ]
+   }
+  ],
+  "mutatedDiffers": true
+ },
+ {
+  "id": "D2H-C6",
+  "file": "scripts/eval-extraction.mjs",
+  "copyEqualsHeadBlob": true,
+  "occurrences": 1,
+  "before": [
+   {
+    "status": 0,
+    "tests": "1",
+    "pass": "1",
+    "fail": "0",
+    "failedNames": [],
+    "msgs": []
+   }
+  ],
+  "after": [
+   {
+    "status": 1,
+    "tests": "1",
+    "pass": "0",
+    "fail": "1",
+    "failedNames": [
+     "C6: --input replay output is byte-identical to the recorded pre-change output",
+     "C6: --input replay output is byte-identical to the recorded pre-change output"
+    ],
+    "msgs": [
+     "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:",
+     "expected",
+     "expected: '{\\n  \"version\": 1,\\n  \"tool\": \"offline-extraction-measurement-v1\",\\n  \"manifestSha256\": \"9e8eb0da1e09e47ffabea1fcb1780c4df1d95a19086b5adea32799dcd5045b39\",\\n  \"complete\": true,\\n  \"declaredCases\": 1,\\n  \"baseline\": {\\n    \"measured\": false\\n  },\\n  \"coverageNote\": null,\\n  \"loadedCases\": 1,\\n  \"artifactBytes\": 557,\\n  \"failures\": [],\\n  \"inventory\": {\\n    \"measured\": false,\\n    \"directories\": [],\\n    \"otherEntries\": [],\\n    \"undeclared\": [],\\n    \"outsideInventory\": []\\n  },\\n  \"artifacts\": [\\n    {\\n      \"id\": \"replay-1\",\\n      \"artifactHash\": \"981076a7959049a914c9cc139a265770d0a761b1b421b676d38478791c6a99e3\",\\n      \"hashes\": {\\n        \"persisted\": \"9cc458e444df0393a05795e0dd61c5afae77df1a8b9f9278ed729b7b2b482fa0\",\\n        \"turns\": \"44012594d048a3224eaada773c13d00068aa032e693084e5a68e618be07dfbb1\"\\n      }\\n    }\\n  ],\\n  \"summary\": {\\n    \"version\": 1,\\n    \"cases\": 1,\\n    \"completeCases\": 1,\\n    \"sourceTurns\": 2,\\n    \"entities\": {\\n      \"topic\": {\\n        \"measuredCases\": 0,\\n        \"unmeasuredCases\": 1,\\n        \"predicted\": 0,\\n        \"labeled\": 0,\\n        \"precision\": {\\n          \"numerator\": 0,\\n          \"denominator\": 0,\\n          \"value\": null\\n        },\\n        \"coverage\": {\\n          \"numerator\": 0,\\n          \"denominator\": 0,\\n          \"value\": null\\n        }\\n      },\\n      \"person\": {\\n        \"measuredCases\": 0,\\n        \"unmeasuredCases\": 1,\\n        \"predicted\": 0,\\n        \"labeled\": 0,\\n        \"precision\": {\\n          \"numerator\": 0,\\n          \"denominator\": 0,\\n          \"value\": null\\n        },\\n        \"coverage\": {\\n          \"numerator\": 0,\\n          \"denominator\": 0,\\n          \"value\": null\\n        }\\n      }\\n    },\\n    \"incompleteCases\": [],\\n    \"stages\": {\\n      \"raw\": {\\n        \"availableCases\": 0,\\n        \"unavailableCases\": 1,\\n        \"rows\": null,\\n        \"affectedClaims\": 0,\\n        \"invalidCitationRate\": {\\n          \"numerator\": 0,\\n          \"denominator\": 0,\\n          \"value\": null\\n        }\\n      },\\n      \"parsed\": {\\n        \"availableCases\": 0,\\n        \"unavailableCases\": 1,\\n        \"rows\": null,\\n        \"affectedClaims\": 0,\\n        \"invalidCitationRate\": {\\n          \"numerator\": 0,\\n          \"denominator\": 0,\\n          \"value\": null\\n        }\\n      },\\n      \"filtered\": {\\n        \"availableCases\": 0,\\n        \"unavailableCases\": 1,\\n        \"rows\": null,\\n        \"affectedClaims\": 0,\\n        \"invalidCitationRate\": {\\n          \"numerator\": 0,\\n          \"denominator\": 0,\\n          \"value\": null\\n        }\\n      },\\n      \"persisted\": {\\n        \"availableCases\": 1,\\n        \"unavailableCases\": 0,\\n        \"rows\": 2,\\n        \"affectedClaims\": 1,\\n        \"invalidCitationRate\": {\\n          \"numerator\": 1,\\n          \"denominator\": 2,\\n          \"value\": 0.5\\n        }\\n      }\\n    },\\n    \"semantic\": {\\n      \"labeledCases\": 0,\\n      \"unmeasuredCases\": 1,\\n      \"unsupportedRate\": {\\n        \"numerator\": 0,\\n        \"denominator\": 0,\\n        \"value\": null\\n      },\\n      \"coverage\": {\\n        \"numerator\": 0,\\n        \"denominator\": 2,\\n        \"value\": 0\\n      },\\n      \"factMeasuredCases\": 0,\\n      \"factUnmeasuredCases\": 1,\\n      \"omissionRate\": {\\n        \"numerator\": 0,\\n        \"denominator\": 0,\\n        \"value\": null\\n      },\\n      \"factCoverage\": {\\n        \"numerator\": 0,\\n        \"denominator\": 0,\\n        \"value\": null\\n      },\\n      \"counts\": {\\n        \"supported\": 0,\\n        \"unsupported\": 0,\\n        \"contradicted\": 0,\\n        \"uncertain\": 0,\\n        \"omitted\": 0\\n      }\\n    },\\n    \"unresolvedReferences\": [\\n      {\\n        \"caseId\": \"replay-1\",\\n        \"claimId\": \"c2\",\\n        \"turnId\": \"gone\",\\n        \"sessionId\": \"s\"\\n      }\\n    ]\\n  },\\n  \"cases\": [\\n    {\\n      \"version\": 1,\\n      \"id\": \"replay-1\",\\n      \"tenantId\": \"t\",\\n      \"sessionId\": \"s\",\\n      \"artifactHash\": \"981076a7959049a914c9cc139a265770d0a761b1b421b676d38478791c6a99e3\",\\n      \"complete\": true,\\n      \"sourceTurns\": 2,\\n      \"sourceIssues\": [],\\n      \"incompleteReasons\": [],\\n      \"stages\": {\\n        \"raw\": {\\n          \"available\": false,\\n          \"reason\": \"artifact-absent\",\\n          \"rows\": null,\\n          \"wellFormedClaims\": null,\\n          \"invalidCitationRate\": {\\n            \"numerator\": 0,\\n            \"denominator\": 0,\\n            \"value\": null\\n          },\\n          \"affectedClaims\": 0,\\n          \"claimIds\": [],\\n          \"issues\": [],\\n          \"optionalChecks\": {\\n            \"span\": 0,\\n            \"attribution\": 0,\\n            \"excerpt\": 0\\n          }\\n        },\\n        \"parsed\": {\\n          \"available\": false,\\n          \"reason\": \"artifact-absent\",\\n          \"rows\": null,\\n          \"wellFormedClaims\": null,\\n          \"invalidCitationRate\": {\\n            \"numerator\": 0,\\n            \"denominator\": 0,\\n            \"value\": null\\n          },\\n          \"affectedClaims\": 0,\\n          \"claimIds\": [],\\n          \"issues\": [],\\n          \"optionalChecks\": {\\n            \"span\": 0,\\n            \"attribution\": 0,\\n            \"excerpt\": 0\\n          }\\n        },\\n        \"filtered\": {\\n          \"available\": false,\\n          \"reason\": \"artifact-absent\",\\n          \"rows\": null,\\n          \"wellFormedClaims\": null,\\n          \"invalidCitationRate\": {\\n            \"numerator\": 0,\\n            \"denominator\": 0,\\n            \"value\": null\\n          },\\n          \"affectedClaims\": 0,\\n          \"claimIds\": [],\\n          \"issues\": [],\\n          \"optionalChecks\": {\\n            \"span\": 0,\\n            \"attribution\": 0,\\n            \"excerpt\": 0\\n          }\\n        },\\n        \"persisted\": {\\n          \"available\": true,\\n          \"reason\": null,\\n          \"rows\": 2,\\n          \"wellFormedClaims\": 2,\\n          \"invalidCitationRate\": {\\n            \"numerator\": 1,\\n            \"denominator\": 2,\\n            \"value\": 0.5\\n          },\\n          \"affectedClaims\": 1,\\n          \"claimIds\": [\\n            \"c1\",\\n            \"c2\"\\n          ],\\n          \"issues\": [\\n            {\\n              \"claimId\": \"c2\",\\n              \"code\": \"missing-turn\",\\n              \"turnId\": \"gone\",\\n              \"sessionId\": \"s\"\\n            }\\n          ],\\n          \"optionalChecks\": {\\n            \"span\": 0,\\n            \"attribution\": 0,\\n            \"excerpt\": 0\\n          }\\n        }\\n      },\\n      \"filterLoss\": null,\\n      \"semantic\": {\\n        \"measured\": false,\\n        \"labeled\": 0,\\n        \"eligible\": 2,\\n        \"coverage\": {\\n          \"numerator\": 0,\\n          \"denominator\": 2,\\n          \"value\": 0\\n        },\\n        \"counts\": {\\n          \"supported\": 0,\\n          \"unsupported\": 0,\\n          \"contradicted\": 0,\\n          \"uncertain\": 0,\\n          \"omitted\": 0\\n        },\\n        \"unsupportedRate\": {\\n          \"numerator\": 0,\\n          \"denominator\": 0,\\n          \"value\": null\\n        },\\n        \"omissionRate\": {\\n          \"numerator\": 0,\\n          \"denominator\": 0,\\n          \"value\": null\\n        },\\n        \"factsMeasured\": false,\\n        \"factCoverage\": {\\n          \"numerator\": 0,\\n          \"denominator\": 0,\\n          \"value\": null\\n        }\\n      },\\n      \"entities\": {\\n        \"topic\": {\\n          \"measured\": false,\\n          \"labeled\": 0,\\n          \"predicted\": 0,\\n          \"precision\": {\\n            \"numerator\": 0,\\n            \"denominator\": 0,\\n            \"value\": null\\n          },\\n          \"coverage\": {\\n            \"numerator\": 0,\\n            \"denominator\": 0,\\n            \"value\": null\\n          }\\n        },\\n        \"person\": {\\n          \"measured\": false,\\n          \"labeled\": 0,\\n          \"predicted\": 0,\\n          \"precision\": {\\n            \"numerator\": 0,\\n            \"denominator\": 0,\\n            \"value\": null\\n          },\\n          \"coverage\": {\\n            \"numerator\": 0,\\n            \"denominator\": 0,\\n            \"value\": null\\n          }\\n        }\\n      }\\n    }\\n  ]\\n}\\n',"
+    ]
+   }
+  ],
+  "mutatedDiffers": true
+ },
+ {
+  "id": "D2H-I1",
+  "file": "scripts/eval-extraction.mjs",
+  "copyEqualsHeadBlob": true,
+  "occurrences": 1,
+  "before": [
+   {
+    "status": 0,
+    "tests": "1",
+    "pass": "1",
+    "fail": "0",
+    "failedNames": [],
+    "msgs": []
+   }
+  ],
+  "after": [
+   {
+    "status": 1,
+    "tests": "1",
+    "pass": "0",
+    "fail": "1",
+    "failedNames": [
+     "I1: the script's imports are local-only",
+     "I1: the script's imports are local-only"
+    ],
+    "msgs": [
+     "AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:",
+     "expected: true,"
+    ]
+   }
+  ],
+  "mutatedDiffers": true
+ },
+ {
+  "id": "D2H-I2",
+  "file": "scripts/eval-extraction.mjs",
+  "copyEqualsHeadBlob": true,
+  "occurrences": 1,
+  "before": [
+   {
+    "status": 0,
+    "tests": "1",
+    "pass": "1",
+    "fail": "0",
+    "failedNames": [],
+    "msgs": []
+   }
+  ],
+  "after": [
+   {
+    "status": 1,
+    "tests": "1",
+    "pass": "0",
+    "fail": "1",
+    "failedNames": [
+     "I2: the gold set and thresholds file are byte-identical after a run",
+     "I2: the gold set and thresholds file are byte-identical after a run"
+    ],
+    "msgs": [
+     "AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:",
+     "expected",
+     "expected: [ '24cefe8f2f7c57265ea2be2a67caaeb35e12da9e268dc6e340cb6bb2e93983a5', '3814922562d77e254ec9f39d0599681079995c0aac14c8c773308a549e72eecd' ],"
+    ]
+   }
+  ],
+  "mutatedDiffers": true
+ }
+]
