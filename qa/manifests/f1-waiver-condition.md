@@ -3,7 +3,7 @@
 **Criteria:** `F1-C1`, `F1-C2`, `F1-C3`, `F1-C4`, `F1-C5`, `F1-C6`, `F1-I1`, `F1-I2`
 **Policy-Version:** proportional-verification/2026-11-22.19
 **Tier:** M
-**Status:** ready-for-check
+**Status:** checked-PASS (qa/verdicts/f1-waiver-condition.md, cycle 0, 2026-11-25)
 **Fix cycle:** 0
 **Round:** 6 files, 8 criteria, est 75 min — two owned source files plus one owned API file, two new test files and one fixture; the corpus had to be located and reconstructed from two delivery logs first
 **slow-plan:** the recorded corpus (14 probes plus 9 failing cases) had to be found and reconstructed from 600 KB of delivery logs before any test could be written; the build cannot be split without separating the detector from the corpus that proves it
