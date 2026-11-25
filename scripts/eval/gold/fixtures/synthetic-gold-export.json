@@ -1,0 +1,66 @@
+{
+  "format": "extraction-authorized-export-v1",
+  "synthetic": true,
+  "tenantId": "synthetic-tenant",
+  "packetSha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+  "humanGoldVerified": false,
+  "bindingThresholds": null,
+  "reviewedCount": 4,
+  "total": 4,
+  "remainingGate": "SYNTHETIC FIXTURE: invented values for tests; not a measurement of any real corpus.",
+  "measurement": {"cases": [], "summary": null},
+  "cases": [
+    {
+      "id": "syn-1", "tenantId": "synthetic-tenant", "sessionId": "syn-s1",
+      "artifactHash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "turns": [
+        {"_id": "t1", "tenantId": "synthetic-tenant", "sessionId": "syn-s1", "speakerRef": "spk-1", "text": "alpha beta gamma", "tStart": 0, "tEnd": 5},
+        {"_id": "t2", "tenantId": "synthetic-tenant", "sessionId": "syn-s1", "speakerRef": "spk-2", "text": "delta epsilon", "tStart": 5, "tEnd": 9},
+        {"_id": "t3", "tenantId": "synthetic-tenant", "sessionId": "syn-s1", "speakerRef": "spk-1", "text": "zeta eta theta", "tStart": 9, "tEnd": 14}
+      ],
+      "persisted": [
+        {"_id": "c1", "tenantId": "synthetic-tenant", "sessionId": "syn-s1", "text": "Synthetic claim one.", "evidence": [{"sessionId": "syn-s1", "turnId": "t1"}]},
+        {"_id": "c2", "tenantId": "synthetic-tenant", "sessionId": "syn-s1", "text": "Synthetic claim two.", "evidence": [{"sessionId": "syn-s1", "turnId": "t2"}]},
+        {"_id": "c3", "tenantId": "synthetic-tenant", "sessionId": "syn-s1", "text": "Synthetic claim three.", "evidence": [{"sessionId": "syn-s1", "turnId": "t3"}]}
+      ],
+      "labels": [
+        {"caseId": "syn-1", "artifactHash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "stage": "persisted", "claimId": "c1", "status": "supported", "reviewerId": "rev-a"},
+        {"caseId": "syn-1", "artifactHash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "stage": "persisted", "claimId": "c2", "status": "supported", "reviewerId": "rev-a"},
+        {"caseId": "syn-1", "artifactHash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "stage": "persisted", "claimId": "c3", "status": "supported", "reviewerId": "rev-a"}
+      ],
+      "secondLabels": [
+        {"stage": "persisted", "claimId": "c1", "status": "supported", "reviewerId": "rev-b"},
+        {"stage": "persisted", "claimId": "c2", "status": "unsupported", "reviewerId": "rev-b"}
+      ],
+      "expectedFacts": [{"id": "f1"}, {"id": "f2"}],
+      "factLabels": [
+        {"caseId": "syn-1", "artifactHash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "factId": "f1", "status": "covered", "stage": "persisted", "claimId": "c1"},
+        {"caseId": "syn-1", "artifactHash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "factId": "f2", "status": "covered", "stage": "persisted", "claimId": "c2"}
+      ],
+      "predictedEntities": [{"id": "top1", "kind": "topic"}, {"id": "top2", "kind": "topic"}],
+      "entityLabels": [
+        {"caseId": "syn-1", "artifactHash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "kind": "topic", "id": "top1", "correct": true},
+        {"caseId": "syn-1", "artifactHash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "kind": "topic", "id": "top2", "correct": true}
+      ],
+      "goldTopics": ["top1", "top2"],
+      "predictedDecisions": [{"id": "dec1"}],
+      "decisionLabels": [{"id": "dec1", "correct": true}],
+      "goldDecisions": ["dec1"]
+    },
+    {
+      "id": "syn-2", "tenantId": "synthetic-tenant", "sessionId": "syn-s2",
+      "artifactHash": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "turns": [
+        {"_id": "u1", "tenantId": "synthetic-tenant", "sessionId": "syn-s2", "speakerRef": "spk-1", "text": "iota kappa", "tStart": 0, "tEnd": 4}
+      ],
+      "persisted": [
+        {"_id": "d1", "tenantId": "synthetic-tenant", "sessionId": "syn-s2", "text": "Synthetic claim four.", "evidence": [{"sessionId": "syn-s2", "turnId": "u1"}]}
+      ],
+      "labels": [
+        {"caseId": "syn-2", "artifactHash": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc", "stage": "persisted", "claimId": "d1", "status": "supported", "reviewerId": "rev-a"}
+      ],
+      "predictedDecisions": [],
+      "noDecisionSession": true
+    }
+  ]
+}
