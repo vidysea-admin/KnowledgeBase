@@ -174,4 +174,4 @@ Line numbers are as at d6935956 (the review's base); `src/wa/sessionManager.ts` 
 - A standby runs `ensureIndexes` before it holds the lease (src/index.ts:120-122).
 - `checkDeadline` does not re-arm after a check that finds the expiry not yet reached (src/wa/sessionManager.ts:482).
 
-## Status: ready-for-check
+## Status: checked-PASS
