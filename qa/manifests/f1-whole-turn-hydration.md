@@ -3,7 +3,7 @@
 **Criteria:** `F1B-C1`, `F1B-C2`, `F1B-C3`, `F1B-C4`, `F1B-C5`, `F1B-I1`, `F1B-I2`, `F1B-I3`, `F1B-I4`
 **Policy-Version:** proportional-verification/2026-11-22.19
 **Tier:** L (tick.mjs --route f7eb479f..HEAD: floor L, rule "contracts"; the diff also reads tenant-scoped turns in the hydrator)
-**Status:** ready-for-check
+**Status:** checked-PASS
 **Fix cycle:** 0
 **Round:** 7 source and test files, 9 criteria, est 150 min — the hydrator, the deep graph and the release gate had to be changed together; the first deep design failed the frozen ask-graph golden and was redone with a conditional marker
 **slow-plan:** the deep answer node, the fast gate and the release gate each judged the same answer separately; one shared judgment (judgeCitedTurns) had to land in all three places before any criterion could be tested end to end
