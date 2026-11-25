@@ -141,4 +141,4 @@ Nothing below was run; forbidden for this unit (F0-I1). Needs Umesh's yes before
 6. Cleanup (each needs Umesh's yes): `gcloud run services update-traffic vidysea-knowledgebase --remove-tags=f0-probe --region asia-south1 --project vidysea-prod`; if step 0 showed `latestRevision: true`, `gcloud run services update-traffic vidysea-knowledgebase --to-latest --region asia-south1 --project vidysea-prod` (help: `$ gcloud run services update-traffic myservice --to-latest`) and re-check `value(spec.traffic)`; `gcloud builds triggers delete f0-throwaway-<date> --region asia-south1 --project vidysea-prod`. The throwaway also moves the shared api `:latest` tag (cache source only, as every master push does today).
 7. Only then, as a separate approved step (F0-I1): point the real trigger at `cloudbuild.yaml` (`gcloud builds triggers update ...` per its help; not drafted here) before any master push.
 
-## Status: ready-for-check
+## Status: checked-PASS (qa/verdicts/f0-cloudbuild.md, cycle 0, 2026-11-25)
