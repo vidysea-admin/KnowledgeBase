@@ -24,7 +24,21 @@
 #   LKB_APP_DIR             working directory (default /app; tests only)
 # Objects: <prefix>/state.tar.gz (members <profile dir name>/ and <release dir name>/), <prefix>/lease,
 # <prefix>/state.prev.tar.gz (the archive before the latest snapshot), <prefix>/recordings/<path under the recordings dir>.
-# Exit statuses worth knowing: 75 lease held elsewhere or lost, 74 a recording was made but not copied to the bucket.
+# Exit statuses worth knowing: 75 lease held elsewhere or lost, 74 a recording was made but not copied to the bucket,
+# 76 publish-proof failed.
+#
+# Live-proof media (D-236 part B, unit B4B). The marker $LKB_RELEASE_DIR/live-proof.json (written by a human, never by this
+# script) names a recording. That recording is kept as its own bucket object gs://<bucket>/live-proof/<sha256>.<ext>, created once
+# and never overwritten, outside the periodic tar, so the run gate can pass again after a restart.
+#   BOT_MODE=publish-proof  one shot, needs LKB_STATE_BUCKET and the marker plus the recording on local disk (an operator step):
+#                           upload the recording create-only (a same-name object holding the same bytes counts as published),
+#                           and only then take the state snapshot. A failed upload exits 76, takes no snapshot, leaves no object.
+#                           Besides the snapshot it writes $LKB_RELEASE_DIR/live-proof.sha256 (sha256 and path), which goes into
+#                           the tar so the restore finds the right object even when several proofs exist. It never restores.
+#   restore (run and record-once with a bucket, after the state restore, before the doctor gate): puts the object back at the path
+#                           the marker names. Never in login or doctor mode. No marker: nothing happens. Any problem: one log line,
+#                           the container keeps running and the run gate stays closed because the file is absent.
+#   LKB_PROOF_TIMEOUT_S     bound on each proof upload or download (default 300)
 set -eu
 cd "${LKB_APP_DIR:-/app}"
 MODE="${BOT_MODE:-run}"
@@ -59,12 +73,17 @@ LEASE_RENEW_S="${LKB_LEASE_RENEW_S:-30}"
 STOP_WAIT="${LKB_STOP_WAIT_S:-3}"; case "$STOP_WAIT" in ''|*[!0-9]*) STOP_WAIT=3 ;; esac
 GC_TIMEOUT="${LKB_GCLOUD_TIMEOUT_S:-120}"; case "$GC_TIMEOUT" in ''|*[!0-9]*|0) GC_TIMEOUT=120 ;; esac
 SHUT_BUDGET="${LKB_SHUTDOWN_BUDGET_S:-5}"; case "$SHUT_BUDGET" in ''|*[!0-9]*) SHUT_BUDGET=5 ;; esac
+PROOF_TIMEOUT="${LKB_PROOF_TIMEOUT_S:-300}"; case "$PROOF_TIMEOUT" in ''|*[!0-9]*|0) PROOF_TIMEOUT=300 ;; esac
+PROOF_MARKER="$RELEASE_DIR/live-proof.json"; PROOF_SIDECAR="$RELEASE_DIR/live-proof.sha256"; PROOF_ROOT="$(pwd -P)"
 ATTENDANCE_ACCOUNT=""; [ "$MODE" = "run" ] && ATTENDANCE_ACCOUNT="${LKB_ATTENDANCE_ACCOUNT:-}"
 ATTENDANCE_S="${LKB_ATTENDANCE_INTERVAL_S:-300}"
 SUPERVISE=0
 if [ -n "$BUCKET" ] || [ -n "$ATTENDANCE_ACCOUNT" ]; then SUPERVISE=1; fi
 if [ "$MODE" = "record-once" ] && { [ -z "${LKB_RECORD_URL:-}" ] || [ -z "${LKB_RECORD_UNTIL:-}" ]; }; then
   echo "record-once mode needs LKB_RECORD_URL and LKB_RECORD_UNTIL" >&2; exit 1
+fi
+if [ "$MODE" = "publish-proof" ] && [ -z "$BUCKET" ]; then
+  echo "[bot-state] proof publish failed: LKB_STATE_BUCKET is not set" >&2; exit 76
 fi
 
 STAGE=""; CHILD=""; CHILD_PG=""; WATCH_PID=""; RENEW_PID=""; SNAP_PID=""; NAP_PID=""; SHUT_DEADLINE=0
@@ -264,6 +283,9 @@ restore_state() {  # 0 restored or first boot; 1 refused or failed (the caller e
     if [ "$prc" -eq 2 ]; then echo "state restore failed: the previous archive could not be read" >&2; return 1; fi
     if [ "$prc" -eq 1 ]; then
       if [ "$mrc" -eq 0 ]; then echo "state restore refused: the current archive is unusable ($main_why) and there is no previous archive" >&2; return 1; fi
+      # ISS-B4RECORDERSTATE-001: "absent" is only a first boot when the generation read said the object does not exist (sg0 = 0);
+      # an object that exists but whose fetch error text looks like "not found" must not start the bot with empty state.
+      if [ "$sg0" != 0 ]; then echo "state restore failed: the state object exists (generation $sg0) but could not be fetched; not starting with empty state" >&2; return 1; fi
       log "no state object in the bucket (first boot): starting with empty state"; return 0
     fi
     crc=0; prev_why="$(check_archive "$STAGE/restore.tar.gz")" || crc=$?
@@ -343,6 +365,140 @@ copy_recordings() {  # non-empty .webm files not yet uploaded, each once. 0 only
   [ "$fails" -eq 0 ]
 }
 
+# ---- live-proof media (D-236 part B, unit B4B): see the header. Nothing here ever sets an ACL, signs a URL or changes IAM. ----
+proof_gc() {  # gc with the proof bound instead of the ordinary one; the status is gc's
+  pg_t="$GC_TIMEOUT"; GC_TIMEOUT="$PROOF_TIMEOUT"; pg_rc=0
+  gc "$@" || pg_rc=$?
+  GC_TIMEOUT="$pg_t"
+  return "$pg_rc"
+}
+proof_field() {  # $1 key: prints the string value of that key in the marker; non-zero unless it appears exactly once, as a plain string
+  pf_flat="$(head -c 65536 "$PROOF_MARKER" 2>/dev/null | tr -d '\r\n')"
+  pf_hits="$(printf '%s' "$pf_flat" | grep -o "\"$1\"[[:space:]]*:[[:space:]]*\"[^\"]*\"" | wc -l | tr -d ' ')"
+  [ "$pf_hits" = 1 ] || return 1
+  printf '%s' "$pf_flat" | grep -o "\"$1\"[[:space:]]*:[[:space:]]*\"[^\"]*\"" | sed 's/^"[^"]*"[[:space:]]*:[[:space:]]*"//; s/"$//'
+}
+proof_recording() {  # reads the marker's `recording` and checks it as a path. 0: PROOF_REC and PROOF_EXT set; 1: refused, PROOF_WHY says why
+  PROOF_REC=""; PROOF_EXT=""; PROOF_WHY=""
+  if ! pr_val="$(proof_field recording)"; then PROOF_WHY="the marker has no single string field \"recording\""; return 1; fi
+  case "$pr_val" in
+    '') PROOF_WHY="the recording path is empty"; return 1 ;;
+    /*|[A-Za-z]:*) PROOF_WHY="the recording path is absolute"; return 1 ;;
+    *\\*) PROOF_WHY="the recording path contains a backslash"; return 1 ;;
+  esac
+  case "/$pr_val/" in */../*) PROOF_WHY="the recording path has a .. component"; return 1 ;; esac
+  case "$pr_val" in *.*) ;; *) PROOF_WHY="the recording path has no .webm, .mkv or .mp4 extension"; return 1 ;; esac
+  pr_ext="$(printf '%s' "${pr_val##*.}" | tr 'A-Z' 'a-z')"
+  case "$pr_ext" in webm|mkv|mp4) ;; *) PROOF_WHY="the recording path does not end .webm, .mkv or .mp4"; return 1 ;; esac
+  PROOF_REC="$pr_val"; PROOF_EXT="$pr_ext"
+  return 0
+}
+proof_path_ok() {  # sets PROOF_FILE. 0 when the path, with symlinks resolved, stays inside the project root; 1 and PROOF_WHY otherwise
+  PROOF_FILE="$PROOF_ROOT/$PROOF_REC"
+  if [ -L "$PROOF_FILE" ]; then PROOF_WHY="the recording path is a symlink"; return 1; fi
+  pp="${PROOF_FILE%/*}"
+  while [ -n "$pp" ] && [ ! -d "$pp" ]; do pp="${pp%/*}"; done   # the deepest directory that exists
+  pd="$(cd "$pp" 2>/dev/null && pwd -P)" || pd=""
+  case "$pd/" in "$PROOF_ROOT"/*) return 0 ;; esac
+  PROOF_WHY="the recording path resolves outside the project root"
+  return 1
+}
+proof_hex64() {  # $1: 0 when it is exactly 64 lower-case hex digits
+  case "$1" in ''|*[!0-9a-f]*) return 1 ;; esac
+  [ "${#1}" -eq 64 ]
+}
+proof_fail() {  # publish: one stable line, status 76
+  echo "[bot-state] proof publish failed: $1" >&2
+  return 76
+}
+publish_proof() {  # BOT_MODE=publish-proof. 0 published; 76 (or the lease status 70 or 75) otherwise. Runs in an `||` context: no set -e.
+  if [ ! -f "$PROOF_MARKER" ]; then proof_fail "no marker at $PROOF_MARKER"; return 76; fi
+  if ! pp_status="$(proof_field status)" || [ "$pp_status" != passed ]; then proof_fail "the marker status is not \"passed\""; return 76; fi
+  if ! proof_recording; then proof_fail "$PROOF_WHY"; return 76; fi
+  if ! proof_path_ok; then proof_fail "$PROOF_WHY"; return 76; fi
+  if [ ! -f "$PROOF_FILE" ] || [ ! -s "$PROOF_FILE" ]; then proof_fail "the recording $PROOF_REC is missing or empty"; return 76; fi
+  sha="$(sha256sum "$PROOF_FILE" | cut -d' ' -f1)"
+  if ! proof_hex64 "$sha"; then proof_fail "the sha256 of the recording could not be computed"; return 76; fi
+  pname="$sha.$PROOF_EXT"; pobj="gs://$BUCKET/live-proof/$pname"
+  urc=0; proof_gc storage cp "$PROOF_FILE" "$pobj" "--if-generation-match=0" >"$STAGE/proof.out" 2>"$STAGE/proof.err" || urc=$?
+  if [ "$urc" -ne 0 ]; then
+    if [ "$urc" -eq 124 ] || [ "$urc" -eq 137 ]; then proof_fail "the upload timed out after ${PROOF_TIMEOUT}s"; return 76; fi
+    if ! grep -Eqi '412|precondition' "$STAGE/proof.err"; then proof_fail "the upload failed (exit $urc)"; return 76; fi
+    # An object already sits under this name: that is success only when it holds the same bytes (judged by downloading it).
+    rm -f "$STAGE/proof.chk"
+    crc=0; proof_gc storage cp "$pobj" "$STAGE/proof.chk" >"$STAGE/proof.out" 2>&1 || crc=$?
+    if [ "$crc" -ne 0 ]; then proof_fail "an object named $pname exists and could not be read back to compare (exit $crc)"; return 76; fi
+    chk="$(sha256sum "$STAGE/proof.chk" | cut -d' ' -f1)"; rm -f "$STAGE/proof.chk"
+    if [ "$chk" != "$sha" ]; then proof_fail "an object named $pname exists with different bytes; it was left unchanged"; return 76; fi
+    log "proof object $pname already stored with the same bytes; not uploaded again"
+  fi
+  lrc=0; lease_acquire || lrc=$?
+  if [ "$lrc" -ne 0 ]; then proof_fail "the lease could not be taken (exit $lrc); the object is stored but no snapshot was taken"; return "$lrc"; fi
+  if ! sg0="$(state_gen_read)"; then proof_fail "the generation of the state object could not be read; no snapshot was taken"; return 76; fi
+  printf '%s\n' "$sg0" >"$STAGE/state.gen" || { proof_fail "the state generation could not be kept"; return 76; }
+  # The pointer from the marker to its object travels in the release tree of the snapshot (live-proof.json itself is never touched).
+  printf '%s  %s\n' "$sha" "$PROOF_REC" >"$PROOF_SIDECAR" || { proof_fail "$PROOF_SIDECAR could not be written"; return 76; }
+  if ! snapshot_state proof; then proof_fail "the object $pname is stored but the state snapshot failed; run again to retry"; return 76; fi
+  log "proof published: $pname"
+  return 0
+}
+proof_skip() {  # restore: one stable line, status 0 (the container keeps running)
+  echo "[bot-state] proof restore skipped: $1" >&2
+  return 0
+}
+restore_proof() {  # after restore_state. ALWAYS returns 0; every problem is exactly one proof_skip line and leaves no file behind
+  if [ ! -f "$PROOF_MARKER" ]; then return 0; fi   # first run, record-once: nothing to restore, nothing is said
+  if ! proof_recording; then proof_skip "$PROOF_WHY"; return 0; fi
+  if ! proof_path_ok; then proof_skip "$PROOF_WHY"; return 0; fi
+  if [ -d "$PROOF_FILE" ] || { [ -e "$PROOF_FILE" ] && [ ! -f "$PROOF_FILE" ]; }; then proof_skip "$PROOF_REC is not a regular file"; return 0; fi
+  if [ -s "$PROOF_FILE" ]; then log "proof media already in place: $PROOF_REC"; return 0; fi
+  psha=""
+  if [ -f "$PROOF_SIDECAR" ]; then   # the pointer publish-proof wrote: "<sha256>  <path>", used only when it names this marker's recording
+    pl="$(head -n 1 "$PROOF_SIDECAR" | tr -d '\r')"
+    ps="${pl%%  *}"; pr="${pl#*  }"
+    if proof_hex64 "$ps" && [ "$pr" = "$PROOF_REC" ]; then psha="$ps"; fi
+  fi
+  if [ -z "$psha" ]; then   # no usable pointer: the one object of this extension, or nothing
+    lrc=0; proof_gc storage ls "gs://$BUCKET/live-proof/" >"$STAGE/proof.ls" 2>"$STAGE/proof.err" || lrc=$?
+    if [ "$lrc" -ne 0 ]; then
+      if is_absent "$STAGE/proof.err"; then proof_skip "no proof object in the bucket"; else proof_skip "the proof objects could not be listed (exit $lrc)"; fi
+      return 0
+    fi
+    cands=0
+    while IFS= read -r pl; do
+      pn="${pl##*/}"
+      if [ "$pl" != "gs://$BUCKET/live-proof/$pn" ] || [ "${pn##*.}" != "$PROOF_EXT" ]; then continue; fi
+      if proof_hex64 "${pn%.*}"; then cands=$((cands + 1)); psha="${pn%.*}"; fi
+    done <"$STAGE/proof.ls"
+    if [ "$cands" -eq 0 ]; then proof_skip "no proof object for a .$PROOF_EXT recording in the bucket"; return 0; fi
+    if [ "$cands" -gt 1 ]; then proof_skip "$cands proof objects match and there is no pointer to choose one; none restored"; return 0; fi
+  fi
+  pobj="gs://$BUCKET/live-proof/$psha.$PROOF_EXT"
+  drc=0; proof_gc storage objects describe "$pobj" '--format=value(size)' >"$STAGE/proof.size" 2>"$STAGE/proof.err" || drc=$?
+  if [ "$drc" -ne 0 ]; then
+    if is_absent "$STAGE/proof.err"; then proof_skip "the proof object $psha.$PROOF_EXT is missing"; else proof_skip "the proof object could not be read (exit $drc)"; fi
+    return 0
+  fi
+  osize="$(tr -d ' \r\n' <"$STAGE/proof.size")"
+  case "$osize" in ''|*[!0-9]*) proof_skip "the size of the proof object could not be read"; return 0 ;; esac
+  rm -f "$STAGE/proof.dl"
+  crc=0; proof_gc storage cp "$pobj" "$STAGE/proof.dl" >"$STAGE/proof.out" 2>&1 || crc=$?
+  if [ "$crc" -ne 0 ]; then rm -f "$STAGE/proof.dl"; proof_skip "the download of $psha.$PROOF_EXT failed (exit $crc)"; return 0; fi
+  dsize="$(wc -c <"$STAGE/proof.dl" | tr -d ' ')"
+  if [ "$dsize" != "$osize" ] || [ "$dsize" -eq 0 ]; then rm -f "$STAGE/proof.dl"; proof_skip "the downloaded size ($dsize) differs from the object's ($osize)"; return 0; fi
+  dsha="$(sha256sum "$STAGE/proof.dl" | cut -d' ' -f1)"
+  if [ "$dsha" != "$psha" ]; then rm -f "$STAGE/proof.dl"; proof_skip "the downloaded bytes do not match the object name"; return 0; fi
+  ptd="${PROOF_FILE%/*}"
+  if ! mkdir -p "$ptd" || ! proof_path_ok; then rm -f "$STAGE/proof.dl"; proof_skip "${PROOF_WHY:-the folder for the recording could not be made}"; return 0; fi
+  ppart="$ptd/.${PROOF_FILE##*/}.partial-$$"
+  if cp "$STAGE/proof.dl" "$ppart" && mv -f "$ppart" "$PROOF_FILE"; then
+    rm -f "$STAGE/proof.dl"; log "proof media restored: $PROOF_REC ($dsize bytes)"
+  else
+    rm -f "$ppart" "$STAGE/proof.dl"; proof_skip "the recording could not be placed at $PROOF_REC"
+  fi
+  return 0
+}
+
 # ---- supervision: the pipeline runs as a child so the shell (and its trap) outlives it ---------------------------------
 # The child gets a process group of its own (setsid, else job control) so that what it starts, Chrome above all, can be
 # stopped with it. Without either, only the child itself can be signalled and a line says so.
@@ -391,9 +547,14 @@ on_term() {
   return 0
 }
 wait_child() {  # sets CHILD_RC; survives trapped signals (a signal interrupts `wait` without reaping the child)
+  prev_rc=""
   while :; do
-    seen=$SIGS; CHILD_RC=0
-    wait "$CHILD" || CHILD_RC=$?
+    seen=$SIGS; wrc=0
+    wait "$CHILD" || wrc=$?
+    # ISS-B4RECORDERSTATE-002: a signal that lands just after wait reaped the child makes the loop wait again, and wait on a
+    # reaped pid gives 127; the status the first wait returned is the real one.
+    if [ "$wrc" = 127 ] && [ -n "$prev_rc" ]; then wrc="$prev_rc"; fi
+    CHILD_RC="$wrc"; prev_rc="$wrc"
     if [ "$SIGS" = "$seen" ]; then break; fi
   done
   reap_group
@@ -415,6 +576,9 @@ start_child() {  # $@ command; runs in the background as CHILD, in a process gro
     set +m 2>/dev/null || true
     if [ -z "$CHILD_PG" ]; then echo "[bot-state] no process-group support: only the pipeline process itself can be stopped" >&2; fi
   fi
+  # ISS-B4RECORDERSTATE-002: a SIGTERM that landed before CHILD was set found nobody to signal (on_term only set STOPPING);
+  # the child that has just started is signalled now, with the same watchdog as on_term.
+  if [ "$STOPPING" = 1 ]; then signal_child TERM; start_watchdog; fi
   return 0
 }
 start_helpers() {  # lease renewal and periodic snapshots, each in its own subshell so neither delays the other
@@ -528,10 +692,15 @@ if [ -n "$BUCKET" ]; then
   if [ "$PROFILE_BASE" = "$RELEASE_BASE" ]; then echo "profile and release directories must have different names" >&2; exit 1; fi
   HOLDER="$(uname -n)-$$-$(date +%s)-$(od -An -N6 -tx1 /dev/urandom | tr -d ' \n')"
   mkdir -p "$PROFILE_DIR" "$RELEASE_DIR"
+  if [ "$MODE" = "publish-proof" ]; then   # one shot: upload, lease, snapshot; no restore (the local trees are what gets snapshotted)
+    pub_rc=0; publish_proof || pub_rc=$?
+    exit "$pub_rc"
+  fi
   lease_rc=0; lease_acquire || lease_rc=$?
   if [ "$lease_rc" -ne 0 ]; then exit "$lease_rc"; fi
   restore_state || exit 1
   rm -f "$RELEASE_DIR/poller.lock" "$PROFILE_DIR/.lkb-tab-capture.lock"   # never .lkb-recovery.lock: a restore leaves it in place
+  restore_proof || true   # live-proof media after the state restore, before the doctor gate; never ends the container
 fi
 
 # PulseAudio null sink: recorder.js' AudioContext needs an output device.
