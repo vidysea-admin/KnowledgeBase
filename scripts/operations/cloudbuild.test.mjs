@@ -163,7 +163,7 @@ export function analyze(text) {
   return v;
 }
 
-const TEXT = readFileSync(FILE, "utf8");
+const TEXT = readFileSync(FILE, "utf8").replace(/\r\n/g, "\n"); // a Windows checkout may have converted line endings
 const without = (re) => TEXT.replace(re, "");
 
 test("cloudbuild.yaml has the contract shape (F0-C1..C4, I2)", () => {
