@@ -178,7 +178,7 @@ test("pairwise: a position-biased judge (always answer 1) is 100% inconsistent, 
   const items = [pitem("i1", true), pitem("i2", false), pitem("i3", true)];
   const first = { name: "first", call: async () => reply12(1) };
   const r = await runPairwise(items, [first, prefers("j2", "GOOD")]);
-  assert.deepEqual(r.judges.first.counts, { A: 0, B: 0, tie: 3, inconsistent: 3, error: 0 });
+  assert.deepEqual(r.judges.first.counts, { A: 0, B: 0, tie: 0, inconsistent: 3, error: 0 });
   assert.equal(r.judges.first.winRate.rate, null);
   assert.equal(r.judges.first.winRate.low, null);
   assert.equal(r.judges.first.winRate.high, null);
@@ -293,17 +293,17 @@ test("pairwise file mode: reads items JSON, writes the report JSON with the meth
 
 test("pairwise flags: needs a file, two provider:model judges and a call cap; reuses the --llm validation", () => {
   assert.deepEqual(parsePairwiseArgs(["--retriever", "vector"], env), { pairwise: false });
-  const base = ["--pairwise", "items.json", "--judge-1", "ollama:glm-5.3-flash", "--judge-2", "gemini:gemini-3-flash", "--max-calls", "400"];
+  const base = ["--pairwise", "items.json", "--llm", "--judge-1", "ollama:glm-5.3-flash", "--judge-2", "gemini:gemini-3-flash", "--max-calls", "400"];
   const ok = parsePairwiseArgs(base, env);
   assert.equal(ok.error, undefined);
   assert.equal(ok.file, "items.json");
   assert.equal(ok.judges[0].model, "glm-5.3-flash");
   assert.equal(ok.judges[1].provider, "gemini");
   assert.equal(ok.maxCalls, 400);
-  assert.match(parsePairwiseArgs(base.filter((_, i) => i !== 2 && i !== 3), env).error, /--judge-1/);
-  assert.match(parsePairwiseArgs(base.slice(0, 6), env).error, /--max-calls/);
+  assert.match(parsePairwiseArgs(base.filter((_, i) => i !== 3 && i !== 4), env).error, /--judge-1/);
+  assert.match(parsePairwiseArgs(base.slice(0, 7), env).error, /--max-calls/);
   assert.match(parsePairwiseArgs(base, {}).error, /OLLAMA_API_KEY|GEMINI_API_KEY/);
-  assert.match(parsePairwiseArgs(["--pairwise", "i.json", "--judge-1", "nocolon", "--judge-2", "ollama:m", "--max-calls", "9"], env).error, /provider:model/);
+  assert.match(parsePairwiseArgs(["--pairwise", "i.json", "--llm", "--judge-1", "nocolon", "--judge-2", "ollama:m", "--max-calls", "9"], env).error, /provider:model/);
 });
 
 test("pairwise real-judge seam: createPairwiseJudge sends the blind prompt through the existing complete(job), counts calls, honours the cap", async () => {
@@ -321,4 +321,109 @@ test("pairwise real-judge seam: createPairwiseJudge sends the blind prompt throu
   assert.equal(j.stats.calls, 2);
   assert.equal(j.stats.inputTokens, 6);
   assert.equal(j.stats.capReached, true);
+});
+
+// ---------------------------------------------------------------------------------------------------------------------
+// Contract qa/contracts/pairwise-answer-judge.md (D4J-C1..C6, I1..I2) - alignment tests added after the checker fold-in.
+// ---------------------------------------------------------------------------------------------------------------------
+import { existsSync } from "node:fs";
+import { spawnSync } from "node:child_process";
+import { fileURLToPath } from "node:url";
+
+test("D4J-C1 pairwise: swapping which side holds which text gives the same prompt body; answer text stays verbatim", () => {
+  const x = "Per Dr. Rao in the 'Visa Basics' session: apply 3 months early [S1].", y = "  Apply early.\nBring your I-20.  ";
+  const one = buildPairwisePrompt({ id: "a", question: "Q?", answerA: x, answerB: y }, false);
+  const two = buildPairwisePrompt({ id: "b", question: "Q?", answerA: y, answerB: x }, true);
+  assert.deepEqual(one, two, "side labels carry no identity: the prompt depends only on what is shown in position 1 and 2");
+  assert.ok(one.user.includes(x) && one.user.includes(y), "names, titles, citations and whitespace pass through unscrubbed");
+});
+
+test("D4J-C1 pairwise: the report notes that style cues in verbatim text can unblind a judge", async () => {
+  const r = await runPairwise([pitem("i1", true)], [prefers("j1", "GOOD"), prefers("j2", "GOOD")]);
+  assert.ok(r.notes.some((n) => /style cues/i.test(n) && /unblind/i.test(n)));
+});
+
+test("D4J-C2 pairwise: an empty reply is an error and is not retried", async () => {
+  let calls = 0;
+  const empty = { name: "empty", call: async () => { calls++; return "   "; } };
+  const r = await runPairwise([pitem("i1", true)], [empty, prefers("j2", "GOOD")]);
+  assert.deepEqual(r.judges.empty.counts, { A: 0, B: 0, tie: 0, inconsistent: 0, error: 1 });
+  assert.equal(calls, 1, "no retry, and no second order after a failure");
+});
+
+test("D4J-C3 pairwise: two judges must have distinct model ids (same model under two names is refused); answering model named and overlap flagged", async () => {
+  const j = (name, model) => ({ ...prefers(name, "GOOD"), model });
+  await assert.rejects(runPairwise([pitem("i", true)], [j("a", "glm-5"), j("b", "glm-5")]), /distinct model ids/);
+  const r = await runPairwise([pitem("i", true)], [j("a", "glm-5"), j("b", "gem-3")], { answerModels: { A: "glm-5", B: "human" } });
+  assert.deepEqual(r.judgeModels, ["glm-5", "gem-3"]);
+  assert.deepEqual(r.answerModels, { A: "glm-5", B: "human" });
+  assert.deepEqual(r.judgeIsAnsweringModel, ["glm-5"]);
+  const none = await runPairwise([pitem("i", true)], [j("a", "glm-5"), j("b", "gem-3")]);
+  assert.equal(none.answerModels, null);
+  assert.deepEqual(none.judgeIsAnsweringModel, []);
+  assert.match(parsePairwiseArgs(["--pairwise", "i.json", "--llm", "--judge-1", "ollama:m", "--judge-2", "gemini:m", "--max-calls", "9"], env).error, /distinct model ids/);
+});
+
+test("D4J-C4 pairwise: inconsistent and error are excluded from the win-rate denominator and reported apart; rules and denominator are named", async () => {
+  const items = [pitem("i1", true), pitem("i2", true), pitem("i3", false), pitem("i4", true), pitem("i5", true)];
+  let n = 0;
+  // j1 is inconsistent on i4 (always 1 there) and errors on i5; otherwise follows GOOD.
+  const j1 = { name: "j1", call: async (p) => { const it = p.user; if (it.includes("Q i5?")) throw new Error("boom"); if (it.includes("Q i4?")) return reply12(1); n++; return prefers("x", "GOOD").call(p); } };
+  const r = await runPairwise(items, [j1, prefers("j2", "GOOD")]);
+  assert.deepEqual(r.judges.j1.counts, { A: 2, B: 1, tie: 0, inconsistent: 1, error: 1 });
+  assert.equal(r.judges.j1.winRate.n, 3, "denominator = A + B only");
+  assert.ok(Math.abs(r.judges.j1.winRate.rate - 2 / 3) < 1e-12);
+  assert.match(r.judges.j1.winRate.denominator, /A \+ B/);
+  assert.match(r.judges.j1.winRate.denominator, /inconsistent and error.*excluded/i);
+  assert.deepEqual(r.combined.counts, { A: 2, B: 1, tie: 0, inconsistent: 1, error: 1 });
+  assert.match(r.method.combined, /error.*inconsistent/s, "combined precedence rule named");
+  assert.match(formatPairwiseSummary(r), /denominator/i);
+});
+
+test("D4J-C4 pairwise: a run with fewer than half the items decided is labelled low-decisive; disagreement rate is reported", async () => {
+  const items = [pitem("i1", true), pitem("i2", true), pitem("i3", true)];
+  const biased = { name: "first", call: async () => reply12(1) };
+  const r = await runPairwise(items, [biased, prefers("j2", "GOOD")]);
+  assert.equal(r.judges.first.lowDecisive, true);
+  assert.equal(r.judges.j2.lowDecisive, false);
+  assert.equal(r.combined.lowDecisive, true);
+  assert.match(formatPairwiseSummary(r), /low-decisive/);
+  const d = await runPairwise(items, [prefers("a", "GOOD"), prefers("b", "BAD")]);
+  assert.equal(d.agreement.rate, 0);
+  assert.equal(d.disagreementRate.rate, 1);
+  assert.equal((await runPairwise([], [biased, prefers("j2", "GOOD")])).combined.lowDecisive, false, "empty list is not labelled low-decisive");
+});
+
+test("D4J-C5 pairwise flags: --llm is required; the cap is the total over items x judges x 2 and the run is refused below it", async () => {
+  const base = ["--pairwise", "items.json", "--llm", "--judge-1", "ollama:glm-5.3-flash", "--judge-2", "gemini:gemini-3-flash", "--max-calls", "8"];
+  assert.equal(parsePairwiseArgs(base, env).error, undefined);
+  assert.match(parsePairwiseArgs(base.filter((a) => a !== "--llm"), env).error, /--llm/);
+  assert.match(parsePairwiseArgs(base.filter((_, i) => i !== 7 && i !== 8), env).error, /--max-calls/);
+  const dir = mkdtempSync(join(tmpdir(), "pairwise-cap-"));
+  const f = join(dir, "items.json");
+  writeFileSync(f, JSON.stringify([pitem("a", true), pitem("b", true), pitem("c", true)]));
+  const run = (cap) => spawnSync(process.execPath, [fileURLToPath(new URL("./llm-eval.mjs", import.meta.url)), "--pairwise", f, "--llm", "--judge-1", "ollama:m1", "--judge-2", "gemini:m2", "--max-calls", String(cap), "--out", join(dir, "o.json")],
+    { encoding: "utf8", env: { ...process.env, OLLAMA_API_KEY: "k-123456", GEMINI_API_KEY: "g-123456" }, timeout: 60000 });
+  const refused = run(11);
+  assert.equal(refused.status, 2);
+  assert.match(refused.stderr, /12 calls/, "3 items x 2 judges x 2 orders = 12 planned, cap 11");
+  assert.equal(existsSync(join(dir, "o.json")), false);
+});
+
+test("D4J-I1 pairwise: running the script directly without --pairwise does nothing, as before", () => {
+  const r = spawnSync(process.execPath, [fileURLToPath(new URL("./llm-eval.mjs", import.meta.url))], { encoding: "utf8", timeout: 60000 });
+  assert.equal(r.status, 0);
+  assert.equal(r.stdout + r.stderr, "");
+});
+
+test("D4J-I2 pairwise: an existing output file is never overwritten, and the refusal happens before any judge call", async () => {
+  const dir = mkdtempSync(join(tmpdir(), "pairwise-ow-"));
+  const inPath = join(dir, "items.json"), outPath = join(dir, "report.json");
+  writeFileSync(inPath, JSON.stringify([pitem("i1", true)]));
+  writeFileSync(outPath, "PRIOR RUN");
+  let calls = 0;
+  const j = (name) => ({ name, call: async () => { calls++; return reply12(1); } });
+  await assert.rejects(runPairwiseFile(inPath, [j("a"), j("b")], outPath), /already exists/);
+  assert.equal(calls, 0);
+  assert.equal(readFileSync(outPath, "utf8"), "PRIOR RUN");
 });

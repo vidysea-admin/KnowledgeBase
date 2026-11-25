@@ -1,6 +1,7 @@
 /**
  * scripts/eval/llm-eval.mjs - U0.10 real-LLM ScoreFn plumbing shared by eval-recall.mjs and eval-calibration.mjs.
- * Opt-in only (`--llm`); without it neither script touches this file. Spend approved by D-164 (Ollama Cloud first, Gemini last).
+ * Opt-in only (`--llm`); without it neither script touches this file. The pairwise answer judge (bottom of file, D4/D-227) is opt-in too:
+ * it runs only when this file is executed with `--pairwise` (and `--llm`, `--max-calls`). Spend approved by D-164 (Ollama Cloud first, Gemini last).
  *
  * The scorer is apps/api's `createLlmScorer` (the production evaluator judge prompt, jobKind "evaluator"), routed through
  * @lkb/ai `complete` with an explicit one-provider chain. No scoring policy is invented here: the prompt, the 0-1 scale and the
@@ -8,7 +9,7 @@
  * OLLAMA_BASE_URL is NEVER read or written: the cloud base URL is passed to the provider instance used by this process only.
  * Writes no Mongo and no job rows (the router's `write` is a no-op).
  */
-import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { register } from "tsx/esm/api";
@@ -266,25 +267,38 @@ export async function judgePair(item, judge) {
 
 const emptyCounts = () => ({ A: 0, B: 0, tie: 0, inconsistent: 0, error: 0 });
 
-/** counts for a list of verdicts. `tie` includes inconsistent (D4J-b: inconsistent is counted as a tie). */
+/** Counts for a list of verdicts. inconsistent and error are their own buckets (D4J-C4), never folded into `tie`. */
 function tally(verdicts) {
   const c = emptyCounts();
-  for (const v of verdicts) { c[v]++; if (v === "inconsistent") c.tie++; }
+  for (const v of verdicts) c[v]++;
   return c;
 }
 
-/** Combined per item: error if either judge errored; A/B only when both judges chose the same side; otherwise a tie. */
+/**
+ * Combined per item, in this precedence: error if either judge errored; else inconsistent if either judge was position-inconsistent;
+ * else A or B when both judges chose that side; else tie (the judges chose opposite sides).
+ */
 function combine(v1, v2) {
-  if (v1 === "error" || v2 === "error") return { verdict: "error", inconsistent: false };
-  const inconsistent = v1 === "inconsistent" || v2 === "inconsistent";
-  return { verdict: (v1 === "A" || v1 === "B") && v1 === v2 ? v1 : "tie", inconsistent };
+  if (v1 === "error" || v2 === "error") return "error";
+  if (v1 === "inconsistent" || v2 === "inconsistent") return "inconsistent";
+  return v1 === v2 ? v1 : "tie";
 }
 
+export const WIN_RATE_DENOMINATOR = "A + B: items decided by both orders (and, for combined, by both judges on the same side); inconsistent and error items are excluded from numerator and denominator and reported separately; combined ties (judges chose opposite sides) are also excluded";
+export const PAIRWISE_NOTES = [
+  "answer text is passed verbatim and unscrubbed: names, titles, citations and style cues inside an answer are content under judgement; style cues can unblind a judge, and this run does not strip them",
+];
+
 /** Runs every item through both judges (sequential, deterministic) and builds the report. */
-export async function runPairwise(items, judges) {
+export async function runPairwise(items, judges, opts = {}) {
   validatePairwiseItems(items);
-  if (!Array.isArray(judges) || judges.length !== 2 || judges[0].name === judges[1].name) throw new Error("pairwise needs exactly two distinct judges (different names)");
+  const modelOf = (j) => j.model ?? j.name;
+  if (!Array.isArray(judges) || judges.length !== 2 || judges[0].name === judges[1].name || modelOf(judges[0]) === modelOf(judges[1]))
+    throw new Error("pairwise needs exactly two distinct judges (distinct model ids; one model run twice is refused)");
   const [j1, j2] = judges;
+  const am = opts.answerModels;
+  const answerModels = am && (am.A || am.B) ? { A: am.A ?? null, B: am.B ?? null } : null;
+  const overlap = answerModels ? [modelOf(j1), modelOf(j2)].filter((m) => m === answerModels.A || m === answerModels.B) : [];
   const per = { [j1.name]: [], [j2.name]: [] };
   const rows = [];
   for (const it of items) {
@@ -292,29 +306,37 @@ export async function runPairwise(items, judges) {
     per[j1.name].push({ id: it.id, ...r1 });
     per[j2.name].push({ id: it.id, ...r2 });
     const c = combine(r1.verdict, r2.verdict);
-    rows.push({ id: it.id, combined: c.verdict, anyInconsistent: c.inconsistent, verdicts: { [j1.name]: r1.verdict, [j2.name]: r2.verdict } });
+    rows.push({ id: it.id, combined: c, verdicts: { [j1.name]: r1.verdict, [j2.name]: r2.verdict } });
   }
+  const lowDecisive = (c, n) => n > 0 && (c.A + c.B) * 2 < n;   // D4J-C4: fewer than half the items decided
+  const winRate = (c) => ({ ...wilsonInterval(c.A, c.A + c.B), denominator: WIN_RATE_DENOMINATOR });
   const judgeReport = (j) => {
     const list = per[j.name], counts = tally(list.map((x) => x.verdict));
-    return { counts, winRate: wilsonInterval(counts.A, counts.A + counts.B), inconsistencyRate: ratio(counts.inconsistent, list.length - counts.error),
+    return { counts, winRate: winRate(counts), lowDecisive: lowDecisive(counts, list.length), inconsistencyRate: ratio(counts.inconsistent, list.length - counts.error),
       ...(j.stats ? { calls: callSummary(j.stats, j.caps ?? {}) } : {}), items: list };
   };
   const combinedCounts = tally(rows.map((r) => r.combined));
-  combinedCounts.inconsistent = rows.filter((r) => r.combined !== "error" && r.anyInconsistent).length;
   const both = rows.filter((r) => ["A", "B"].includes(r.verdicts[j1.name]) && ["A", "B"].includes(r.verdicts[j2.name]));
   const jr = [judgeReport(j1), judgeReport(j2)];
   return {
     method: {
       design: "blind pairwise; two judges; each (item, judge) asked twice with the answers in opposite order; A or B only when both orders agree",
       winRate: WILSON_METHOD,
-      combined: "per item: error if either judge errored; A or B only when both judges chose that side; otherwise tie (inconsistent counts as tie)",
+      combined: "per item, in this precedence: error if either judge errored; else inconsistent if either judge was position-inconsistent; else A or B when both judges chose that side; else tie (opposite sides)",
+      denominator: WIN_RATE_DENOMINATOR,
+      lowDecisive: "labelled low-decisive when fewer than half of the items are decided (A + B < n / 2)",
       agreement: "share of items where both judges returned a decisive verdict (A or B) and it is the same side",
       inconsistencyRate: "inconsistent / (items - errors), pooled over both judges",
     },
     n: items.length,
+    judgeModels: [modelOf(j1), modelOf(j2)],
+    answerModels,
+    judgeIsAnsweringModel: overlap,
+    notes: [...PAIRWISE_NOTES, ...(overlap.length ? ["a judge is identical to an answering model (reported, not a failure)"] : [])],
     judges: { [j1.name]: jr[0], [j2.name]: jr[1] },
-    combined: { counts: combinedCounts, winRate: wilsonInterval(combinedCounts.A, combinedCounts.A + combinedCounts.B) },
+    combined: { counts: combinedCounts, winRate: winRate(combinedCounts), lowDecisive: lowDecisive(combinedCounts, items.length) },
     agreement: ratio(both.filter((r) => r.verdicts[j1.name] === r.verdicts[j2.name]).length, both.length),
+    disagreementRate: ratio(both.filter((r) => r.verdicts[j1.name] !== r.verdicts[j2.name]).length, both.length),
     inconsistencyRate: ratio(jr[0].counts.inconsistent + jr[1].counts.inconsistent, jr[0].items.length + jr[1].items.length - jr[0].counts.error - jr[1].counts.error),
     items: rows.map(({ id, combined, verdicts }) => ({ id, combined, verdicts })),
   };
@@ -322,21 +344,32 @@ export async function runPairwise(items, judges) {
 
 const pct = (x) => (x === null ? "undefined" : `${(x * 100).toFixed(1)}%`);
 const rateLine = (w) => (w.rate === null ? "undefined (no decided items)" : `${pct(w.rate)} [95% CI ${pct(w.low)} to ${pct(w.high)}] over ${w.n} decided`);
-const countsLine = (c) => `A ${c.A} / B ${c.B} / tie ${c.tie} (inconsistent ${c.inconsistent}) / error ${c.error}`;
+const countsLine = (c) => `A ${c.A} / B ${c.B} / tie ${c.tie} / inconsistent ${c.inconsistent} / error ${c.error}`;
 
 export function formatPairwiseSummary(report) {
-  const lines = [`pairwise judge: ${report.n} item(s)`];
-  for (const [name, j] of Object.entries(report.judges)) lines.push(`  judge ${name}: ${countsLine(j.counts)}; win rate of A ${rateLine(j.winRate)}; position-inconsistency ${pct(j.inconsistencyRate.rate)}`);
-  lines.push(`  combined: ${countsLine(report.combined.counts)}; win rate of A ${rateLine(report.combined.winRate)}`);
+  const lines = [`pairwise judge: ${report.n} item(s); judge models: ${report.judgeModels.join(", ")}${report.answerModels ? `; answer models: A ${report.answerModels.A ?? "?"}, B ${report.answerModels.B ?? "?"}` : ""}`];
+  if (report.judgeIsAnsweringModel.length) lines.push(`  NOTE: judge identical to an answering model: ${report.judgeIsAnsweringModel.join(", ")}`);
+  const low = (x) => (x.lowDecisive ? " [low-decisive: fewer than half the items decided]" : "");
+  for (const [name, j] of Object.entries(report.judges)) lines.push(`  judge ${name}: ${countsLine(j.counts)}; win rate of A ${rateLine(j.winRate)}; position-inconsistency ${pct(j.inconsistencyRate.rate)}${low(j)}`);
+  lines.push(`  combined: ${countsLine(report.combined.counts)}; win rate of A ${rateLine(report.combined.winRate)}${low(report.combined)}`);
+  lines.push(`  win-rate denominator: ${report.method.denominator}`);
+  lines.push(`  combined rule: ${report.method.combined}`);
   lines.push(`  judge agreement: ${pct(report.agreement.rate)} (${report.agreement.k}/${report.agreement.n} items with two decisive verdicts)`);
   lines.push(`  position-inconsistency (pooled): ${pct(report.inconsistencyRate.rate)} (${report.inconsistencyRate.k}/${report.inconsistencyRate.n})`);
+  lines.push(`  judge disagreement: ${pct(report.disagreementRate.rate)} (${report.disagreementRate.k}/${report.disagreementRate.n})`);
   lines.push(`  CI method: ${report.method.winRate}`);
+  for (const n of report.notes) lines.push(`  NOTE: ${n}`);
   return lines.join("\n");
 }
 
-/** File mode: items JSON in, report JSON out (+ printed summary text). */
-export async function runPairwiseFile(inPath, judges, outPath, redact = (t) => t) {
-  const report = await runPairwise(loadPairwiseItems(inPath), judges);
+/**
+ * File mode: items JSON in, report JSON out (+ printed summary text). An existing output file is never overwritten (D4J-I2);
+ * the refusal comes before any judge call. Answering models come from opts.answerModels or the file's top-level `answerModels`.
+ */
+export async function runPairwiseFile(inPath, judges, outPath, redact = (t) => t, opts = {}) {
+  if (existsSync(outPath)) throw new Error(`refused: output file already exists and is never overwritten: ${outPath} (choose another --out)`);
+  const raw = JSON.parse(readFileSync(inPath, "utf8"));
+  const report = await runPairwise(loadPairwiseItems(inPath), judges, { answerModels: opts.answerModels ?? raw?.answerModels });
   return { report, summary: formatPairwiseSummary(report), path: writeResults(outPath, report, redact) };
 }
 
@@ -344,7 +377,7 @@ export async function runPairwiseFile(inPath, judges, outPath, redact = (t) => t
  * A real judge over the existing `complete(job)` seam (createEvalComplete). Same job kind and cap rule as createLlmScoreFn:
  * the cap is checked BEFORE each call and the capped call is never sent. Returns the reply text; parsing is runPairwise's job.
  */
-export function createPairwiseJudge(name, complete, caps, now = () => performance.now()) {
+export function createPairwiseJudge(name, complete, caps, now = () => performance.now(), model = undefined) {
   const stats = { calls: 0, ok: 0, failed: 0, fallbacks: 0, costUsd: 0, inputTokens: 0, outputTokens: 0, latenciesMs: [], errors: [], capReached: false };
   const call = async ({ system, user }) => {
     if (capHit(caps, stats)) { stats.capReached = true; throw new CapReached("call/cost cap reached; call not sent"); }
@@ -365,19 +398,21 @@ export function createPairwiseJudge(name, complete, caps, now = () => performanc
       throw e;
     }
   };
-  return { name, call, stats, caps };
+  return { name, model, call, stats, caps };
 }
 
 /**
- * `--pairwise <items.json> --judge-1 <provider:model> --judge-2 <provider:model> --max-calls <n> [--base-url u] [--out file]`.
- * Each judge is validated by the unchanged parseLlmArgs (keys, provider, positive cap). `--max-calls` applies per judge.
+ * `--pairwise <items.json> --llm --judge-1 <provider:model> --judge-2 <provider:model> --max-calls <n> [--base-url u] [--out file]
+ *  [--answer-model-a <id>] [--answer-model-b <id>]`. Same opt-in gate as the other modes (D-164): --llm and --max-calls are required,
+ * each judge is validated by the unchanged parseLlmArgs (keys, provider, positive cap). `--max-calls` is the TOTAL for the run.
  */
 export function parsePairwiseArgs(argv, env = {}) {
   const val = (n) => { const i = argv.indexOf(n); return i >= 0 ? argv[i + 1] : undefined; };
   if (!argv.includes("--pairwise")) return { pairwise: false };
-  const o = { pairwise: true, file: val("--pairwise"), out: val("--out"), maxCalls: val("--max-calls") === undefined ? undefined : Number(val("--max-calls")) };
+  const o = { pairwise: true, file: val("--pairwise"), out: val("--out"), answerModels: { A: val("--answer-model-a"), B: val("--answer-model-b") }, maxCalls: val("--max-calls") === undefined ? undefined : Number(val("--max-calls")) };
   const bad = (m) => ({ ...o, error: `refused: ${m}` });
   if (!o.file || o.file.startsWith("--")) return bad("--pairwise requires an items JSON file");
+  if (!argv.includes("--llm")) return bad("--pairwise sends content to a model and needs the opt-in --llm flag (D-164)");
   const judges = [];
   for (const flag of ["--judge-1", "--judge-2"]) {
     const spec = val(flag);
@@ -386,8 +421,8 @@ export function parsePairwiseArgs(argv, env = {}) {
     if (!m) return bad(`${flag} must be provider:model, e.g. ollama:glm-5.3-flash`);
     judges.push({ provider: m[1], model: m[2], spec });
   }
-  if (judges[0].spec === judges[1].spec) return bad("--judge-1 and --judge-2 must be two different judges");
-  if (o.maxCalls === undefined) return bad("--max-calls <n> is required (per judge)");
+  if (judges[0].model === judges[1].model) return bad("--judge-1 and --judge-2 must have distinct model ids (one model run twice is refused)");
+  if (o.maxCalls === undefined) return bad("--max-calls <n> is required (total for the run)");
   const parsed = judges.map((j) => parseLlmArgs(["--llm", "--model", j.model, "--provider", j.provider, "--max-calls", String(o.maxCalls), ...(val("--base-url") ? ["--base-url", val("--base-url")] : [])], env));
   const err = parsed.find((p) => p.error);
   if (err) return bad(err.error.replace(/^refused: /, ""));
@@ -397,16 +432,20 @@ export function parsePairwiseArgs(argv, env = {}) {
 /** CLI entry: only runs when this file is executed directly (importing it never starts a run). */
 export async function pairwiseMain(argv, env = process.env) {
   const a = parsePairwiseArgs(argv, env);
-  if (!a.pairwise) { console.error("usage: node scripts/eval/llm-eval.mjs --pairwise <items.json> --judge-1 <provider:model> --judge-2 <provider:model> --max-calls <n> [--base-url <url>] [--out <file>]"); return 2; }
+  if (!a.pairwise) { console.error("usage: node scripts/eval/llm-eval.mjs --pairwise <items.json> --llm --judge-1 <provider:model> --judge-2 <provider:model> --max-calls <n> [--base-url <url>] [--out <file>]"); return 2; }
   if (a.error) { console.error(a.error); return 2; }
   const items = loadPairwiseItems(a.file);
-  if (a.maxCalls < items.length * 2) { console.error(`refused: ${items.length} item(s) need ${items.length * 2} calls per judge (two orders each); --max-calls is ${a.maxCalls}`); return 2; }
-  const judges = [];
-  for (const o of a.judges) judges.push(createPairwiseJudge(o.spec, await createEvalComplete(o, env), { maxCalls: a.maxCalls }));
+  const planned = items.length * a.judges.length * 2;
+  if (planned > a.maxCalls) { console.error(`refused: ${planned} calls planned (${items.length} items x ${a.judges.length} judges x 2 orders) exceed --max-calls ${a.maxCalls}`); return 2; }
   const out = a.out ? resolve(a.out) : join(RESULTS_DIR, `pairwise-${new Date().toISOString().slice(0, 10)}.json`);
-  const { summary, path } = await runPairwiseFile(a.file, judges, out, redactor([env.OLLAMA_API_KEY, env.GEMINI_API_KEY].filter(Boolean)));
+  if (existsSync(out)) { console.error(`refused: output file already exists and is never overwritten: ${out} (choose another --out)`); return 2; }
+  const judges = [];
+  // D-164 provider order: Ollama Cloud first, Gemini last. Each judge is capped at its own planned calls, so the total never exceeds --max-calls.
+  for (const o of [...a.judges].sort((x, y) => (x.provider === "gemini") - (y.provider === "gemini")))
+    judges.push(createPairwiseJudge(o.spec, await createEvalComplete(o, env), { maxCalls: items.length * 2 }, undefined, o.model));
+  const { summary, path } = await runPairwiseFile(a.file, judges, out, redactor([env.OLLAMA_API_KEY, env.GEMINI_API_KEY].filter(Boolean)), { answerModels: a.answerModels });
   console.log(`${summary}\nreport: ${path}`);
   return 0;
 }
 
-if (process.argv[1] && pathToFileURL(resolve(process.argv[1])).href === import.meta.url) process.exitCode = await pairwiseMain(process.argv.slice(2));
+if (process.argv.includes("--pairwise") && process.argv[1] && pathToFileURL(resolve(process.argv[1])).href === import.meta.url) process.exitCode = await pairwiseMain(process.argv.slice(2));
