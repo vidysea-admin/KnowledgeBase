@@ -230,4 +230,4 @@ The file-backed store is not changed.
 5. **Owner validation is mongo-only.** The file backend still accepts any string as `userId` (C3B-I1: unchanged). On the file backend an id like `../x` is not refused by this unit. Pre-existing behaviour, not changed.
 6. **Tests need a long timeout for C3B-C8d.** Run the loopback command with a timeout of at least 300 s.
 
-## Status: ready-for-check
+## Status: checked-PASS
