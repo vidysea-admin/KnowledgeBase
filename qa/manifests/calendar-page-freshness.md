@@ -7,6 +7,7 @@
 **Hold-reopens:** 0
 **Resume-reset:** unused
 **Capability-redispatch:** 0
+Round cap: HUMAN_GATE pending (D-014 option b, waiver requested 2026-11-25). Non-security class. T1 is a roadmap feature (plan section 4 row 9; D-242 item 6; D-243 item 2), not a findings round, but the delivery gate counts 11 prior PASSes on CalendarPage.tsx / CalendarPage.test.tsx. The check is not dispatched until a DECISIONS entry with Approved-by: Umesh records the waiver; without it the unit is withdrawn and filed file-don't-fix.
 **Dual check:** no
 dual-note: the contract sets one checker (Tier L, trigger concurrency/timing/race: a repeating timer, an in-flight request that can outlive a sign-out or unmount, a slow response that can overwrite a newer one). No API, auth, tenancy or data-write code changes (nothing under `apps/api`), so none of the security triggers of a dual check applies. The client-side rule that one key's meetings never render for another key is an existing invariant this unit keeps (T1-C5), not a new trust boundary. The checker recomputes `tick.mjs --route`; it may only raise this.
 **Persona walk:** skip (no screen, flow or user type added; one out-of-date notice line on the existing Calendar page, same page, same controls, same user types)
