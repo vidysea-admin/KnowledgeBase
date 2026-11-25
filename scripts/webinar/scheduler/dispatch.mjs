@@ -2,6 +2,28 @@
 import {existsSync, readFileSync} from 'node:fs';
 import {join, resolve} from 'node:path';
 
+const REFUSAL_REASONS = ['overlap-lost', 'needs-registration', 'needs-review', 'invalid-time', 'unsafe-join-link', 'rule-denied', 'opted-out', 'rules-unevaluable'];
+const ATTEMPT_LIMIT = 3;
+
+/**
+ * H1 (recorder-self-heal-rejoin): what became of a capture whose owner is gone. `undefined` means "not an interruption" and the older recovery paths decide.
+ * recording row (the process died mid-capture): attempt limit reached -> 'stopped'; meeting ended -> 'ended' (a surviving file is finalized as before);
+ * meeting still running -> 'rejoining'. [ASSUMPTION, D-244] a capture that failed with its own error, never with a recording file, is rejoined like a
+ * crash; a host refusing the bot (`admission_denied`) never is; a failed row with no launched attempt is not a crash; `previous < attempts` stops a
+ * rejoin that never launched from looping, because every launch writes its attempt first.
+ */
+function interruptionOutcome(c, row, locate, indexed) {
+  const attempts = row.attempts ?? 0, previous = row.interruption?.n ?? 0, end = Date.parse(row.endTime);
+  if (!Number.isFinite(end)) return undefined;
+  const running = end > Date.parse(c.now());
+  if (row.status === 'recording') {
+    if (attempts >= ATTEMPT_LIMIT || (previous > 0 && previous >= attempts)) return 'stopped';
+    return running ? 'rejoining' : locate() ? undefined : 'ended';
+  }
+  return row.status === 'failed' && running && attempts >= 1 && attempts < ATTEMPT_LIMIT && previous < attempts && !indexed &&
+    !/^admission_denied(?![A-Za-z0-9_])/.test(String(row.reason ?? '')) && !locate() ? 'rejoining' : undefined;
+}
+
 export async function runSchedulerCycle(c) {
   const {state, pool, now, update, select, complete, finishOperation, execute, root, env, work, deps} = c;
   const stopped = () => c.signal?.aborted === true;
@@ -21,9 +43,11 @@ export async function runSchedulerCycle(c) {
   c.setPreview(selection);
   for (const id of Object.keys(state.operations)) c.notify(id);
 
+  const rejoined = new Set();
   for (const [id, row] of Object.entries(state.operations)) {
     if (stopped()) return;
     if (pool?.has(id) || !['recording', 'processing', 'failed'].includes(row.status)) continue;
+    if (['recording', 'failed'].includes(row.status) && row.tenantId !== c.tenantId) continue; // H1-I5: another tenant's row is left exactly as found
     const indexed = complete(id);
     // An index marker may precede the queue acknowledgement. Graph recovery must
     // reopen the durable graph and receive its complete outcome before finishing.
@@ -31,11 +55,27 @@ export async function runSchedulerCycle(c) {
     if (pool && !c.slots.includes(row.captureSlot)) {
       update(id, {status: 'action_required', reason: 'capture-slot-unavailable'}); continue;
     }
-    if ((row.attempts ?? 0) >= 3) { update(id, {status: 'action_required', reason: 'retry-limit'}); continue; }
     let artifact = row.artifact;
     const sourcePath = join(root, 'data/toc-migrated', id, 'source.json');
-    if (!artifact && existsSync(sourcePath)) artifact = resolve(root, JSON.parse(readFileSync(sourcePath, 'utf8')).path ?? '');
-    if (!artifact || !existsSync(artifact)) {
+    const locate = () => {
+      if (!artifact && existsSync(sourcePath)) artifact = resolve(root, JSON.parse(readFileSync(sourcePath, 'utf8')).path ?? '');
+      return Boolean(artifact) && existsSync(artifact);
+    };
+    // H1: a capture whose owner is gone while its meeting is still running is rejoined, not abandoned (decision in `interruptionOutcome`).
+    const outcome = interruptionOutcome(c, row, locate, indexed);
+    if (outcome) {
+      const hasFile = locate();
+      const n = (row.interruption?.n ?? 0) + 1, interruption = {n, outcome};
+      if (outcome === 'rejoining') {
+        // The old file is neither finalized nor deleted (H1-C8); it stays findable on the row. The new capture writes its own `artifact`.
+        update(id, {status: 'queued', reason: 'interrupted-rejoining', interruption, artifact: undefined, ...(hasFile ? {interruptedArtifact: artifact} : {})});
+        rejoined.add(id);
+      } else update(id, {status: 'action_required', reason: outcome === 'ended' ? 'interrupted-ended' : 'retry-limit', interruption});
+      continue;
+    }
+    if ((row.attempts ?? 0) >= 3) { update(id, {status: 'action_required', reason: 'retry-limit',
+      ...(row.interruption && row.status === 'failed' ? {interruption: {n: row.interruption.n + 1, outcome: 'stopped'}} : {})}); continue; }
+    if (!locate()) {
       if (!(indexed && c.graphEnabled(env) && row.graphSourceFingerprint)) {
         update(id, {status: 'action_required', reason: 'interrupted-no-recording-artifact'}); continue;
       }
@@ -61,6 +101,21 @@ export async function runSchedulerCycle(c) {
       } catch (error) { update(id, {status: 'failed', reason: c.safeText(error.message)}); }
     };
     if (pool) pool.start(id, slot, recover); else await recover(row.captureSlot);
+  }
+
+  if (rejoined.size) {
+    // The first selection ran while these rows were still `recording`; schedule the rejoins in THIS cycle, never in a later interval (H1-C2).
+    // A rejoin is a join (H1-C7): the same join rules and opt-out decide it, so the fresh selection goes through them too.
+    let fresh = select();
+    if (deps.applyJoinRules) fresh = await deps.applyJoinRules(fresh, {readOnly: false, now: now(), selectWithRules: select, remote: Boolean(deps.calendarAttendance)});
+    if (stopped()) return;
+    const listed = new Set(selection.toSchedule.map(item => item.sessionKey));
+    selection = {...selection, toSchedule: [...selection.toSchedule, ...fresh.toSchedule.filter(item => rejoined.has(item.sessionKey) && !listed.has(item.sessionKey))],
+      skipped: [...selection.skipped, ...fresh.skipped.filter(item => rejoined.has(item.sessionKey))]};
+    const decided = new Set([...fresh.toSchedule.map(item => item.sessionKey),
+      ...fresh.skipped.filter(skipped => ['cancelled', 'past', ...REFUSAL_REASONS].includes(skipped.reason)).map(skipped => skipped.sessionKey)]);
+    // A meeting that vanished from the selection (rescheduled, link no longer usable) cannot be rejoined: say so instead of leaving a "rejoining" row.
+    for (const id of rejoined) if (!decided.has(id) && state.operations[id]?.status === 'queued') update(id, {status: 'action_required', reason: 'coverage-review'});
   }
 
   const ordered = [...selection.toSchedule].sort((a, b) => (c.priority(b) - c.priority(a)) ||
@@ -129,8 +184,7 @@ export async function runSchedulerCycle(c) {
   for (const skipped of [...selection.skipped, ...select().skipped]) {
     if (['cancelled', 'past'].includes(skipped.reason) && state.operations[skipped.sessionKey]?.status === 'queued')
       update(skipped.sessionKey, {status: 'action_required', reason: skipped.reason === 'past' ? 'missed-coverage' : 'cancelled'});
-    if (['overlap-lost', 'needs-registration', 'needs-review', 'invalid-time', 'unsafe-join-link',
-      'rule-denied', 'opted-out', 'rules-unevaluable'].includes(skipped.reason)) {
+    if (REFUSAL_REASONS.includes(skipped.reason)) {
       if (c.validId(skipped.sessionKey) && (!state.operations[skipped.sessionKey] || state.operations[skipped.sessionKey].status === 'queued'))
         update(skipped.sessionKey, {status: 'action_required', reason: skipped.reason, title: skipped.title});
       else c.log(`Skipped: ${skipped.reason}`);

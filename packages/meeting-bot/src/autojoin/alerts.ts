@@ -19,15 +19,25 @@ import type { AutojoinConfig } from "./config.js";
 import { ALERT_KINDS, appendBotEvent, cleanBotText, type AlertKind, type BotFeedEvent } from "./bot-events.js";
 import { createBotCalendarEvent, sendAlertEmail, updateBotCalendarEvent, type AutojoinGwsRunner } from "./gws-channels.js";
 
+/** H1: one interruption of a capture. `n` is its number for the meeting, so a second interruption is a new alert and not a duplicate of the first. */
+export type InterruptionOutcome = "rejoining" | "ended" | "stopped";
+const OUTCOMES: ReadonlySet<string> = new Set<InterruptionOutcome>(["rejoining", "ended", "stopped"]);
+const LOST = "What was recorded before the interruption is lost and not kept.";
+const INTERRUPTION_NOTE: Record<InterruptionOutcome, string> = {
+  rejoining: `The recorder restarted and is rejoining the meeting. ${LOST}`,
+  ended: `The recorder restarted after the meeting had already ended, so it did not rejoin. ${LOST}`,
+  stopped: `The recorder was interrupted again and the limit of three attempts is reached. It has stopped and will not rejoin. ${LOST}`,
+};
 export interface AlertInput {
   kind: AlertKind; sessionKey: string; title: string; startTime?: string; endTime?: string;
   careerGuidance?: boolean; testData?: boolean; matchedKeywords?: string[]; detail?: string; outputPath?: string;
+  interruption?: { n: number; outcome: InterruptionOutcome };
 }
 export interface AlertDeps { cfg: AutojoinConfig; stateDir: string; tenantId: string; now: () => string; log: (m: string) => void; gws: AutojoinGwsRunner }
 
 interface AlertState {
   version: 1; done: Record<string, string>; failed: Record<string, number>; emailLog: string[];
-  failLog: string[]; digestLog: string[]; pending: { sessionKey: string; kind: AlertKind; title: string; at: string }[];
+  failLog: string[]; digestLog: string[]; pending: { sessionKey: string; kind: AlertKind; title: string; at: string; interrupted?: boolean }[];
   calendar: Record<string, { eventId: string; lastAt: string; lines: string[]; eventAt?: string; kind?: AlertKind }>;
   /** Additive version-1 field: one-shot alerts survive a transport outage/restart. */
   retries: { tenantId: string; at: string; input: AlertInput }[];
@@ -85,7 +95,8 @@ function retryInput(raw: unknown): AlertInput | undefined {
   if (!(ALERT_KINDS as readonly unknown[]).includes(r.kind) || typeof r.title !== "string" || typeof r.sessionKey !== "string"
     || !r.sessionKey || r.sessionKey.length > 150 || cleanBotText(r.sessionKey, 150) !== r.sessionKey) return undefined;
   const time = (v: unknown) => typeof v === "string" && v.length <= 40 && Number.isFinite(Date.parse(v)) ? v : undefined;
-  return { kind: r.kind, sessionKey: r.sessionKey, title: cleanBotText(r.title, 200),
+  const i = r.interruption, interruption = i && Number.isSafeInteger(i.n) && i.n > 0 && i.n < 1000 && OUTCOMES.has(i.outcome) ? { n: i.n, outcome: i.outcome } : undefined;
+  return { kind: r.kind, ...(interruption ? { interruption } : {}), sessionKey: r.sessionKey, title: cleanBotText(r.title, 200),
     startTime: time(r.startTime), endTime: time(r.endTime),
     ...(typeof r.careerGuidance === "boolean" ? { careerGuidance: r.careerGuidance } : {}),
     ...(typeof r.testData === "boolean" ? { testData: r.testData } : {}),
@@ -94,7 +105,7 @@ function retryInput(raw: unknown): AlertInput | undefined {
 }
 
 function rememberRetry(st: AlertState, a: AlertInput, at: string, retry: boolean, deps: AlertDeps): void {
-  const same = (r: AlertState["retries"][number]) => r.input.sessionKey === a.sessionKey && r.input.kind === a.kind;
+  const same = (r: AlertState["retries"][number]) => r.input.sessionKey === a.sessionKey && r.input.kind === a.kind && (r.input.interruption?.n ?? 0) === (a.interruption?.n ?? 0);
   const old = st.retries.find(same);
   st.retries = st.retries.filter(r => !same(r));
   if (!retry) return;
@@ -112,11 +123,14 @@ function saveState(file: string, s: AlertState): void {
   renameSync(`${file}.tmp`, file);
 }
 
+const labelOf = (a: { kind: AlertKind; interruption?: unknown }): string => a.interruption ? "Recorder interrupted" : LABEL[a.kind];
+
 export function describeAlert(a: AlertInput): string {
-  const lines = [`${LABEL[a.kind]}: ${cleanBotText(a.title, 200)}`];
+  const lines = [`${labelOf(a)}: ${cleanBotText(a.title, 200)}`];
   if (a.startTime) lines.push(`Scheduled: ${a.startTime}${a.endTime ? ` to ${a.endTime}` : ""}`);
   if (a.careerGuidance !== undefined) lines.push(a.careerGuidance ? `Topic: career guidance (priority)${a.matchedKeywords?.length ? `; matched: ${a.matchedKeywords.join(", ")}` : ""}` : "Topic: not career guidance (test data, staging only)");
   if (a.detail) lines.push(cleanBotText(a.detail, 300));
+  if (a.interruption) lines.push(INTERRUPTION_NOTE[a.interruption.outcome]);
   if (a.outputPath) lines.push(`Output: ${cleanBotText(a.outputPath, 260)}`);
   return lines.join("\n");
 }
@@ -169,7 +183,8 @@ async function deliverAlert(deps: AlertDeps, a: AlertInput, flushDigest: boolean
   if (a.kind === "rules-degraded" && (!st.rulesOutage || !a.sessionKey.startsWith(`${st.rulesOutage.id}:`))) {
     log("  join-rules alert refused: no matching active outage"); return { email: "invalid-outage", calendar: "invalid-outage", dashboard: "invalid-outage" };
   }
-  const key = (ch: string) => `${a.kind === "rules-degraded" && ch === "email" ? st.rulesOutage?.id ?? a.sessionKey : a.sessionKey}|${a.kind}|${ch}`;
+  const occurrence = a.interruption ? `#${a.interruption.n}` : "";
+  const key = (ch: string) => `${a.kind === "rules-degraded" && ch === "email" ? st.rulesOutage?.id ?? a.sessionKey : a.sessionKey}${occurrence}|${a.kind}|${ch}`;
   const fresh = (ch: string): boolean => !st.done[key(ch)] && (st.failed[key(ch)] ?? 0) < MAX_ATTEMPTS;
   const fail = (ch: string, err: unknown) => {
     st.failed[key(ch)] = (st.failed[key(ch)] ?? 0) + 1;
@@ -188,13 +203,13 @@ async function deliverAlert(deps: AlertDeps, a: AlertInput, flushDigest: boolean
   if (cfg.alerts.email) {
     if (!fresh("email")) res.email = "duplicate";
     else if (a.testData && !cfg.alerts.emailTestData && !FAILURE.has(a.kind)) { st.done[key("email")] = nowIso; res.email = "skipped-test-data"; }
-    else if (FAILURE.has(a.kind) && st.failLog.length >= cfg.rateLimit.failureEmailPerHour) {
-      st.pending.push({ sessionKey: a.sessionKey, kind: a.kind, title: cleanBotText(a.title, 120), at: nowIso }); st.done[key("email")] = nowIso; res.email = "digest-queued";
+    else if (FAILURE.has(a.kind) && st.failLog.length >= cfg.rateLimit.failureEmailPerHour && a.interruption?.outcome !== "stopped") { // H1: the stop alert is never held for a digest
+      st.pending.push({ sessionKey: a.sessionKey, kind: a.kind, title: cleanBotText(a.title, 120), at: nowIso, ...(a.interruption ? { interrupted: true } : {}) }); st.done[key("email")] = nowIso; res.email = "digest-queued";
       log(`  alert email: failure cap (${cfg.rateLimit.failureEmailPerHour}/hour) reached; ${a.kind} queued for the hourly digest`);
     }
     else if (a.kind !== "rules-degraded" && !FAILURE.has(a.kind) && st.emailLog.length >= cfg.rateLimit.emailPerHour) { res.email = "rate-limited"; log(`  alert email rate-limited (${cfg.rateLimit.emailPerHour}/hour): ${a.kind} not emailed this tick`); }
     else try {
-      await sendAlertEmail(deps.gws, cfg.alerts.emailTo, `[LKB bot] ${LABEL[a.kind]}: ${cleanBotText(a.title, 120)}`, text + "\n\n-- LKB bot (automatic alert)\n");
+      await sendAlertEmail(deps.gws, cfg.alerts.emailTo, `[LKB bot] ${labelOf(a)}: ${cleanBotText(a.title, 120)}`, text + "\n\n-- LKB bot (automatic alert)\n");
       st.done[key("email")] = nowIso; if (a.kind !== "rules-degraded") (FAILURE.has(a.kind) ? st.failLog : st.emailLog).push(nowIso); res.email = "sent";
     } catch (e) { fail("email", e); res.email = "failed"; }
   }
@@ -226,7 +241,7 @@ async function deliverAlert(deps: AlertDeps, a: AlertInput, flushDigest: boolean
 async function sendDigestIfDue(deps: AlertDeps, st: AlertState, now: number): Promise<boolean> {
   const { cfg } = deps;
   if (!cfg.alerts.email || st.pending.length === 0 || st.digestLog.length > 0 || now - Date.parse(st.pending[0]!.at) < DIGEST_AFTER_MS) return false;
-  const lines = st.pending.map((p) => `- ${LABEL[p.kind]}: ${p.title} (${p.at})`);
+  const lines = st.pending.map((p) => `- ${p.interrupted ? "Recorder interrupted" : LABEL[p.kind]}: ${p.title} (${p.at})`);
   try {
     const text = [`These failures exceeded the ${cfg.rateLimit.failureEmailPerHour}/hour individual email limit. Each is also on the dashboard and calendar.`, "", ...lines, "", "-- LKB bot (automatic alert)", ""].join("\n");
     await sendAlertEmail(deps.gws, cfg.alerts.emailTo, `[LKB bot] ${st.pending.length} more recording problem(s) (digest)`, text);

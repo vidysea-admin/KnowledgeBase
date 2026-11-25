@@ -8,16 +8,26 @@ const {readCaptureTags} = await import('../../../packages/meeting-bot/src/autojo
 const ID = /^[a-z0-9][a-z0-9-]{0,63}$/;
 const REASONS = new Set(['capacity-full', 'capture-slot-unavailable', 'missed-coverage', 'missed-while-processing', 'retry-limit',
   'cancelled', 'rescheduled', 'coverage-review', 'controller-disconnected', 'privacy-controller-unavailable',
-  'interrupted-no-recording-artifact', 'rule-denied', 'opted-out', 'rules-unevaluable', 'needs-registration', 'needs-review', 'admission_denied']);
+  'interrupted-no-recording-artifact', 'rule-denied', 'opted-out', 'rules-unevaluable', 'needs-registration', 'needs-review', 'admission_denied',
+  'interrupted-rejoining', 'interrupted-ended']);
 /** D-236 A3: a reason is a listed name, or starts with one followed by an ASCII character that is not a letter, digit or underscore (`name: text`, `name - text`). A hyphen glued to the name is not a delimiter (`rescheduled-completed` is a different value). */
 const reasonName = reason => typeof reason === 'string' ? [...REASONS].find(name => reason === name ||
   reason.startsWith(name) && /[\x00-\x2c\x2e\x2f\x3a-\x40\x5b-\x5e\x60\x7b-\x7f]/.test(reason[name.length])) : undefined;
+/** H1: an interruption outcome is mailed only while the row still shows the state that outcome produced (a stale marker never relabels a later failure). */
+const INTERRUPTION_STATE = {rejoining: ['queued', 'interrupted-rejoining'], ended: ['action_required', 'interrupted-ended'], stopped: ['action_required', 'retry-limit']};
+const interruptionOf = row => {
+  const {n, outcome} = row.interruption ?? {}, [status, reason] = INTERRUPTION_STATE[outcome] ?? [];
+  return Number.isSafeInteger(n) && n > 0 && row.status === status && row.reason === reason ? {n, outcome} : undefined;
+};
+/** Identity of one alert in the durable outbox: an interruption is told apart by its number, every other alert by session and kind alone. */
+const alertKey = alert => `${alert.sessionKey}:${alert.kind}${alert.interruption ? `#${alert.interruption.n}` : ''}`;
 const LIMIT = 50, REPLAY = 25, LOOKBACK = 2 * 24 * 60 * 60 * 1000;
 const HANDOFF = new Set(['sent', 'duplicate', 'disabled', 'digest-queued', 'skipped-test-data', 'created', 'updated', 'skipped-no-times', 'superseded']);
 
 export function canonicalOperationAlert(id, row, tags = {}, event) {
   if (!ID.test(id)) return;
-  const kind = event === 'capture-started' ? event : row.status === 'ready' ? 'capture-done'
+  const interruption = interruptionOf(row);
+  const kind = event === 'capture-started' ? event : interruption ? 'capture-failed' : row.status === 'ready' ? 'capture-done'
     : row.status === 'failed' ? 'capture-failed' : row.status === 'action_required' ? row.stopDisposition ? 'capture-stopped-early' : 'capture-failed'
     : row.status === 'queued' && ['capacity-full', 'capture-slot-unavailable'].includes(row.reason) ? 'coverage-deferred' : undefined;
   if (!kind) return;
@@ -27,6 +37,7 @@ export function canonicalOperationAlert(id, row, tags = {}, event) {
     startTime: row.startTime, endTime: row.endTime,
     careerGuidance, testData,
     ...(kind === 'capture-done' ? {outputPath: `data/toc-migrated/${id}`} : {}),
+    ...(interruption && kind === 'capture-failed' ? {interruption} : {}),
     ...(row.reason || row.reason === '' ? {detail: reasonName(row.reason) ? `Coverage: ${reasonName(row.reason)}.` : 'Coverage requires review.'} : {})};
 }
 
@@ -58,10 +69,11 @@ export function createCanonicalAlerts({state, tenantId, autojoin, flush, assertO
       ...(typeof input.careerGuidance === 'boolean' ? {careerGuidance: input.careerGuidance} : {}),
       ...(typeof input.testData === 'boolean' ? {testData: input.testData} : {}),
       ...(typeof input.detail === 'string' ? {detail: cleanBotText(input.detail, 300)} : {}),
-      ...(typeof input.outputPath === 'string' ? {outputPath: cleanBotText(input.outputPath, 260)} : {})};
-    const key = `${snapshot.sessionKey}:${snapshot.kind}`;
+      ...(typeof input.outputPath === 'string' ? {outputPath: cleanBotText(input.outputPath, 260)} : {}),
+      ...(input.interruption ? {interruption: input.interruption} : {})};
+    const key = alertKey(snapshot);
     const outbox = Array.isArray(row.schedulerAlertOutbox) ? row.schedulerAlertOutbox : [];
-    const changed = !outbox.some(saved => saved?.sessionKey === snapshot.sessionKey && saved?.kind === snapshot.kind);
+    const changed = !outbox.some(saved => saved && alertKey(saved) === key);
     if (changed) {
       if (outbox.length >= 8) {log('Scheduler durable alert backlog full; coverage requires review'); throw new Error('Scheduler alert outbox capacity reached');}
       assertOwned(); row.schedulerAlertOutbox = [...outbox, snapshot];
@@ -71,7 +83,7 @@ export function createCanonicalAlerts({state, tenantId, autojoin, flush, assertO
       if (!result || !['email', 'dashboard', 'calendar'].every(channel => HANDOFF.has(result[channel]))) return;
       assertOwned(); const latest = carrier(collection, id);
       if (!latest || collection === 'operations' && latest.tenantId !== tenantId) return;
-      latest.schedulerAlertOutbox = (latest.schedulerAlertOutbox ?? []).filter(saved => `${saved.sessionKey}:${saved.kind}` !== key);
+      latest.schedulerAlertOutbox = (latest.schedulerAlertOutbox ?? []).filter(saved => alertKey(saved) !== key);
       save();
     })};
   };
