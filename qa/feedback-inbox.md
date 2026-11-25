@@ -249,3 +249,77 @@ Current mounted caller evidence remains gated by explicit ROUTE_FREEZE; T022 hum
 
 Architecture feedback for checker adoption — public Ask vectorless boundary (root-authorized 2026-10-15): active public /ask must never invoke embedding, vector-storage or legacy retrieval ports, including when configured vectorless:false and with an installed embedding port. Canonical current-authority HTTP acceptance requires 200, exact source citation and zero embedding/vector/legacy-factory counters. Pure low-level vector adapter implementations/tests may remain dormant. The preserved qa/evidence/ask-graph-selection/legacy-http-diagnostic.test.ts keeps its original expected-one-embedding assertion and is an architecture-incompatible historical diagnostic, never evidence of current architecture PASS. Only checker may adopt this feedback into contracts; maker changed no qa/contracts file.
 2026-10-31 · maker 6c-wa-wave3 · PATTERN: on this host (C: full, pagefile cannot grow) a full suite at default runner parallelism dies out-of-memory and looks like ~20 product reds; run api with --test-concurrency=6 and vitest with --maxWorkers=4. Also the api test run writes untracked apps/api/qa/evidence/goal-t059-maker/rows.json into the tree, which blocks --stamp-6c-green in that worktree · EVIDENCE: qa/verdicts/prepush-wa-wave3.md (cf244ceb) · APPLIES NEXT: every 6c/backstop full suite here; the rows.json writer should target a temp dir
+
+## 2026-11-25 - Umesh (approved plan, D-227) - 17 acceptance checks for go-live — folded 2026-11-25 (checker Mode B fold-in, no sweep) → `qa/contracts/go-live-acceptance.md` [G01-G17, LIVE-ONLY, GI1-GI8]; unit dependencies in live-verify-script.md, ask-condition-fidelity.md, pairwise-answer-judge.md, extraction-scoring-harness.md
+Source: Umesh, approved plan of 2026-11-25 (decision D-227). Plan file: C:\Users\Lenovo\.claude\plans\meeting-bot-imperative-starfish-of-3fb8d78b-cac7-406e-9e13-fe76f3d5cd42.md, section 4.
+
+These 17 rows are the acceptance checks for the plan approved on 2026-11-25 (D-227). /checker folds each row into the matching contract. One check per feature. Findings outside a row are filed, not built. Consent stays out of scope (D-210).
+
+| # | Feature | The single check |
+|---|---|---|
+| 1 | Public web, sign-in, Ask | From a phone on mobile data at `https://kb.vidysea.com/knowledgebase`: a new person signs up, the admin approves them as viewer, they sign in, ask the pinned UC question, get a citation with speaker and start/end time, open the cited turn, sign out. The viewer cannot open admin, ingest, WhatsApp or meeting-bot pages. Scripted in `scripts/live-verify.mjs --base …` |
+| 2 | Old link | `www.vidysea.com/knowledgebase/…` redirects to the same path on the kb host |
+| 3 | Waiver defect | The 14 archived UC probes and the checker's failing cases in `qa/verdicts/kb-ask-web-grounding-repair.md` pass; one live UC retest |
+| 4 | All 23 sessions | 23 of 23 eligible; the 23 per-session controls and the 36 questions for the nine sessions pass (D-221) |
+| 5 | Retrieval | `scripts/eval-recall.mjs` on `data/eval/golden-set.json`: above the new baseline, zero questions lost |
+| 6 | Web fallback | One live outside-knowledge question is answered, or returns an explicit "answered from our sessions only", never an error shown as "stale" |
+| 7 | Bot joins and records | One real Meet joined by the Cloud Run bot with nobody clicking; a non-empty recording in the bucket; the session indexed into `MONGO_WORK_DB`. Then one calendar event starts a capture by itself |
+| 8 | Bot refusal | The host refuses the bot: the capture ends in under 30 s with `admission_denied`, no zero-byte file, one alert mail |
+| 9 | Calendar | Hosted `GET /calendar/upcoming` returns 200 with Umesh's next meeting within 10 minutes; the Calendar page shows it |
+| 10 | Auto-registration | The bot registers for one real public webinar; the confirmation mail arrives |
+| 11 | WhatsApp linking | Umesh scans the QR on the hosted link screen; one group message appears in the archive database |
+| 12 | WhatsApp into the knowledge base | A message sent in a tracked group shows on the hosted WhatsApp page without a manual run |
+| 13 | Speaker names | 100 citations from the 92-question replay plus 30 claims, audited by a second reviewer: 0 wrong names; at least 85% of cited turns show a confirmed full name |
+| 14 | Claims | At least 90% of claims cited in the 92-question replay are human-verified or machine-checked; the 300-claim audit meets the approved bar |
+| 15 | Counsellor page | On the deployed build: 10 scripted questions, each with a named-speaker citation whose click lands on the cited turn, at least one real microphone turn spoken back. 10 of 10 |
+| 16 | Championship rehearsal | 92 of 92 questions frozen, answered, baselined and judged on a work copy |
+| 17 | Database hardening | Rehearsal: the check in row 1 passes through an authenticated connection; unauthenticated `listDatabases` is refused; the app user cannot read other databases |
+
+## 2026-11-25 - Umesh (approved plan, D-227) - unit-level checks for wave 1 — folded 2026-11-25 (checker Mode B fold-in, no sweep) → L1 `live-verify-script.md` · L2 `api-rate-limit.md` · F0 `cloud-build-deploy.md` · F1 `ask-condition-fidelity.md` · D4 `pairwise-answer-judge.md` · D2 `extraction-scoring-harness.md`; maker-reading dispositions in each file's amendment log (rejected: F0 `latest` tag, D4 name-scrubbing)
+
+Source: plan file `C:\Users\Lenovo\.claude\plans\meeting-bot-imperative-starfish-of-3fb8d78b-cac7-406e-9e13-fe76f3d5cd42.md`, sections 6 and 7, approved by Umesh on 2026-11-25 (D-227). Text in quotes is the plan's own wording. Lines under "Maker reading" are the maker's interpretation, NOT Umesh's words; the checker decides whether each becomes a criterion.
+
+### L1 - live check script (plan section 6)
+"Extend `scripts/live-verify.mjs` with `--base` and the env names `LKB_LIVE_EMAIL`, `LKB_LIVE_PASSWORD`" - check: "runs green against the test tag".
+Maker reading:
+- [L1-a] `node scripts/live-verify.mjs --base <origin-with-base-path>` targets that deployment; without `--base` the script behaves as today.
+- [L1-b] With `LKB_LIVE_EMAIL` and `LKB_LIVE_PASSWORD` set the script signs in through the session login route and runs its checks as that user; the password never appears in argv, stdout, stderr or any written file; missing credentials when sign-in is needed give a clear non-zero exit.
+- [L1-c] In signed-in mode the script covers the scripted part of launch row 1: ask the pinned UC question and assert a citation carrying a speaker and start/end time; open the cited turn; assert a viewer is refused on admin, ingest, WhatsApp and meeting-bot routes; sign out and assert the session is gone. Non-zero exit if any step fails; one PASS/FAIL line per step.
+
+### L2 - per-user rate limit (plan section 6)
+"The one code fix before launch. `apps/api/src/rate-limit.ts` `createRateLimiter` keys on `tenantId`, so all signed-in users share one bucket of 60 per minute (a 429 from a single admin browsing is in `qa/evidence/cloud-run-visible-admin-20261125.md`). Key it on the user for session principals. Branch `release/kb-golive` off `a9bbeb98`. Touches auth: full manifest, one fresh checker" - check: "unit tests plus a two-user probe on the tagged URL".
+Maker reading:
+- [L2-a] For a session principal the bucket key is the user: two signed-in users of one tenant each get the full per-minute allowance, and user A exhausting theirs never gives user B a 429.
+- [L2-b] Every other principal kind keeps today's key and limits exactly (API-key principals, unauthenticated requests). No route loses rate limiting; the per-minute number is unchanged.
+- [L2-c] The key comes from the authenticated session, never from a header, query or body value, and includes the tenant so two users can never collide across tenants.
+
+### F0 - build config for master pushes (plan section 7, lane A)
+"Make master pushes safe. New file: root `cloudbuild.yaml` that builds both targets and runs the two-container deploy" - check: "a throwaway tagged deploy from the trigger keeps both containers". Stage 0 correction: the trigger runs an inline four-step config (it does not auto-detect the Dockerfile); the unit is unchanged in substance.
+Maker reading:
+- [F0-a] `cloudbuild.yaml` builds the Dockerfile twice (`--target web`, `--target api`), tags each image with the commit sha and `latest`, pushes both, and keeps the inline config's build-arg, cache and labels.
+- [F0-b] The deploy step sets the image of BOTH named containers of the service in one revision and changes nothing else.
+- [F0-c] No new required substitution beyond the trigger's existing ones; optional substitutions with safe defaults allow a tagged, no-traffic throwaway run.
+- [F0-d] A test parses the file and asserts the two builds, two pushes, one two-container deploy, and that every substitution is the trigger's or has a default.
+
+### F1 - waiver defect (plan section 7, lane A)
+"Waiver defect. Cause as far as the code shows: the school-specific condition is lost between excerpt hydration and answer generation (D-219 found excerpts that split sentences; `def9078d` fixed only wording). Feed the full speaker turn as the evidence unit in `packages/ask/src/answer.ts` and `ask-v2.ts`; add a gate in `apps/api/src/answer-policy/answer-evidence.ts`: when the cited turn carries a condition and the answer drops it, hold the answer" - check (row 3): "The 14 archived UC probes and the checker's failing cases in `qa/verdicts/kb-ask-web-grounding-repair.md` pass; one live UC retest".
+Maker reading:
+- [F1-a] The text given to answer generation for a cited turn is the whole speaker turn, never a fragment that cuts a sentence or drops the clause carrying the condition.
+- [F1-b] When a cited turn states a rule with a scope or condition and the answer states the rule without it, the answer is held through the existing hold path; an answer that keeps the condition passes; an answer citing an unconditional turn is not held.
+- [F1-c] A standing regression test re-runs, verbatim, the 14 archived UC probes and every failing case in the verdict above from their recorded inputs; the manifest reports the count against that corpus by id; an open case is named with its reason (D-015).
+
+### D4 - pairwise answer judge (plan section 7, lane D)
+"two model judges, blind and order-swapped (`scripts/eval/llm-eval.mjs` extended with a pairwise prompt); output = win rate with a confidence interval."
+Maker reading:
+- [D4J-a] A pairwise mode takes items {id, question, answerA, answerB}; the prompt never reveals which side is the AI or the human, a source name, a session id or a speaker name.
+- [D4J-b] Every (item, judge) is asked twice with the order swapped; the result is A or B only when both orders agree, otherwise `inconsistent` (counted as a tie); a failed or unparseable reply is `error`, never a win.
+- [D4J-c] Output per judge and combined: counts A / B / tie / inconsistent / error, win rate of side A over decided items with a 95% confidence interval (method named), the judges' agreement rate, the position-inconsistency rate.
+- [D4J-d] Existing modes and tests unchanged; tests make no network call (stub judges, including one that always prefers the first position).
+
+### D2 - extraction scoring harness (plan section 7, lane D)
+"State: the scoring harness exists (`packages/index/src/eval/extraction.ts` `evaluateExtractionCase`, `scripts/eval-extraction.mjs`) but scores 72 local claims with no accepted gold set and no thresholds." "Thresholds proposed for Umesh's approval: 0 fabricated citations; claim support at least 95%; machine-checked tier at least 98%; fact coverage at least 70%; topics 90% precision and 70% recall; decisions 85% and 70%; 0 false decisions on no-decision sessions."
+Maker reading:
+- [D2H-a] `scripts/eval-extraction.mjs --gold <path>` scores against a human gold set in the review tooling's export shape and reports each metric named above with numerator and denominator.
+- [D2H-b] `--thresholds <path>` reads the bar from a file; the run exits non-zero when a measured metric misses it; the proposed numbers ship in a file marked proposed, not approved; nothing in code hard-codes them.
+- [D2H-c] A metric whose inputs are absent is reported `not-measured`, never 0 or 100, and fails the run only if the thresholds file marks it required.
+- [D2H-d] Where two reviewers labelled the same claim the harness reports their agreement rate; without `--gold` the script behaves as today.
