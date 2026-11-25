@@ -1,0 +1,75 @@
+CONTROL (scratch copy of HEAD, unmutated): red=[] error=null
+M01 C1 [Dockerfile] patch step gets `|| true`
+   red after: [C1,C2,C7] expected [C1,C2,C7] extra [] -> KILLED; restored bytes=true hash=true green-again=true
+   C1: bypass on the patch line: /\|\|/ /\|/ | C2: final node_modules is not patched: node_modules copied from build: reinstall at: RUN npm ci | C7: bypass on the patch line: /\|\|/ /\|/
+M02 C1 [Dockerfile] build stage tag becomes latest
+   red after: [C1] expected [C1] extra [] -> KILLED; restored bytes=true hash=true green-again=true
+   C1: FROM node:latest: latest
+M03 C1 [Dockerfile] `npm ci` becomes `npm install`
+   red after: [C1] expected [C1] extra [] -> KILLED; restored bytes=true hash=true green-again=true
+   C1: build stage has no `npm ci`; an `npm install|i|add` appears in the build stage; `npm install` in: RUN npm inst
+M04 C1 [Dockerfile] patch step moved after `npm run build`
+   red after: [C1] expected [C1] extra [] -> KILLED; restored bytes=true hash=true green-again=true
+   C1: the patch step does not come before `npm run build`
+M05 C2 [Dockerfile] final node_modules reinstalled with `npm ci --omit=dev` instead of copied (unpatched)
+   red after: [C2,C4] expected [C2,C4] extra [] -> KILLED; restored bytes=true hash=true green-again=true
+   C2: final node_modules is not patched: reinstall at: RUN npm ci --omit=dev | C4: final stage does not copy node_modules
+M06 C2 [Dockerfile] a bare `npm ci --omit=dev` after the copy in the final stage
+   red after: [C2] expected [C2] extra [] -> KILLED; restored bytes=true hash=true green-again=true
+   C2: final node_modules is not patched: reinstall at: RUN npm ci --omit=dev
+M07 C3 [Dockerfile] `USER node` becomes `USER root`
+   red after: [C3] expected [C3] extra [] -> KILLED; restored bytes=true hash=true green-again=true
+   C3: last USER is root/0: root
+M08 C3 [Dockerfile] a chmod after the last USER
+   red after: [C3] expected [C3] extra [] -> KILLED; restored bytes=true hash=true green-again=true
+   C3: chown/chmod after the last USER: RUN chmod -R a+rwx /app
+M09 C3 [Dockerfile] USER instruction removed
+   red after: [C3] expected [C3] extra [] -> KILLED; restored bytes=true hash=true green-again=true
+   C3: no USER instruction in the final stage
+M10 C4 [.dockerignore] `sessions` removed from .dockerignore
+   red after: [C4] expected [C4] extra [] -> KILLED; restored bytes=true hash=true green-again=true
+   C4: .dockerignore does not exclude sessions/x.json; .dockerignore does not list sessions
+M11 C4 [.dockerignore] `patches` added to .dockerignore (build input hidden)
+   red after: [C4] expected [C4] extra [] -> KILLED; restored bytes=true hash=true green-again=true
+   C4: .dockerignore hides patches, which the build needs; .dockerignore hides patches/apply-baileys-patch.mjs, which
+M12 C4 [Dockerfile] a `COPY .env` is added to the build stage
+   red after: [C4,C6] expected [C4,C6] extra [] -> KILLED; restored bytes=true hash=true green-again=true
+   C4: COPY names .env | C6: COPY of a credentials-looking file: .env
+M13 C4 [Dockerfile] `npm prune --omit=dev` removed (dev dependencies reach the image)
+   red after: [C4] expected [C4] extra [] -> KILLED; restored bytes=true hash=true green-again=true
+   C4: node_modules is not production-only (no `npm prune --omit=dev` after the install in the source stage, no `--om
+M14 C4 [Dockerfile] final stage also copies web/
+   red after: [C4] expected [C4] extra [] -> KILLED; restored bytes=true hash=true green-again=true
+   C4: COPY names /app/web; final stage copies /app/web (allowed: dist, node_modules, package.json)
+M15 C5 [Dockerfile] CMD in shell form
+   red after: [C5] expected [C5] extra [] -> KILLED; restored bytes=true hash=true green-again=true
+   C5: CMD is shell form: node dist/index.js
+M16 C5 [Dockerfile] CMD becomes `npm start`
+   red after: [C5] expected [C5] extra [] -> KILLED; restored bytes=true hash=true green-again=true
+   C5: CMD is ["npm","start"], not ["node","dist/index.js"]
+M17 C5 [Dockerfile] a HEALTHCHECK is added
+   red after: [C5] expected [C5] extra [] -> KILLED; restored bytes=true hash=true green-again=true
+   C5: HEALTHCHECK present: HEALTHCHECK CMD curl -f http://localhost:8080/svc/v1/health || exit 1
+M18 C5 [Dockerfile] EXPOSE 3000 while ENV PORT=8080
+   red after: [C5] expected [C5] extra [] -> KILLED; restored bytes=true hash=true green-again=true
+   C5: EXPOSE 3000 does not match ENV PORT (8080)
+M19 C6 [Dockerfile] ENV SERVICE_API_TOKEN with a value
+   red after: [C6] expected [C6] extra [] -> KILLED; restored bytes=true hash=true green-again=true
+   C6: ENV matches the secret pattern: ENV SERVICE_API_TOKEN=<hidden>; ENV names SERVICE_API_TOKEN with a value
+M20 C6 [Dockerfile] ARG MONGO_URI with a value
+   red after: [C6] expected [C6] extra [] -> KILLED; restored bytes=true hash=true green-again=true
+   C6: ARG matches the secret pattern: ARG MONGO_URI=<hidden>; ARG names MONGO_URI with a value
+M21 C7 [Dockerfile] patch step followed by `; true`
+   red after: [C1,C2,C7] expected [C1,C2,C7] extra [] -> KILLED; restored bytes=true hash=true green-again=true
+   C1: bypass on the patch line: /;/ | C2: final node_modules is not patched: node_modules copied from build: reinstall at: RUN npm ci | C7: bypass on the patch line: /;/
+M22 C7 [Dockerfile] `COPY patches ./patches` removed (patch step cannot see its patch)
+   red after: [C7] expected [C7] extra [] -> KILLED; restored bytes=true hash=true green-again=true
+   C7: patches is not copied into the build stage before the patch step
+M23 I3 [Dockerfile] a 44-character token-like string in a comment
+   red after: [I3] expected [I3] extra [] -> KILLED; restored bytes=true hash=true green-again=true
+   I3: a 40+ character token-like string
+WORKTREE hash==HEAD blob: Dockerfile:true .dockerignore:true; git status --short: (empty)
+M24 C2 (dynamic) build stage without the patch step: sim exit=1; MARKER socket.js=0 messages-recv.js=0 -> KILLED
+M24 control (unmutated Dockerfile, same context): sim exit=0; MARKER socket.js=1 messages-recv.js=1 -> GREEN
+M24 Dockerfile hash==HEAD blob: true
+SUMMARY mutants=23+1 dynamic problems=0

@@ -1,0 +1,10 @@
+FAIL C3C-C1 no Dockerfile at D:\KnowledgeBase\.worktrees\wa-c2\Dockerfile
+FAIL C3C-C2 no Dockerfile at D:\KnowledgeBase\.worktrees\wa-c2\Dockerfile
+FAIL C3C-C3 no Dockerfile at D:\KnowledgeBase\.worktrees\wa-c2\Dockerfile
+FAIL C3C-C4 no Dockerfile at D:\KnowledgeBase\.worktrees\wa-c2\Dockerfile
+FAIL C3C-C5 no Dockerfile at D:\KnowledgeBase\.worktrees\wa-c2\Dockerfile
+FAIL C3C-C6 no Dockerfile at D:\KnowledgeBase\.worktrees\wa-c2\Dockerfile
+FAIL C3C-C7 no Dockerfile at D:\KnowledgeBase\.worktrees\wa-c2\Dockerfile
+exit=1
+be5a090 wa-baileys-patch (C2) repair: typecheck fixes in the new tests
+0

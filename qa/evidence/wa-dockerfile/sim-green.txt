@@ -1,0 +1,27 @@
+--- replay log ---
+COPY package.json -> /app/
+COPY package-lock.json -> /app/
+COPY tsconfig.json -> /app/
+COPY patches -> /app/patches
+RUN npm ci (stage 0) -> exit 0 in 19s
+RUN npm run patch:baileys (stage 0) -> exit 0 in 3s
+COPY src -> /app/src
+RUN npm run build (stage 0) -> exit 0 in 5s
+RUN npm prune --omit=dev (stage 0) -> exit 0 in 5s
+COPY --from=build /app/package.json -> /app/package.json
+COPY --from=build /app/node_modules -> /app/node_modules
+COPY --from=build /app/dist -> /app/dist
+--- RUN lines not executed (not npm, or compound) ---
+(none)
+--- final stage inspection ---
+MARKER socket.js=1 messages-recv.js=1
+ls -A /app: dist node_modules package.json
+lock marks 62 packages dev-only (e.g. typescript, tsx, esbuild, @types/express); present in final node_modules: none; typescript present: false; tsx present: false
+dist/index.js present: true
+forbidden entries in /app: none
+START node dist/index.js (PORT=18099, no secrets, MONGO_URI=loopback port 1): exit=1 signal=none after 18.1s
+START log (first 6 lines, truncated):
+{"level":50,"time":1795611710023,"pid":24392,"hostname":"LAPTOP-AC7NCA4G","err":{"type":"MongoServerSelectionError","message":"connect ECONNREFUSED 127.0.0.1:1: connect ECONNREFUSED 127.0.0.1:1: connect ECONNREFUSED 127.
+START module-resolution errors: none
+ls -A /app after start: dist node_modules package.json
+SIM-PASS

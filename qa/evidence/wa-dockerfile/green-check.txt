@@ -1,0 +1,8 @@
+PASS C3C-C1 2 stages, all FROM tagged, ci -> patch -> build in stage 0, no bypass
+PASS C3C-C2 final stage node_modules: node_modules copied from build: patch step ran
+PASS C3C-C3 last USER node, no chown/chmod after it
+PASS C3C-C4 no forbidden COPY source; final stage copies dist, node_modules, package.json only; node_modules pruned; .dockerignore lists all nine, hides no build input
+PASS C3C-C5 start is ["node","dist/index.js"] in exec form; ENV PORT=8080; no HEALTHCHECK; EXPOSE none
+PASS C3C-C6 no ENV/ARG/RUN secret assignment, none of the four names with a value, no credentials COPY
+PASS C3C-C7 patch line has no bypass; patches/, package.json, package-lock.json copied before it
+PASS C3C-I3 no token-like string, key block, credentialed URI or bearer value in either file
