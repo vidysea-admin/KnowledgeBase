@@ -5,8 +5,8 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { once } from "node:events";
 import express from "express";
-import { isValidTenantId, requireAuth, type SessionAuthenticator, type VerifiedKey } from "./auth.js";
-import { createRateLimiter, type RateLimitOptions } from "./rate-limit.js";
+import { isValidTenantId, requireAuth, type SessionAuthenticator, type VerifiedKey } from "../auth.js";
+import { createRateLimiter, type RateLimitOptions } from "../rate-limit.js";
 
 /**
  * Stand-in for the cookie authenticator: the header "x-test-session" (JSON [tenant, user, sessionId?]) plays the role of a valid

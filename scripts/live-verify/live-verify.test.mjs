@@ -2,7 +2,7 @@
 // The script is spawned as a real child process against a local stub HTTP server that enforces what the real API enforces on the
 // routes in play: the session cookie, the CSRF proof on unsafe methods, the role -> scope table (roles.ts) and the viewer read-only
 // guard (viewer-guard.ts). Nothing here reaches a deployed URL, a database or `lkb_prod`.
-// Run: node --test --import tsx scripts/live-verify.test.mjs
+// Run: node --test --import tsx scripts/live-verify/live-verify.test.mjs
 import assert from "node:assert/strict";
 import { spawn } from "node:child_process";
 import { randomUUID } from "node:crypto";
@@ -13,11 +13,11 @@ import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import test from "node:test";
 import { fileURLToPath } from "node:url";
-import { csrfTokenFor } from "../apps/api/src/user-accounts/csrf.ts";
-import { ROLE_SCOPES } from "../apps/api/src/user-accounts/roles.ts";
-import { isReadLikePost } from "../apps/api/src/user-accounts/viewer-guard.ts";
+import { csrfTokenFor } from "../../apps/api/src/user-accounts/csrf.ts";
+import { ROLE_SCOPES } from "../../apps/api/src/user-accounts/roles.ts";
+import { isReadLikePost } from "../../apps/api/src/user-accounts/viewer-guard.ts";
 
-const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
+const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..", "..");
 const SCRIPT = join(ROOT, "scripts", "live-verify.mjs");
 const API_PATH = "/knowledgebase/api";
 const UC_SESSION = "2026-07-03-inside-the-uc-session";
@@ -284,7 +284,7 @@ test("a base that is not an http(s) URL exits non-zero with a clear message and 
 });
 
 test("the pinned question is read from the committed file, not written inline in the script [L1-C3]", async () => {
-  const pinned = JSON.parse(readFileSync(join(ROOT, "scripts", "live-verify.pinned-question.json"), "utf8"));
+  const pinned = JSON.parse(readFileSync(join(ROOT, "scripts", "live-verify", "live-verify.pinned-question.json"), "utf8"));
   const stub = await startStub();
   const r = await runScript(["--base", stub.base], creds);
   try {

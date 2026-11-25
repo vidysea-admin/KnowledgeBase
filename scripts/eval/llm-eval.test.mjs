@@ -127,7 +127,7 @@ test("helpers: limitByQuestion, redactor, latencySummary", () => {
 import { mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { buildPairwisePrompt, parsePairwiseChoice, wilsonInterval, loadPairwiseItems, runPairwise, runPairwiseFile, formatPairwiseSummary, parsePairwiseArgs, createPairwiseJudge } from "./llm-eval.mjs";
+import { buildPairwisePrompt, parsePairwiseChoice, wilsonInterval, loadPairwiseItems, runPairwise, runPairwiseFile, formatPairwiseSummary, parsePairwiseArgs, createPairwiseJudge } from "./pairwise/pairwise-judge.mjs";
 
 /** Which position (1 or 2) holds the answer containing `token`, read from the blind user prompt; undefined if neither. */
 const positionOf = (user, token) => {
@@ -402,7 +402,7 @@ test("D4J-C5 pairwise flags: --llm is required; the cap is the total over items 
   const dir = mkdtempSync(join(tmpdir(), "pairwise-cap-"));
   const f = join(dir, "items.json");
   writeFileSync(f, JSON.stringify([pitem("a", true), pitem("b", true), pitem("c", true)]));
-  const run = (cap) => spawnSync(process.execPath, [fileURLToPath(new URL("./llm-eval.mjs", import.meta.url)), "--pairwise", f, "--llm", "--judge-1", "ollama:m1", "--judge-2", "gemini:m2", "--max-calls", String(cap), "--out", join(dir, "o.json")],
+  const run = (cap) => spawnSync(process.execPath, [fileURLToPath(new URL("./pairwise/pairwise-judge.mjs", import.meta.url)), "--pairwise", f, "--llm", "--judge-1", "ollama:m1", "--judge-2", "gemini:m2", "--max-calls", String(cap), "--out", join(dir, "o.json")],
     { encoding: "utf8", env: { ...process.env, OLLAMA_API_KEY: "k-123456", GEMINI_API_KEY: "g-123456" }, timeout: 60000 });
   const refused = run(11);
   assert.equal(refused.status, 2);

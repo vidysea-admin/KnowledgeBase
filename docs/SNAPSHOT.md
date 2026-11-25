@@ -78,6 +78,7 @@ Read next: `docs/HLD.md` (pipeline stage status, deployment) and `docs/LLD.md` (
   - `scripts/demo/`
   - `scripts/eval/`
   - `scripts/lib/`
+  - `scripts/live-verify/`
   - `scripts/native-capture/`
   - `scripts/operations/`
   - `scripts/qa/`
