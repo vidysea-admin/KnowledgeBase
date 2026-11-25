@@ -129,4 +129,4 @@ Not UI-touching. No real mail, `gws`, network, browser or meeting was used. The 
 (iii) No test uses a real child process or pipe, so the claim that stderr stays drained rests on a fake emitter (B10-C7d floods about 6.5 MB through it).
 (iv) Unsure: a page-set `capture-error` text starting with `admission_denied` (record-commands.ts:127) could label a failure as admission_denied; not examined further here.
 
-## Status: ready-for-check
+## Status: checked-PASS
