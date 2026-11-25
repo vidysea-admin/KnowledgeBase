@@ -1,5 +1,5 @@
 # Manifest — structure-lint-repair
-**Status:** ready-for-check
+**Status:** checked-PASS
 **Contract:** none (repair authorized by D-237 on release/kb-golive; acceptance criteria SL-1..SL-5 below are the brief's, fixed)
 **Goal task:** none (release integration branch repair)
 **Date:** 2026-11-25
