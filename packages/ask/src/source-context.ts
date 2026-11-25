@@ -53,6 +53,9 @@ export interface SourceHydration {
   excludedTurns?: ExcludedSourceTurn[];
   /** Optional: live turn text for proof recomputation. Same canonicalization as the proof producer (raw UTF-8 sha256, UTF-16 char offsets, UTF-8 byte offsets of the prefix). */
   liveTurns?: LiveSourceTurn[];
+  /** F1B-C1: turns the hydrator read and validated in scope but left out of `liveTurns` only for size (over the per-turn cap). Their quotes stay as
+   * excerpt evidence that is not whole, so an answer citing one is held; a turn missing from `liveTurns` for any other reason is still stale. */
+  overCapTurns?: Omit<LiveSourceTurn, "text">[];
   nodes: TreeIndexNode[];
   snapshotSHA256: string;
   sourceBytes: number;
@@ -95,9 +98,9 @@ const hash = (value: unknown): value is string => typeof value === "string" && /
 const text = (value: unknown): value is string => typeof value === "string" && value.trim().length > 0;
 const sha256 = (value: string): string => createHash("sha256").update(value, "utf8").digest("hex");
 /** Returns a stale-proof reason, or null when the proof matches the live turn text. */
-function staleQuoteProof(q: SourceQuote, live: Map<string, string>): string | null {
-  const turnText = live.get(JSON.stringify([q.sessionRef, q.turnId]));
-  if (turnText === undefined) return "quote-proof-stale: live turn missing";
+function staleQuoteProof(q: SourceQuote, live: Map<string, string>, overCap: Set<string>): string | null {
+  const key = JSON.stringify([q.sessionRef, q.turnId]), turnText = live.get(key);
+  if (turnText === undefined) return overCap.has(key) ? null : "quote-proof-stale: live turn missing";
   if (sha256(turnText) !== q.turnTextSHA256) return "quote-proof-stale: turn text hash differs";
   if (q.charEnd > turnText.length) return "quote-proof-stale: offsets out of range";
   const slice = turnText.slice(q.charStart, q.charEnd);
@@ -157,6 +160,10 @@ export function validateHydration(result: SourceHydration, admitted: TreeIndexNo
   if (live && !result.liveTurns!.every((t) => text(t?.sessionId) && text(t?.turnId) && typeof t.text === "string")) {
     throw new BoundedAskError("invalid live turn text");
   }
+  if (result.overCapTurns !== undefined && (!Array.isArray(result.overCapTurns) || !result.overCapTurns.every((t) => text(t?.sessionId) && text(t?.turnId)))) {
+    throw new BoundedAskError("invalid over-cap turn list");
+  }
+  const overCap = new Set((result.overCapTurns ?? []).map((t) => JSON.stringify([t.sessionId, t.turnId])));
   const kept: TreeIndexNode[] = [];
   for (const node of result.nodes) {
     const original = originals.get(node.node_id);
@@ -199,7 +206,7 @@ export function validateHydration(result: SourceHydration, admitted: TreeIndexNo
     // Recompute against live turn text; a stale citation is excluded (never cited) with a per-citation reason.
     const good: SourceEvidenceQuote[] = [];
     for (const q of quotes) {
-      const reason = isNativeSourceQuote(q) ? null : staleQuoteProof(q, live);
+      const reason = isNativeSourceQuote(q) ? null : staleQuoteProof(q, live, overCap);
       if (!reason) { good.push(q); continue; }
       const sq = q as SourceQuote;
       (result.excludedTurns ??= []).push({ sessionId: sq.sessionRef, turnId: sq.turnId, reason });

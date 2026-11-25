@@ -7,6 +7,7 @@ import { parseJsonLoose } from "@lkb/ai";
 import type { CompleteFn } from "./select-nodes.js";
 import { packContext, type ContextSource, type ContextStrip } from "./bounded-refine.js";
 import { AnswerAbstainError, BoundedAskError, type LiveSourceTurn, type SourceQuote } from "./source-context.js";
+import type { AskV2Result } from "./ask-shared.js";
 
 /** F1 (ask-condition-fidelity C2): the answer is withheld for review, never thrown away as a refusal. `draft` is the held
  * text and its cited source ids; callers keep it only in the stored candidate (the review path), never in a public field. */
@@ -267,4 +268,26 @@ export function conditionHold(answerText: string, turnTexts: string[]): string |
     if (asked >= 2 && stated < 2) return "the cited turn only asks this question; it does not state the answer";
   }
   return null;
+}
+
+/** F1 (ask-condition-fidelity): the existing hold path. "ambiguous" + insufficient coverage is what the answer policy routes to
+ * review; the workflow then stores the candidate in state review and publishes an empty answer (C3). The reason never quotes
+ * the held answer. */
+export function holdForReview(result: AskV2Result, why: string): AskV2Result {
+  return { ...result, verdict: "ambiguous", insufficient_coverage: true, reason: `held for review: ${why}`,
+    auditLog: [...result.auditLog, { jobKind: "ask.condition_held", step: `condition_held: ${why}` }] };
+}
+/** F1B-C3/C4: the ONE condition judgment, over the turns the answer cites (fast and deep share it). A cited turn that is not whole holds
+ * the answer; otherwise `conditionHold` judges the whole turns, with no model call. Web sources are not turns and never enter it. When the
+ * hydrator supplied the whole turns (`live`), the judged answer carries the `ask.condition_checked` marker, so the release gate does not
+ * judge it again on slices. */
+export function judgeCitedTurns(result: AskV2Result, turns: EvidenceTurn[], cited: string[] | undefined, live: boolean): AskV2Result {
+  if (!cited) return result;
+  const ids = new Set(cited.flatMap((id) => turns.find((t) => t.whole && t.quoteIds.includes(id))?.quoteIds ?? [id]));
+  const citedTurns = turns.filter((t) => t.quoteIds.some((id) => ids.has(id)));
+  if (!citedTurns.length) return result;
+  const partial = citedTurns.find((t) => !t.whole);
+  const why = partial ? `cited turn ${partial.turnId}: ${partial.incomplete}` : conditionHold(result.answer, citedTurns.map((t) => t.text));
+  return why ? holdForReview(result, why) : !live ? result
+    : { ...result, auditLog: [...result.auditLog, { jobKind: "ask.condition_checked", step: "condition_checked: whole turns" }] };
 }

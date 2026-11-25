@@ -271,7 +271,7 @@ import { createSourceHydrator } from "../../ask/source-context.js";
 const sessionTurns: Row[] = rows.filter((r) => r.sessionId === session);
 /** Same harness as check(), but retrieval is the production hydrator over the archived session (all its turns), not a fixture hydrator. The fake
  * model cites the source that carries the archived turn t042 (found by its turn identity), whatever excerpt the hydrator chose. */
-async function checkReal(query: string, drafts: Draft[], opt: { mode?: "deep"; turns?: Row[]; webAllowed?: boolean } = {}) {
+async function checkReal(query: string, drafts: Draft[], opt: { mode?: "deep"; turns?: Row[]; webAllowed?: boolean; cite?: string } = {}) {
   const db = answerTestDb(), store = createInMemoryAnswerRecordStore();
   db.rows("sessions").push({ _id: session, tenantId: tenant, sourceId: "rec" });
   db.rows("sources").push({ _id: "rec", tenantId: tenant, kind: "recording" });
@@ -291,7 +291,7 @@ async function checkReal(query: string, drafts: Draft[], opt: { mode?: "deep"; t
       if (job.kind === "ask.answer") {
         const ctx = data.context as { strips: { sourceIndex: number; text: string }[]; sources: { sourceId: string; source?: { turnId: string } }[] };
         presented = ctx.strips.map((s) => ({ sourceId: ctx.sources[s.sourceIndex]!.sourceId, turnId: ctx.sources[s.sourceIndex]!.source?.turnId, text: s.text }));
-        const cite = ctx.sources.find((s) => s.source?.turnId === A.turnId)?.sourceId ?? ctx.sources[0]!.sourceId;
+        const cite = ctx.sources.find((s) => s.source?.turnId === (opt.cite ?? A.turnId))?.sourceId ?? ctx.sources[0]!.sourceId;
         return result({ sentences: drafts.map((d) => ({ text: d.text, sourceIds: [cite] })) });
       }
       if (job.kind === "ask.answer_grounding") return result({ decisions: data.sentences.map((s: { id: string }) => ({ id: s.id, supported: true, answersQuery: true })) });
@@ -346,14 +346,27 @@ test("[F1B-C3] real hydrator, deep: generation reads the whole t042 turn; the ve
   assert.deepEqual(r.calls, ["ask.select_nodes", "ask.answer", "ask.answer_grounding"]);
 });
 
-test("[F1B-C1] real hydrator: a turn over the 16 KiB cap is left out of liveTurns, so none of its slices reaches generation or a released source (CORE-REQUEST-1: it is excluded, not held)", async () => {
-  const big = "Every applicant must submit an official transcript. ".repeat(400);
-  assert.ok(Buffer.byteLength(big) > 16 * 1024);
-  const row: Row = { _id: "fixture-big", tenantId: tenant, sessionId: session, speakerRef: "Presenter", tStart: 5, tEnd: 900, text: big };
-  const r = await checkReal(ENGLISH, [draft("Every applicant must submit an official transcript.", "big")], { turns: [row], webAllowed: true });
-  assert.equal(r.hydration.liveTurns!.length, 0, "the over-cap turn is left out of liveTurns");
-  assert.ok(r.presented.every((s) => s.turnId !== "fixture-big"), "no slice of the over-cap turn reaches generation");
-  assert.deepEqual(r.out.sources.internal, [], "and none is released as a source");
+// CORE-REQUEST-1 resolved: a turn over the 16 KiB cap is left out of liveTurns but stays as excerpt evidence marked not whole, so an answer that cites it is HELD.
+const overCap = (): Row[] => [
+  { _id: "fixture-big", tenantId: tenant, sessionId: session, speakerRef: "Presenter", tStart: 5, tEnd: 900, text: "Only applicants from Maple School must submit an official transcript. ".repeat(300) },
+  { _id: "fixture-short", tenantId: tenant, sessionId: session, speakerRef: "Presenter", tStart: 1, tEnd: 4, text: "Every applicant must submit an official transcript." },
+];
+const TRANSCRIPT = "Which official transcript must every applicant submit?", HELD = "Every applicant needs to hand in an official transcript.";
+for (const mode of ["fast", "deep"] as const) {
+  test(`[F1B-C1][F1B-I3] real hydrator, ${mode}: an answer that cites a turn over the 16 KiB cap is HELD (never cut, never judged on slices); the turn is absent from liveTurns`, async () => {
+    const turns = overCap(); assert.ok(Buffer.byteLength(turns[0]!.text) > 16 * 1024);
+    const r = await checkReal(TRANSCRIPT, [draft(HELD, "x")], { turns, cite: "fixture-big", webAllowed: true, ...(mode === "deep" ? { mode } : {}) });
+    assert.deepEqual(r.hydration.liveTurns!.map((t) => t.turnId), ["fixture-short"], "the over-cap turn is left out of liveTurns, whole text and all");
+    assert.ok(r.presented.some((s) => s.turnId === "fixture-big"), "its excerpt stays evidence for generation, so the model can cite it");
+    assert.ok(r.presented.every((s) => s.turnId !== "fixture-big" || Buffer.byteLength(s.text) <= 1024), "and generation never reads more than a slice of it");
+    assertWithheld(r, [draft(HELD)], /^held for review: cited turn fixture-big: /);
+  });
+}
+test("[F1B-C1] real hydrator, fast: an answer that cites only the short turn next to an over-cap turn is released, and the over-cap turn is not among its released sources", async () => {
+  const r = await checkReal(TRANSCRIPT, [draft(HELD, "x")], { turns: overCap(), cite: "fixture-short", webAllowed: true });
+  assert.equal(r.out.state, "allowed", r.out.reason); assert.equal(r.out.answer, HELD); assert.doesNotMatch(r.out.reason, /held/);
+  const released = r.out.sources.internal.flatMap((n) => (n.evidence!.sourceQuotes as { turnId: string }[]).map((q) => q.turnId));
+  assert.deepEqual([...new Set(released)], ["fixture-short"]);
 });
 
 // ---- F1B-C4 / ISS-F1WAIVERCONDITION-005: one judgment, on whole turns; web_used answers are still checked on internal sources -------------

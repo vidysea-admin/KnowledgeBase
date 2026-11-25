@@ -17,7 +17,7 @@ import { LOWER_THRESHOLD, UPPER_THRESHOLD, type ScoreFn } from "./evaluator.js";
 import { selectNodes, type CompleteFn } from "./select-nodes.js";
 import { rrfMerge } from "./merge.js";
 import { refine, type RefinableDoc } from "./refine.js";
-import { answer as generateAnswer, conditionHold, evidenceTurns, wholeTurnSources, type EvidenceTurn } from "./answer.js";
+import { answer as generateAnswer, evidenceTurns, judgeCitedTurns, wholeTurnSources, type EvidenceTurn } from "./answer.js";
 import { sourceCatalog, validateHydration, sourceQuotes, isNativeSourceQuote, completionBudget, BoundedAskError, SOURCE_LIMITS, type LiveSourceTurn, type SourceQuote } from "./source-context.js";
 import { boundedRefine, contextStrips, type ContextSource } from "./bounded-refine.js";
 import type { AskV2Deps, AskV2Result, AuditEntry } from "./ask-shared.js";
@@ -74,13 +74,6 @@ function collectNodesById(root: TreeIndexNode): Map<string, TreeIndexNode> {
   return byId;
 }
 
-/** F1 (ask-condition-fidelity): the existing hold path. "ambiguous" + insufficient coverage is what the answer policy routes to
- * review; the workflow then stores the candidate in state review and publishes an empty answer (C3). The reason never quotes
- * the held answer. */
-export function holdForReview(result: AskV2Result, why: string): AskV2Result {
-  return { ...result, verdict: "ambiguous", insufficient_coverage: true, reason: `held for review: ${why}`,
-    auditLog: [...result.auditLog, { jobKind: "ask.condition_held", step: `condition_held: ${why}` }] };
-}
 /** Transcript quotes of hydrated or released internal sources (native passages have no speaker turn). */
 export function transcriptQuotes(nodes: { evidence?: unknown }[]): SourceQuote[] {
   return nodes.flatMap((n) => {
@@ -88,21 +81,6 @@ export function transcriptQuotes(nodes: { evidence?: unknown }[]): SourceQuote[]
     return Array.isArray(quotes) ? (quotes as Parameters<typeof isNativeSourceQuote>[0][]).filter((q): q is SourceQuote => !!q && !isNativeSourceQuote(q)) : [];
   });
 }
-/** F1B-C3/C4: the ONE condition judgment, over the turns the answer cites (fast and deep share it). A cited turn that is not whole holds
- * the answer; otherwise `conditionHold` judges the whole turns, with no model call. Web sources are not turns and never enter it. When the
- * hydrator supplied the whole turns (`live`), the judged answer carries the `ask.condition_checked` marker, so the release gate does not
- * judge it again on slices. */
-export function judgeCitedTurns(result: AskV2Result, turns: EvidenceTurn[], cited: string[] | undefined, live: boolean): AskV2Result {
-  if (!cited) return result;
-  const ids = new Set(cited.flatMap((id) => turns.find((t) => t.whole && t.quoteIds.includes(id))?.quoteIds ?? [id]));
-  const citedTurns = turns.filter((t) => t.quoteIds.some((id) => ids.has(id)));
-  if (!citedTurns.length) return result;
-  const partial = citedTurns.find((t) => !t.whole);
-  const why = partial ? `cited turn ${partial.turnId}: ${partial.incomplete}` : conditionHold(result.answer, citedTurns.map((t) => t.text));
-  return why ? holdForReview(result, why) : !live ? result
-    : { ...result, auditLog: [...result.auditLog, { jobKind: "ask.condition_checked", step: "condition_checked: whole turns" }] };
-}
-
 /** Bounded answer context: exact source quotes of the admitted nodes (tuple identity attached) plus unverified web text. */
 export function boundedSourcesOf(nodes: TreeIndexNode[], web: WebSource[]): ContextSource[] {
   return [

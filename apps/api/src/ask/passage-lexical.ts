@@ -1,8 +1,30 @@
 /** Unicode passage slicing and query-time lexical scoring for transcript and native source hydration. */
-import type { TreeIndexNode } from "@lkb/core";
+import { createHash } from "node:crypto";
+import type { TreeIndexNode, Turns } from "@lkb/core";
 import { lexicalQueryTokens } from "@lkb/index";
+import { BoundedAskError, type SourceQuote } from "@lkb/ask";
 
 export interface Span { charStart: number; charEnd: number }
+const sha256Hex = (text: string) => createHash("sha256").update(text, "utf8").digest("hex");
+/** The hydrated quote of a turn span, with its byte offsets and turn/slice proof hashes. */
+export function quote(node: TreeIndexNode, turn: Turns, span: Span): SourceQuote {
+  const text = turn.text.slice(span.charStart, span.charEnd);
+  // Review overlays may change text/speaker labels, but cannot promote frame evidence to speech.
+  const screenSource = turn.speakerRef === "screen" || turn.screenEvidence !== undefined;
+  const origin = screenSource
+    ? turn.text.startsWith("[Screen OCR; unverified]") ? "screen-ocr-unverified"
+      : turn.text.startsWith("[Visual observation; unverified]") ? "visual-observation-unverified" : null
+    : "speech";
+  if (!origin) throw new BoundedAskError("screen source origin is unresolved");
+  return {
+    id: "quote-" + sha256Hex(JSON.stringify([node.node_id, turn._id, span, text])).slice(0, 24),
+    nodeId: node.node_id, sessionRef: turn.sessionId, turnId: turn._id, speakerRef: screenSource ? "screen" : turn.speakerRef,
+    tStart: turn.tStart, tEnd: turn.tEnd, charStart: span.charStart, charEnd: span.charEnd,
+    byteStart: Buffer.byteLength(turn.text.slice(0, span.charStart), "utf8"),
+    byteEnd: Buffer.byteLength(turn.text.slice(0, span.charEnd), "utf8"),
+    turnTextSHA256: sha256Hex(turn.text), sliceSHA256: sha256Hex(text), quote: text, origin,
+  };
+}
 /** Unicode-safe half-open slices; no new turns or invented sub-turn timestamps. */
 export function slices(text: string): Span[] {
   const result: Span[] = [];

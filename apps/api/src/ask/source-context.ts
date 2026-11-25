@@ -9,7 +9,7 @@ import { BoundedAskError, payloadBytes, validateHydration, type AskV2Deps, type 
   type SourceQuote, type HydrateSourcesFn } from "@lkb/ask";
 import { createAskArmsFor, type ArmsEmbedFn } from "./ask-arms.js";
 import { createLlmScorer } from "../score.js";
-import { passageLexicalScorer, slices, type Span } from "./passage-lexical.js";
+import { passageLexicalScorer, quote, slices, type Span } from "./passage-lexical.js";
 import { readEffectiveTurns } from '../transcript-review/effective-reader.js';
 import { createKnowledgeVisibility } from '../visibility/knowledge.js';
 import { chunkContentMatches } from '../indexing/chunk-integrity.js';
@@ -46,24 +46,6 @@ function rowProblem(turn: Turns): string | null {
   if (turn.tStart < 0) return `tStart ${turn.tStart} is negative`;
   if (turn.tEnd < turn.tStart) return `tEnd ${turn.tEnd} is before tStart ${turn.tStart}`;
   return null;
-}
-function quote(node: TreeIndexNode, turn: Turns, span: Span): SourceQuote {
-  const text = turn.text.slice(span.charStart, span.charEnd);
-  // Review overlays may change text/speaker labels, but cannot promote frame evidence to speech.
-  const screenSource = turn.speakerRef === "screen" || turn.screenEvidence !== undefined;
-  const origin = screenSource
-    ? turn.text.startsWith("[Screen OCR; unverified]") ? "screen-ocr-unverified"
-      : turn.text.startsWith("[Visual observation; unverified]") ? "visual-observation-unverified" : null
-    : "speech";
-  if (!origin) throw new BoundedAskError("screen source origin is unresolved");
-  return {
-    id: "quote-" + sha(JSON.stringify([node.node_id, turn._id, span, text])).slice(0, 24),
-    nodeId: node.node_id, sessionRef: turn.sessionId, turnId: turn._id, speakerRef: screenSource ? "screen" : turn.speakerRef,
-    tStart: turn.tStart, tEnd: turn.tEnd, charStart: span.charStart, charEnd: span.charEnd,
-    byteStart: Buffer.byteLength(turn.text.slice(0, span.charStart), "utf8"),
-    byteEnd: Buffer.byteLength(turn.text.slice(0, span.charEnd), "utf8"),
-    turnTextSHA256: sha(turn.text), sliceSHA256: sha(text), quote: text, origin,
-  };
 }
 function validateChunk(chunk: BoundChunk, tenantId: string, turns: Map<string, Turns>): void {
   if (chunk.tenantId !== tenantId || !nonempty(chunk._id) || !nonempty(chunk.sourceRef)
@@ -245,12 +227,13 @@ export function createSourceHydrator(tenantId: string, deps: { db?: ReadDb; embe
           sourceSnapshotSHA256: snapshotSHA256, sourceMode: "exact-scoped-turn-excerpts" },
       });
     }
-    // F1B-C1: the whole text of every cited turn, taken from the row already read above (same tenant, visibility and review overlay,
-    // no new read), next to the excerpts. A turn over the per-turn cap is left out, never cut, so a quote of it is never judged on a slice.
-    const liveTurns = [...new Map(result.flatMap((n) => (n.evidence!.sourceQuotes as SourceQuote[]).map((q) => byTurn.get(q.turnId)!))
-      .map((t) => [t._id, { sessionId: t.sessionId, turnId: t._id, text: t.text }] as const)).values()]
-      .filter((t) => Buffer.byteLength(t.text, "utf8") <= TURN_EVIDENCE_LIMITS.turnBytes);
-    return { nodes: result, liveTurns, snapshotSHA256, sourceBytes: Buffer.byteLength(bytes, "utf8"), ...(degraded ? { degraded } : {}), ...(excludedTurns.length ? { excludedTurns } : {}) };
+    // F1B-C1: the whole text of every cited turn, from the row already read above (same tenant, visibility and overlay, no new read). A turn over the
+    // per-turn cap is never cut: it is left out of liveTurns and named in overCapTurns, so its quotes stay as excerpts that are not whole and an answer citing one is held.
+    const cited = [...new Map(result.flatMap((n) => (n.evidence!.sourceQuotes as SourceQuote[]).map((q) => byTurn.get(q.turnId)!)).map((t) => [t._id, t] as const)).values()];
+    const fits = (t: Turns) => Buffer.byteLength(t.text, "utf8") <= TURN_EVIDENCE_LIMITS.turnBytes;
+    const overCapTurns = cited.filter((t) => !fits(t)).map((t) => ({ sessionId: t.sessionId, turnId: t._id }));
+    const liveTurns = cited.filter(fits).map((t) => ({ sessionId: t.sessionId, turnId: t._id, text: t.text }));
+    return { nodes: result, liveTurns, ...(overCapTurns.length ? { overCapTurns } : {}), snapshotSHA256, sourceBytes: Buffer.byteLength(bytes, "utf8"), ...(degraded ? { degraded } : {}), ...(excludedTurns.length ? { excludedTurns } : {}) };
   };
 }
 
@@ -301,7 +284,7 @@ export function createSourceRequestDepsFor(options: RequestAskOptions) {
         const snapshotSHA256 = sha(JSON.stringify([transcript.snapshotSHA256, other.snapshotSHA256]));
         const nodes = proven.map(node => { const copy = structuredClone(node); return { ...copy, evidence: { ...copy.evidence, sourceSnapshotSHA256: snapshotSHA256 } }; });
         const excludedTurns = [...(transcript.excludedTurns ?? []), ...(other.excludedTurns ?? [])];
-        return { nodes, ...(transcript.liveTurns ? { liveTurns: transcript.liveTurns } : {}), snapshotSHA256, sourceBytes: transcript.sourceBytes + other.sourceBytes, ...(excludedTurns.length ? { excludedTurns } : {}),
+        return { nodes, ...(transcript.liveTurns ? { liveTurns: transcript.liveTurns } : {}), ...(transcript.overCapTurns ? { overCapTurns: transcript.overCapTurns } : {}), snapshotSHA256, sourceBytes: transcript.sourceBytes + other.sourceBytes, ...(excludedTurns.length ? { excludedTurns } : {}),
           degraded: [transcript.degraded, other.degraded].filter(Boolean).join("; ") || undefined };
       }, ...(nativeSource ? { revalidate: (nodes: TreeIndexNode[]) => nativeSource.revalidate(nodes.filter(isNative)) } : {}) },
     };
