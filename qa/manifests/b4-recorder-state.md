@@ -158,4 +158,4 @@ Not UI-touching — no surface changed. Changed paths: `docker/meeting-bot/entry
 - **Dockerfile not built.** The new RUN block and the `util-linux` addition were not built (no network build in this unit; the contract lists the image build as an operator step).
 - **CORE-REQUEST:** none. Everything needed was inside `docker/meeting-bot/`. (For the record, `docker-compose.yml` will need the new environment variables and the `LKB_STATE_BUCKET` wiring; that is plan B5 and is not requested here.)
 
-## Status: ready-for-check
+## Status: checked-PASS
