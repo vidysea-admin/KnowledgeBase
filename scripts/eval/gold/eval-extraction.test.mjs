@@ -34,7 +34,8 @@ test("C1: --gold reports every metric with numerator and denominator, labelled s
   assert.deepEqual([m.claimSupport.numerator, m.claimSupport.denominator], [4, 4]);
   assert.deepEqual([m.falseDecisions.numerator, m.falseDecisions.denominator], [0, 1]);
   assert.equal(r.json.provenance.synthetic, true); assert.equal(r.json.measurementOfRealCorpus, false);
-  assert.equal(r.json.bar, "none"); assert.equal(typeof r.json.definitions.claimSupport, "string");
+  assert.equal(r.json.bar, "none");
+  for (const k of Object.keys(m)) assert.match(r.json.definitions[k], /^numerator = .+; denominator = .+/, "D2H-C5 pinned definition for " + k);
 });
 test("C1 falsification: a fabricated citation and an unsupported label move the metrics", () => {
   const g = gold(); g.cases[0].persisted[1].evidence[0].turnId = "no-such-turn"; g.cases[0].labels[2].status = "unsupported";
