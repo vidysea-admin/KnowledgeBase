@@ -4,6 +4,9 @@
 R-11..R-14, R-16, R-34, R-42, R-43, R-45). Nothing here is implemented. Docs only.
 **Owner of this file:** the KB repo. **Implementer:** the archiver repo (`sources/whatsapp_msg`), unit W2b,
 under its own governance.
+**Amended 2026-11-25 by D-235** (plan unit C6; the archiver's own entry is its D-023): the host is Cloud Run, so
+the service runs on one listener behind internal ingress. Changed: section 1 Auth row, section 3 points 1 to 3,
+and tests AC-A3, AC-A4, AC-A5. Everything else in this file is as before.
 **Every unstated input is [ASSUMPTION].** Where this contract chooses between readings the spec leaves open,
 the choice is listed in section 13 so the archiver's maker and the human can overrule it before code starts.
 
@@ -37,7 +40,7 @@ service layer next to the existing UI server, not a rewrite.
 | Unlink | `POST /api/wa/logout` with `confirm: "UNLINK"`; `authState.destroyAuthState` moves credentials to `sessions/.trash` (D-022, up to 5 archives, restorable by `POST /api/wa/restore`) | Owner state `unlinked`, capture disabled, not restorable through any service call (O6). |
 | Restart rehydration | `index.ts` starts a session for every directory in `sessions/` that has `creds.json` (`authState.linkedUserIds`) | Skip owners in state `unlinked`. |
 | Capture gate | `wa/ingest.ts`: group must have `isTracked: true`; if not `trackAllSenders`, the sender must have a `tracking` row | Nothing; the service changes the same fields, so capture follows at once. |
-| Auth | Cookie sessions for password users (`api/auth.ts`) | A separate token-authenticated listener (section 3). Cookie routes are untouched. |
+| Auth | Cookie sessions for password users (`api/auth.ts`) | Token-authenticated `/svc/v1` routes on the one production listener, UI routes not mounted in that mode (section 3; D-235, archiver D-023). Cookie routes are untouched in the UI mode. |
 
 ## 2. Conventions
 
@@ -65,20 +68,21 @@ service layer next to the existing UI server, not a rewrite.
 
 ## 3. Transport, auth and network placement (R-42, R-43)
 
-1. **Separate listener.** A second HTTP server instance with its own bind address and port, distinct from the UI
-   server (`config.port`). It mounts **only** the `/svc/v1` routes: no `cookie-parser`, no `express.static`, no
-   `/api/*` routes. The UI server mounts **no** `/svc` route. Test: a request for `/svc/v1/health` on the UI port
-   is 404 with or without a token; `/api/me` and `/` on the service port are 404.
-2. **Not public.** The listener binds to a private address only (loopback, a private network address or a tunnel
-   interface). It **fails closed**: if the bind address, port or token is unset, too short or malformed, the
-   archiver starts without the service listener and logs one line naming the missing setting (never a value).
-   Binding `0.0.0.0` or `::` requires an explicit extra setting and logs a warning every boot. It is never routed
-   through the public reverse proxy of the UI. Names are the archiver's choice; suggested:
-   `SERVICE_API_BIND`, `SERVICE_API_PORT`, `SERVICE_API_TOKEN`, `SERVICE_API_TOKEN_NEXT`,
-   `SERVICE_API_ALLOW_CIDRS`.
-3. **Source allowlist.** The remote socket address must fall in `SERVICE_API_ALLOW_CIDRS` (the app host).
-   `X-Forwarded-For` and similar headers are **never** trusted. A disallowed source gets the same response as a
-   bad token (point 4), so the listener is not an oracle for its allowlist.
+1. **One listener, service-only mode** (amended by D-235; archiver D-023 item 2). In production the archiver
+   serves the `/svc/v1` routes on **one** listener, the port the host gives it in `PORT` (Cloud Run publishes one
+   container port, so a second listener cannot be reached). A mode setting turns the old UI routes off: no
+   `/api/*`, no `express.static`, no `cookie-parser`. The QR travels over `/svc/v1` only
+   (`GET /svc/v1/owners/{ownerId}/session/qr`, section 5.2); no other route carries it. The bearer token stays
+   the only credential. Test: AC-A3.
+2. **Not public.** The service is not reachable from the public internet: the host's internal ingress is the
+   network boundary (D-235). It **fails closed**: in service-only mode, if the token is unset, shorter than 32
+   bytes or malformed, the process exits non-zero and logs one line naming the missing setting (never a value).
+   The token is never logged. Names are the archiver's choice; suggested: `SERVICE_API_ONLY` (the mode),
+   `SERVICE_API_TOKEN`, `SERVICE_API_TOKEN_NEXT`. The bind address and port are the host's, not settings of this
+   contract.
+3. **No source address check** (amended by D-235; replaces the source allowlist by CIDR). On Cloud Run the caller
+   reaches the service through Google's front end, so the remote socket address says nothing about the caller and
+   a check on it cannot work. Access is limited by internal ingress plus the token (point 4).
 4. **Token.** `Authorization: Bearer <token>`, a server-to-server secret of at least 32 random bytes (64 hex
    characters or more), compared in constant time (compare SHA-256 digests with `timingSafeEqual`). Missing,
    malformed, wrong, wrong scheme or disallowed source all return exactly
@@ -461,12 +465,11 @@ Fixtures for wire tests: a way to put an owner in each status (`not_started`, `a
   character off, and the token of a different length all return `401` with exactly the same body and headers
   (apart from `X-Request-Id`), and none reaches a handler (a side-effect counter stays 0).
 - AC-A2 (wire) A valid token on any route succeeds; the second configured token (rotation) also succeeds.
-- AC-A3 (archiver-only) The listener is not served on the UI port: `/svc/v1/health` on the UI port is 404 with
-  and without the token; `/api/me` and the static UI on the service port are 404.
-- AC-A4 (archiver-only) With the bind address, port or token unset or shorter than 32 bytes, no service listener
-  starts, the UI still starts, and the log names the missing setting without a value.
-- AC-A5 (archiver-only) A source outside the allowlist gets the AC-A1 response; `X-Forwarded-For` does not
-  change that.
+- AC-A3 (archiver-only; rewritten by D-235) With the service-only mode on, `/api/me` and the static UI return 404
+  with and without the token.
+- AC-A4 (archiver-only; rewritten by D-235) With the token missing or shorter than 32 bytes in that mode, the
+  process exits non-zero and the log names the missing setting without a value.
+- AC-A5 (archiver-only; rewritten by D-235) A request with a missing or wrong token gets the AC-A1 response.
 - AC-A6 (archiver-only) The token never appears in logs, in any response, or in the process arguments; an
   `Authorization` header sent to a failing route is absent from logs (canary token).
 - AC-A7 (wire) 21 bad-token requests inside a minute from one source: the 21st gets `429 rate_limited`.
