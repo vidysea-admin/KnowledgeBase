@@ -3031,3 +3031,21 @@ Master is not pushed, and nothing is merged to master or to the archiver's main 
 - any enforcement path.
 **Approved-by:** Umesh (the T1 round-cap waiver, read from the chat message quoted above; withdrawn by "T1 roko")
 **Links:** D-014, D-227, D-245, D-246, qa/manifests/calendar-page-freshness.md, qa/gates/golive-owner-questions-2026-11-25.md, plan section 6
+
+## D-248 | 2026-11-25 | type: decision | status: ACTIVE
+**What:** On 2026-11-25 the Approver wrote in chat: "umeshsugara-ai git repo se krna access hoga". This entry records four decisions on where pushes go.
+(1) The push target for this repo is the remote `legacy`, umeshsugara-ai/living-knowledge-base. `gh repo view` shows it is PRIVATE, with ADMIN access for the active account umeshsugara-ai. For feature branches only, this replaces the standing rule kept earlier in this session not to push to the legacy remote.
+(2) The WhatsApp archiver pushes to its own `origin`, umeshsugara-ai/whatsapp-archiver, which is also PRIVATE with ADMIN access.
+(3) Finding: this repo's `origin`, vidysea-admin/KnowledgeBase, is PUBLIC. Nothing from the go-live work is pushed there: not docs/cloud-run-golive (decisions, verdicts, evidence), not any feature branch. The Approver is told. Whether a public deploy repo is intended is his and the vendor's call, and is not changed here.
+(4) Credentials are taken per command from the gh active account (`-c credential.helper=!gh auth git-credential`). No global git or credential config is changed. `master` and `main` are not pushed to any remote, and nothing is merged to them.
+**Why:** The Approver named the repo that has access. Pushing to a private repo keeps built work off this laptop without publishing internal decisions, verdicts or evidence. The earlier 403 came from the public origin, so the old rule against legacy no longer serves its purpose for feature branches. A master push stays gated by D-247 and plan section 6.
+**Result:** `gh auth status` shows two accounts, umeshsugara-ai (active, scopes repo and workflow) and umesh-sugara. `gh repo view` read the visibility and permissions above. Nothing has been pushed yet: the push follows the inventory and secret scan of D-247.
+**Changes-authorized:** `git push` of feature branches to `legacy` (this repo) and to the archiver's `origin`, after a clean secret scan. The pushes run per command with the gh credential helper. Not authorized:
+- any push to `origin` of this repo
+- a push or merge to master or main
+- a global git config change
+- ARCHITECTURE.md or contracts/
+- any cloud change or database write
+- installing a new package
+- any enforcement path
+**Links:** D-227, D-247, plan section 6
