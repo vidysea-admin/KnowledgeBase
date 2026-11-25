@@ -7,9 +7,12 @@
  * `admitted` once it sees the in-call controls (non-Meet platforms with no lobby or denied text for the whole wait: `assumed: true`, D-167);
  * this gate starts the watchdog only then, and turns the two failure shapes into clear messages:
  *  - `admission_timeout`  -> "admission_timeout: ..." (the bot was never let in);
+ *  - `admission_denied`   -> "admission_denied: ..." (B2 / D-232: Meet refused the bot; pre-admission only);
  *  - a `capture-error` that follows a post-admission page reload -> the error plus the reload cause.
  * Split out of record-commands.ts to keep that file inside the repo LOC budget.
  */
+import { existsSync, readFileSync, rmSync, statSync } from "node:fs";
+import { writeOwnedTabStatus } from "./tab-browser.js";
 export interface GateEvent { event: string; error?: unknown; seconds?: unknown; limit?: unknown; assumed?: unknown; reason?: unknown }
 /** How the bot came to be `admitted`: positively seen in the call, or assumed (non-Meet, no lobby signal, D-167). */
 export interface AdmissionInfo { assumed: boolean; reason?: string }
@@ -24,6 +27,7 @@ export function createAdmissionGate(now: () => number = Date.now) {
   let lastReload: { at: number; kind: string } | undefined;
   let failure: string | undefined;
   let timedOut = false;
+  let denied = false;
   let admission: AdmissionInfo | undefined;
 
   function decide(ev: GateEvent): string | undefined {
@@ -36,6 +40,10 @@ export function createAdmissionGate(now: () => number = Date.now) {
       case "admission_timeout":
         timedOut = !admitted;
         return `admission_timeout: the bot was not admitted to the meeting within ${String(ev.limit ?? "?")}s (waited ${String(ev.seconds ?? "?")}s in the lobby); no recording made`;
+      case "admission_denied":
+        if (admitted) return undefined; // a refusal phrase after admission is just page text; it never fails a live capture
+        denied = true;
+        return `admission_denied: Google Meet refused the bot ("You can't join this video call"; shown after ${String(ev.seconds ?? "?")}s); no recording made`;
       case "watchdog-reload":
       case "reconnect-reload":
         if (admitted) lastReload = { at: now(), kind: ev.event };
@@ -55,8 +63,8 @@ export function createAdmissionGate(now: () => number = Date.now) {
     get admitted(): boolean { return admitted; },
     /** Undefined until `admitted`; `assumed: true` means no positive in-call signal was ever seen. */
     get admission(): AdmissionInfo | undefined { return admission; },
-    /** "lobby" until `admitted`; "failed" once an admission_timeout was reported; a capture is "recording" only in "admitted". */
-    get state(): "lobby" | "admitted" | "failed" { return admitted ? "admitted" : timedOut ? "failed" : "lobby"; },
+    /** "lobby" until `admitted`; "failed" once an admission_timeout or admission_denied was reported; a capture is "recording" only in "admitted". */
+    get state(): "lobby" | "admitted" | "failed" { return admitted ? "admitted" : timedOut || denied ? "failed" : "lobby"; },
     /** The most recent failure message this gate produced (the tab backend's own stop error is terser). */
     get failure(): string | undefined { return failure; },
     /** Registers the watchdog; starts it at once if `admitted` already arrived (join() can emit it first). */
@@ -68,4 +76,24 @@ export function createAdmissionGate(now: () => number = Date.now) {
       return message;
     },
   };
+}
+
+const STATUS_IDENTITY_KEYS = ["output", "pid", "handle", "sessionId", "tenantId", "profileDir", "recordDir", "controllerStartedAt"];
+
+/**
+ * B2 / D-232, refusal path only (never called for admission_timeout or any other failure): after the tab backend has stopped,
+ * remove THIS session's recording file if it is zero bytes (a refused bot never produced media) and re-mark its status file
+ * "failed" (the backend writes "stopped" for a clean recorder stop). A non-empty partial is never touched (B2-I5).
+ * Best effort and silent: it must never mask the admission_denied failure the caller is about to throw.
+ */
+export function settleDeniedCapture(output: string | undefined, failure: string | undefined): void {
+  if (!output) return;
+  try { if (existsSync(output) && statSync(output).size === 0) rmSync(output); } catch { /* keep the file; the failure is still reported */ }
+  try {
+    const file = `${output}.status.json`;
+    if (!existsSync(file)) return;
+    const prior = JSON.parse(readFileSync(file, "utf8")) as Record<string, unknown>;
+    const identity = Object.fromEntries(STATUS_IDENTITY_KEYS.filter((k) => prior[k] !== undefined).map((k) => [k, prior[k]]));
+    writeOwnedTabStatus(file, identity, { state: "failed", error: failure ?? "admission_denied" });
+  } catch { /* a status the backend refuses to rewrite stays as it is */ }
 }

@@ -136,6 +136,10 @@ LOBBY_PHRASES = [
     "you'll join the call when someone lets you in", "waiting for the host to let you in",
     "waiting to be let in", "your request to join",
 ]
+# B2 / D-232: the Meet refusal page ("You can't join this video call", straight or typographic apostrophe).
+# Meet only. It is a pre-admission signal: the loop ignores it once `admitted` was emitted (B2-C8), because
+# body text also holds captions and chat lines typed by other participants.
+REFUSED_PHRASES = ["you can't join this video call", "you can’t join this video call"]
 # After admission_timeout the browser stays open this long for the controller's flush + stop file.
 FLUSH_GRACE_S = 45
 ADMISSION_TIMEOUT_S = 15 * 60  # default lobby wait before giving up (--admission-timeout overrides)
@@ -150,9 +154,12 @@ def is_meet_url(url):
 
 
 def classify_meet_state(in_call_dom, body_lower):
-    """Pure: "lobby" | "in-call" | "unknown". `in_call_dom` is IN_CALL_JS's result (the leave-call
-    button / call-controls bar is visible); `body_lower` is the lowercased body text. Lobby text
-    always wins: the pre-join and waiting screens can render a leave/hang-up control too."""
+    """Pure: "refused" | "lobby" | "in-call" | "unknown". `in_call_dom` is IN_CALL_JS's result (the
+    leave-call button / call-controls bar is visible); `body_lower` is the lowercased body text. The
+    refusal text ("you can't join this video call") wins over everything (B2-C1). Lobby text
+    always wins over the controls: the pre-join and waiting screens can render a leave/hang-up control too."""
+    if any(p in (body_lower or "") for p in REFUSED_PHRASES):
+        return "refused"
     if any(p in (body_lower or "") for p in LOBBY_PHRASES):
         return "lobby"
     return "in-call" if in_call_dom else "unknown"
@@ -204,7 +211,7 @@ def platform_of(url):
 
 
 def classify_admission(platform, in_call_dom, body_lower):
-    """Pure: "lobby" | "in-call" | "unknown" for any platform. `in_call_dom` is that platform's
+    """Pure: "lobby" | "in-call" | "unknown" for any platform (Meet alone can also return "refused"). `in_call_dom` is that platform's
     in-call JS result. Order: denied/ended -> unknown; lobby text -> lobby (the waiting room can
     render a leave control); visible in-call control -> in-call; otherwise unknown. An unknown
     platform ("other") is in-call ONLY on a positive generic control, and any known lobby text wins;

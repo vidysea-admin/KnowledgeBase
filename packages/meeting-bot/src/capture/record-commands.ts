@@ -5,7 +5,7 @@ import { OBSWebSocket } from "obs-websocket-js";
 import { createBrowserJoiner } from "../joiners/browser-joiner.js";
 import { detectPlatform } from "../platform.js";
 import { selectJoinStrategy } from "../strategy.js";
-import { createAdmissionGate } from "./admission-gate.js";
+import { createAdmissionGate, settleDeniedCapture } from "./admission-gate.js";
 import { createAudioWatchdog, createRealLevelSource } from "./audio-watchdog.js";
 import { type ControllerRecoveryActions, type ControllerRecoveryContext, cleanupOwnedBrowserProfile, finalizeControllerRecording, getProcessStartTime, removeControllerState, writeControllerState } from "./controller-state.js";
 import { AUDIO_INPUT, createObsBrowserDeps, type ObsBrowserConfig, type ObsBrowserDepsOverrides, type ObsClientLike } from "./obs/obs-windows.js";
@@ -115,7 +115,7 @@ export async function runRecord(rest: string[], inject: RecordInject = {}): Prom
   const gaps: GapWindow[] = [];
   const telegram = inject.telegram ?? createTelegramNotifier();
   let captureFailure: string | undefined;
-  let joinedNotified = false;
+  let joinedNotified = false, admissionDenied = false;
   const gate = createAdmissionGate(); // ISS-CAPTUREFIX-001: the silence watchdog starts only after `admitted`
   const onEvent = (_h: string, ev: Parameters<typeof collectGapEvent>[1]) => {
     consentControl.privacy.onCaptureEvent(ev);
@@ -126,6 +126,7 @@ export async function runRecord(rest: string[], inject: RecordInject = {}): Prom
     if (ev.event === "ended" && endedAt === undefined) endedAt = Date.now();
     if (ev.event === "capture-error") captureFailure = gateFailure ?? String(ev.error ?? "capture failed");
     if (ev.event === "admission_timeout") captureFailure ??= gateFailure;
+    if (ev.event === "admission_denied" && gateFailure) { admissionDenied = true; captureFailure ??= gateFailure; } // B2 / D-232: Meet refusal, pre-admission only
     if (ev.event === "capture-stopped" && (ev as {failed?: unknown}).failed !== false) captureFailure ??= "capture stopped with failure";
     collectGapEvent(gaps, ev);
     telegram.onBotEvent(ev);
@@ -201,7 +202,7 @@ export async function runRecord(rest: string[], inject: RecordInject = {}): Prom
       } catch (e) {
         console.error(`[bot] stop failed: ${e instanceof Error ? e.message : String(e)}`);
         if (backend === "tab") throw gate.failure ? new Error(gate.failure) : e; // ISS-CAPTUREFIX-001: name the reload that killed it
-      }
+      } finally { if (admissionDenied) settleDeniedCapture(bot.outputPath(sessionHandle), gate.failure); } // B2 / D-232: refusal only
       await bot.disconnect().catch(() => {});
     }
     control.dispose();
