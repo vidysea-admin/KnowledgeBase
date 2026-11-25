@@ -121,6 +121,14 @@ export function installCaptureControl(context: {tenantId: string; sessionId: str
     },
   };
 }
+/** B10 (D-236 A6, D-238 item 3): the only child stderr text ever kept is ONE name from this fixed list, read from the LAST line that
+ * starts with the marker the CLI prints (cli.ts: `lkb capture failed: <message>`). Nothing else from stderr is stored, logged or reported. */
+const CAPTURE_FAILURE_NAMES = ["admission_denied"], FAILURE_MARKER = "lkb capture failed: ", STDERR_WINDOW = 65536;
+function captureFailureName(window: string, truncated: boolean): string | undefined {
+  const lines = window.split("\n"); if (truncated) lines.shift(); // the first line of a cut window began before it
+  const last = lines.filter(line => line.startsWith(FAILURE_MARKER)).pop()?.slice(FAILURE_MARKER.length);
+  return CAPTURE_FAILURE_NAMES.find(name => last?.startsWith(name) && (last.length === name.length || /[\x00-\x2f\x3a-\x40\x5b-\x5e\x60\x7b-\x7f]/.test(last[name.length]!)));
+}
 /** Single fixed CLI launcher; parent handles never escape the closure and no signal fallback exists. */
 export function launchControlledRecording(root: string, args: string[], env: NodeJS.ProcessEnv, onLine: (line: string) => void, onControl?: (control: RecordingControl) => void, spawnLike = spawn): Promise<void> {
   const managed = args[0] === "record", sessionId = args[args.indexOf("--session-id") + 1], tenantId = env.LKB_TENANT_ID;
@@ -144,11 +152,18 @@ export function launchControlledRecording(root: string, args: string[], env: Nod
       pending += bytes.toString(); if (pending.length > 65536) pending = pending.slice(-65536);
       const lines = pending.split("\n"); pending = lines.pop() ?? ""; for (const line of lines) onLine(line);
     });
-    child.stderr!.on("data", () => {});
+    let errWindow = "", errTruncated = false; // most recent STDERR_WINDOW characters of stderr, always drained
+    child.stderr!.on("data", bytes => {
+      errWindow += bytes.toString(); if (errWindow.length > STDERR_WINDOW) { errWindow = errWindow.slice(-STDERR_WINDOW); errTruncated = true; }
+    });
     const cleanup = () => { closed = true; settle("unavailable"); privacy?.dispose(); child.off("message", message); };
     child.once("disconnect", () => settle("unavailable"));
     child.once("error", () => {cleanup(); fail(new Error("Recording child could not start"));});
-    child.once("close", code => {cleanup(); code === 0 ? done() : fail(new Error(`Recording pipeline exited ${code}`));});
+    child.once("close", code => {
+      cleanup(); if (code === 0) return done();
+      const name = captureFailureName(errWindow, errTruncated), message = `Recording pipeline exited ${code}`;
+      fail(name ? Object.assign(new Error(`${name}: ${message}`), {code: name}) : new Error(message));
+    });
     if (managed && onControl) onControl({generation, privacy: privacy!.privacy, privacyStatus: privacy!.privacyStatus, stop: reason => {
       if (!["cancelled", "rescheduled"].includes(reason) || closed || !child.connected || (requested && requested !== reason)) return Promise.resolve("unavailable");
       if (acknowledged) return Promise.resolve("accepted");
