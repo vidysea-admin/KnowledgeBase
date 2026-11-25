@@ -9,9 +9,9 @@ const ID = /^[a-z0-9][a-z0-9-]{0,63}$/;
 const REASONS = new Set(['capacity-full', 'capture-slot-unavailable', 'missed-coverage', 'missed-while-processing', 'retry-limit',
   'cancelled', 'rescheduled', 'coverage-review', 'controller-disconnected', 'privacy-controller-unavailable',
   'interrupted-no-recording-artifact', 'rule-denied', 'opted-out', 'rules-unevaluable', 'needs-registration', 'needs-review', 'admission_denied']);
-/** D-236 A3: a reason is a listed name, or starts with one followed by an ASCII character that is not a letter, digit or underscore (`name: text`, `name - text`). */
+/** D-236 A3: a reason is a listed name, or starts with one followed by an ASCII character that is not a letter, digit or underscore (`name: text`, `name - text`). A hyphen glued to the name is not a delimiter (`rescheduled-completed` is a different value). */
 const reasonName = reason => typeof reason === 'string' ? [...REASONS].find(name => reason === name ||
-  reason.startsWith(name) && /[\x00-\x2f\x3a-\x40\x5b-\x5e\x60\x7b-\x7f]/.test(reason[name.length])) : undefined;
+  reason.startsWith(name) && /[\x00-\x2c\x2e\x2f\x3a-\x40\x5b-\x5e\x60\x7b-\x7f]/.test(reason[name.length])) : undefined;
 const LIMIT = 50, REPLAY = 25, LOOKBACK = 2 * 24 * 60 * 60 * 1000;
 const HANDOFF = new Set(['sent', 'duplicate', 'disabled', 'digest-queued', 'skipped-test-data', 'created', 'updated', 'skipped-no-times', 'superseded']);
 

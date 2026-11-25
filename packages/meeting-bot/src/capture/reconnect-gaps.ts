@@ -127,7 +127,7 @@ const CAPTURE_FAILURE_NAMES = ["admission_denied"], FAILURE_MARKER = "lkb captur
 function captureFailureName(window: string, truncated: boolean): string | undefined {
   const lines = window.split("\n"); if (truncated) lines.shift(); // the first line of a cut window began before it
   const last = lines.filter(line => line.startsWith(FAILURE_MARKER)).pop()?.slice(FAILURE_MARKER.length);
-  return CAPTURE_FAILURE_NAMES.find(name => last?.startsWith(name) && (last.length === name.length || /[\x00-\x2f\x3a-\x40\x5b-\x5e\x60\x7b-\x7f]/.test(last[name.length]!)));
+  return CAPTURE_FAILURE_NAMES.find(name => last?.startsWith(name) && (last.length === name.length || /[\x00-\x2c\x2e\x2f\x3a-\x40\x5b-\x5e\x60\x7b-\x7f]/.test(last[name.length]!)));
 }
 /** Single fixed CLI launcher; parent handles never escape the closure and no signal fallback exists. */
 export function launchControlledRecording(root: string, args: string[], env: NodeJS.ProcessEnv, onLine: (line: string) => void, onControl?: (control: RecordingControl) => void, spawnLike = spawn): Promise<void> {

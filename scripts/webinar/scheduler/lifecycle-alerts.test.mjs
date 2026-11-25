@@ -207,10 +207,13 @@ test('B10-C2: the reason lookup matches a listed name only as a whole word, and 
   for (const name of [...OLD_NAMES, 'admission_denied']) {
     assert.equal(detailOf(name), `Coverage: ${name}.`, name);
     assert.equal(detailOf(`${name}: free text`), `Coverage: ${name}.`); assert.equal(detailOf(`${name} - free text`), `Coverage: ${name}.`);
-    for (const reason of [`${name}_extra`, `${name}x`, `${name}2`, `x${name}`, `the host said ${name} later`, `${name}é`]) assert.equal(detailOf(reason), NEUTRAL, reason);
+    for (const reason of [`${name}_extra`, `${name}x`, `${name}2`, `x${name}`, `the host said ${name} later`, `${name}é`, `${name}-foo`]) assert.equal(detailOf(reason), NEUTRAL, reason);
   }
   for (const reason of ['admission', '', 'admission_', 'Admission_Denied', 'private-secret']) assert.equal(detailOf(reason), NEUTRAL, JSON.stringify(reason));
   assert.equal(detailOf(undefined), undefined);
+  // Review R1: a hyphen glued to a listed name is part of a longer value, never the end of the name (auto-record-policy.ts writes `rescheduled-completed`).
+  for (const reason of ['rescheduled-completed', 'cancelled-by-host', 'retry-limit-reached', 'admission_denied-foo']) assert.equal(detailOf(reason), NEUTRAL, reason);
+  assert.equal(detailOf('rescheduled'), 'Coverage: rescheduled.'); assert.equal(detailOf('rescheduled: x\r\n'), 'Coverage: rescheduled.');
 });
 
 test('B10-C3: the mail names the event and the matched name only; no secret from the reason, the environment or a URL title reaches it', async () => {

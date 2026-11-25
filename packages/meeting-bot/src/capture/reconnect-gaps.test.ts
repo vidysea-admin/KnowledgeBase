@@ -187,7 +187,7 @@ test("B10-C4 B10-C7a: the refusal line becomes the message and the code; any oth
 
 test("B10-C7b: the name must be whole and the line must start with the marker", async () => {
   for (const text of ["lkb capture failed: admission_denied_extra\n", "lkb capture failed: admission_deniedx\n", "lkb capture failed: admission_denied2\n",
-    "lkb capture failed: admission_deniedé\n", "lkb capture failed: Admission_Denied\n", "lkb capture failed:  admission_denied\n", "lkb capture failed: \n",
+    "lkb capture failed: admission_deniedé\n", "lkb capture failed: admission_denied-foo\n", "lkb capture failed: admission_denied-\n", "lkb capture failed: Admission_Denied\n", "lkb capture failed:  admission_denied\n", "lkb capture failed: \n",
     "error: lkb capture failed: admission_denied\n", "note admission_denied\n", "lkb capture failed admission_denied\n"])
     assert.equal((await stderrOf(text))?.message, "Recording pipeline exited 1", JSON.stringify(text));
   for (const text of ["lkb capture failed: admission_denied", "lkb capture failed: admission_denied\n", "lkb capture failed: admission_denied: x\n",
