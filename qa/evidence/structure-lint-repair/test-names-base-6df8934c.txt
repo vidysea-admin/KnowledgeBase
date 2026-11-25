@@ -1,0 +1,118 @@
+answer-fast | ok | [C1][C2] default = one answer call + one grounding check; filters.mode=deep runs the multi-step graph (select_nodes)
+answer-fast | ok | [C2] mode is parsed from filters, validated, and never persisted into the stored filter schema
+answer-fast | ok | [C3] empty retrieval: insufficient_coverage, no citation, no model call
+answer-fast | ok | [C3] response shape is identical in both modes
+answer-fast | ok | [C5] web fallback runs on empty retrieval only when filters.sources allows web; never for sources=internal
+answer-fast | ok | [C7] a fresh default-path answer whose citations are valid internal chunks ships those sources
+answer-fast | ok | [C7] a verification failure surfaces its real reason instead of a generic wipe
+answer-fast | ok | [C7] deep mode keeps the previous stale wording (unchanged behavior)
+answer-fast | ok | [F3] a verifier that throws never turns a persisted default-path run into a 500; it degrades to the generic stale wording like deep
+answer-fast | ok | [F4] sources.internal is what the answer cites: one uncited chunk that fails verification does not wipe the cited, valid one
+answer-fast | ok | [ISS-AFR-001] a default-path answer whose grounding check dropped sentences is verdict 'ambiguous' and goes to review, not straight to allowed
+answer-fast | ok | [ISS-AFR-002] irrelevant retrieval reaches the web fallback when filters.sources allows web
+answer-fast | ok | [ISS-AFR-003] irrelevant retrieval is a persisted, honest refusal (insufficient coverage), never a thrown 503
+answer-fast | ok | fresh refusal reports search failure separately from empty evidence and redacts diagnostics
+answer-persistence | ok | Mongo conflict identity deduplicates only same tenant/run/source pair and closes atomically
+answer-persistence | ok | NASA's Titan facts reference resolves the visible Mercury paragraph with linked CSS # SKIP
+answer-persistence | ok | WhatsApp current eligibility and trusted web proof are required; denied approval never falls back to raw turn equality
+answer-persistence | ok | a linked stylesheet holds the same publisher concurrency slot as its document
+answer-persistence | ok | answer-record production guard stays closed by default; feedback cap is enforced in the actual Mongo update filter
+answer-persistence | ok | canonical source verifier checks tenant, exact text/hash/byte/tuple/origin and missing metadata
+answer-persistence | ok | current committed effective transcript authorizes corrected evidence and invalidates raw or superseded quote hashes
+answer-persistence | ok | linked and imported publisher styles use their canonical bases and are re-read for verification
+answer-persistence | ok | publisher evidence preserves final URL, page title and visible quotation on each fresh read
+answer-persistence | ok | publisher redirects keep the original deadline and enforce HTTPS at each hop
+answer-persistence | ok | publisher root attributes, inline CSS and linked visibility apply to descendant quotations
+answer-persistence | ok | real Mongo adapter uses tenant-filtered durable identity; restart and review CAS retain immutable candidate
+answer-persistence | ok | redirected publisher DNS lookup is cancelled at the original deadline before a second connection
+answer-persistence | ok | stylesheets share the document's byte and time limits and the stylesheet count is bounded
+answer-persistence | ok | substantial publisher pages favor article evidence and omit animated or conditionally hidden passages
+answer-persistence | ok | the publisher read withholds evidence when a linked stylesheet is missing or unassessable
+answer-persistence | ok | zero-alpha text colors and inherited text fill withhold both discovery and saved citations
+answer-router | ok | API-key scopes and claimed human labels cannot approve, prefer sources or label usefulness without trusted authority
+answer-router | ok | direct answer read returns original metadata only under authenticated tenant and ask scope
+answer-router | ok | human verification fails closed on absent, foreign, nonhuman, malformed and unavailable authority
+answer-router | ok | human-authorized history/answer-review endpoints preserve scope, tenant, revision and duplicate boundaries
+answer-router | ok | trusted human authority receives each action and persists source preference attribution
+championship-proof | ok | cross-tenant turn id: sources stripped and stale flag set
+championship-proof | ok | store without a verifier fails closed for cited trials
+championship-proof | ok | turn missing: sources stripped and stale flag set
+championship-proof | ok | turn text changed: sources stripped and stale flag set
+championship-proof | ok | valid proof keeps sources and response shape unchanged
+live-verify | ok | a base that is not an http(s) URL exits non-zero with a clear message and sends nothing [L1-C1]
+live-verify | ok | a citation whose end is not after its start, or a cited turn whose time range differs, is a FAIL [L1-C3]
+live-verify | ok | a cited turn that does not exist in the session is a FAIL [L1-C3]
+live-verify | ok | a deployment that sets the Secure session cookie name is handled the same way [L1-C2]
+live-verify | ok | a refusal must be exactly 401 or 403: a 200 on the viewer's own request is a FAIL [L1-C4]
+live-verify | ok | a refusal on a route that does not exist (typo'd path) is not a pass: the operator-key control must find the route [L1-C4]
+live-verify | ok | a sign-out that leaves the session alive is a FAIL [L1-C5]
+live-verify | ok | a viewer signs in, asks the pinned UC question, opens the cited turn, is refused on admin/ingest/WhatsApp/meeting-bot, signs out [L1-C1][L1-C2][L1-C3][L1-C4][L1-C5][L1-C6]
+live-verify | ok | a viewer who can reach an admin route is a FAIL, one line per surface [L1-C4]
+live-verify | ok | a wrong password stops at sign-in with a non-zero exit and nothing else is called [L1-C2]
+live-verify | ok | an admin account cannot stand in for the viewer: the refusal steps FAIL instead of passing vacuously [L1-C4][L1-I2]
+live-verify | ok | an answer whose citation has no speaker, no end time or no citation at all is a FAIL [L1-C3]
+live-verify | ok | missing credentials when sign-in is needed: clear message, exit 5, no request made [L1-C2]
+live-verify | ok | no secret (password, operator key, session cookie, CSRF proof) appears in stdout, stderr or any written file; a password flag on argv is refused [L1-C2]
+live-verify | ok | sign-out is shown on a route that answered 200 before it, and the run lists the row steps it did not cover [L1-C5][L1-C6]
+live-verify | ok | the pinned question is read from the committed file, not written inline in the script [L1-C3]
+live-verify | ok | without --base and without credentials the script behaves as before: local default target, no sign-in, INCONCLUSIVE exit 3 [L1-C1][L1-I1]
+live-verify | ok | without an operator key the four refusal steps FAIL instead of passing without proof the routes exist [L1-C4]
+llm-eval | ok | D4J-C1 pairwise: swapping which side holds which text gives the same prompt body; answer text stays verbatim
+llm-eval | ok | D4J-C1 pairwise: the report notes that style cues in verbatim text can unblind a judge
+llm-eval | ok | D4J-C2 pairwise: an empty reply is an error and is not retried
+llm-eval | ok | D4J-C3 pairwise: two judges must have distinct model ids (same model under two names is refused); answering model named and overlap flagged
+llm-eval | ok | D4J-C4 pairwise: a run with fewer than half the items decided is labelled low-decisive; disagreement rate is reported
+llm-eval | ok | D4J-C4 pairwise: inconsistent and error are excluded from the win-rate denominator and reported apart; rules and denominator are named
+llm-eval | ok | D4J-C5 pairwise flags: --llm is required; the cap is the total over items x judges x 2 and the run is refused below it
+llm-eval | ok | D4J-I1 pairwise: running the script directly without --pairwise does nothing, as before
+llm-eval | ok | D4J-I2 pairwise: an existing output file is never overwritten, and the refusal happens before any judge call
+llm-eval | ok | ISS-U010HARNESS-001: --max-cost-usd alone is refused (adapters report costUsd 0); allowed with --max-calls
+llm-eval | ok | a failed or unparseable reply is flagged as a heuristic fallback, never silently counted as an LLM score
+llm-eval | ok | calibration stops cleanly at the cap and reports not-scored pairs
+llm-eval | ok | cap boundary: at exactly the limit the next call is refused; one below it is allowed
+llm-eval | ok | cap: checked before each call; the capped call is never sent
+llm-eval | ok | fake transport: cloud URL + bearer header sent, model id passed, OLLAMA_BASE_URL untouched
+llm-eval | ok | flags: without --llm nothing is enabled; --llm needs a model and a cap
+llm-eval | ok | helpers: limitByQuestion, redactor, latencySummary
+llm-eval | ok | pairwise blind prompt: only the question and 'Answer 1'/'Answer 2'; no id, source, session, speaker or side label
+llm-eval | ok | pairwise file mode: reads items JSON, writes the report JSON with the method and prints a summary; bad items are refused
+llm-eval | ok | pairwise flags: needs a file, two provider:model judges and a call cap; reuses the --llm validation
+llm-eval | ok | pairwise real-judge seam: createPairwiseJudge sends the blind prompt through the existing complete(job), counts calls, honours the cap
+llm-eval | ok | pairwise reply parsing: JSON winner 1 or 2 only; prose, tie, out-of-range and missing are undefined
+llm-eval | ok | pairwise wilson interval: known values, n=0 undefined, bounds stay within [0,1]
+llm-eval | ok | pairwise: a judge call that throws is an error for that item only, and the run completes
+llm-eval | ok | pairwise: a judge that answers in prose instead of a choice is an error, never a win for either side
+llm-eval | ok | pairwise: a position-biased judge (always answer 1) is 100% inconsistent, win rate undefined (never 50%)
+llm-eval | ok | pairwise: an empty item list gives zero counts and undefined rates, makes no judge call, and does not throw
+llm-eval | ok | pairwise: judges disagree - opposite preferences give A vs B per judge, a combined tie, agreement 0
+llm-eval | ok | pairwise: one order parses and the other is prose - error, not inconsistent and not a win
+llm-eval | ok | pairwise: two judges agree - A wins 3 of 4, each (item,judge) asked twice in opposite orders, CI named
+llm-eval | ok | recall ranking scores whole questions only and reports the rest as not-scored
+llm-eval | ok | results warning field appears only when heuristic fallbacks > 0
+message-vertical | ok | approved Hinglish message traverses actual ingest approval transaction native search citation Ask policy and history
+message-vertical | ok | native message deletion invalidates actual search citation policy history and Ask
+message-vertical | ok | native message source-mutation invalidates actual search citation policy history and Ask
+message-vertical | ok | native message withdrawal invalidates actual search citation policy history and Ask
+native-answer-evidence | ok | actual Mongo evidence verifier accepts native document/message bindings using fourth resolver and no audio reads
+native-answer-evidence | ok | actual cached release verifier rereads current epoch/revision and withdrawal
+native-answer-evidence | ok | existing transcript verifier retains scoped turn/overlay checks and optional eligibility callback
+native-answer-evidence | ok | mixed and forged native envelopes fail closed before authority or legacy DB reads
+native-answer-evidence | ok | native authority infrastructure errors cannot release a cached binding
+native-answer-evidence | ok | native binding requires exact joined excerpt, original fingerprint and current resolver capability
+native-answer-evidence | ok | web freshness remains supplied by the existing trusted web verifier
+rate-limit | ok | a 429 keeps the existing body and Retry-After, and names no user or session [L2-C2][L2-I2]
+rate-limit | ok | a session principal with no user id falls back to today's tenant key rather than escaping the limit [L2-C2]
+rate-limit | ok | a viewer cannot pick or share another bucket with a forged header, query or body value [L2-C3]
+rate-limit | ok | an anonymous burst (no authenticated principal) is still limited per client address [L2-C2]
+rate-limit | ok | one API-key client keeps the per-tenant bucket and is not touched by session users in the same tenant [L2-C2]
+rate-limit | ok | one viewer signing in again on a second browser shares ONE bucket: the key is the user, never the session id [L2-C1]
+rate-limit | ok | the default allowance stays 60 per minute for a session user [L2-C2]
+rate-limit | ok | two viewers browsing at once in one tenant each get the full allowance; A exhausting theirs never 429s B [L2-C1]
+rate-limit | ok | users of one tenant stay separate even when ids contain separators or equal a tenant id; the session key can never be a tenant-only key [L2-C4]
+stale-citation-refusal | ok | one stale binding among current ones refuses the whole set; web proof and WhatsApp eligibility are mandatory
+stale-citation-refusal | ok | stale citation baseline is accepted, then each withdrawal path is refused
+stale-citation-refusal | ok | tampered or hollow stored bindings are refused
+vertical | ok | native Ask vertical: deletion after grounding refuses the completed answer
+vertical | ok | native document vertical: actual mounted consent/upload/publication, Hindi source and request-bound Ask
+vertical | ok | native lifecycle vertical: retry/head advance/restart/body mutation/revoke/delete invalidate exact evidence
+vertical | ok | native policy vertical: actual policy release and mounted history refuse advanced or revoked canonical evidence
