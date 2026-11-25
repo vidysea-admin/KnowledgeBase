@@ -1,5 +1,5 @@
 # Checkpoint — b10-failure-alert-mail (checker, Mode A, coordinator single)
-Verdict: CONTINUE-NEEDED (input change: code-review finding, repair pending). No verdict file for 6a2cbd7c. Cycle 0, resume 0 of 2 (not a budget exhaustion).
+Verdict: PASS written at resume 1 on c8071e2e (qa/verdicts/b10-failure-alert-mail.md, Cycle checked: 0). Earlier state, kept below: CONTINUE-NEEDED on 6a2cbd7c, no verdict file for it.
 Written 2026-11-25. Bound root: D:\KnowledgeBase\.worktrees\b10-failure-alert-mail, base 063a9b79, head judged so far 6a2cbd7c (manifest commit 51185fdd). Tier: M (route floor null, recomputed by checker: `tick.mjs --route 063a9b79..6a2cbd7c` -> {"floor":null,"dual":false,"rules_fired":[]}, exit 0).
 
 ## Rulings (contract commit 1fffeefe on branch docs/cloud-run-golive, main tree, file qa/contracts/meeting-bot-failure-alert-mail.md only)
@@ -21,3 +21,9 @@ Written 2026-11-25. Bound root: D:\KnowledgeBase\.worktrees\b10-failure-alert-ma
 3. Falsification floor on the repaired code: one per changed criterion (C2 and C7b are the ones the repair changes; plus C1, C3, C4, C5, C6, C7c, C7d at least once on the new blobs).
 4. B10-C5 test: confirm it asserts the 3-attempt / 90 s ceiling (it does at 6a2cbd7c: `tick <= 3*30000 && attempts <= 3`) and reports the measured 60 s. B10-C3: confirm an assertion on `inputs[0].sessionKey` exists (it does in the C4 test at 6a2cbd7c).
 5. Verdict at cycle 0 with `Cycle checked: 0`, narrow-pathspec commit in the worktree.
+
+## Resume 1 (2026-11-25, head c8071e2e, manifest 47f76149): DONE
+- Evidence identity: lifecycle-alerts.mjs 3c2257cf3a4d, reconnect-gaps.ts bc213a8e8af0. Re-runs: 19 pass (lifecycle + alert-kinds), 47 pass (four meeting-bot files), 23 pass (run-pipeline), tsc exit 0. alerts.ts, telegram-channel.ts, run-pipeline-deps.mjs byte-equal to base. Diff scope: the four allowed files plus manifest and checkpoint.
+- Falsification, 12 mutants, all hash==HEAD after restore: C1 C2 C2h C3 C4 C5 C6 C7a C7d C7h C7x red after and green before; C7e survived (equivalent, note only). Over cap by 2: ISS-B10FAILUREALERTMAIL-001 (low, process).
+- CONTRACT-GAP[B10-C2,B10-C7]: resolved by the 1fffeefe amendment (hyphen not a delimiter); code matches.
+- Remaining: none for this check. The maker closes out the manifest (checked-PASS).
