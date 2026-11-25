@@ -111,4 +111,4 @@ node scripts/eval/llm-eval.mjs --pairwise <items.json> --llm --judge-1 ollama:<m
 ## Live browser evidence
 Not UI-touching — no surface changed (changed paths: scripts/eval/llm-eval.mjs, scripts/eval/llm-eval.test.mjs, the contract copy, this manifest).
 
-## Status: ready-for-check
+## Status: checked-PASS (qa/verdicts/d4-pairwise-judge.md, cycle 0, 2026-11-25)
