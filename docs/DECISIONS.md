@@ -3009,3 +3009,25 @@ fourth would have left real decisions idle behind an unrelated unit.
 - a live registration on an outside site;
 - any enforcement path.
 **Links:** D-014, D-238, D-243, D-244, D-245, qa/manifests/wa-key-store.md, qa/manifests/wa-svc-surface.md, qa/manifests/recorder-host-id.md, qa/manifests/recorder-self-heal-rejoin.md, qa/manifests/calendar-page-freshness.md, qa/contracts/wa-key-store.md, qa/gates/golive-owner-questions-2026-11-25.md
+
+## D-247 | 2026-11-25 | type: decision | status: ACTIVE
+**What:** On 2026-11-25 the Approver wrote in chat: "jo jo build ho chuka hai vo sabb validate krke commit krke push kroo taaki remaining walo pr dedicated manner mai focus krr paayngee". The main session reads it as four items.
+(1) Validate every unit that is built. A unit counts as validated only by a checker PASS. That covers the units still unchecked: H1, which is running; B4B, C3C and the C3AB integration branch, each checked once its builder hands back; and T1.
+(2) T1 (`calendar-page-freshness`) is built, so the instruction is taken as the D-014 round-cap waiver asked as Q7. T1 is a non-security seam: the meetings list refresh in `apps/web/src/pages/calendar/`. Its check is dispatched once a test slot is free under the 4-agent memory ceiling. If the Approver meant otherwise, he says "T1 roko" and the check is stopped and filed as file-don't-fix.
+(3) Push the feature branches of this repo and of the WhatsApp archiver to their own remotes. Before the push, two things happen: an inventory of each branch (head, upstream, manifest status, verdicts), and a secret scan of exactly what each push would send. The scan covers keys, tokens, connection strings with credentials and private keys. A branch with a hit is not pushed.
+(4) Commit only this session's own files in the main tree:
+- included: docs, qa manifests, verdicts, gates and evidence;
+- never committed: `qa/QUEUE.md` (another session's edits), the local-only `apps/web/vite.e2e.local.config.mjs` and `.claude/launch.json`, and the untracked `data/` probe and browser-profile folders.
+Master is not pushed, and nothing is merged to master or to the archiver's main branch. The vendor's trigger fires on every master push, builds only the API image and runs a `services update`, which would remove the web container (plan section 6). A master push still needs F0, the Approver's own yes and a heads-up to the vendor.
+**Why:** The instruction asks for built work to be checked and kept safe off this laptop, so that the remaining units get full attention. Pushing feature branches does that and was already authorized by the approved plan (D-227, item 3). Pushing master would deploy, which the instruction did not name and the plan gates separately. The T1 waiver is low risk: it only lets a read-only check run on a UI-only change. A wrong reading is undone by stopping the check.
+**Result:** Nothing has been pushed yet; the inventory and secret scan come first. An earlier `git push origin release/kb-golive` returned 403 (GitHub write access, still asked as G 1, G 2 or G 3). If the push is still refused, that is reported, and no other route is tried.
+**Changes-authorized:** T1 check dispatch. Commits of this session's own files on `docs/cloud-run-golive`. `git push` of feature branches (never master, never a branch with "master" in its name, never the `legacy` remote) in both repos, after a clean secret scan. Not authorized:
+- ARCHITECTURE.md and contracts/;
+- a merge to master or to the archiver's main branch;
+- any cloud change or database write;
+- sending the vendor mail;
+- installing a new package;
+- a live registration on an outside site;
+- any enforcement path.
+**Approved-by:** Umesh (the T1 round-cap waiver, read from the chat message quoted above; withdrawn by "T1 roko")
+**Links:** D-014, D-227, D-245, D-246, qa/manifests/calendar-page-freshness.md, qa/gates/golive-owner-questions-2026-11-25.md, plan section 6
