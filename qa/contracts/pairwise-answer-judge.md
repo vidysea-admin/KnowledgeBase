@@ -2,6 +2,7 @@
 
 > Status: adopted by /checker 2026-11-25. Authority: D-227; plan section 7 lane D D4; D-164 (spend and provider order for opt-in LLM eval). Scope: `scripts/eval/llm-eval.mjs` (new pairwise mode) and its tests.
 > Owner's words: "two model judges, blind and order-swapped (`scripts/eval/llm-eval.mjs` extended with a pairwise prompt); output = win rate with a confidence interval."
+> Path note (D-237, 2026-11-25; the owner's words above are not reworded): on branch `release/kb-golive`, after the structure-lint repair, the pairwise judge and its command line live in `scripts/eval/pairwise/pairwise-judge.mjs`, which imports one way from `../llm-eval.mjs`; `scripts/eval/llm-eval.mjs` keeps the base evaluation only. Wherever a line of this contract says `scripts/eval/llm-eval.mjs` for the pairwise code (the Scope line, the owner's words, the D4J-I1 wording "`llm-eval.mjs` behaves exactly as today" read as: the base evaluation is unchanged), it means the new path on that branch. The criteria themselves do not change. The move exists only on `release/kb-golive` until it merges, so the old path stays true on every other branch; the repair's own checks are in `structure-lint-repair.md` (SL-3, SL-4).
 > Feeds launch row G16 (`go-live-acceptance.md`). Not `evaluator-calibration.md` (that is the node-relevance scorer).
 
 ## Criteria
@@ -32,3 +33,4 @@ Choosing the judge models; the 92 questions and baselines themselves (row G16 ow
 - 2026-11-25 · routine · created. Maker reading [D4J-a]->C1 (REJECTED hiding source name, session id and speaker name inside answer text: scrubbing alters the content being judged, including speaker attribution;
   blindness is about who wrote the side), [D4J-b]->C2, [D4J-c]->C4 (tightened: denominator and combined rule stated; the maker's "inconsistent counted as a tie" conflicted with reporting both, so they are separate and
   excluded from the win rate), [D4J-d]->C6 (tightened: named stub behaviours); added C3 (two distinct judge models, the owner's wording) and C5 (D-164 spend gate) · folds inbox "unit-level checks for wave 1" (D-227)
+- 2026-11-25 · routine · path note added under the owner's words: the pairwise judge moves to `scripts/eval/pairwise/pairwise-judge.mjs` on branch `release/kb-golive` (D-237); no criterion and no owner quote changed · folds inbox "structure-lint repair" item 1
