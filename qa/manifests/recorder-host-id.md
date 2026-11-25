@@ -155,4 +155,4 @@ Not UI-touching. No browser, no meeting.
 - The start-time log line goes to stderr with `console.error` (assumption); if a host wants structured logging the CORE-REQUEST owners can wrap the call.
 - `LKB_CAPTURE_HOST_ID` set to the same value on staging, production and a laptop would make a copied profile pass the host comparison (Approver question 1); the HMAC issuer key still blocks a registry the signing never saw (tested), but not a holder of the whole profile tar.
 
-## Status: ready-for-check
+## Status: checked-PASS
