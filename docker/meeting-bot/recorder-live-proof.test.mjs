@@ -249,12 +249,13 @@ test('B4B-C1 publish: one create-only upload to live-proof/<sha256>.<ext>, bytes
 
 test('B4B-C2 a failed publish exits non-zero with one stable line, takes no snapshot, leaves no object and the marker byte-equal; a good rerun uploads once and snapshots', T, () => {
   const cases = {
-    'upload exits non-zero': {env: {STUB_FAIL_UPLOAD: 'live-proof'}},
-    'upload hangs past the bound': {env: {STUB_HANG_PROOF: '1', LKB_PROOF_TIMEOUT_S: '2'}},
-    'no marker': {setup: (w) => rmSync(w.release('live-proof.json'))},
-    'status is not passed': {setup: (w) => writeFileSync(w.release('live-proof.json'), marker(REC, {status: 'failed'}))},
-    'recording is missing': {setup: (w) => rmSync(w.app(REC))},
-    'recording is zero bytes': {setup: (w) => writeFileSync(w.app(REC), Buffer.alloc(0))},
+    // `line`: the one failure line names its cause (a stub that hangs for 20 s and then exits 1 would otherwise fail the run too, only later)
+    'upload exits non-zero': {env: {STUB_FAIL_UPLOAD: 'live-proof'}, line: /upload failed/},
+    'upload hangs past the bound': {env: {STUB_HANG_PROOF: '1', LKB_PROOF_TIMEOUT_S: '2'}, line: /timed out/},
+    'no marker': {setup: (w) => rmSync(w.release('live-proof.json')), line: /no marker/},
+    'status is not passed': {setup: (w) => writeFileSync(w.release('live-proof.json'), marker(REC, {status: 'failed'})), line: /status/},
+    'recording is missing': {setup: (w) => rmSync(w.app(REC)), line: /missing or empty/},
+    'recording is zero bytes': {setup: (w) => writeFileSync(w.app(REC), Buffer.alloc(0)), line: /missing or empty/},
   };
   for (const [label, c] of Object.entries(cases)) {
     const w = world();
@@ -264,6 +265,7 @@ test('B4B-C2 a failed publish exits non-zero with one stable line, takes no snap
       const r = w.publish(c.env ?? {});
       assert.notEqual(r.status, 0, `${label}: ${r.out}`);
       assert.equal(failLines(r.out).length, 1, `${label}: one stable log line\n${r.out}`);
+      assert.match(failLines(r.out)[0], c.line, `${label}: the line names the cause`);
       assert.equal(stateUploads(w).length, 0, `${label}: no snapshot call`);
       assert.deepEqual(w.proofObjects(), [], `${label}: no object left`);
       if (mk) assert.equal(Buffer.compare(readFileSync(w.release('live-proof.json')), mk), 0, `${label}: marker byte-equal`);
