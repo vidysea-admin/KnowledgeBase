@@ -110,4 +110,4 @@ Also in the committed tests: C2 count metrics (max vs numerator), invalid-thresh
 ## Live browser evidence
 Not UI-touching — no surface changed. Changed paths: packages/index/src/eval/extraction.ts, packages/index/src/eval/extraction-gold.test.ts, scripts/eval-extraction.mjs, scripts/eval/gold/, data/eval/extraction-thresholds.json, qa/contracts/extraction-scoring-harness.md, qa/manifests/d2-extraction-harness.md.
 
-## Status: ready-for-check
+## Status: checked-PASS (qa/verdicts/d2-extraction-harness.md, cycle 0, 2026-11-25)
