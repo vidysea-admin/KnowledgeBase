@@ -106,4 +106,4 @@ after the timeout-bounded test). `git status --short` after all five: only untra
   pre-existing on the integration head and untouched (ISS-VECTOR-003). `session.ts` is exactly at budget.
 - No live provider, network or production Mongo call was made.
 
-## Status: ready-for-check
+## Status: checked-PASS (dual: qa/verdicts/vector-gap-durability.md + qa/verdicts/vector-gap-durability.b.md, cycle 1, 2026-10-28)
