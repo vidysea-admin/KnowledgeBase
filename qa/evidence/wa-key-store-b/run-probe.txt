@@ -1,0 +1,25 @@
+C3B seed=5 (replay with C3B_SEED=5); loopback mongod: yes
+PROBE-P1 restore survivor value: fake straggler-1
+PROBE-P1 unlink survivor value: fake straggler-2
+✔ PROBE-P1: clash on restore and on repeat unlink with two other owners present (same ms, same type/id): one row, decrypts, others untouched, every query owner-scoped [fake] (585.9548ms)
+PROBE-P1 restore survivor value: mongo straggler-1
+PROBE-P1 unlink survivor value: mongo straggler-2
+✔ PROBE-P1: clash on restore and on repeat unlink with two other owners present (same ms, same type/id): one row, decrypts, others untouched, every query owner-scoped [mongo] (456.0863ms)
+PROBE-P2 fake stale saveCreds resolved ; stored marker now = STALE-OLD
+✔ PROBE-P2: finding 1 - a stale handle after unlink + fresh pairing overwrites the new creds [fake] (48.275ms)
+PROBE-P2 mongo stale saveCreds resolved ; stored marker now = STALE-OLD
+✔ PROBE-P2: finding 1 - a stale handle after unlink + fresh pairing overwrites the new creds [mongo] (110.0848ms)
+✔ PROBE-P3: updateMany that applies part of its rows then throws: the repeat completes (unlink and restore) [fake] (40.7838ms)
+✔ PROBE-P3: updateMany that applies part of its rows then throws: the repeat completes (unlink and restore) [mongo] (160.1863ms)
+PROBE-P4 fake marker after-restore
+✔ PROBE-P4: C6f straggler saveCreds after restore of the same link (held handle matches restored row) [fake] (28.1467ms)
+PROBE-P4 mongo marker after-restore
+✔ PROBE-P4: C6f straggler saveCreds after restore of the same link (held handle matches restored row) [mongo] (91.9023ms)
+ℹ tests 8
+ℹ suites 0
+ℹ pass 8
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 11613.1809

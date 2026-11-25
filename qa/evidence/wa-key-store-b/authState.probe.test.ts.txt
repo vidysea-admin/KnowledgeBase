@@ -1,0 +1,1457 @@
+/**
+ * Protection for the one piece of state that cannot be rebuilt.
+ *
+ * Everything else in this app lives in Mongo and can be recreated. The WhatsApp
+ * credentials cannot: losing them costs a physical QR scan on someone's phone. An unlink
+ * was once triggered to test a feature and threw away a working session for no benefit,
+ * so the archive-and-restore behaviour is pinned here rather than trusted.
+ *
+ * C3B (wa-key-store): the same cases now run over every backend through the seam `each()`
+ * below: the file store, the database store on an in-memory fake collection, and the
+ * database store on a throwaway database of a LOOPBACK mongod (only when C3B_TEST_MONGO_URI
+ * is set; otherwise those cases are skipped and printed as NOT-MEASURED, never PASS).
+ */
+process.env['SESSIONS_DIR'] = './.test-sessions';
+
+import { test, before, beforeEach, after } from 'node:test';
+import assert from 'node:assert/strict';
+import { mkdir, rm, writeFile, readdir, access, readFile } from 'node:fs/promises';
+import { join, basename, dirname } from 'node:path';
+import { randomBytes } from 'node:crypto';
+import { isDeepStrictEqual } from 'node:util';
+import { ObjectId, Binary } from 'mongodb';
+import { makeCacheableSignalKeyStore, BufferJSON, proto } from 'baileys';
+import type { KeyColl } from './authState.js';
+
+/** C3B-I6: every Mongo-using test passes this first; anything but a loopback host aborts. */
+function assertLoopbackMongo(uri: string): void {
+  let host = '';
+  try { host = new URL(uri).hostname; } catch { /* unparseable: refused below */ }
+  if (host !== '127.0.0.1' && host !== 'localhost') {
+    throw new Error('C3B-I6: refusing a MONGO_URI whose host is not 127.0.0.1 or localhost');
+  }
+}
+
+const MONGO_URI = process.env['C3B_TEST_MONGO_URI'] ?? '';
+const TEST_DB = `whatsapp_msg_test_${randomBytes(6).toString('hex')}`;
+if (MONGO_URI) {
+  assertLoopbackMongo(MONGO_URI);
+  process.env['MONGO_URI'] = MONGO_URI;
+  process.env['MONGO_DB'] = TEST_DB;
+} else {
+  process.env['MONGO_URI'] = 'mongodb://127.0.0.1:1'; // never connected without the opt-in above
+}
+
+const AS = await import('./authState.js');
+const { destroyAuthState, restoreAuthState, hasRestorableAuthState, linkedUserIds, sessionDir, createAuthState } = AS;
+const { KeyStoreError, keyStoreTestSeam: seam } = AS;
+const { config, ARCHIVE_MAX_AGE_DAYS } = await import('../config.js');
+const { logger } = await import('../logger.js');
+const mongo = await import('../db/mongo.js');
+
+const cfg = config as unknown as { keyStore: 'file' | 'mongo'; keyEncryptionKey: Buffer | null };
+
+const ROOT = './.test-sessions';
+const USER = 'aaaaaaaaaaaaaaaaaaaaaaaa';
+const OWNER_A = 'a1'.repeat(12);
+const OWNER_B = 'b2'.repeat(12);
+const OWNER_C = 'c3'.repeat(12);
+
+/* ------------------------------------------------------------------ secrets, logs, seeds */
+
+const KEY1 = randomBytes(32);
+const KEY2 = randomBytes(32);
+const KEY33 = randomBytes(33);
+const KEY31 = randomBytes(31);
+const CANARY = `CANARY-KEY-${randomBytes(6).toString('hex')}`;
+const SECRETS: Buffer[] = [KEY1, KEY2, KEY33, KEY31, Buffer.from(CANARY)];
+
+const SEED = process.env['C3B_SEED'] !== undefined ? Number(process.env['C3B_SEED']) : randomBytes(4).readUInt32LE(0);
+console.log(`C3B seed=${SEED} (replay with C3B_SEED=${SEED}); loopback mongod: ${MONGO_URI ? 'yes' : 'no (NOT-MEASURED clauses are skipped)'}`);
+
+function mulberry32(a: number): () => number {
+  return () => {
+    a = (a + 0x6d2b79f5) | 0;
+    let t = Math.imul(a ^ (a >>> 15), 1 | a);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+/** Everything the module under test logs is captured here (and scanned in after()). */
+const captured: string[] = [];
+const thrown: string[] = [];
+const safe = (a: unknown) =>
+  JSON.stringify(a, (_k, v) => (v instanceof Error ? { name: v.name, message: v.message, stack: v.stack } : typeof v === 'bigint' ? String(v) : v));
+for (const m of ['trace', 'debug', 'info', 'warn', 'error', 'fatal'] as const) {
+  (logger as unknown as Record<string, unknown>)[m] = (...a: unknown[]) => { captured.push(safe(a)); };
+}
+
+const leaks = (text: string): string[] => {
+  const hits: string[] = [];
+  SECRETS.forEach((s, i) => {
+    for (const form of [s.toString('latin1'), s.toString('hex'), s.toString('base64'), s.toString('base64url')]) {
+      if (form.length >= 8 && text.includes(form)) hits.push(`secret#${i}`);
+    }
+  });
+  return hits;
+};
+
+/* ------------------------------------------------------------------ small helpers */
+
+type Any = any; // eslint-disable-line @typescript-eslint/no-explicit-any
+const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+const rt = (v: unknown): Any => JSON.parse(JSON.stringify(v, BufferJSON.replacer), BufferJSON.reviver);
+const canon = (v: unknown) => JSON.stringify(v, BufferJSON.replacer);
+const same = (a: unknown, b: unknown, label: string) => assert.ok(isDeepStrictEqual(a, b), label);
+const bin = (b: Binary): Buffer => Buffer.from(b.buffer.subarray(0, b.length()));
+const flip = (b: Binary, at = 0): Binary => { const x = bin(b); x[at % x.length] = (x[at % x.length] ?? 0) ^ 1; return new Binary(x); };
+
+async function rejectsWith(p: Promise<unknown>, code: string, label: string) {
+  try {
+    await p;
+  } catch (e) {
+    assert.ok(e instanceof KeyStoreError, `${label}: error is a KeyStoreError`);
+    assert.equal((e as InstanceType<typeof KeyStoreError>).code, code, `${label}: code`);
+    thrown.push(String((e as Error).message));
+    return;
+  }
+  assert.fail(`${label}: expected a rejection with ${code}`);
+}
+
+const ALL_TYPES = [
+  'pre-key', 'session', 'sender-key', 'sender-key-memory', 'app-state-sync-key',
+  'app-state-sync-version', 'lid-mapping', 'device-list', 'tctoken', 'identity-key',
+] as const;
+type KType = (typeof ALL_TYPES)[number];
+
+function genValue(type: KType, r: () => number): Any {
+  const int = (n: number) => Math.floor(r() * n);
+  const rb = (n: number) => Buffer.from(Array.from({ length: n }, () => int(256)));
+  switch (type) {
+    case 'pre-key': return { private: rb(32), public: rb(32) };
+    case 'session': return rb(48);
+    case 'sender-key': return rb(40);
+    case 'sender-key-memory': return { [`${int(1e6)}@s.whatsapp.net`]: true, [`${int(1e6)}@lid`]: true };
+    case 'app-state-sync-key':
+      return { keyData: rb(32), fingerprint: { rawId: int(1e6), currentIndex: int(100), deviceIndexes: [int(5), int(5)] } };
+    case 'app-state-sync-version':
+      return { version: int(1000), hash: rb(128), indexValueMap: { [rb(6).toString('hex')]: { valueMac: rb(32) } } };
+    case 'lid-mapping': return `${int(1e9)}@lid`;
+    case 'device-list': return [String(int(9)), String(int(9))];
+    case 'tctoken': return { token: rb(20), timestamp: String(1_700_000_000 + int(1e6)) };
+    case 'identity-key': return rb(32);
+  }
+}
+
+/** What a store must hand back for `value` (the file store's own read path, written independently). */
+const expectedRead = (type: string, value: unknown): Any =>
+  type === 'app-state-sync-key' ? proto.Message.AppStateSyncKeyData.fromObject(rt(value)) : rt(value);
+
+/* ------------------------------------------------------------------ the fake collection and the probe */
+
+function veq(a: Any, b: Any): boolean {
+  if (a === undefined) a = null;
+  if (b === undefined) b = null;
+  if (a === null || b === null) return a === b;
+  if (a instanceof ObjectId && b instanceof ObjectId) return a.equals(b);
+  if (a instanceof Date && b instanceof Date) return a.getTime() === b.getTime();
+  return a === b;
+}
+const num = (v: Any) => (v instanceof Date ? v.getTime() : v);
+const isOpObj = (c: Any) =>
+  c !== null && typeof c === 'object' && !(c instanceof ObjectId) && !(c instanceof Date) && !Array.isArray(c) &&
+  Object.keys(c).some((k) => k.startsWith('$'));
+
+function matches(doc: Any, f: Any): boolean {
+  return Object.entries(f).every(([k, c]: [string, Any]) => {
+    const dv = doc[k];
+    if (isOpObj(c)) {
+      return Object.entries(c).every(([op, arg]: [string, Any]) => {
+        switch (op) {
+          case '$in': return (arg as Any[]).some((x) => veq(dv, x));
+          case '$ne': return !veq(dv, arg);
+          case '$gt': return dv != null && num(dv) > num(arg);
+          case '$lte': return dv != null && num(dv) <= num(arg);
+          default: throw new Error(`fake collection: unsupported operator ${op}`);
+        }
+      });
+    }
+    return veq(dv, c);
+  });
+}
+
+const dupKey = () => Object.assign(new Error('E11000 duplicate key error (fake)'), { code: 11000 });
+
+/** In-memory collection with the unique indexes the real one has (a missing field counts as null, as in Mongo). */
+class FakeColl implements KeyColl<Any> {
+  docs: Any[] = [];
+  constructor(private unique: string[][], private rand: () => number) {}
+  private async tick() {
+    if (this.rand() < 0.3) await new Promise((r) => setImmediate(r)); else await Promise.resolve();
+  }
+  private clash(cand: Any, self: Any): boolean {
+    return this.unique.some((fields) => this.docs.some((d) => d !== self && fields.every((f) => veq(d[f], cand[f]))));
+  }
+  private apply(doc: Any, u: Any) {
+    for (const [k, v] of Object.entries(u.$set ?? {})) doc[k] = v;
+    for (const k of Object.keys(u.$unset ?? {})) delete doc[k];
+  }
+  async findOne(f: Any) { await this.tick(); const d = this.docs.find((x) => matches(x, f)); return d ? { ...d } : null; }
+  find(f: Any) {
+    return { toArray: async () => { await this.tick(); return this.docs.filter((x) => matches(x, f)).map((d) => ({ ...d })); } };
+  }
+  async updateOne(f: Any, u: Any, o?: { upsert?: boolean }) {
+    await this.tick();
+    const d = this.docs.find((x) => matches(x, f));
+    if (d) {
+      const next = { ...d }; this.apply(next, u);
+      if (this.clash(next, d)) throw dupKey();
+      Object.assign(d, next); for (const k of Object.keys(u.$unset ?? {})) delete d[k];
+      return { matchedCount: 1 };
+    }
+    if (!o?.upsert) return { matchedCount: 0 };
+    const nd: Any = { _id: new ObjectId() };
+    for (const [k, c] of Object.entries(f)) if (!isOpObj(c)) nd[k] = c;
+    for (const [k, v] of Object.entries(u.$setOnInsert ?? {})) nd[k] = v;
+    this.apply(nd, u);
+    if (this.clash(nd, null)) throw dupKey();
+    this.docs.push(nd);
+    return { matchedCount: 0 };
+  }
+  async updateMany(f: Any, u: Any) {
+    await this.tick();
+    for (const d of this.docs.filter((x) => matches(x, f))) {
+      const next = { ...d }; this.apply(next, u);
+      if (this.clash(next, d)) throw dupKey();
+      Object.assign(d, next); for (const k of Object.keys(u.$unset ?? {})) delete d[k];
+    }
+  }
+  async deleteOne(f: Any) { await this.tick(); const i = this.docs.findIndex((x) => matches(x, f)); if (i >= 0) this.docs.splice(i, 1); }
+  async deleteMany(f: Any) { await this.tick(); this.docs = this.docs.filter((x) => !matches(x, f)); }
+}
+
+/** Wraps any KeyColl (fake or the real collection): records every query, can inject failures. */
+class Probe implements KeyColl<Any> {
+  calls: { op: string; filter: Any; update?: Any }[] = [];
+  failOn: ((op: string, filter: Any, update?: Any) => Error | null) | null = null;
+  constructor(public inner: KeyColl<Any>) {}
+  private rec(op: string, filter: Any, update?: Any) {
+    this.calls.push({ op, filter, update });
+    const e = this.failOn?.(op, filter, update);
+    if (e) throw e;
+  }
+  async findOne(f: Any, o?: Any) { this.rec('findOne', f); return this.inner.findOne(f, o); }
+  find(f: Any, o?: Any) { this.rec('find', f); return this.inner.find(f, o); }
+  async updateOne(f: Any, u: Any, o?: Any) { this.rec('updateOne', f, u); return this.inner.updateOne(f, u, o); }
+  async updateMany(f: Any, u: Any) { this.rec('updateMany', f, u); return this.inner.updateMany(f, u); }
+  async deleteOne(f: Any) { this.rec('deleteOne', f); return this.inner.deleteOne(f); }
+  async deleteMany(f: Any) { this.rec('deleteMany', f); return this.inner.deleteMany(f); }
+  /** Unrecorded raw read (the way the contract reads "the raw backend rows, not through the store"). */
+  raw(): Promise<Any[]> { return this.inner.find({}).toArray(); }
+}
+
+/* ------------------------------------------------------------------ the backends and the test seam */
+
+interface Rig {
+  name: 'file' | 'fake' | 'mongo';
+  skip: string | undefined;
+  creds: Probe | null;
+  keys: Probe | null;
+  activate(): Promise<void>;
+  deactivate(): Promise<void>;
+  wipe(): Promise<void>;
+}
+
+const realNow = () => new Date();
+const NOT_MEASURED = 'NOT-MEASURED: no loopback mongod (C3B_TEST_MONGO_URI unset)';
+
+function dbRig(name: 'fake' | 'mongo'): Rig {
+  const rig: Rig = {
+    name,
+    skip: name === 'mongo' && !MONGO_URI ? NOT_MEASURED : undefined,
+    creds: null,
+    keys: null,
+    async activate() {
+      cfg.keyStore = 'mongo';
+      cfg.keyEncryptionKey = KEY1;
+      seam.now = realNow;
+      if (name === 'fake') {
+        const rnd = mulberry32(SEED ^ 0x5eed);
+        rig.creds = new Probe(new FakeColl([['ownerUserId', 'archiveId']], rnd));
+        rig.keys = new Probe(new FakeColl([['ownerUserId', 'archiveId', 'type', 'id']], rnd));
+      } else {
+        rig.creds = new Probe(mongo.waCreds() as unknown as KeyColl<Any>);
+        rig.keys = new Probe(mongo.waKeys() as unknown as KeyColl<Any>);
+      }
+      seam.creds = rig.creds;
+      seam.keys = rig.keys;
+    },
+    async deactivate() {
+      cfg.keyStore = 'file';
+      cfg.keyEncryptionKey = null;
+      seam.creds = null;
+      seam.keys = null;
+      seam.now = realNow;
+    },
+    async wipe() {
+      await rig.creds!.inner.deleteMany({});
+      await rig.keys!.inner.deleteMany({});
+    },
+  };
+  return rig;
+}
+
+const fileRig: Rig = {
+  name: 'file',
+  skip: undefined,
+  creds: null,
+  keys: null,
+  async activate() { cfg.keyStore = 'file'; cfg.keyEncryptionKey = null; },
+  async deactivate() { cfg.keyStore = 'file'; },
+  async wipe() { await rm(ROOT, { recursive: true, force: true }); },
+};
+const fakeRig = dbRig('fake');
+const mongoRig = dbRig('mongo');
+const RIGS: Rig[] = [fileRig, fakeRig, mongoRig];
+
+let current: Rig = fileRig;
+const isDb = () => current.name !== 'file';
+
+/**
+ * THE TEST SEAM: one test body, registered once per backend. `each(name, body)` runs the body
+ * on the file store, on the database store over the in-memory fake, and on the database store
+ * over a loopback mongod (skipped as NOT-MEASURED when there is none).
+ */
+function each(name: string, body: (rig: Rig) => Promise<void>, only?: Array<Rig['name']>, timeout?: number) {
+  for (const rig of RIGS) {
+    if (only && !only.includes(rig.name)) continue;
+    const opts: { skip?: string; timeout?: number } = {};
+    if (rig.skip) opts.skip = rig.skip;
+    if (timeout) opts.timeout = timeout;
+    test(`${name} [${rig.name}]`, opts, async () => {
+      current = rig;
+      if (rig.name === 'mongo') assertLoopbackMongo(config.mongoUri);
+      await rig.activate();
+      try { await body(rig); } finally { await rig.deactivate(); current = fileRig; }
+    });
+  }
+}
+
+/* ------------------------------------------------------------------ backend-neutral helpers for the existing cases */
+
+async function fakeLink(userId: string, marker = 'original') {
+  if (isDb()) {
+    const { state, saveCreds } = await createAuthState(userId);
+    (state.creds as Any).marker = marker;
+    await saveCreds();
+    await state.keys.set({ 'app-state-sync-key': { AAA: {} as Any } });
+    return;
+  }
+  const dir = sessionDir(userId);
+  await mkdir(dir, { recursive: true });
+  await writeFile(join(dir, 'creds.json'), JSON.stringify({ marker }));
+  await writeFile(join(dir, 'app-state-sync-key-AAA.json'), '{}');
+}
+
+const exists = async (p: string) => {
+  if (isDb()) {
+    // the database has no paths: ".../<owner>/creds.json" is the live creds row, "<archive>/creds.json" an archived one
+    const dir = basename(dirname(p));
+    const owner = /^[0-9a-f]{24}$/.test(dir) ? dir : USER;
+    const archiveId = owner === dir ? null : dir;
+    return (await current.creds!.raw()).some((r) => r.ownerUserId.toHexString() === owner && r.archiveId === archiveId);
+  }
+  try { await access(p); return true; } catch { return false; }
+};
+
+async function readCredsText(userId: string): Promise<string> {
+  if (isDb()) {
+    const { state } = await createAuthState(userId);
+    return JSON.stringify(state.creds, BufferJSON.replacer);
+  }
+  return readFile(join(sessionDir(userId), 'creds.json'), 'utf8');
+}
+
+async function halfLink(userId: string) {
+  if (isDb()) {
+    const { state } = await createAuthState(userId);
+    await state.keys.set({ 'pre-key': { '1': { private: randomBytes(32), public: randomBytes(32) } } });
+    return;
+  }
+  await mkdir(sessionDir(userId), { recursive: true });
+}
+
+async function archiveNames(userId: string): Promise<string[]> {
+  if (isDb()) {
+    const rows = [...(await current.creds!.raw()), ...(await current.keys!.raw())];
+    return [...new Set(rows.filter((r) => r.ownerUserId.toHexString() === userId && r.archiveId !== null).map((r) => r.archiveId as string))];
+  }
+  return (await readdir(join(ROOT, '.trash'))).filter((n) => n.startsWith(userId));
+}
+
+async function connectedWipe() {
+  if (!MONGO_URI) return;
+  await mongo.waCreds().deleteMany({});
+  await mongo.waKeys().deleteMany({});
+}
+
+before(async () => {
+  await rm(ROOT, { recursive: true, force: true });
+  if (MONGO_URI) {
+    assertLoopbackMongo(config.mongoUri);
+    await mongo.connect();
+    await mongo.ensureIndexes();
+  }
+});
+beforeEach(async () => { await rm(ROOT, { recursive: true, force: true }); await connectedWipe(); });
+after(async () => {
+  await rm(ROOT, { recursive: true, force: true });
+  if (MONGO_URI) {
+    const db = await mongo.connect();
+    assert.ok(db.databaseName.startsWith('whatsapp_msg_test_'), 'only a throwaway database is dropped');
+    await db.dropDatabase();
+    await mongo.close();
+  }
+  // C3B-I4: nothing this module logged, and no error it raised, carries a key, a value or the canary.
+  assert.deepEqual(leaks(captured.join('\n')), [], 'a secret reached a log line');
+  assert.deepEqual(leaks(thrown.join('\n')), [], 'a secret reached an error message');
+});
+
+/* ================================================================== the existing cases, over every backend */
+
+each('unlinking archives the credentials instead of deleting them', async () => {
+  await fakeLink(USER);
+  const archived = await destroyAuthState(USER);
+
+  assert.ok(archived, 'an archive path must be returned');
+  assert.equal(await exists(join(sessionDir(USER), 'creds.json')), false, 'live link is gone');
+  assert.equal(await exists(join(archived!, 'creds.json')), true, 'but the credentials survive');
+  assert.equal(await hasRestorableAuthState(USER), true);
+});
+
+each('an accidental unlink can be undone', async () => {
+  await fakeLink(USER, 'the-real-session');
+  await destroyAuthState(USER);
+
+  assert.equal(await restoreAuthState(USER), true);
+  const restored = await readCredsText(USER);
+  assert.match(restored, /the-real-session/, 'the original credentials must come back');
+});
+
+each('restore refuses to clobber a link that is already live', async () => {
+  await fakeLink(USER, 'old');
+  await destroyAuthState(USER);
+  await fakeLink(USER, 'new-and-working');
+
+  assert.equal(await restoreAuthState(USER), false, 'must not overwrite a working session');
+  const live = await readCredsText(USER);
+  assert.match(live, /new-and-working/);
+});
+
+each('restore reports failure when there is nothing archived', async () => {
+  assert.equal(await hasRestorableAuthState(USER), false);
+  assert.equal(await restoreAuthState(USER), false);
+});
+
+each('a half-finished link with no credentials is simply removed, not archived', async () => {
+  await halfLink(USER);
+  const archived = await destroyAuthState(USER);
+  assert.equal(archived, null);
+  assert.equal(await hasRestorableAuthState(USER), false);
+});
+
+each('archived links are never mistaken for live sessions on boot', async () => {
+  await fakeLink(USER);
+  await destroyAuthState(USER);
+  // The trash directory sits inside sessions/, so rehydration must skip it or the server
+  // would try to bring an unlinked account back online.
+  assert.deepEqual(await linkedUserIds(), []);
+
+  await fakeLink(USER);
+  assert.deepEqual(await linkedUserIds(), [USER]);
+});
+
+each('old archives are pruned so the trash cannot grow without bound', async () => {
+  for (let i = 0; i < 8; i += 1) {
+    await fakeLink(USER, `gen-${i}`);
+    await destroyAuthState(USER);
+    await new Promise((r) => setTimeout(r, 5)); // distinct timestamps
+  }
+  const kept = await archiveNames(USER);
+  assert.ok(kept.length <= 5, `expected at most 5 archives, found ${kept.length}`);
+});
+
+/* ================================================================== C3B-C1 same behaviour as the file store */
+
+test('C3B-C1z: the list of key types tested is exactly the SignalDataTypeMap list in Auth.d.ts', async () => {
+  const dts = await readFile('./node_modules/baileys/lib/Types/Auth.d.ts', 'utf8');
+  const block = /export type SignalDataTypeMap = \{([\s\S]*?)\n\};/.exec(dts);
+  assert.ok(block, 'SignalDataTypeMap found');
+  const names = [...(block![1] ?? '').matchAll(/^ {4}'?([a-z-]+)'?:/gm)].map((m) => m[1]).sort();
+  assert.deepEqual(names, [...ALL_TYPES].sort());
+});
+
+each('C3B-C1a: 1000 seeded random operations give the same result on the file store, the database store and a Map model', async (rig) => {
+  const seed = SEED + 101;
+  console.log(`C3B-C1a [${rig.name}] seed=${seed}`);
+  const r = mulberry32(seed);
+  const int = (n: number) => Math.floor(r() * n);
+  const IDS = ['1', '2', '3', '44', 'abc', 'x:y/z', '7', '8', '9', '10', '11', '12'];
+
+  // the reference: the real file store, in its own folder, under the file backend
+  cfg.keyStore = 'file';
+  const ref = await createAuthState(OWNER_A);
+  cfg.keyStore = rig.name === 'file' ? 'file' : 'mongo';
+  const sut = rig.name === 'file' ? await createAuthState(OWNER_B) : await createAuthState(OWNER_A);
+  const model = new Map<string, Any>();
+  const mk = (t: string, id: string) => `${t}\u0000${id}`;
+
+  for (let i = 0; i < 1000; i += 1) {
+    const type = ALL_TYPES[int(ALL_TYPES.length)]!;
+    if (r() < 0.5) {
+      const data: Any = {};
+      for (let j = 0, n = 1 + int(3); j < n; j += 1) {
+        const t = ALL_TYPES[int(ALL_TYPES.length)]!;
+        const id = IDS[int(IDS.length)]!;
+        const roll = r();
+        const v = roll < 0.25 ? null : t === 'lid-mapping' && roll < 0.3 ? '' : genValue(t, r);
+        (data[t] ??= {})[id] = v;
+      }
+      await ref.state.keys.set(data);
+      await sut.state.keys.set(data);
+      for (const t of Object.keys(data)) for (const id of Object.keys(data[t])) {
+        const v = data[t][id];
+        if (v) model.set(mk(t, id), rt(v)); else model.delete(mk(t, id)); // the file store drops every falsy value
+      }
+    } else {
+      const ids = [...new Set(Array.from({ length: 1 + int(4) }, () => IDS[int(IDS.length)]!))];
+      const a = await ref.state.keys.get(type, ids);
+      const b = await sut.state.keys.get(type, ids);
+      same(a, b, `op ${i}: file and database stores disagree on ${type}`);
+      const m: Any = {};
+      for (const id of ids) m[id] = model.has(mk(type, id)) ? expectedRead(type, model.get(mk(type, id))) : null;
+      same(a, m, `op ${i}: file store and the model disagree on ${type}`);
+      same(b, m, `op ${i}: database store and the model disagree on ${type}`);
+    }
+  }
+  // final sweep over every (type, id)
+  for (const type of ALL_TYPES) {
+    const a = await ref.state.keys.get(type, IDS);
+    const b = await sut.state.keys.get(type, IDS);
+    same(a, b, `sweep: stores disagree on ${type}`);
+  }
+}, ['fake', 'mongo']);
+
+each('C3B-C1b: a read through makeCacheableSignalKeyStore after a set or delete in the same handle is never older', async () => {
+  const r = mulberry32(SEED + 102);
+  const { state } = await createAuthState(OWNER_A);
+  const cached = makeCacheableSignalKeyStore(state.keys);
+  for (let i = 0; i < 25; i += 1) {
+    const v = genValue('pre-key', r);
+    await cached.set({ 'pre-key': { '7': v } });
+    same((await cached.get('pre-key', ['7']))['7'], rt(v), `read ${i} after set is not the new value`);
+    same((await state.keys.get('pre-key', ['7']))['7'], rt(v), `store read ${i} after set is not the new value`);
+  }
+  await cached.set({ 'pre-key': { '7': null } });
+  assert.equal((await cached.get('pre-key', ['7']))['7'] ?? null, null, 'a deleted key must not come back');
+  assert.equal((await state.keys.get('pre-key', ['7']))['7'] ?? null, null, 'the store agrees on the delete');
+});
+
+/* ================================================================== C3B-C2 round trip of every value kind */
+
+each('C3B-C2: creds and every key type read back byte for byte, a null write deletes the row', async (rig) => {
+  const r = mulberry32(SEED + 201);
+  const h1 = await createAuthState(OWNER_A);
+  (h1.state.creds as Any).nestedBinary = { a: { b: randomBytes(33), c: [randomBytes(5)] } };
+  await h1.saveCreds();
+  const h2 = await createAuthState(OWNER_A);
+  assert.equal(canon(h2.state.creds), canon(h1.state.creds), 'creds differ after a round trip');
+  assert.ok(Buffer.isBuffer((h2.state.creds as Any).noiseKey.private), 'nested binary comes back as Buffer');
+  assert.ok(Buffer.isBuffer((h2.state.creds as Any).nestedBinary.a.c[0]), 'deeply nested binary comes back as Buffer');
+
+  for (const type of ALL_TYPES) {
+    const v = genValue(type, r);
+    await h1.state.keys.set({ [type]: { k1: v } } as Any);
+    const got = (await h2.state.keys.get(type, ['k1']))['k1'];
+    if (type === 'app-state-sync-key') {
+      assert.ok(got instanceof proto.Message.AppStateSyncKeyData, 'app-state-sync-key comes back as AppStateSyncKeyData');
+    }
+    assert.equal(canon(got), canon(expectedRead(type, v)), `${type} differs after a round trip`);
+    await h1.state.keys.set({ [type]: { k1: null } } as Any);
+    assert.equal((await h2.state.keys.get(type, ['k1']))['k1'] ?? null, null, `${type}: a null write must delete`);
+    if (rig.keys) {
+      assert.equal((await rig.keys.raw()).filter((x) => x.type === type).length, 0, `${type}: the row must be gone`);
+    }
+  }
+}, ['file', 'fake', 'mongo']);
+
+/* ================================================================== C3B-C3 at rest */
+
+/** Every leaf of a raw row as a Buffer, plus the JSON text, so a plaintext hit anywhere is found. */
+function leafBlobs(row: Any): Buffer[] {
+  const out: Buffer[] = [];
+  const walk = (v: Any) => {
+    if (v instanceof Binary) out.push(bin(v));
+    else if (Buffer.isBuffer(v)) out.push(v);
+    else if (typeof v === 'string') out.push(Buffer.from(v));
+    else if (v instanceof ObjectId) out.push(Buffer.from(v.toHexString()));
+    else if (v instanceof Date) out.push(Buffer.from(v.toISOString()));
+    else if (v && typeof v === 'object') Object.values(v).forEach(walk);
+  };
+  walk(row);
+  return out;
+}
+function canaryNeedles(c: string): Buffer[] {
+  const b64 = (pad: number) => Buffer.from('x'.repeat(pad) + c).toString('base64');
+  return [Buffer.from(c), Buffer.from(Buffer.from(c).toString('hex')), Buffer.from(b64(0).slice(0, -4)), Buffer.from(b64(1).slice(2, -4)), Buffer.from(b64(2).slice(3, -4))];
+}
+const hasCanary = (rows: Any[]) => rows.some((row) => leafBlobs(row).some((b) => canaryNeedles(CANARY).some((n) => b.includes(n))));
+
+each('C3B-C3: raw rows hold only ciphertext in the contracted shape; nonces are fresh; owners differ', async (rig) => {
+  const ha = await createAuthState(OWNER_A);
+  (ha.state.creds as Any).canaryNote = CANARY;
+  await ha.saveCreds();
+  await ha.state.keys.set({
+    'lid-mapping': { c1: CANARY },
+    session: { c2: Buffer.from(`${CANARY}-session`) },
+    'device-list': { c3: [CANARY, 'x'] },
+  });
+  const rows = [...(await rig.creds!.raw()), ...(await rig.keys!.raw())];
+  assert.ok(rows.length === 4, 'one creds row and three key rows');
+  assert.equal(hasCanary(rows), false, 'the canary must not appear in any raw field');
+  assert.equal(rows.some((x) => JSON.stringify(x).includes(CANARY)), false, 'nor in the JSON of a raw row');
+
+  const ALLOWED = new Set(['_id', 'ownerUserId', 'archiveId', 'archivedAt', 'type', 'id', 'updatedAt', 'value']);
+  for (const row of rows) {
+    for (const k of Object.keys(row)) assert.ok(ALLOWED.has(k), `unexpected raw field "${k}"`);
+    assert.deepEqual(Object.keys(row.value).sort(), ['ct', 'nonce', 'tag', 'v']);
+    assert.equal(row.value.v, 1);
+    assert.equal(bin(row.value.nonce).length, 12, 'nonce is 12 bytes');
+    assert.equal(bin(row.value.tag).length, 16, 'tag is 16 bytes');
+    assert.ok(bin(row.value.ct).length > 0);
+  }
+
+  // the same value written twice: new nonce, new ciphertext
+  const v = Buffer.from('same-plaintext-both-times');
+  await ha.state.keys.set({ session: { dup: v } });
+  const first = (await rig.keys!.raw()).find((x) => x.id === 'dup')!;
+  await ha.state.keys.set({ session: { dup: v } });
+  const second = (await rig.keys!.raw()).find((x) => x.id === 'dup')!;
+  assert.ok(!bin(first.value.nonce).equals(bin(second.value.nonce)), 'the same value must get a fresh nonce');
+  assert.ok(!bin(first.value.ct).equals(bin(second.value.ct)), 'and a different ciphertext');
+
+  // the same value for two owners: different ciphertext
+  const hb = await createAuthState(OWNER_B);
+  await hb.state.keys.set({ session: { dup: v } });
+  const other = (await rig.keys!.raw()).find((x) => x.id === 'dup' && x.ownerUserId.toHexString() === OWNER_B)!;
+  assert.ok(!bin(second.value.ct).equals(bin(other.value.ct)), 'two owners must not share a ciphertext');
+
+  // archived rows stay encrypted and carry a plain Date archivedAt
+  await destroyAuthState(OWNER_A);
+  const after = [...(await rig.creds!.raw()), ...(await rig.keys!.raw())];
+  assert.equal(hasCanary(after), false, 'archived rows must not hold the canary either');
+  assert.ok(after.filter((x) => x.archiveId !== null).every((x) => x.archivedAt instanceof Date && x.value.v === 1));
+}, ['fake', 'mongo']);
+
+/* ================================================================== C3B-C4 wrong key, tampering, missing key */
+
+async function seedOwnerA(rig: Rig) {
+  const h = await createAuthState(OWNER_A);
+  (h.state.creds as Any).marker = 'seeded-creds';
+  await h.saveCreds();
+  await h.state.keys.set({ 'pre-key': { '1': { private: randomBytes(32), public: randomBytes(32) } }, session: { '1': randomBytes(40) } });
+  return { h, creds: (await rig.creds!.raw())[0]!, key: (await rig.keys!.raw()).find((x) => x.type === 'pre-key')! };
+}
+
+each('C3B-C4a/b: a wrong key, or one flipped byte of ct, tag or nonce, rejects with a typed error and is never "no key"', async (rig) => {
+  const { h, key } = await seedOwnerA(rig);
+  void h;
+  // (a) a different 32-byte key
+  cfg.keyEncryptionKey = KEY2;
+  await rejectsWith(createAuthState(OWNER_A), 'DECRYPT_FAILED', 'creds under another key');
+  // a store that has keys but no creds row opens fine, and then refuses to read a key it cannot decrypt
+  await rig.creds!.inner.deleteMany({});
+  const h2 = await createAuthState(OWNER_A);
+  await rejectsWith(h2.state.keys.get('pre-key', ['1']) as Promise<unknown>, 'DECRYPT_FAILED', 'key under another key');
+  cfg.keyEncryptionKey = KEY1;
+
+  // (b) one flipped byte of each field, and an unknown envelope version
+  const h3 = await createAuthState(OWNER_A);
+  for (const field of ['ct', 'tag', 'nonce'] as const) {
+    await rig.keys!.inner.updateOne({ _id: key._id }, { $set: { value: { ...key.value, [field]: flip(key.value[field]) } } });
+    await rejectsWith(h3.state.keys.get('pre-key', ['1']) as Promise<unknown>, 'DECRYPT_FAILED', `flipped ${field}`);
+  }
+  await rig.keys!.inner.updateOne({ _id: key._id }, { $set: { value: { ...key.value, v: 2 } } });
+  await rejectsWith(h3.state.keys.get('pre-key', ['1']) as Promise<unknown>, 'DECRYPT_FAILED', 'unknown envelope version');
+  await rig.keys!.inner.updateOne({ _id: key._id }, { $set: { value: key.value } });
+  assert.ok((await h3.state.keys.get('pre-key', ['1']))['1'], 'the untouched row reads again');
+}, ['fake', 'mongo']);
+
+each('C3B-C4c: a valid ciphertext copied into another owner, type or id rejects', async (rig) => {
+  await seedOwnerA(rig);
+  const hb = await createAuthState(OWNER_B);
+  await hb.state.keys.set({ 'pre-key': { '1': { private: randomBytes(32), public: randomBytes(32) } }, session: { '2': randomBytes(10) } });
+  const rows = await rig.keys!.raw();
+  const aPre = rows.find((x) => x.ownerUserId.toHexString() === OWNER_A && x.type === 'pre-key')!;
+  const bPre = rows.find((x) => x.ownerUserId.toHexString() === OWNER_B && x.type === 'pre-key')!;
+  const bSes = rows.find((x) => x.ownerUserId.toHexString() === OWNER_B && x.type === 'session')!;
+
+  await rig.keys!.inner.updateOne({ _id: bPre._id }, { $set: { value: aPre.value } }); // another owner
+  await rejectsWith(hb.state.keys.get('pre-key', ['1']) as Promise<unknown>, 'DECRYPT_FAILED', 'another owner');
+  await rig.keys!.inner.updateOne({ _id: bSes._id }, { $set: { value: aPre.value } }); // another type
+  await rejectsWith(hb.state.keys.get('session', ['2']) as Promise<unknown>, 'DECRYPT_FAILED', 'another type');
+  const ha = await createAuthState(OWNER_A);
+  const aSes = rows.find((x) => x.ownerUserId.toHexString() === OWNER_A && x.type === 'session')!;
+  await rig.keys!.inner.updateOne({ _id: aSes._id }, { $set: { value: aPre.value } }); // same owner, another id
+  await rejectsWith(ha.state.keys.get('session', ['1']) as Promise<unknown>, 'DECRYPT_FAILED', 'another id');
+  // creds ciphertext into a key row, and a key ciphertext into the creds row
+  const credsRow = (await rig.creds!.raw())[0]!;
+  await rig.keys!.inner.updateOne({ _id: aSes._id }, { $set: { value: credsRow.value } });
+  await rejectsWith(ha.state.keys.get('session', ['1']) as Promise<unknown>, 'DECRYPT_FAILED', 'creds ciphertext in a key row');
+  await rig.creds!.inner.updateOne({ _id: credsRow._id }, { $set: { value: aPre.value } });
+  await rejectsWith(createAuthState(OWNER_A), 'DECRYPT_FAILED', 'key ciphertext in the creds row');
+}, ['fake', 'mongo']);
+
+each('C3B-C4d: creds that cannot be decrypted reject; nothing is overwritten or deleted; the right key reads the original', async (rig) => {
+  await seedOwnerA(rig);
+  const before = canon((await rig.creds!.raw()).concat(await rig.keys!.raw()).map((x) => ({ ...x, value: { ...x.value, nonce: bin(x.value.nonce), ct: bin(x.value.ct), tag: bin(x.value.tag) } })));
+  cfg.keyEncryptionKey = KEY2;
+  await rejectsWith(createAuthState(OWNER_A), 'DECRYPT_FAILED', 'creds under the wrong key');
+  const h = await createAuthState(OWNER_A).catch(() => null);
+  assert.equal(h, null, 'no fresh initAuthCreds() may be handed out');
+  const afterRows = canon((await rig.creds!.raw()).concat(await rig.keys!.raw()).map((x) => ({ ...x, value: { ...x.value, nonce: bin(x.value.nonce), ct: bin(x.value.ct), tag: bin(x.value.tag) } })));
+  assert.equal(afterRows, before, 'the stored rows must be untouched');
+  cfg.keyEncryptionKey = KEY1;
+  const ok = await createAuthState(OWNER_A);
+  assert.equal((ok.state.creds as Any).marker, 'seeded-creds', 'the original value is still there');
+  assert.ok((await ok.state.keys.get('pre-key', ['1']))['1'], 'and so is the key');
+}, ['fake', 'mongo']);
+
+each('C3B-C4e: keyStore mongo with no key, or a key that is not 32 bytes, rejects and never falls back', async (rig) => {
+  for (const bad of [null, KEY31, KEY33, Buffer.alloc(0)]) {
+    cfg.keyEncryptionKey = bad;
+    await rejectsWith(createAuthState(OWNER_A), 'KEY_MISSING', 'bad key');
+  }
+  cfg.keyEncryptionKey = KEY1;
+  let dirMade = true;
+  try { await access(sessionDir(OWNER_A)); } catch { dirMade = false; }
+  assert.equal(dirMade, false, 'no file store was opened as a fallback');
+  assert.equal((await rig.creds!.raw()).length + (await rig.keys!.raw()).length, 0, 'nothing was written');
+}, ['fake', 'mongo']);
+
+each('C3B-C4f: no error message or log line holds key bytes, a value or the canary', async (rig) => {
+  const h = await createAuthState(OWNER_A);
+  await h.state.keys.set({ 'lid-mapping': { k: CANARY } });
+  cfg.keyEncryptionKey = KEY2;
+  const h2 = await createAuthState(OWNER_A);
+  const e1 = await Promise.resolve(h2.state.keys.get('lid-mapping', ['k'])).then(() => null, (e: Error) => e);
+  assert.ok(e1, 'the read rejects');
+  cfg.keyEncryptionKey = KEY33;
+  const e2 = await createAuthState(OWNER_A).then(() => null, (e: Error) => e);
+  assert.ok(e2, 'the open rejects');
+  const text = [e1, e2].map((e) => `${e!.name} ${e!.message} ${e!.stack ?? ''}`).join('\n') + captured.join('\n');
+  assert.deepEqual(leaks(text), [], 'a secret appears in an error or a log line');
+  void rig;
+}, ['fake', 'mongo']);
+
+/* ================================================================== C3B-C5 write-through, failed writes, concurrency */
+
+each('C3B-C5a: a second handle sees a value as soon as set or saveCreds resolves', async () => {
+  const h1 = await createAuthState(OWNER_A);
+  await h1.state.keys.set({ session: { s: Buffer.from('v1') } });
+  (h1.state.creds as Any).marker = 'm1';
+  await h1.saveCreds();
+  const h2 = await createAuthState(OWNER_A);
+  same((await h2.state.keys.get('session', ['s']))['s'], rt(Buffer.from('v1')), 'no write-behind for keys');
+  assert.equal((h2.state.creds as Any).marker, 'm1', 'no write-behind for creds');
+  await h1.state.keys.set({ session: { s: Buffer.from('v2') } });
+  same((await h2.state.keys.get('session', ['s']))['s'], rt(Buffer.from('v2')), 'and a later write is also visible at once');
+}, ['fake', 'mongo']);
+
+each('C3B-C5b: a rejected write rejects set and saveCreds, is invisible, and is logged without the value', async (rig) => {
+  const h1 = await createAuthState(OWNER_A);
+  await h1.state.keys.set({ 'lid-mapping': { k: 'old-value' } });
+  (h1.state.creds as Any).marker = 'old-creds';
+  await h1.saveCreds();
+  const logged = captured.length;
+
+  const boom = new Error('backend down (injected)');
+  rig.keys!.failOn = (op) => (op === 'updateOne' || op === 'deleteOne' ? boom : null);
+  rig.creds!.failOn = (op) => (op === 'updateOne' ? boom : null);
+  await assert.rejects(async () => h1.state.keys.set({ 'lid-mapping': { k: CANARY } }), /backend down/);
+  await assert.rejects(async () => h1.state.keys.set({ 'lid-mapping': { k: null } }), /backend down/);
+  (h1.state.creds as Any).marker = CANARY;
+  await assert.rejects(h1.saveCreds(), /backend down/);
+  rig.keys!.failOn = null;
+  rig.creds!.failOn = null;
+
+  assert.equal((await h1.state.keys.get('lid-mapping', ['k']))['k'], 'old-value', 'the same handle must not serve the rejected value');
+  const h2 = await createAuthState(OWNER_A);
+  assert.equal((await h2.state.keys.get('lid-mapping', ['k']))['k'], 'old-value', 'a new handle must not see it');
+  assert.equal((h2.state.creds as Any).marker, 'old-creds', 'nor in the creds');
+  const lines = captured.slice(logged).join('\n');
+  assert.ok(lines.length > 0, 'the failed write is logged');
+  assert.equal(lines.includes(CANARY), false, 'the log line must not carry the value');
+}, ['fake', 'mongo']);
+
+each('C3B-C5c1: a duplicate-key error from a racing upsert is retried, not surfaced', async (rig) => {
+  const h = await createAuthState(OWNER_A);
+  let left = 2;
+  rig.keys!.failOn = (op) => (op === 'updateOne' && left-- > 0 ? dupKey() : null);
+  await h.state.keys.set({ session: { r: Buffer.from('raced') } });
+  rig.keys!.failOn = null;
+  same((await h.state.keys.get('session', ['r']))['r'], rt(Buffer.from('raced')), 'the write lands after the retries');
+  left = 1;
+  rig.creds!.failOn = (op) => (op === 'updateOne' && left-- > 0 ? dupKey() : null);
+  await h.saveCreds();
+  rig.creds!.failOn = null;
+  assert.equal((await rig.creds!.raw()).length, 1, 'one creds row');
+}, ['fake', 'mongo']);
+
+each('C3B-C5c2: 100 parallel sets of one key leave one row equal to one of them; 100 distinct keys leave 100 rows; a saveCreds storm ends on the last state', async (rig) => {
+  const h = await createAuthState(OWNER_A);
+  const vals = Array.from({ length: 100 }, (_, i) => Buffer.from(`value-${i}-${randomBytes(4).toString('hex')}`));
+  await Promise.all(vals.map((v) => h.state.keys.set({ session: { one: v } })));
+  const rows = (await rig.keys!.raw()).filter((x) => x.type === 'session' && x.id === 'one');
+  assert.equal(rows.length, 1, 'exactly one row for the contended key');
+  const got = (await h.state.keys.get('session', ['one']))['one'];
+  assert.ok(vals.some((v) => canon(rt(v)) === canon(got)), 'the stored value is exactly one of the 100, never a mix');
+
+  await Promise.all(Array.from({ length: 100 }, (_, i) => h.state.keys.set({ 'sender-key': { [`k${i}`]: Buffer.from(`d${i}`) } })));
+  assert.equal((await rig.keys!.raw()).filter((x) => x.type === 'sender-key').length, 100, '100 distinct keys, 100 rows');
+
+  const storm: Promise<void>[] = [];
+  for (let i = 0; i < 100; i += 1) {
+    (h.state.creds as Any).counter = i;
+    storm.push(h.saveCreds());
+    await new Promise((r) => setImmediate(r)); // let some calls run before the next mutation
+  }
+  await Promise.all(storm);
+  assert.equal((await rig.creds!.raw()).length, 1, 'still exactly one creds row');
+  const h2 = await createAuthState(OWNER_A);
+  assert.equal(canon(h2.state.creds), canon(h.state.creds), 'the stored creds equal the in-memory creds after the last call');
+  assert.equal((h2.state.creds as Any).counter, 99);
+}, ['fake', 'mongo']);
+
+each('C3B-C5d: a reader running during writes sees the old or the new value, never a partial one (1000 repeats)', async () => {
+  const h = await createAuthState(OWNER_A);
+  const A = Buffer.alloc(4096, 1);
+  const B = Buffer.alloc(4096, 2);
+  await h.state.keys.set({ session: { rw: A } });
+  for (let i = 0; i < 1000; i += 1) {
+    const next = i % 2 ? A : B;
+    const [, read] = await Promise.all([h.state.keys.set({ session: { rw: next } }), h.state.keys.get('session', ['rw'])]);
+    const v = read['rw'] as Buffer;
+    assert.ok(Buffer.isBuffer(v) && v.length === 4096, `repeat ${i}: a partial value`);
+    assert.ok(v.every((x) => x === v[0]) && (v[0] === 1 || v[0] === 2), `repeat ${i}: a mixed value`);
+  }
+}, ['fake', 'mongo']);
+
+/* ================================================================== C3B-C6 lifecycle on the database store */
+
+async function linkWithKeys(owner: string, marker: string) {
+  const h = await createAuthState(owner);
+  (h.state.creds as Any).marker = marker;
+  await h.saveCreds();
+  await h.state.keys.set({
+    'pre-key': { '1': { private: randomBytes(32), public: randomBytes(32) } },
+    session: { '1': randomBytes(40) },
+    'app-state-sync-key': { AAA: { keyData: randomBytes(16) } as Any },
+  });
+  return h;
+}
+const liveRows = async (rig: Rig, owner: string) => ({
+  creds: (await rig.creds!.raw()).filter((x) => x.ownerUserId.toHexString() === owner && x.archiveId === null),
+  keys: (await rig.keys!.raw()).filter((x) => x.ownerUserId.toHexString() === owner && x.archiveId === null),
+});
+const archivedRows = async (rig: Rig, owner: string, archiveId?: string) => ({
+  creds: (await rig.creds!.raw()).filter((x) => x.ownerUserId.toHexString() === owner && x.archiveId !== null && (!archiveId || x.archiveId === archiveId)),
+  keys: (await rig.keys!.raw()).filter((x) => x.ownerUserId.toHexString() === owner && x.archiveId !== null && (!archiveId || x.archiveId === archiveId)),
+});
+
+each('C3B-C6a: unlink archives the live rows under one archiveId; with no creds it removes only that owner\'s live keys and returns null', async (rig) => {
+  const old = await linkWithKeys(OWNER_A, 'a-old');
+  await linkWithKeys(OWNER_B, 'b-live');
+  const name = await destroyAuthState(OWNER_A);
+  assert.ok(typeof name === 'string' && name.length > 0, 'a non-null archive name');
+  const live = await liveRows(rig, OWNER_A);
+  assert.equal(live.creds.length + live.keys.length, 0, 'no live rows left');
+  const arch = await archivedRows(rig, OWNER_A);
+  assert.equal(arch.creds.length, 1);
+  assert.equal(arch.keys.length, 3);
+  assert.ok([...arch.creds, ...arch.keys].every((x) => x.archiveId === name && x.value.v === 1), 'one archiveId, still encrypted');
+  const fresh = await createAuthState(OWNER_A);
+  assert.notEqual(canon((fresh.state.creds as Any).noiseKey), canon((old.state.creds as Any).noiseKey), 'a new link starts from fresh creds');
+  assert.equal((fresh.state.creds as Any).marker, undefined);
+
+  // no live creds: only that owner's live key rows go, and the archive is left alone
+  await sleep(5); // keys written after the archive was cut, by more than the 1 ms the timestamps resolve
+  await halfLink(OWNER_A);
+  const bBefore = (await liveRows(rig, OWNER_B)).keys.length;
+  assert.equal((await liveRows(rig, OWNER_A)).keys.length, 1);
+  assert.equal(await destroyAuthState(OWNER_A), null);
+  assert.equal((await liveRows(rig, OWNER_A)).keys.length, 0);
+  assert.equal((await archivedRows(rig, OWNER_A)).keys.length, 3, 'the archive is untouched');
+  assert.equal((await liveRows(rig, OWNER_B)).keys.length, bBefore, 'another owner is untouched');
+}, ['fake', 'mongo']);
+
+each('C3B-C6b: after 6 unlinks exactly the 5 newest archives remain, in both collections', async (rig) => {
+  const names: string[] = [];
+  for (let i = 0; i < 6; i += 1) {
+    await linkWithKeys(OWNER_A, `gen-${i}`);
+    names.push((await destroyAuthState(OWNER_A))!);
+  }
+  const arch = await archivedRows(rig, OWNER_A);
+  const want = names.slice(1).sort();
+  assert.deepEqual(arch.creds.map((x) => x.archiveId).sort(), want, 'creds: the 5 newest');
+  assert.deepEqual([...new Set(arch.keys.map((x) => x.archiveId))].sort(), want, 'keys: the 5 newest');
+  assert.equal(arch.keys.length, 15, 'three key rows per archive, none from the pruned one');
+  assert.equal(await restoreAuthState(OWNER_A), true);
+  assert.match(await readCredsText(OWNER_A), /gen-5/, 'the newest archive is the one restored');
+}, ['fake', 'mongo']);
+
+each('C3B-C6c: restorable iff an archive exists; restore refuses a live link, otherwise restores the newest', async (rig) => {
+  assert.equal(await hasRestorableAuthState(OWNER_A), false);
+  assert.equal(await restoreAuthState(OWNER_A), false);
+  await linkWithKeys(OWNER_A, 'first');
+  await destroyAuthState(OWNER_A);
+  await linkWithKeys(OWNER_A, 'second');
+  await destroyAuthState(OWNER_A);
+  assert.equal(await hasRestorableAuthState(OWNER_A), true);
+  await linkWithKeys(OWNER_A, 'live-now');
+  const snap = canon((await rig.creds!.raw()).concat(await rig.keys!.raw()).map((x) => ({ ...x, value: bin(x.value.ct) })));
+  assert.equal(await restoreAuthState(OWNER_A), false, 'a live link blocks the restore');
+  assert.equal(canon((await rig.creds!.raw()).concat(await rig.keys!.raw()).map((x) => ({ ...x, value: bin(x.value.ct) }))), snap, 'and changes nothing');
+  await destroyAuthState(OWNER_A);
+  assert.equal(await restoreAuthState(OWNER_A), true);
+  assert.match(await readCredsText(OWNER_A), /live-now/, 'the newest archive comes back');
+  const h = await createAuthState(OWNER_A);
+  assert.ok((await h.state.keys.get('pre-key', ['1']))['1'], 'its keys come back with it');
+  assert.equal((await archivedRows(rig, OWNER_A)).creds.length, 2, 'the restored archive is consumed, the older ones stay');
+}, ['fake', 'mongo']);
+
+each('C3B-C6d: linkedUserIds is exactly the owners with a live creds row', async () => {
+  await linkWithKeys(OWNER_A, 'live');
+  await linkWithKeys(OWNER_B, 'archived-only');
+  await destroyAuthState(OWNER_B);
+  await halfLink(OWNER_C); // keys but no creds
+  assert.deepEqual(await linkedUserIds(), [OWNER_A]);
+}, ['fake', 'mongo']);
+
+each('C3B-C6e: a failed unlink leaves the owner unlinked and repeating completes it; a failed restore leaves no live creds and repeating completes it', async (rig) => {
+  const err = new Error('backend down (injected)');
+  await linkWithKeys(OWNER_A, 'to-unlink');
+  await linkWithKeys(OWNER_B, 'bystander');
+  rig.keys!.failOn = (op) => (op === 'updateMany' ? err : null); // the creds step has already happened
+  await assert.rejects(destroyAuthState(OWNER_A), /backend down/);
+  rig.keys!.failOn = null;
+  assert.deepEqual(await linkedUserIds(), [OWNER_B], 'half-unlinked owner is not live');
+  assert.equal((await liveRows(rig, OWNER_A)).keys.length, 3, 'the keys are still where they were');
+  const name = await destroyAuthState(OWNER_A);
+  assert.ok(name, 'the repeat completes the archive');
+  assert.equal((await liveRows(rig, OWNER_A)).keys.length, 0);
+  assert.equal((await archivedRows(rig, OWNER_A, name!)).keys.length, 3, 'every key row ended up in the archive');
+  assert.equal((await archivedRows(rig, OWNER_A, name!)).creds.length, 1);
+
+  // restore, failing at the creds step (the last one)
+  rig.creds!.failOn = (op, _f, u) => (op === 'updateOne' && u?.$unset ? err : null);
+  await assert.rejects(restoreAuthState(OWNER_A), /backend down/);
+  rig.creds!.failOn = null;
+  assert.deepEqual(await linkedUserIds(), [OWNER_B], 'no live creds after the failed restore');
+  assert.equal(await restoreAuthState(OWNER_A), true, 'repeating completes it');
+  assert.deepEqual(await linkedUserIds(), [OWNER_A, OWNER_B]);
+  const h = await createAuthState(OWNER_A);
+  assert.equal((h.state.creds as Any).marker, 'to-unlink');
+  assert.equal((await liveRows(rig, OWNER_A)).keys.length, 3);
+  assert.equal((await archivedRows(rig, OWNER_A)).creds.length + (await archivedRows(rig, OWNER_A)).keys.length, 0);
+
+  // and a restore that fails at the key step leaves no live creds either
+  await destroyAuthState(OWNER_A);
+  rig.keys!.failOn = (op) => (op === 'updateMany' ? err : null);
+  await assert.rejects(restoreAuthState(OWNER_A), /backend down/);
+  rig.keys!.failOn = null;
+  assert.deepEqual(await linkedUserIds(), [OWNER_B]);
+  assert.equal(await restoreAuthState(OWNER_A), true);
+}, ['fake', 'mongo']);
+
+/* ================================================================== C3B-C6f a write never revives an archived link */
+
+const everythingOf = async (rig: Rig) => (await snapshot(rig, OWNER_A)) + (await snapshot(rig, OWNER_B));
+
+each('C3B-C6f: a saveCreds after the unlink rejects LINK_GONE and writes nothing; it never revives the link', async (rig) => {
+  const stale = await linkWithKeys(OWNER_A, 'linked'); // holds a row: its own first saveCreds succeeded
+  await linkWithKeys(OWNER_B, 'bystander');
+  const reopened = await createAuthState(OWNER_A); // holds a row: it loaded one when opened
+  const name = (await destroyAuthState(OWNER_A))!;
+  const before = await everythingOf(rig);
+  const logged = captured.length;
+  for (const [label, h] of [['the handle that linked', stale], ['the reopened handle', reopened]] as const) {
+    (h.state.creds as Any).marker = CANARY;
+    await rejectsWith(h.saveCreds(), 'LINK_GONE', label);
+    await rejectsWith(h.saveCreds(), 'LINK_GONE', `${label}, again`);
+  }
+  assert.equal(await everythingOf(rig), before, 'the raw rows are unchanged by the rejected calls');
+  assert.deepEqual(await linkedUserIds(), [OWNER_B], 'the owner is not listed');
+  assert.equal(await hasRestorableAuthState(OWNER_A), true);
+  const lines = captured.slice(logged).join('\n');
+  assert.ok(lines.includes('LINK_GONE'), 'the refusal is logged by error class');
+  assert.equal(lines.includes(CANARY), false, 'and never with the value');
+  assert.deepEqual(await archiveNames(OWNER_A), [name]);
+  assert.equal(await destroyAuthState(OWNER_A), null, 'a repeat unlink after the stragglers adds no archive');
+  assert.deepEqual(await archiveNames(OWNER_A), [name], 'still the one archive');
+  assert.equal(await restoreAuthState(OWNER_A), true, 'the restore is not blocked');
+  assert.deepEqual(await linkedUserIds(), [OWNER_A, OWNER_B]);
+  assert.equal(((await createAuthState(OWNER_A)).state.creds as Any).marker, 'linked', 'the archived creds came back, not the straggler\'s');
+}, ['fake', 'mongo']);
+
+each('C3B-C6f: a removed creds row also rejects; a fresh handle\'s first saveCreds still creates the row and later ones update it', async (rig) => {
+  const h = await linkWithKeys(OWNER_A, 'x');
+  await rig.creds!.inner.deleteMany({});
+  await rejectsWith(h.saveCreds(), 'LINK_GONE', 'removed row');
+  assert.equal((await rig.creds!.raw()).length, 0, 'nothing was written');
+  const fresh = await createAuthState(OWNER_A); // opened on no row: pairing
+  (fresh.state.creds as Any).marker = 'paired';
+  await fresh.saveCreds();
+  assert.deepEqual(await linkedUserIds(), [OWNER_A]);
+  (fresh.state.creds as Any).marker = 'paired-2';
+  await fresh.saveCreds();
+  assert.equal((await rig.creds!.raw()).length, 1, 'one creds row');
+  assert.equal(((await createAuthState(OWNER_A)).state.creds as Any).marker, 'paired-2');
+}, ['fake', 'mongo']);
+
+each('C3B-C6f: a key set after the unlink resolves, changes neither listing nor restorability, and a restore still returns true', async (rig) => {
+  const h = await linkWithKeys(OWNER_A, 'k');
+  await destroyAuthState(OWNER_A);
+  await sleep(5);
+  await h.state.keys.set({ session: { '1': Buffer.from('late') }, 'lid-mapping': { late: 'x' } });
+  assert.deepEqual(await linkedUserIds(), []);
+  assert.equal(await hasRestorableAuthState(OWNER_A), true);
+  assert.equal(await restoreAuthState(OWNER_A), true);
+  assert.equal((await liveRows(rig, OWNER_A)).keys.length, 3, 'the late rows are debris and are gone, the archived rows are back');
+  assert.deepEqual(await linkedUserIds(), [OWNER_A]);
+}, ['fake', 'mongo']);
+
+/* ================================================================== C3B-C6e duplicate rule and tie rule (second and first ruling) */
+
+const CLOCK0 = new Date('2026-06-01T10:00:00.000Z');
+const frozen = (d: Date) => { seam.now = () => new Date(d); };
+const kinds = (rows: Any[]) => rows.map((x) => `${x.type}/${x.id}`).sort();
+
+each('C3B-C6e duplicate: a restore never fails on an (owner, type, id) clash; one row remains and it decrypts', async (rig) => {
+  frozen(CLOCK0); // every write stamps the same millisecond: the straggler lands with updatedAt == archivedAt
+  const h = await linkWithKeys(OWNER_A, 'dup');
+  await destroyAuthState(OWNER_A);
+  await h.state.keys.set({ session: { '1': Buffer.from('straggler') } });
+  assert.equal((await liveRows(rig, OWNER_A)).keys.length, 1, 'the straggler row is live next to its archived twin');
+  assert.equal(await restoreAuthState(OWNER_A), true, 'the restore completes in one call');
+  const live = await liveRows(rig, OWNER_A);
+  assert.equal(live.creds.length, 1);
+  assert.deepEqual(kinds(live.keys), ['app-state-sync-key/AAA', 'pre-key/1', 'session/1'], 'exactly one row per (type, id)');
+  assert.equal((await archivedRows(rig, OWNER_A)).keys.length, 0, 'the archive is consumed');
+  const h2 = await createAuthState(OWNER_A);
+  assert.ok(Buffer.isBuffer((await h2.state.keys.get('session', ['1']))['1']), 'the surviving row decrypts');
+  assert.ok((await h2.state.keys.get('pre-key', ['1']))['1'], 'and so do the others');
+}, ['fake', 'mongo']);
+
+each('C3B-C6e duplicate: a repeat unlink never fails on an (owner, type, id) clash; one row remains and it decrypts', async (rig) => {
+  frozen(CLOCK0);
+  const h = await linkWithKeys(OWNER_A, 'dup');
+  const name = (await destroyAuthState(OWNER_A))!;
+  await h.state.keys.set({ session: { '1': Buffer.from('straggler') } });
+  assert.equal(await destroyAuthState(OWNER_A), name, 'the repeat completes into the same archive in one call');
+  assert.equal((await liveRows(rig, OWNER_A)).keys.length, 0);
+  const arch = await archivedRows(rig, OWNER_A, name);
+  assert.deepEqual(kinds(arch.keys), ['app-state-sync-key/AAA', 'pre-key/1', 'session/1'], 'exactly one row per (type, id) in the archive');
+  assert.equal(await restoreAuthState(OWNER_A), true);
+  const h2 = await createAuthState(OWNER_A);
+  assert.ok(Buffer.isBuffer((await h2.state.keys.get('session', ['1']))['1']), 'the surviving row decrypts');
+}, ['fake', 'mongo']);
+
+each('C3B-C6e tie: a repeat unlink moves a key row at archivedAt into the archive and deletes one at archivedAt + 1 ms', async (rig) => {
+  frozen(CLOCK0);
+  const h = await linkWithKeys(OWNER_A, 'tie');
+  const name = (await destroyAuthState(OWNER_A))!;
+  await h.state.keys.set({ 'lid-mapping': { tie: 'at-archivedAt' } });
+  seam.now = () => new Date(CLOCK0.getTime() + 1);
+  await h.state.keys.set({ 'lid-mapping': { later: 'one-ms-after' } });
+  assert.equal(await destroyAuthState(OWNER_A), name);
+  assert.equal((await liveRows(rig, OWNER_A)).keys.length, 0, 'nothing is left live');
+  const ids = (await archivedRows(rig, OWNER_A, name)).keys.filter((x) => x.type === 'lid-mapping').map((x) => x.id);
+  assert.deepEqual(ids, ['tie'], 'the tie belongs to the archive, the +1 ms row is gone');
+}, ['fake', 'mongo']);
+
+each('C3B-C6e tie: a repeat restore keeps a key row at archivedAt and deletes one at archivedAt + 1 ms', async (rig) => {
+  frozen(CLOCK0);
+  const h = await linkWithKeys(OWNER_A, 'tie');
+  await destroyAuthState(OWNER_A);
+  await h.state.keys.set({ 'lid-mapping': { tie: 'at-archivedAt' } });
+  seam.now = () => new Date(CLOCK0.getTime() + 1);
+  await h.state.keys.set({ 'lid-mapping': { later: 'one-ms-after' } });
+  assert.equal(await restoreAuthState(OWNER_A), true);
+  const ids = (await liveRows(rig, OWNER_A)).keys.filter((x) => x.type === 'lid-mapping').map((x) => x.id);
+  assert.deepEqual(ids, ['tie'], 'the tie is kept, the +1 ms row is debris');
+  assert.equal((await liveRows(rig, OWNER_A)).keys.length, 4, 'with the three restored rows');
+}, ['fake', 'mongo']);
+
+/* ================================================================== C3B-C7 owner isolation (security class) */
+
+const snapshot = async (rig: Rig, owner: string) =>
+  canon([...(await rig.creds!.raw()), ...(await rig.keys!.raw())]
+    .filter((x) => x.ownerUserId.toHexString() === owner)
+    .map((x) => ({ ...x, value: { v: x.value.v, nonce: bin(x.value.nonce), ct: bin(x.value.ct), tag: bin(x.value.tag) } }))
+    .sort((a, b) => String(a._id).localeCompare(String(b._id))));
+
+each('C3B-C7a: owner A\'s keys and creds are never returned to a handle for owner B', async () => {
+  const ha = await createAuthState(OWNER_A);
+  (ha.state.creds as Any).marker = 'A-creds';
+  await ha.saveCreds();
+  await ha.state.keys.set({ 'lid-mapping': { same: 'from-A' }, session: { same: Buffer.from('A-session') } });
+  const hb = await createAuthState(OWNER_B);
+  assert.equal((hb.state.creds as Any).marker, undefined, 'B does not get A\'s creds');
+  assert.equal((await hb.state.keys.get('lid-mapping', ['same']))['same'] ?? null, null);
+  assert.equal((await hb.state.keys.get('session', ['same']))['same'] ?? null, null);
+  await hb.state.keys.set({ 'lid-mapping': { same: 'from-B' } });
+  assert.equal((await ha.state.keys.get('lid-mapping', ['same']))['same'], 'from-A');
+  assert.equal((await hb.state.keys.get('lid-mapping', ['same']))['same'], 'from-B');
+}, ['fake', 'mongo']);
+
+each('C3B-C7b: delete, archive, prune and restore of A change none of B\'s raw rows; the lifecycle reports each owner by its own rows', async (rig) => {
+  await linkWithKeys(OWNER_B, 'B-live');
+  await linkWithKeys(OWNER_C, 'C-archived');
+  await destroyAuthState(OWNER_C);
+  const snapB = await snapshot(rig, OWNER_B);
+  const snapC = await snapshot(rig, OWNER_C);
+  const ha = await linkWithKeys(OWNER_A, 'A-0');
+  await ha.state.keys.set({ session: { '1': null } }); // delete
+  for (let i = 1; i < 8; i += 1) { // archive, then prune past 5
+    await destroyAuthState(OWNER_A);
+    await linkWithKeys(OWNER_A, `A-${i}`);
+  }
+  await destroyAuthState(OWNER_A);
+  await restoreAuthState(OWNER_A);
+  assert.equal(await snapshot(rig, OWNER_B), snapB, 'B\'s raw rows are byte-identical');
+  assert.equal(await snapshot(rig, OWNER_C), snapC, 'so are C\'s');
+  assert.equal(await hasRestorableAuthState(OWNER_B), false, 'B has only live rows');
+  assert.equal(await hasRestorableAuthState(OWNER_C), true, 'C has an archive');
+  assert.equal(await hasRestorableAuthState(OWNER_A), true, 'A has archives');
+  assert.deepEqual(await linkedUserIds(), [OWNER_A, OWNER_B]);
+}, ['fake', 'mongo']);
+
+each('C3B-C7c: an owner id that is not 24 lowercase hex is refused before any backend call', async (rig) => {
+  const evil: unknown[] = [
+    '..', '../x', '', 'abc', 'A1'.repeat(12), 'g'.repeat(24), 'a'.repeat(23), 'a'.repeat(25), `${'a'.repeat(24)}\n`, ` ${'a'.repeat(23)}`,
+    { toString: () => 'a'.repeat(24) }, ['a'.repeat(24)], 12, null, undefined, new ObjectId(), { $ne: null },
+  ];
+  const calls = () => rig.creds!.calls.length + rig.keys!.calls.length;
+  for (const bad of evil) {
+    for (const fn of [createAuthState, destroyAuthState, hasRestorableAuthState, restoreAuthState] as Array<(u: Any) => Promise<unknown>>) {
+      const before = calls();
+      await rejectsWith(fn(bad), 'BAD_OWNER', `${fn.name}(${typeof bad})`);
+      assert.equal(calls(), before, `${fn.name}: a backend call was made for a refused id`);
+    }
+  }
+}, ['fake', 'mongo']);
+
+each('C3B-C7d: every backend query carries the owner id (the one ownerless query is the list of live owners)', async (rig) => {
+  const ha = await linkWithKeys(OWNER_A, 'q');
+  await ha.state.keys.get('pre-key', ['1', '2']);
+  await ha.state.keys.set({ session: { '1': null, '9': Buffer.from('x') } });
+  await ha.saveCreds();
+  await destroyAuthState(OWNER_A);
+  await hasRestorableAuthState(OWNER_A);
+  await restoreAuthState(OWNER_A);
+  await halfLink(OWNER_B);
+  await destroyAuthState(OWNER_B);
+  await linkedUserIds();
+  await linkedUserIds();
+  for (const [name, p] of [['creds', rig.creds!], ['keys', rig.keys!]] as const) {
+    for (const c of p.calls) {
+      if (c.filter.ownerUserId === undefined) {
+        assert.ok(name === 'creds' && c.op === 'find' && isDeepStrictEqual(c.filter, { archiveId: null }), `${name}.${c.op}: a query without an owner id`);
+      } else {
+        assert.ok(c.filter.ownerUserId instanceof ObjectId, `${name}.${c.op}: owner id is an ObjectId`);
+      }
+    }
+  }
+  assert.equal(rig.creds!.calls.filter((c) => c.filter.ownerUserId === undefined).length, 2, 'only the two linkedUserIds calls are ownerless');
+}, ['fake', 'mongo']);
+
+/* ================================================================== C3B-C8 archive age limit */
+
+const AGE_MS = ARCHIVE_MAX_AGE_DAYS * 86_400_000;
+
+each('C3B-C8a: one archivedAt on every row of an archive; a live row never holds one', async (rig) => {
+  const T0 = new Date('2026-06-01T10:00:00.000Z');
+  seam.now = () => new Date(T0);
+  const h = await linkWithKeys(OWNER_A, 'one');
+  const name = (await destroyAuthState(OWNER_A))!;
+  const arch = await archivedRows(rig, OWNER_A, name);
+  const stamps = new Set([...arch.creds, ...arch.keys].map((x) => (x.archivedAt as Date).getTime()));
+  assert.equal(stamps.size, 1, 'every row of the archive has the same archivedAt');
+  assert.equal([...stamps][0], T0.getTime());
+  assert.ok([...arch.creds, ...arch.keys].every((x) => x.archivedAt instanceof Date));
+  void h;
+
+  seam.now = () => new Date(T0.getTime() + 60_000);
+  const noArchivedAt = async () => {
+    const live = await liveRows(rig, OWNER_A);
+    for (const x of [...live.creds, ...live.keys]) assert.ok(!('archivedAt' in x) || x.archivedAt === undefined, 'a live row holds an archivedAt');
+  };
+  await noArchivedAt();
+  assert.equal(await restoreAuthState(OWNER_A), true);
+  await noArchivedAt();
+  const restored = await liveRows(rig, OWNER_A);
+  assert.equal(restored.creds.length, 1);
+  assert.equal(restored.keys.length, 3);
+  assert.ok([...restored.creds, ...restored.keys].every((x) => x.archiveId === null));
+  const h2 = await createAuthState(OWNER_A);
+  await h2.state.keys.set({ session: { '5': Buffer.from('later') } });
+  await h2.state.keys.set({ session: { '5': null } });
+  await h2.state.keys.set({ session: { '6': Buffer.from('later') } });
+  await h2.saveCreds();
+  await h2.saveCreds();
+  await noArchivedAt();
+  await destroyAuthState(OWNER_A);
+  await linkWithKeys(OWNER_A, 'again');
+  await noArchivedAt();
+  assert.ok((await archivedRows(rig, OWNER_A)).creds.every((x) => x.archivedAt instanceof Date), 'the archived one keeps its Date');
+}, ['fake', 'mongo']);
+
+each('C3B-C8b: on a fake clock an archive is restorable at the limit minus 1 s and not at plus 1 s', async (rig) => {
+  const T0 = new Date('2026-06-01T10:00:00.000Z').getTime();
+  const at = (ms: number) => { seam.now = () => new Date(ms); };
+  const unchanged = async (f: () => Promise<unknown>) => {
+    const s = canon((await rig.creds!.raw()).concat(await rig.keys!.raw()).map((x) => ({ ...x, value: bin(x.value.ct) })));
+    const out = await f();
+    assert.equal(canon((await rig.creds!.raw()).concat(await rig.keys!.raw()).map((x) => ({ ...x, value: bin(x.value.ct) }))), s, 'rows changed');
+    return out;
+  };
+
+  for (const [offset, want] of [[AGE_MS - 1000, true], [AGE_MS + 1000, false]] as const) {
+    await rig.wipe();
+    at(T0);
+    await linkWithKeys(OWNER_A, 'aged');
+    await destroyAuthState(OWNER_A);
+    at(T0 + offset);
+    assert.equal(await hasRestorableAuthState(OWNER_A), want, `hasRestorable at limit${offset < AGE_MS ? '-' : '+'}1s`);
+    if (want) {
+      assert.equal(await restoreAuthState(OWNER_A), true);
+    } else {
+      assert.equal(await unchanged(() => restoreAuthState(OWNER_A)), false, 'past the limit restore is false and changes nothing');
+    }
+  }
+
+  // an archive whose creds row is missing (partly expired) is never restorable
+  await rig.wipe();
+  at(T0);
+  await linkWithKeys(OWNER_A, 'partial');
+  await destroyAuthState(OWNER_A);
+  await rig.creds!.inner.deleteMany({});
+  assert.equal(await hasRestorableAuthState(OWNER_A), false);
+  assert.equal(await unchanged(() => restoreAuthState(OWNER_A)), false);
+
+  // the 5-newest rule and the age rule both apply
+  await rig.wipe();
+  const DAY = 86_400_000;
+  for (let i = 0; i < 6; i += 1) {
+    at(T0 + i * DAY);
+    await linkWithKeys(OWNER_A, `day-${i}`);
+    await destroyAuthState(OWNER_A);
+  }
+  assert.equal((await archivedRows(rig, OWNER_A)).creds.length, 5, 'five newest kept');
+  at(T0 + 5 * DAY + AGE_MS - 1000);
+  assert.equal(await hasRestorableAuthState(OWNER_A), true);
+  at(T0 + 5 * DAY + AGE_MS + 1000);
+  assert.equal(await hasRestorableAuthState(OWNER_A), false, 'five rows are still there, all too old');
+  assert.equal(await unchanged(() => restoreAuthState(OWNER_A)), false);
+  at(T0 + 5 * DAY + AGE_MS - 1000);
+  assert.equal(await restoreAuthState(OWNER_A), true);
+  assert.match(await readCredsText(OWNER_A), /day-5/);
+}, ['fake', 'mongo']);
+
+each('C3B-C8c: the expiry index is read back from the database: expireAfterSeconds is AGE x 86400 on archivedAt, both collections', async () => {
+  for (const c of [mongo.waCreds(), mongo.waKeys()]) {
+    const idx = (await c.indexes()).find((i) => Object.keys(i.key).length === 1 && i.key['archivedAt'] === 1);
+    assert.ok(idx, 'an index on archivedAt exists');
+    assert.equal(idx!.expireAfterSeconds, ARCHIVE_MAX_AGE_DAYS * 86400);
+  }
+}, ['mongo']);
+
+each('C3B-C8d: a row with a past archivedAt is expired by the server and a live row beside it is not (within 90 s)', async () => {
+  const db = await mongo.connect();
+  assert.ok(db.databaseName.startsWith('whatsapp_msg_test_'));
+  const col = db.collection(`c3b_ttl_probe_${randomBytes(4).toString('hex')}`);
+  try {
+    await col.createIndex({ archivedAt: 1 }, { expireAfterSeconds: 1 });
+    await col.insertMany([{ tag: 'archived', archivedAt: new Date(Date.now() - 60_000) }, { tag: 'live' }]);
+    const deadline = Date.now() + 90_000;
+    let gone = false;
+    while (Date.now() < deadline) {
+      if ((await col.countDocuments({ tag: 'archived' })) === 0) { gone = true; break; }
+      await sleep(2000);
+    }
+    assert.ok(gone, 'the archived row was not expired within 90 s');
+    assert.equal(await col.countDocuments({ tag: 'live' }), 1, 'the live row (no archivedAt) must remain');
+  } finally {
+    await col.drop().catch(() => undefined);
+  }
+}, ['mongo'], 150_000);
+
+test('C3B-C8e: no module outside authState.ts touches the key collections; the archive-reading functions take only an owner id', async () => {
+  const files = (await readdir('./src', { recursive: true })).map(String).filter((f) => f.endsWith('.ts') && !f.endsWith('.test.ts'));
+  assert.ok(files.length > 10);
+  for (const f of files) {
+    const norm = f.replace(/\\/g, '/');
+    if (norm === 'wa/authState.ts' || norm === 'db/mongo.ts') continue;
+    const text = await readFile(join('./src', f), 'utf8');
+    assert.equal(/\bwaCreds\b|\bwaKeys\b|wa_auth_(creds|keys)/.test(text), false, `${norm} reaches into the key collections`);
+  }
+  assert.deepEqual(Object.keys(AS).sort(), [
+    'KeyStoreError', 'createAuthState', 'destroyAuthState', 'hasRestorableAuthState', 'keyStoreTestSeam', 'linkedUserIds', 'restoreAuthState', 'sessionDir',
+  ].sort(), 'authState.ts exports nothing else that could read archives');
+  assert.deepEqual([destroyAuthState.length, hasRestorableAuthState.length, restoreAuthState.length, linkedUserIds.length, createAuthState.length], [1, 1, 1, 0, 1]);
+});
+
+/* ================================================================== invariants */
+
+test('C3B-I1: with the file store the five functions keep their shape', async () => {
+  cfg.keyStore = 'file';
+  const h = await createAuthState(USER);
+  assert.deepEqual(Object.keys(h).sort(), ['saveCreds', 'state']);
+  assert.deepEqual(Object.keys(h.state).sort(), ['creds', 'keys']);
+  assert.equal(typeof h.state.keys.get, 'function');
+  assert.equal(typeof h.state.keys.set, 'function');
+  assert.equal(typeof h.saveCreds, 'function');
+  await h.saveCreds();
+  assert.equal(await exists(join(sessionDir(USER), 'creds.json')), true, 'creds.json is written where it always was');
+  assert.deepEqual(await linkedUserIds(), [USER]);
+  assert.equal(typeof (await destroyAuthState(USER)), 'string');
+});
+
+test('C3B-I5/I6: no transaction or change stream in authState.ts; the loopback guard refuses everything but 127.0.0.1 and localhost', async () => {
+  const src = await readFile('./src/wa/authState.ts', 'utf8');
+  assert.equal(/withTransaction|startSession\(|\.watch\(/.test(src), false);
+  for (const ok of ['mongodb://127.0.0.1:27017', 'mongodb://localhost/x', 'mongodb://u:p@127.0.0.1:1/db?x=1']) assert.doesNotThrow(() => assertLoopbackMongo(ok));
+  for (const bad of ['mongodb://example.com', 'mongodb+srv://c.mongodb.net', 'mongodb://127.0.0.1.evil.com', 'mongodb://localhost.evil.com', 'mongodb://127.0.0.1@evil.com',
+    'mongodb://127.0.0.1:1,evil.com:2', 'mongodb://10.0.0.5', 'mongodb://[::1]', '', 'not a url']) {
+    assert.throws(() => assertLoopbackMongo(bad), /C3B-I6/, bad);
+  }
+  assert.ok(config.mongoUri.startsWith('mongodb://127.0.0.1') || config.mongoUri.startsWith('mongodb://localhost'), 'the effective URI of this run is loopback');
+});
+
+/* ================================================================== CHECKER PROBES (scratch copy only) */
+const allCarryOwner = (rig: Rig, from: { c: number; k: number }) => {
+  const bad: string[] = [];
+  rig.creds!.calls.slice(from.c).forEach((c) => { if (c.filter.ownerUserId === undefined) bad.push(`creds.${c.op} ${JSON.stringify(c.filter)}`); });
+  rig.keys!.calls.slice(from.k).forEach((c) => { if (c.filter.ownerUserId === undefined) bad.push(`keys.${c.op} ${JSON.stringify(c.filter)}`); });
+  return bad;
+};
+
+each('PROBE-P1: clash on restore and on repeat unlink with two other owners present (same ms, same type/id): one row, decrypts, others untouched, every query owner-scoped', async (rig) => {
+  frozen(CLOCK0);
+  await linkWithKeys(OWNER_B, 'b-live');
+  await linkWithKeys(OWNER_C, 'c-arch');
+  await destroyAuthState(OWNER_C);
+  const h = await linkWithKeys(OWNER_A, 'dup');
+  const snapB = await snapshot(rig, OWNER_B);
+  const snapC = await snapshot(rig, OWNER_C);
+  const mark = { c: rig.creds!.calls.length, k: rig.keys!.calls.length };
+
+  // restore direction
+  await destroyAuthState(OWNER_A);
+  await h.state.keys.set({ session: { '1': Buffer.from('straggler-1') } });
+  const bothBefore = (await rig.keys!.raw()).filter((x) => x.ownerUserId.toHexString() === OWNER_A && x.type === 'session' && x.id === '1');
+  assert.equal(bothBefore.length, 2, 'clash exists: live twin + archived twin');
+  assert.equal(await restoreAuthState(OWNER_A), true);
+  let a = (await rig.keys!.raw()).filter((x) => x.ownerUserId.toHexString() === OWNER_A);
+  assert.deepEqual(kinds(a), ['app-state-sync-key/AAA', 'pre-key/1', 'session/1']);
+  assert.ok(a.every((x) => x.archiveId === null && x.archivedAt === undefined), 'restored rows are live, no archivedAt');
+  const h2 = await createAuthState(OWNER_A);
+  const got = (await h2.state.keys.get('session', ['1']))['1'];
+  assert.ok(Buffer.isBuffer(got));
+  console.log('PROBE-P1 restore survivor value:', rig.name, got.toString());
+
+  // repeat-unlink direction
+  const name = (await destroyAuthState(OWNER_A))!;
+  await h.state.keys.set({ session: { '1': Buffer.from('straggler-2') } });
+  const before2 = (await rig.keys!.raw()).filter((x) => x.ownerUserId.toHexString() === OWNER_A && x.type === 'session' && x.id === '1');
+  assert.equal(before2.length, 2, 'clash exists again');
+  assert.equal(await destroyAuthState(OWNER_A), name);
+  a = (await rig.keys!.raw()).filter((x) => x.ownerUserId.toHexString() === OWNER_A);
+  assert.deepEqual(kinds(a), ['app-state-sync-key/AAA', 'pre-key/1', 'session/1']);
+  assert.ok(a.every((x) => x.archiveId === name && x.archivedAt instanceof Date), 'all in the archive');
+  assert.equal(await restoreAuthState(OWNER_A), true);
+  const h3 = await createAuthState(OWNER_A);
+  assert.ok(Buffer.isBuffer((await h3.state.keys.get('session', ['1']))['1']));
+  console.log('PROBE-P1 unlink survivor value:', rig.name, ((await h3.state.keys.get('session', ['1']))['1'] as Buffer).toString());
+
+  assert.equal(await snapshot(rig, OWNER_B), snapB, 'B raw rows byte identical');
+  assert.equal(await snapshot(rig, OWNER_C), snapC, 'C raw rows byte identical');
+  assert.deepEqual(allCarryOwner(rig, mark), [], 'every query carries an owner id');
+  const alien = [...rig.creds!.calls.slice(mark.c), ...rig.keys!.calls.slice(mark.k)].filter((c) => c.filter.ownerUserId && c.filter.ownerUserId.toHexString() !== OWNER_A);
+  assert.equal(alien.length, 0, 'every query names owner A only');
+}, ['fake', 'mongo']);
+
+each('PROBE-P2: finding 1 - a stale handle after unlink + fresh pairing overwrites the new creds', async (rig) => {
+  const old = await linkWithKeys(OWNER_A, 'old-link');
+  await destroyAuthState(OWNER_A);
+  const fresh = await createAuthState(OWNER_A);
+  (fresh.state.creds as Any).marker = 'NEW-PAIRING';
+  await fresh.saveCreds();
+  (old.state.creds as Any).marker = 'STALE-OLD';
+  let res = 'resolved';
+  try { await old.saveCreds(); } catch (e) { res = `rejected ${(e as Error).name}`; }
+  const read = ((await createAuthState(OWNER_A)).state.creds as Any).marker;
+  console.log('PROBE-P2', rig.name, 'stale saveCreds', res, '; stored marker now =', read);
+}, ['fake', 'mongo']);
+
+each('PROBE-P3: updateMany that applies part of its rows then throws: the repeat completes (unlink and restore)', async (rig) => {
+  const h = await linkWithKeys(OWNER_A, 'partial');
+  const inner = rig.keys!.inner as Any;
+  const realUM = inner.updateMany.bind(inner);
+  let armed = true;
+  inner.updateMany = async (f: Any, u: Any) => {
+    if (!armed) return realUM(f, u);
+    const docs = await inner.find(f).toArray();
+    if (docs.length > 1) await inner.updateOne({ _id: docs[0]._id }, u);
+    armed = false;
+    throw new Error('backend down (partial)');
+  };
+  await assert.rejects(destroyAuthState(OWNER_A), /partial/);
+  assert.deepEqual(await linkedUserIds(), []);
+  const name = (await destroyAuthState(OWNER_A))!;
+  assert.ok(name);
+  const arch = await archivedRows(rig, OWNER_A, name);
+  assert.equal(arch.keys.length, 3);
+  assert.equal((await liveRows(rig, OWNER_A)).keys.length, 0);
+  armed = true;
+  await assert.rejects(restoreAuthState(OWNER_A), /partial/);
+  assert.deepEqual(await linkedUserIds(), []);
+  assert.equal(await restoreAuthState(OWNER_A), true);
+  assert.equal((await liveRows(rig, OWNER_A)).keys.length, 3);
+  assert.equal((await archivedRows(rig, OWNER_A)).keys.length, 0);
+  inner.updateMany = realUM;
+  void h;
+}, ['fake', 'mongo']);
+
+each('PROBE-P4: C6f straggler saveCreds after restore of the same link (held handle matches restored row)', async (rig) => {
+  const old = await linkWithKeys(OWNER_A, 'orig');
+  await destroyAuthState(OWNER_A);
+  assert.equal(await restoreAuthState(OWNER_A), true);
+  (old.state.creds as Any).marker = 'after-restore';
+  await old.saveCreds();
+  console.log('PROBE-P4', rig.name, 'marker', ((await createAuthState(OWNER_A)).state.creds as Any).marker);
+}, ['fake', 'mongo']);
+
+each('PROBE-P5: the one ownerless find in linkedUserIds passes projection {ownerUserId:1} and nothing else', async (rig) => {
+  await linkWithKeys(OWNER_A, 'p5');
+  const seen: Any[] = [];
+  const c = rig.creds as Any;
+  const orig = c.find.bind(c);
+  c.find = (f: Any, o?: Any) => { seen.push({ f, o }); return orig(f, o); };
+  await linkedUserIds();
+  assert.equal(seen.length, 1, 'one find');
+  assert.deepEqual(seen[0].f, { archiveId: null });
+  assert.deepEqual(seen[0].o, { projection: { ownerUserId: 1 } });
+}, ['fake']);

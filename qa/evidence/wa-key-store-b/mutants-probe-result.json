@@ -1,0 +1,36 @@
+[
+ {
+  "id": "BASE",
+  "exit": 0,
+  "timedOut": false,
+  "pass": "2",
+  "fail": "0",
+  "failing": [],
+  "hashAfterRestore": "equals HEAD blob",
+  "dirRemoved": true
+ },
+ {
+  "id": "X8",
+  "exit": 1,
+  "timedOut": false,
+  "pass": "1",
+  "fail": "1",
+  "failing": [
+   "PROBE-P5: the one ownerless find in linkedUserIds passes projection {ownerUserId:1} and nothing else [fake]"
+  ],
+  "hashAfterRestore": "equals HEAD blob",
+  "dirRemoved": true
+ },
+ {
+  "id": "X9",
+  "exit": 1,
+  "timedOut": false,
+  "pass": "1",
+  "fail": "1",
+  "failing": [
+   "PROBE-P1: clash on restore and on repeat unlink with two other owners present"
+  ],
+  "hashAfterRestore": "equals HEAD blob",
+  "dirRemoved": true
+ }
+]

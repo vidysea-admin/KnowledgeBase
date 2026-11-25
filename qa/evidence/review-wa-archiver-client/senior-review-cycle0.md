@@ -1,0 +1,5 @@
+# Senior review wa-archiver-client (W3), cycle 0, diff 00de9d92..1647c25b — VERDICT: Warning (nothing above low)
+- low: config.ts:63-78 SSRF host filter is literal-only; probe accepted [::169.254.169.254], [64:ff9b::a9fe:a9fe], [::a9fe:a9fe], [2002:a9fe:a9fe::1], metadata.google.internal. Operator-env URL only (defence in depth); manifest claim "link-local/metadata refused for every scheme" overstates it. Fix: classify embedded IPv4 for ::/96, 64:ff9b::/96, 2002::/16; reject *.internal / metadata.*; or document DNS names out of scope.
+- low/no action: success hard-coded to 200 (matches contract).
+- Sound: token only via bearer(), redacted; errors code-only; fixed origin + constant paths; redirect manual + 3xx refused; bounded retries with stable idempotency key; getQr no retry/cache; size-bounded bodies; strict shapes.
+- Open: callers (W5-W9) must derive ownerId from the session's own link record (name it as acceptance in the first caller unit); ALLOW_PRIVATE_HTTP owner decision; H-11 compose gate; tests not test-first.
