@@ -107,4 +107,4 @@ Not UI-touching. No browser session against Google and no real meeting was run; 
 - **Not measured here (operator steps, contract "Out of scope"):** a host really refusing the bot on the hosted recorder, the bucket holding no zero-byte file for that session, and the alert mail (B10).
 - **The U+2019 spelling is unverified live.** The saved fixture uses the straight apostrophe; the pure tests cover both. Whichever Meet renders, both match.
 
-## Status: ready-for-check
+## Status: checked-PASS
