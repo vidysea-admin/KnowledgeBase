@@ -1,8 +1,10 @@
-# Checkpoint (coordinator B): recorder-self-heal-rejoin, cycle 0
-Head e327d86bc30307e98ec27d93fd9d1e2fa1a53d06, contract 7e683dff, policy proportional-verification/2026-11-22.19
-Worktree: D:/KnowledgeBase/.worktrees/h1-check-b (detached at head, pnpm install --offline)
-Evidence identities (all run in that worktree, final head):
-- node --test scripts/webinar/scheduler/self-heal-rejoin.test.mjs -> 23/23; related suites 46/46, 36/36, 24/24; tsc exit 0; 5 changed files
-- C10 probe: scratchpad h1-check-b/probe-c10.test.mjs via node --import tsx --test -> mail contains the passcode sentence (FAIL)
-- Mutants A-J (dispatch.mjs, lifecycle-alerts.mjs, alerts.ts), --test-timeout 60s, per-mutation backup, hash equal to HEAD blob after each: A, C, D, E, F, G, H, I, J killed; B survived
-Status: complete; verdict FAIL on C10.
+# Checkpoint (coordinator B): recorder-self-heal-rejoin, cycle 1
+Head c42c9559ca7c92fbb1378b41cd90e85404e7ec4b, base e327d86b, contract 7e683dff, policy proportional-verification/2026-11-22.19
+Worktree: D:/KnowledgeBase/.worktrees/h1-check-b (detached at head)
+Evidence identities (final head):
+- git diff --stat e327d86b c42c9559: bot-events.ts, self-heal-rejoin.test.mjs only
+- probe-c10.test.mjs verbatim via node --import tsx --test: 3/3 clean mails; probe-clean.test.mjs 14/15 redacted ("Passcode - 445566" leaks, medium hardening)
+- autojoin/*.test.ts 54/54; scheduler/*.test.mjs 92/92 (incl. self-heal-rejoin 26/26); tsc --noEmit meeting-bot exit 0
+- mutants K-N on bot-events.ts, 60 s timeout, per-mutation backup, hash == HEAD blob c47b198d: all killed
+- cycle-0 evidence (C1-C9, I1-I6, mutants A, C-J) reused by identity: dispatch.mjs, lifecycle-alerts.mjs, alerts.ts unchanged since e327d86b
+Status: complete; verdict PASS.
