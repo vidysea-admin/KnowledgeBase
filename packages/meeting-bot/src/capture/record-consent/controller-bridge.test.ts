@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { spawn } from "node:child_process";
+import { spawn,spawnSync } from "node:child_process";
 import { randomBytes,randomUUID } from "node:crypto";
 import { mkdtempSync,mkdirSync,readFileSync,writeFileSync,rmSync,readdirSync } from "node:fs";
 import { tmpdir } from "node:os";
@@ -10,6 +10,18 @@ import { once } from "node:events";
 import { createRecordingPrivacyControl } from "./controller-client.js";
 import { publishCapturePrivacyController } from "./controller-bridge.js";
 import { readRecordConsent } from "./receipt-store.js";
+// Windows equivalent of the POSIX mode 0o700 below: mode bits are ignored on Windows, so a fixture created
+// under %TEMP% inherits whatever that folder grants (for example a sandbox group). Make THIS test's own temp
+// directory private (no inheritance; SYSTEM, Administrators and the current identity only) before use.
+function makeFixturePrivateOnWindows(directory:string):void {
+  if(process.platform!=="win32")return;
+  const system32=path.join(process.env.SystemRoot??"C:\\Windows","System32"); // never a PATH lookup (Git ships its own whoami)
+  const who=spawnSync(path.join(system32,"whoami.exe"),["/user","/fo","csv","/nh"],{encoding:"utf8",windowsHide:true});
+  const sid=/"(S-1-[0-9]+(?:-[0-9]+)+)"/.exec(who.stdout??"")?.[1];
+  assert.ok(who.status===0&&sid,"current Windows identity SID required for fixture ACL");
+  const acl=spawnSync(path.join(system32,"icacls.exe"),[directory,"/inheritance:r","/grant:r","*S-1-5-18:(OI)(CI)F","*S-1-5-32-544:(OI)(CI)F",`*${sid}:(OI)(CI)F`],{encoding:"utf8",windowsHide:true});
+  assert.equal(acl.status,0,`fixture ACL setup failed: ${acl.stderr}`);
+}
 type BotPrivacyDeps={list(tenant:string):Promise<Array<{privacy:string;status:string}>>;set(tenant:string,session:string,generation:string,action:"private-start"|"private-end"):Promise<string>};
 // Harness-only dynamic cross-package import exercises the actual API transport without a production dependency.
 const apiModule=new URL("../../../../../apps/api/src/bot-privacy/host-connector.ts",import.meta.url).href;
@@ -25,6 +37,7 @@ for(const scenario of ["known-clock","write-failure","unknown-clock"])test(`actu
   const protectedRoot=process.env.LKB_PRIVATE_ACL_PROBE_DIR;
   if(protectedRoot)assert.ok(path.isAbsolute(protectedRoot)&&!/^[/\\]{2}/.test(protectedRoot),"Fixture protected root must be an explicit local absolute directory");
   const directory=mkdtempSync(path.join(protectedRoot??tmpdir(),"t011-bridge-")),recordDir=path.join(directory,"receipt"),controlDir=path.join(directory,"private");
+  if(!protectedRoot)try{makeFixturePrivateOnWindows(directory);}catch(error){rmSync(directory,{recursive:true,force:true});throw error;}
   mkdirSync(controlDir,{mode:0o700}); // actual configured private root exists before publisher capability is exposed
   const generation=randomUUID(),token=randomBytes(32).toString("hex");
   const child=spawn(process.execPath,["--import","tsx",fileURLToPath(new URL("controller-worker.fixture.ts",import.meta.url))],{

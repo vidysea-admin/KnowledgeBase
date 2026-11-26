@@ -6,6 +6,11 @@ import os from "node:os";
 import path from "node:path";
 import { leanFfmpegArgs, normalizeLeanCapture, type LeanCommand } from "./lean-video-ffmpeg.js";
 
+// The product refuses a recording on a drive other than the bot's working directory (regularLocalFile).
+// Fixtures live under os.tmpdir(), so run this file from there; otherwise a checkout on another Windows
+// drive (D:) refuses every fixture before the behaviour under test is reached.
+process.chdir(os.tmpdir());
+
 const media = (changes: Record<string, unknown> = {}) => ({format: {duration: "10"}, streams: [
   {codec_type: "video", codec_name: "h264", nb_read_packets: "50", duration: "10", width: 1280, height: 720, avg_frame_rate: "5/1"},
   {codec_type: "audio", codec_name: "aac", nb_read_packets: "470", duration: "10", channels: 1, sample_rate: "48000"}], ...changes});
