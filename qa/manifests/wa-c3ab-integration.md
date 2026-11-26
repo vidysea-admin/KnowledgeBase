@@ -88,4 +88,4 @@ Mongod: PID 47016 on 127.0.0.1:27345 (loopback only), stopped by that PID at han
 ## Not done
 No mutant (none was needed, see above). No code review agent dispatched (the builder does not spawn agents; the code review named in D-246 item 5 follows from the coordinator). Nothing pushed, nothing merged to the archiver's main.
 
-## Status: ready-for-check
+## Status: checked-PASS (C3AB-J1, cycle 0, 2026-11-26, verdict commit 12be155c; 7/7 parts met, joint harness 10/10, 7 mutants killed; issues qa/issues.C3ABINTEGRATION.jsonl 001-003. The checker's route recompute said dual:true; judged as one check per the dual-note above, since both units were dual-checked on their own heads and the merge adds no code)
