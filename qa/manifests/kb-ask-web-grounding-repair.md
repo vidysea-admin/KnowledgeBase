@@ -2,6 +2,7 @@
 
 **Status:** checked-PASS (engineering C1/C3/C4 at f445c61a, publisher C2 owner-authorized recheck at 13a6c546)
 **Fix cycle:** 3 (explicit owner-authorized final recheck)
+**Handshake status:** STALLED (2026-11-26). At cycle 3, verdict A is FAIL on the school-policy wording (def9078d) and verdict B is PASS for C2 only, so there is no same-cycle dual PASS. The wording release is held by D-218, and the repair continues as unit F1 (`wave/f1-waiver-condition`). Not a close-out. This canonical field also stops the session hook from counting old PASS blocks (qa/QUEUE.md:1249).
 **Policy-Version:** proportional-verification/2026-11-22.19
 **Dual check:** required
 **Feature commit:** 13a6c546

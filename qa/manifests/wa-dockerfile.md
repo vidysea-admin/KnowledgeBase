@@ -2,7 +2,7 @@
 **Contract:** qa/contracts/wa-dockerfile.md (unit C3C, criteria and invariants verbatim under Acceptance criteria below and named on the Criteria line); decisions D-227, archiver D-023 item 8, KB D-235
 **Goal task:** none
 **Date:** 2026-11-25
-**Status:** ready-for-check
+**Status:** checked-PASS (verdict qa/verdicts/wa-dockerfile.md, cycle 0, 2026-11-26; issues qa/issues.C3CDOCKERFILE.jsonl 001-005; Docker-daemon halves of C2-C4, C6, C7 and C8 NOT-MEASURED, owed at deploy C5)
 **Fix cycle:** 0 of max 2
 **Hold fix cycles:** 0 of 2
 **Hold-reopens:** 0
