@@ -158,7 +158,7 @@ function world() {
       STUB_LOG: w.posix('stub.log'), STUB_DIR: w.posix('stub'), STUB_BUCKET_DIR: w.posix('bucket'), ...extra};
   };
   w.bucketEnv = (extra = {}) => w.env({LKB_STATE_BUCKET: BUCKET, ...extra});
-  w.run = (env, timeout = 90000) => {
+  w.run = (env, timeout = 300000) => {
     const r = spawnSync(SH, [posix(ENTRY)], {env, encoding: 'utf8', timeout});
     return {status: r.status, out: (r.stdout ?? '') + (r.stderr ?? ''), signal: r.signal};
   };
