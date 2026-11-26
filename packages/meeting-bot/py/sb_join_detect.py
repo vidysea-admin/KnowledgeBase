@@ -9,6 +9,9 @@ JOIN_TEXTS = [
     # Meet pre-join (live 2026-11-26): skip the media modal without granting mic/camera (C2), and
     # knock on a meeting the bot's account does not own.
     "continue without microphone and camera", "ask to join",
+    # Owner already in the call on the same account: dismiss the tooltip and join alongside. Never
+    # "switch here" — it moves the owner's own call to the bot and ends it on his device.
+    "got it", "join here too",
 ]
 END_PHRASES = [
     "webinar has ended", "webinar has been ended", "session has ended", "meeting has ended",

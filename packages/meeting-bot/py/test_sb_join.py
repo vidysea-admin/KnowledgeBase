@@ -225,6 +225,17 @@ def test_join_texts_contains_exact_meet_join_now_without_media_controls():
     assert not ({"turn on microphone", "turn on camera", "unmute", "allow"} & set(JOIN_TEXTS))
 
 
+def test_join_texts_join_alongside_own_account_never_switch():
+    """Live 2026-11-26 frame: when the bot's account is already in the call (the owner attends his own
+    meeting), Meet offers 'Switch here' (moves the owner's call to the bot and ends it on his device)
+    with 'Join here too' under a 'Got it' tooltip. The bot dismisses the tooltip and joins alongside;
+    it must never press 'Switch here'."""
+    for label in ("join here too", "got it"):
+        assert label in JOIN_TEXTS
+        assert len(label) <= 40
+    assert "switch here" not in JOIN_TEXTS
+
+
 def test_join_texts_pass_meet_prejoin_without_granting_media():
     """Live 2026-11-26: a signed-in bot met Meet's 'Continue without microphone and camera' modal and,
     in a meeting it does not own, the 'Ask to join' button. Neither grants mic/camera (C2), and both
