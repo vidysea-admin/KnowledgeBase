@@ -7,7 +7,7 @@
  */
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { mkdtempSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -80,6 +80,11 @@ test("gate: admission info carries assumed + reason from the admitted event; pos
   assert.equal(k.admission?.assumed, false, "an admitted event without assumed is a positive admission");
 });
 
+test("gate: admission_denied is a typed, readable failure (B2-C4)", () => {
+  const msg = createAdmissionGate().onEvent({ event: "admission_denied", seconds: 4 });
+  assert.match(msg ?? "", /^admission_denied: .*no recording made/);
+});
+
 // ---- runRecord with a fake join script ----
 
 const FAKE = [
@@ -90,28 +95,31 @@ const FAKE = [
   'const ev = (o) => post("/event", JSON.stringify(o));',
   'const out = (e) => console.log(JSON.stringify({t: Date.now() / 1000, ...e}));',
   'const sleep = (ms) => new Promise((r) => setTimeout(r, ms));',
-  'const giveUp = Date.now() + 8000;',
-  'out({event: "opened"}); await ev({event: "capture-started"}); await post("/chunk?seq=0", "partial-media");',
+  'const giveUp = Date.now() + (String(scenario).startsWith("denied") ? 60000 : 8000);', // the refusal tests run runRecord's real 5000 ms poll
+  'out({event: "opened"}); await ev({event: "capture-started"}); if (scenario !== "denied-empty" && scenario !== "timeout-empty") await post("/chunk?seq=0", "partial-media");',
   'await sleep(800);',
+  'if (scenario === "denied" || scenario === "denied-empty") out({event: "admission_denied", seconds: 3});',
   'if (scenario === "admitted") out({event: "admitted"});',
-  'if (scenario === "timeout") out({event: "admission_timeout", seconds: 901, limit: 900});',
+  'if (scenario === "timeout" || scenario === "timeout-empty") out({event: "admission_timeout", seconds: 901, limit: 900});',
   'if (scenario === "reload-kill") { out({event: "admitted"}); await sleep(300); out({event: "watchdog-reload", reason: "audio-silence"}); await sleep(300); await ev({event: "capture-error", error: "audio track ended unexpectedly"}); }',
   'for (;;) { if (Date.now() > giveUp) process.exit(0); if ((await (await post("/control", "{}")).json()).stop) break; await sleep(30); }',
   'await ev({event: "capture-stopped", failed: false}); process.exit(0);',
 ].join("\n");
 
-async function drive(scenario: string, untilMs: number) {
+type Seen = { wallMs: number; files: { name: string; size: number; bytes: string }[]; status?: { state?: string; error?: string } };
+// `real` = keep runRecord's own 5000 ms poll (no inject.wait); `seen` is sampled before the temp dir is removed.
+async function drive(scenario: string, untilMs: number, real = false) {
   const dir = mkdtempSync(join(tmpdir(), "lkb-adm-")), script = join(dir, "fake-join.mjs"), recordDir = join(dir, "record");
   writeFileSync(script, FAKE);
   process.env.FAKE_ADM = scenario;
-  let levelSubscriptions = 0;
+  let levelSubscriptions = 0, seen: Seen | undefined;
   try {
     const t0 = Date.now();
     let error: unknown;
     await runRecord(["https://meet.google.com/abc-defg-hij", "--until", new Date(t0 + untilMs).toISOString(), "--backend", "tab",
       "--session-id", "adm", "--tenant", "fixture", "--title", "fixture",
       "--capture-approved-by", "fixture", "--capture-approval-ref", "fixture", "--recorded-by", "fixture"], {
-      recordDir, wait: async () => { await new Promise((r) => setTimeout(r, 20)); }, finalize: async () => {},
+      recordDir, ...(real ? {} : { wait: async () => { await new Promise((r) => setTimeout(r, 20)); } }), finalize: async () => {},
       tab: (onEvent) => {
         const t = createTabBrowserDeps({ python: process.execPath, joinScript: script, profileDir: join(dir, "profile"), recordDir,
           extensionDir: join(REPO_ROOT, "packages/meeting-bot/py/tab-capture"), sessionId: "adm", tenantId: "fixture",
@@ -121,7 +129,12 @@ async function drive(scenario: string, untilMs: number) {
         return t;
       },
     }).catch((e) => { error = e; });
-    return { error: error as Error | undefined, levelSubscriptions };
+    const wallMs = Date.now() - t0;
+    const names = readdirSync(recordDir);
+    const files = names.filter((n) => n.endsWith(".webm")).map((n) => ({ name: n, size: statSync(join(recordDir, n)).size, bytes: readFileSync(join(recordDir, n), "utf8") }));
+    const sf = names.find((n) => n.endsWith(".status.json"));
+    seen = { wallMs, files, status: sf ? JSON.parse(readFileSync(join(recordDir, sf), "utf8")) : undefined };
+    return { error: error as Error | undefined, levelSubscriptions, seen };
   } finally { delete process.env.FAKE_ADM; rmSync(dir, { recursive: true, force: true }); }
 }
 const T = { timeout: 60000 };
@@ -147,4 +160,35 @@ test("runRecord: a reload that ends the audio track after admission is reported 
   const r = await drive("reload-kill", 120000);
   assert.match(r.error?.message ?? "", /audio track ended unexpectedly.*page reload \[watchdog-reload\] following admission/);
   assert.equal(r.levelSubscriptions, 1);
+});
+
+// ---- B2-C5 / B2-C6: a Meet refusal ends the capture early, with the real 5000 ms controller poll ----
+
+test("runRecord: admission_denied fails the capture with a typed message in under 30 s (B2-C5)", T, async () => {
+  const r = await drive("denied", 120000, true);
+  assert.match(r.error?.message ?? "", /^admission_denied/);
+  assert.equal(r.levelSubscriptions, 0);
+  assert.ok((r.seen?.wallMs ?? Infinity) < 30000, `wall ${r.seen?.wallMs} ms`);
+});
+
+test("runRecord: refusal with a ZERO-byte recording leaves no zero-byte .webm; status failed (B2-C6a)", T, async () => {
+  const r = await drive("denied-empty", 120000, true);
+  assert.match(r.error?.message ?? "", /^admission_denied/);
+  assert.deepEqual(r.seen?.files.filter((f) => f.size === 0), [], `zero-byte files left: ${JSON.stringify(r.seen?.files)}`);
+  assert.equal(r.seen?.status?.state, "failed");
+});
+
+test("runRecord: refusal with a NON-EMPTY partial keeps it byte-equal; status failed (B2-C6b)", T, async () => {
+  const r = await drive("denied", 120000, true);
+  assert.match(r.error?.message ?? "", /^admission_denied/);
+  assert.equal(r.seen?.files.length, 1, JSON.stringify(r.seen?.files));
+  assert.equal(r.seen?.files[0]?.bytes, "partial-media");
+  assert.equal(r.seen?.status?.state, "failed");
+});
+
+test("runRecord: a zero-byte recording is NOT removed on the admission_timeout path (B2-I5)", T, async () => {
+  const r = await drive("timeout-empty", 120000);
+  assert.match(r.error?.message ?? "", /^admission_timeout: /);
+  assert.equal(r.seen?.files.length, 1);
+  assert.equal(r.seen?.files[0]?.size, 0);
 });

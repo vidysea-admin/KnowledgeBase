@@ -1,8 +1,66 @@
 # Redeploy runbook for DevOps (2026-11-01)
 
+> 2026-11-24: the VM steps (sections 1-8 below) are superseded by D-215 for the go-live. Follow the Cloud Run section first. Sections 1-8 stay as reference (env names, smoke checks, rollback ideas).
+
 Goal: get the live site to the current `master`, keep it at `https://vidysea.com/knowledgebase/`, and make Mongo safe.
 Names only. Never paste a secret into chat, git or a ticket. Never print `.env`.
 Longer background: `docs/GO-LIVE-UBUNTU.md` (GL), `docs/user-accounts/ops.md` (UA), `docs/DEVOPS-HANDOVER.md`.
+
+## Cloud Run go-live (D-215, 2026-11-24) — supersedes the VM steps below
+
+State on 2026-11-24: the vendor stopped VM 34.47.136.12 on 2026-11-23, so `www.vidysea.com/knowledgebase` (302 to `https://34.47.136.12:8081/`) is dead and `kb.vidysea.com` has no DNS. The Cloud Run service `vidysea-knowledgebase` (project `vidysea-prod`, `asia-south1`) is API-only today: its pages say "Internal preview build", every app route answers 401, and on 2026-11-13 it ran `lkb_staging`. Names only below; secrets live in Secret Manager.
+
+**Who does what.** Vendor: Cloud Build trigger from `master` (`ce5cef49`, contains `d521fec0`), the two-container service, the load balancer, Cloudflare DNS, the AWS ALB rule, the ingress lock. We supply the names and values through an agreed secure channel; the vendor applies them in Cloud Run and Secret Manager. We also run the smoke checks, first admin and indexing. Every DNS, LB, ALB, ingress and server step is shown to Umesh first and runs on his yes.
+
+**Safety.** Merging to master triggers the vendor's Cloud Build deploy; do not merge or push to master without Umesh's yes and a heads-up to the vendor.
+
+**Shape.** ONE Cloud Run service, TWO containers, both built from the root `Dockerfile`. No code change. Web starts after api.
+
+| | web (ingress) | api (sidecar) |
+|---|---|---|
+| Build | `--target web` | `--target api` |
+| Port | `PORT=8080` (Cloud Run sets it; nginx `listen ${PORT}`, nginx.conf:10; image default 80, Dockerfile:68) | no `PORT` set by us (Cloud Run injects `PORT` into the ingress container only and documents it as not user-settable); it listens on 3300 by default, `Number(process.env.PORT ?? 3300)` (server.ts:201), and `API_UPSTREAM=http://127.0.0.1:3300` relies on that |
+| Probe | `GET /healthz` (200 `ok`, nginx.conf:18-22) | startup probe `GET /health` (health.ts:158; no auth, mounted before `requireAuth`, server.ts:134 vs :136; 503 if Mongo or a watcher-heartbeat read fails, health.ts:171-173) |
+| Env | `APP_BASE_PATH=/knowledgebase`, `API_UPSTREAM=http://127.0.0.1:3300`, `APP_USER_ACCOUNTS=1` | see below |
+
+`API_UPSTREAM` must be `127.0.0.1`: the compose default `http://api:3300` does not resolve on Cloud Run. nginx strips the prefix, so `/knowledgebase/api/health` reaches `/health` (nginx.conf:25-34). Leave `APP_API_BASE` and `VITE_API_BASE_URL` empty.
+
+**api env.** Plain: `MONGODB_DB=lkb_prod` (no `LKB_I_KNOW_THIS_IS_PRODUCTION`; `lkb_prod` needs no opt-in, db-name.ts:25-31; remove `LKB_ALLOW_STAGING`), `USER_SIGNUP_TENANT=toc`, `APP_PUBLIC_ORIGIN=https://kb.vidysea.com`, `CORS_ORIGINS=https://kb.vidysea.com`, `APP_BASE_PATH=/knowledgebase`, `LKB_ASK_FAST_DEADLINE_MS=150000`, `TRUST_PROXY_HOPS` (measured, see check 8). Secrets (Secret Manager): `MONGODB_URL`, `OLLAMA_API_KEY`, `GEMINI_API_KEY`, `AUTH_CSRF_SECRET` (32+ bytes, the vendor generates it directly in Secret Manager, never print it). Optional, not needed for go-live: `TAVILY_API_KEY`, `LKB_HOSTING_*`, the WhatsApp Mongo settings. Leave every `*_STATE_DIR` and `LKB_SOURCE_INTAKE` unset. `NODE_ENV=production` comes from the image (Dockerfile:113); it makes the cookie `Secure` with the `__Secure-` prefix (cookie.ts:37-40).
+
+**Service settings.** Request timeout 300 s (matches nginx 300 s, nginx.conf:32-33). Max instances 1 at launch: the per-IP and per-key window limiters (`rate-limit.ts:16-33`, express-rate-limit default memory store; `user-accounts/throttle.ts:81-83`, `Map`) are in memory; the login lockout state is in Mongo (`auth_throttles`, `composition/integrations/user-accounts.ts:88-108`); sessions and CSRF are Mongo/HMAC, so scaling later is safe. `--no-cpu-throttling` recommended: usage rows are written after the response (server.ts:138). The Mongo host allow-list must admit the service's egress (Direct VPC egress / NAT address).
+
+**Public path.** Global external HTTPS load balancer + serverless NEG + Google-managed certificate (Cloud Run domain mapping is preview and not offered in `asia-south1`). Cloudflare A record `kb` -> LB IP, DNS only. The site root `/` is NOT served: only `/knowledgebase` and `/knowledgebase/` (nginx.conf:38,45), so `/` gives 403/404. The LB should redirect `/` to `/knowledgebase/`.
+
+**First admin (needs Umesh's yes; writes `lkb_prod`).** There is no compose `indexer` here. Run from a laptop with the repo checked out, deps installed, and a network path to Mongo (allow-listed IP). `MONGODB_URL` in the environment, never echoed:
+```sh
+read -rs ADMIN_PASSWORD; echo             # 12+ characters
+printf '%s' "$ADMIN_PASSWORD" | MONGODB_DB=lkb_prod node scripts/create-admin.mjs --tenant toc --email <admin-email> --i-know-this-is-production
+unset ADMIN_PASSWORD                      # exit 0 = created or already admin; 3 = email exists, untouched; 1 = refused
+```
+
+**Indexing (needs Umesh's yes; writes `lkb_prod`).** Same laptop, `OLLAMA_API_KEY` (and `GEMINI_API_KEY` for transcribe) in the environment. Dry run first, then the real run (sync-session.mjs:25-27, 60-75):
+```sh
+node scripts/webinar/sync-session.mjs <sessionId> --index-existing --tenant toc --grounded-notes --dry-run
+MONGO_WORK_DB=lkb_prod MONGODB_DB=lkb_prod node scripts/webinar/sync-session.mjs <sessionId> --index-existing --tenant toc --grounded-notes --i-know-this-is-production
+```
+About 35 min per grounded session; never kill it midway (a killed run leaves the attempt `running`; see section 6 and GL 493-502). A Cloud Run Job (image `--target build`, task timeout 1 h or more, max retries 0) can take this over later.
+
+**Smoke checks.** Run the list below first against the run.app URL (`B=https://<service>.run.app/knowledgebase`), then against `B=https://kb.vidysea.com/knowledgebase` once DNS and the certificate work. Keep the header `Origin: https://kb.vidysea.com` on the sign-in call in both runs, because `APP_PUBLIC_ORIGIN` is fixed. This reuses section 7 with the new base.
+```sh
+B=https://kb.vidysea.com/knowledgebase
+curl -s -o /dev/null -w '%{http_code} [%{redirect_url}]\n' $B/     # 1. 200 []
+curl -fsS $B/ | grep -o '<base href="[^"]*"'                        # 2. <base href="/knowledgebase/"
+JS=$(curl -fsS $B/ | grep -o 'assets/index-[A-Za-z0-9_-]*\.js' | head -1); echo "$JS"   # 3. NOT index-B4U1QW49.js
+curl -fsS $B/config.js                                              # 4. see expected line below
+curl -fsS $B/api/health                                             # 5. {"db":"ok"}
+curl -s -o /dev/null -w '%{http_code}\n' $B/api/auth/session        # 6. NOT 404 (404 = accounts off)
+curl -s -o /dev/null -w '%{http_code}\n' $B/watch                   # 7. 200 (SPA deep link)
+```
+4. Expected `config.js` (written by 40-lkb-runtime-config.sh:19), one line: `window.__LKB_CONFIG__ = { basePath: "/knowledgebase", apiBase: "", userAccounts: true };`
+5. A 401 on any app route means the old API-only build is still serving.
+8. Sign-in and rate limit, after the first admin exists (needs Umesh's yes; writes `lkb_prod` auth rows: a session and auth events on sign-in, about 25 `auth_throttles` rows from the loop, composition/integrations/user-accounts.ts:94-101). Use section 7's sign-in call with `Origin: https://kb.vidysea.com`: HTTP 200 and `Set-Cookie: __Secure-lkb_sid=<redacted>; Path=/knowledgebase/api; HttpOnly; Secure; SameSite=Strict` (cookie.ts:44). Then run the forged `X-Forwarded-For` loop in `docs/user-accounts/ops.md` section 4 with `BASE=$B`: about 20 x 401, then 429. This measurement sets `TRUST_PROXY_HOPS`; never guess it. On Cloud Run the chain is client -> Google LB -> Cloud Run front end -> nginx (appends `X-Forwarded-For`, nginx.conf:30) -> api. All 401 means the value is too high; lower it and repeat. Cross-check the api log line `trust proxy: effective hops=N`. The run.app chain has no LB, so measure again on `kb.vidysea.com`.
+
+**Last steps, in order.** (a) Checks 1-8 pass on the run.app URL and on `kb.vidysea.com`. (b) On Umesh's yes, the vendor sets the AWS ALB rule `/knowledgebase*` to a path-keeping 302 to `https://kb.vidysea.com/#{path}?#{query}`; then check `curl -sI https://www.vidysea.com/knowledgebase/ | grep -i '^location'` shows the kb host and the path. (c) On Umesh's yes, the vendor locks Cloud Run ingress to internal + Cloud Load Balancing; re-run 1-7 on `kb.vidysea.com` and confirm the run.app URL no longer answers from outside. Rollback before (b): nothing public changed. After (b): the vendor reverts the ALB rule (that returns to the dead VM link, so fix forward where possible).
 
 ## What we found today (2026-11-01)
 

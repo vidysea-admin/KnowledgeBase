@@ -33,6 +33,24 @@ test("gate.state: lobby -> admitted; lobby -> failed on timeout; late timeout af
   assert.equal(b.state, "failed");
 });
 
+test("gate (B2-C4): admission_denied is a typed failure before admission and sets state failed", () => {
+  const g = createAdmissionGate();
+  const msg = g.onEvent({ event: "admission_denied", seconds: 4 });
+  assert.match(msg ?? "", /^admission_denied: /);
+  assert.equal(g.state, "failed");
+  assert.equal(g.admitted, false);
+  assert.equal(g.failure, msg);
+});
+
+test("gate (B2-C4): an admission_denied after admitted changes nothing", () => {
+  const g = createAdmissionGate();
+  g.onEvent({ event: "admitted" });
+  assert.equal(g.onEvent({ event: "admission_denied", seconds: 30 }), undefined);
+  assert.equal(g.state, "admitted");
+  assert.equal(g.admitted, true);
+  assert.equal(g.failure, undefined);
+});
+
 const FAKE = [
   'import {existsSync, readFileSync} from "node:fs"; import {dirname} from "node:path";',
   'const argv = process.argv, ext = argv[argv.indexOf("--capture-extension") + 1], scenario = process.env.FAKE_CAPADMIT;',

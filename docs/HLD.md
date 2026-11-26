@@ -83,17 +83,25 @@ Status legend: **B** = built in code · **L✓** = working on live (2026-10-26 a
 
 ## 5. Deployment topology
 
-- **Server (Ubuntu, Docker Compose, from `master`)** — nginx (https, same-origin `/api`) + api + web.
-  Runbook: `docs/GO-LIVE-UBUNTU.md`. URL & audit: `references/portals/lkb-live.knowledge.md`.
-- **Bot machine (Windows)** — scheduler `pnpm webinar:run --watch --run`, meeting bot, Chrome profile,
-  FFmpeg. Not in the compose stack.
-- **MongoDB host** — shared with other Vidysea DBs; IP-allowlisted, **auth still off** (enable `lkb_app`, §6a).
-- **Databases** — `lkb_staging` (local pipeline writes here), `MONGO_WORK_DB` (isolated work DBs),
-  `lkb_prod` (live; populated 2026-10-26 by copying staging). **New pipeline output does not reach live
-  until a writer targets `lkb_prod`.**
-- **Env groups the server needs** (full list in LLD §6): core Mongo · hosting (4× `LKB_HOSTING_*`, all or none) ·
-  `GEMINI_API_KEY` · `TAVILY_API_KEY` · WhatsApp Mongo · gws/calendar · bot/capture. Plan (Umesh, 2026-10-28):
-  validate locally from `.env`, then roll the same config to live.
+Go-live target (D-215, 2026-11-24; supersedes the VM route of D-214). Runbook: `docs/DEVOPS-REDEPLOY-2026-11-01.md`, section "Cloud Run go-live".
+
+```
+browser -> https://kb.vidysea.com (Cloudflare DNS only, A record -> LB IP)
+        -> Google global external HTTPS LB (serverless NEG, managed certificate)
+        -> Cloud Run service vidysea-knowledgebase (vidysea-prod, asia-south1): ONE service, TWO containers
+             web  (Dockerfile --target web, ingress, PORT=8080): serves /knowledgebase/, proxies /knowledgebase/api/* to
+             api  (Dockerfile --target api, sidecar, no PORT set; listens on default 3300) on 127.0.0.1:3300, prefix stripped
+        -> MongoDB lkb_prod (Direct VPC egress; IP-allowlisted host)
+legacy: AWS ALB /knowledgebase* -> 302 https://kb.vidysea.com/#{path}?#{query}   (flipped only after the smoke checks pass)
+```
+
+- **Images** — both containers come from the root `Dockerfile`, built by the vendor's Cloud Build trigger from `master`. No code change: nginx proxies to a literal upstream (`API_UPSTREAM=http://127.0.0.1:3300`, `apps/web/nginx.conf:25-34`).
+- **Public path** — Cloud Run domain mapping is preview-only and not offered in `asia-south1`, so the vendor runs the LB. `/` is not served; the LB redirects it to `/knowledgebase/`. After the checks, Cloud Run ingress is locked to internal + Cloud Load Balancing.
+- **Service settings** — secrets in Secret Manager; request timeout 300 s; max instances 1 at launch (rate limiters are in memory; sessions and CSRF are Mongo/HMAC, so scaling later is safe).
+- **Database** — `lkb_prod` (live, the one KB database, D-209). `lkb_staging` and `MONGO_WORK_DB` stay for local pipeline and isolated work runs. New pipeline output reaches live only through an approved write to `lkb_prod`. The MongoDB host is shared with other Vidysea DBs and IP-allowlisted, and auth is still off (enable `lkb_app`); see the runbook section 2 (H1).
+- **Operator laptop** — first admin (`scripts/create-admin.mjs`) and indexing (`scripts/webinar/sync-session.mjs`) run from a checked-out repo with network access to Mongo; each write to `lkb_prod` needs Umesh's yes. A Cloud Run Job (`--target build`) can take indexing over later.
+- **Bot machine (Windows)** — scheduler `pnpm webinar:run --watch --run`, meeting bot, Chrome profile, FFmpeg. Not part of the Cloud Run service.
+- **Env groups the api needs** (full list in LLD §6): core Mongo · accounts (`AUTH_CSRF_SECRET`, `USER_SIGNUP_TENANT`, `APP_PUBLIC_ORIGIN`, `TRUST_PROXY_HOPS`) · `OLLAMA_API_KEY` · `GEMINI_API_KEY` · `TAVILY_API_KEY` (optional) · hosting (4× `LKB_HOSTING_*`, all or none) · WhatsApp Mongo.
 
 ## 6. Live status snapshot (2026-10-26 audit of 48 pages)
 

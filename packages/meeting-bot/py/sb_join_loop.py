@@ -61,6 +61,13 @@ def run_session(sb, a, *, os, time, emit):
             except Exception:
                 in_call_dom = False
             state = classify_admission(platform, in_call_dom, body)
+            if state == "refused" and not admission.admitted:
+                # B2 / D-232: Meet refused the bot. Never click or reload; end the capture now instead of
+                # waiting out the lobby timeout. Pre-admission only (B2-C8): after `admitted`, the phrase is
+                # just text (a caption or chat line) and must never end a live recording.
+                emit("admission_denied", seconds=int(now - started))
+                hold_for_flush = True  # same bounded hold as admission_timeout: the controller flushes, then writes the stop file
+                break
             verdict = admission.tick(state == "in-call", now, blocked=state == "lobby" or bool(ended) or is_blocked_text(body))
             if verdict == "admitted":
                 emit("admitted", platform=platform, assumed=False)

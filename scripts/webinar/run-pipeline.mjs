@@ -28,7 +28,7 @@ const {createTopicLookup, dropOwnMarkerEvents, writeCaptureTags, announceSchedul
 const {readCaptureTags} = await import('../../packages/meeting-bot/src/autojoin/capture-tags.ts');
 const OPERATION_ONLY_REASONS = ['retry-limit', 'interrupted-no-recording-artifact', 'missed-while-processing', 'missed-coverage', 'controller-disconnected',
   'coverage-review', 'source-discontinuity', 'unproven-calendar-history', 'rejected', 'rescheduled', 'rescheduled-completed', 'recurring-series',
-  'unknown-tombstone', 'ambiguous-provider', 'contradictory-revision', 'missing-revision', 'ambiguous-identity', 'capacity-full', 'capture-slot-unavailable', 'graph-aborted', 'service-stopped', 'privacy-controller-unavailable'];
+  'unknown-tombstone', 'ambiguous-provider', 'contradictory-revision', 'missing-revision', 'ambiguous-identity', 'capacity-full', 'capture-slot-unavailable', 'graph-aborted', 'service-stopped', 'privacy-controller-unavailable', 'interrupted-rejoining', 'interrupted-ended'];
 export const OPERATION_REASONS = [...OPERATION_ONLY_REASONS, ...Object.keys(SKIP_REASON_MEANING)];
 export {createPipelineDeps};
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../..');

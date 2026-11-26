@@ -158,3 +158,64 @@ test("strict gap unions retain controls and computed recovery only, with bounded
   for(const value of [null,{},Array(25).fill(gap),[{...gap,start:Infinity}],[{...gap,end:-1}],[{...gap,recovered:true}],
     [{...gap,extra:true}],[{...gap,reason:"invented"}],[{...gap,end:253402300800}]]) assert.throws(()=>validateCaptureControlGaps(value,"recovery"));
 });
+
+// ---- B10: the launcher carries one listed failure name from the child's stderr (D-236 A6, D-238 item 3) ----
+const fakeSpawn = (script: (child: any) => void) => ((_exe: string, _args: string[], _options: any) => {
+  const child: any = Object.assign(new EventEmitter(), {stdout: new EventEmitter(), stderr: new EventEmitter(), connected: false});
+  setImmediate(() => script(child)); return child;
+}) as unknown as typeof spawn;
+const launchFake = (script: (child: any) => void, lines: string[] = [], code: number | null = 1) =>
+  launchControlledRecording(process.cwd(), ["record", "--session-id", "session"], {LKB_TENANT_ID: "owned"}, line => lines.push(line), undefined,
+    fakeSpawn(child => { script(child); child.emit("close", code); }));
+const failure = (promise: Promise<void>) => promise.then(() => undefined, (error: Error & {code?: string}) => error);
+const stderrOf = (...chunks: string[]) => failure(launchFake(child => { for (const chunk of chunks) child.stderr.emit("data", Buffer.from(chunk)); }));
+const REFUSED = "lkb capture failed: admission_denied: Google Meet refused the bot; no recording made";
+const CARRIED = "admission_denied: Recording pipeline exited 1";
+
+test("B10-C4 B10-C7a: the refusal line becomes the message and the code; any other child exit stays unchanged", async () => {
+  const refused = await stderrOf(`${REFUSED}\n`);
+  assert.equal(refused?.message, CARRIED); assert.equal(refused?.code, "admission_denied");
+  const silent = await stderrOf();
+  assert.equal(silent?.message, "Recording pipeline exited 1"); assert.equal(silent?.code, undefined);
+  const other = await stderrOf("lkb capture failed: something_else: secret=abc\n");
+  assert.equal(other?.message, "Recording pipeline exited 1"); assert.equal(other?.code, undefined);
+  for (const text of [other!.message, String(other!.stack).split("\n")[0]!]) assert.ok(!/something_else|secret=abc/.test(text));
+  const split = await stderrOf("lkb capture fa", "iled: admission_den", "ied: x\r\n");
+  assert.equal(split?.message, CARRIED);
+  assert.equal((await failure(launchFake(child => child.stderr.emit("data", Buffer.from(`${REFUSED}\n`)), [], null)))?.message, "admission_denied: Recording pipeline exited null");
+});
+
+test("B10-C7b: the name must be whole and the line must start with the marker", async () => {
+  for (const text of ["lkb capture failed: admission_denied_extra\n", "lkb capture failed: admission_deniedx\n", "lkb capture failed: admission_denied2\n",
+    "lkb capture failed: admission_deniedé\n", "lkb capture failed: admission_denied-foo\n", "lkb capture failed: admission_denied-\n", "lkb capture failed: Admission_Denied\n", "lkb capture failed:  admission_denied\n", "lkb capture failed: \n",
+    "error: lkb capture failed: admission_denied\n", "note admission_denied\n", "lkb capture failed admission_denied\n"])
+    assert.equal((await stderrOf(text))?.message, "Recording pipeline exited 1", JSON.stringify(text));
+  for (const text of ["lkb capture failed: admission_denied", "lkb capture failed: admission_denied\n", "lkb capture failed: admission_denied: x\n",
+    "lkb capture failed: admission_denied - x\n", "noise\nlkb capture failed: admission_denied\r\nmore noise\n"])
+    assert.equal((await stderrOf(text))?.message, CARRIED, JSON.stringify(text));
+});
+
+test("B10-C7c: the LAST line that starts with the marker decides", async () => {
+  assert.equal((await stderrOf(`${REFUSED}\nlkb capture failed: something_else\n`))?.message, "Recording pipeline exited 1");
+  assert.equal((await stderrOf(`lkb capture failed: something_else\n${REFUSED}\n`))?.message, CARRIED);
+  assert.equal((await stderrOf(`${REFUSED}\nlkb capture failed: admission_denied_extra\n`))?.message, "Recording pipeline exited 1");
+});
+
+test("B10-C7d: stderr stays drained and only the most recent 64 KiB window is kept", {timeout: 60000}, async () => {
+  const noise = Buffer.from("noise noise noise noise noise noise\n".repeat(1820)); // about 64 KiB per chunk
+  const flood = (child: any) => { for (let n = 0; n < 100; n++) child.stderr.emit("data", noise); };
+  assert.equal((await failure(launchFake(child => { flood(child); child.stderr.emit("data", Buffer.from(`${REFUSED}\n`)); })))?.message, CARRIED);
+  assert.equal((await failure(launchFake(child => { child.stderr.emit("data", Buffer.from(`${REFUSED}\n`)); flood(child); })))?.message, "Recording pipeline exited 1");
+  assert.equal((await failure(launchFake(child => { child.stderr.emit("data", Buffer.from("lkb capture failed: admission_denied ")); for (let n = 0; n < 4; n++) child.stderr.emit("data", Buffer.from("y".repeat(50000))); })))?.message,
+    "Recording pipeline exited 1", "a single line longer than the window is not kept");
+  assert.equal((await failure(launchFake(child => { child.stderr.emit("data", Buffer.from("x".repeat(65536 - 30))); child.stderr.emit("data", Buffer.from(`\n${REFUSED}\n`)); })))?.message, CARRIED);
+});
+
+test("B10-C7e: stdout lines still reach onLine and a clean exit still resolves", async () => {
+  const lines: string[] = [];
+  await launchFake(child => { child.stdout.emit("data", Buffer.from("one\ntw")); child.stdout.emit("data", Buffer.from("o\n")); child.stderr.emit("data", Buffer.from(`${REFUSED}\n`)); }, lines, 0);
+  assert.deepEqual(lines, ["one", "two"]);
+  const started = launchControlledRecording(process.cwd(), ["record", "--session-id", "session"], {LKB_TENANT_ID: "owned"}, () => {}, undefined,
+    fakeSpawn(child => child.emit("error", new Error("spawn ENOENT private-path"))));
+  assert.equal((await failure(started))?.message, "Recording child could not start");
+});
