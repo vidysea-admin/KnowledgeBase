@@ -35,7 +35,7 @@ export function createHostBotPrivacyDeps(directory: string): BotPrivacyDeps {
   const send = async (descriptor:Descriptor,action:string) => {
     const {tenantId,sessionId,generation,secret}=descriptor,requestId=randomUUID(),at=Date.now();
     const body={version:1,tenantId,sessionId,generation,requestId,at,action,mac:mac(secret,"capture-request-v1",[1,tenantId,sessionId,generation,requestId,at,action])};
-    const response=await fetch(`${descriptor.origin}/privacy`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body),redirect:"error",signal:AbortSignal.timeout(12000)});
+    const response=await fetch(`${descriptor.origin}/privacy`,{method:"POST",headers:{"Content-Type":"application/json","Connection":"close"},body:JSON.stringify(body),redirect:"error",signal:AbortSignal.timeout(12000)});
     if (!response.ok) throw new Error("Recorder did not acknowledge privacy");
     const text=await response.text(); if(Buffer.byteLength(text)>2048)throw new Error("Invalid recorder response");
     const row=JSON.parse(text), proof={version:row.version,requestId:row.requestId,generation:row.generation,result:row.result,status:row.status,privacy:row.privacy};
