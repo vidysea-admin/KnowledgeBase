@@ -57,11 +57,12 @@ export function createHostBotPrivacyDeps(directory: string): BotPrivacyDeps {
       const probed=await Promise.all(descriptors.map(async entry=>{let state:Awaited<ReturnType<typeof send>>|undefined;
         try{state=await send(entry.descriptor,"status");}catch{try{state=await send(entry.descriptor,"status");}catch{state=undefined;}}
         return {...entry,state};}));
-      /* The router rejects duplicate sessionIds (a crashed generation plus its restart), so collapse to one row per session: verified rows beat dead ones; among several verified, the newest descriptor file (the restarted recorder) wins, ties broken by file name; a session with no verified descriptor keeps one unavailable row (first by name). */
-      const best=new Map<string,typeof probed[number]>();
-      for(const entry of probed){const held=best.get(entry.descriptor.sessionId);
-        if(!held||(entry.state?1:0)>(held.state?1:0)||(entry.state&&held.state&&entry.mtime>held.mtime))best.set(entry.descriptor.sessionId,entry);}
-      const rows:BotPrivacyCaptureView[]=[...best.values()].map(({descriptor,state})=>({tenantId:tenant,sessionId:descriptor.sessionId,generation:descriptor.generation,status:state?state.status:"interrupted",privacy:state?state.privacy:"unavailable"}));
+      /* The router rejects duplicate sessionIds (a crashed generation plus its restart), so collapse to one row per session: verified rows beat dead ones; among several verified, the newest descriptor file (the restarted recorder) supplies generation and status, ties broken by file name. If the verified generations disagree on privacy (an old recorder may still be capturing publicly), the row says "unavailable" rather than claim any state; a session with no verified descriptor keeps one unavailable row (first by name). */
+      const best=new Map<string,typeof probed[number]>(),privacies=new Map<string,Set<string>>();
+      for(const entry of probed){const id=entry.descriptor.sessionId,held=best.get(id);
+        if(entry.state)privacies.set(id,(privacies.get(id)??new Set<string>()).add(entry.state.privacy));
+        if(!held||(entry.state?1:0)>(held.state?1:0)||(entry.state&&held.state&&entry.mtime>held.mtime))best.set(id,entry);}
+      const rows:BotPrivacyCaptureView[]=[...best.values()].map(({descriptor,state})=>({tenantId:tenant,sessionId:descriptor.sessionId,generation:descriptor.generation,status:state?state.status:"interrupted",privacy:state&&privacies.get(descriptor.sessionId)!.size===1?state.privacy:"unavailable"}));
       return rows;
     },
     set: async (tenant,session,generation,action) => {

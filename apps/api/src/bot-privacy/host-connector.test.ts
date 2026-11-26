@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { createServer } from "node:http";
 import { spawnSync } from "node:child_process";
 import { createHmac, randomUUID, randomBytes } from "node:crypto";
-import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from "node:fs";
+import { mkdtempSync, mkdirSync, writeFileSync, rmSync, utimesSync } from "node:fs";
 import { hostname, tmpdir } from "node:os";
 import path from "node:path";
 import { createHostBotPrivacyDeps } from "./host-connector.js";
@@ -105,7 +105,7 @@ test("host connector never reports the claimed privacy when the reply mac is bad
   });
 });
 // Two descriptors for one session (crashed recorder genA + restarted genB): router rejects duplicate sessionIds, so list() must collapse to one row per session.
-async function withTwoGenerations(live: { old: boolean; new: boolean }, run: (list: () => ReturnType<ReturnType<typeof createHostBotPrivacyDeps>["list"]>, genNew: string) => Promise<void>): Promise<void> {
+async function withTwoGenerations(live: { old: boolean; new: boolean }, run: (list: () => ReturnType<ReturnType<typeof createHostBotPrivacyDeps>["list"]>, genNew: string, genOld: string) => Promise<void>, privacy: { old: string; new: string } = { old: "public", new: "private" }): Promise<void> {
   const root = mkdtempSync(path.join(tmpdir(), "host-connector-"));
   const servers: Array<ReturnType<typeof createServer>> = [];
   const start = async (alive: boolean, generation: string, secret: string, privacy: string) => {
@@ -122,11 +122,15 @@ async function withTwoGenerations(live: { old: boolean; new: boolean }, run: (li
     makePrivateOnWindows(root);
     mkdirSync(path.join(root, "owned"), { mode: 0o700 });
     const genOld = randomUUID(), genNew = randomUUID();
-    for (const [generation, alive, privacy] of [[genOld, live.old, "public"], [genNew, live.new, "private"]] as const) {
-      const secret = randomBytes(32).toString("hex"), port = await start(alive, generation, secret, privacy);
-      writeFileSync(path.join(root, "owned", `capture--${generation}.json`), JSON.stringify({ version: 1, tenantId: "owned", sessionId: "capture", generation, host: hostname(), origin: `http://127.0.0.1:${port}`, secret }), { mode: 0o600 });
+    for (const [generation, alive, state] of [[genOld, live.old, privacy.old], [genNew, live.new, privacy.new]] as const) {
+      const secret = randomBytes(32).toString("hex"), port = await start(alive, generation, secret, state);
+      const file = path.join(root, "owned", `capture--${generation}.json`);
+      writeFileSync(file, JSON.stringify({ version: 1, tenantId: "owned", sessionId: "capture", generation, host: hostname(), origin: `http://127.0.0.1:${port}`, secret }), { mode: 0o600 });
+      // Deterministic mtimes: the old generation is a minute older than the new one, whatever the name order.
+      const when = new Date(Date.now() - (generation === genOld ? 60000 : 0));
+      utimesSync(file, when, when);
     }
-    await run(() => createHostBotPrivacyDeps(root).list("owned"), genNew);
+    await run(() => createHostBotPrivacyDeps(root).list("owned"), genNew, genOld);
   } finally {
     for (const server of servers) { server.close(); server.closeAllConnections?.(); }
     rmSync(root, { recursive: true, force: true });
@@ -146,9 +150,13 @@ test("host connector keeps exactly one unavailable row when every generation of 
     assert.equal(rows[0]!.status, "interrupted");
   });
 });
-test("host connector collapses two verified generations of one session to a single row", { timeout: 60000 }, async () => {
-  await withTwoGenerations({ old: true, new: true }, async list => {
-    const rows = await list();
-    assert.equal(rows.length, 1, "two verified generations of one session collapse to one row");
-  });
+test("host connector collapses two agreeing verified generations to the newest one, showing its privacy", { timeout: 60000 }, async () => {
+  await withTwoGenerations({ old: true, new: true }, async (list, genNew) => {
+    assert.deepEqual(await list(), [{ tenantId: "owned", sessionId: "capture", generation: genNew, status: "recording", privacy: "private" }]);
+  }, { old: "private", new: "private" });
+});
+test("host connector shows unavailable (never a claimed state) when verified generations of one session disagree on privacy", { timeout: 60000 }, async () => {
+  await withTwoGenerations({ old: true, new: true }, async (list, genNew) => {
+    assert.deepEqual(await list(), [{ tenantId: "owned", sessionId: "capture", generation: genNew, status: "recording", privacy: "unavailable" }]);
+  }, { old: "public", new: "private" });
 });
