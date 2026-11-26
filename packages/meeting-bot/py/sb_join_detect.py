@@ -6,6 +6,9 @@ JOIN_TEXTS = [
     "join now", "join webinar", "join from browser", "join via browser", "join from your browser",
     "join in browser", "join", "join audio", "computer audio", "join with computer audio",
     "listen only", "continue in browser", "continue", "watch now", "i agree", "accept",
+    # Meet pre-join (live 2026-11-26): skip the media modal without granting mic/camera (C2), and
+    # knock on a meeting the bot's account does not own.
+    "continue without microphone and camera", "ask to join",
 ]
 END_PHRASES = [
     "webinar has ended", "webinar has been ended", "session has ended", "meeting has ended",

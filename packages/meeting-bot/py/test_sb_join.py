@@ -225,6 +225,15 @@ def test_join_texts_contains_exact_meet_join_now_without_media_controls():
     assert not ({"turn on microphone", "turn on camera", "unmute", "allow"} & set(JOIN_TEXTS))
 
 
+def test_join_texts_pass_meet_prejoin_without_granting_media():
+    """Live 2026-11-26: a signed-in bot met Meet's 'Continue without microphone and camera' modal and,
+    in a meeting it does not own, the 'Ask to join' button. Neither grants mic/camera (C2), and both
+    fit CLICK_JS's 40-character label limit, so the bot passes them unattended."""
+    for label in ("continue without microphone and camera", "ask to join"):
+        assert label in JOIN_TEXTS
+        assert len(label) <= 40
+
+
 @pytest.fixture
 def managed_main(monkeypatch, tmp_path):
     stop = tmp_path / "stop"
