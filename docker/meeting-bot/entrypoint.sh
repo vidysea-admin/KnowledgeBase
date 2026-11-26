@@ -21,6 +21,13 @@
 #   LKB_GCLOUD_TIMEOUT_S    bound on every single bucket call (default 120)
 #   LKB_SHUTDOWN_BUDGET_S   after SIGTERM, all bucket calls together must end within LKB_STOP_WAIT_S plus this (default 5)
 #   LKB_ATTENDANCE_ACCOUNT  attendance account (run mode)             LKB_ATTENDANCE_INTERVAL_S (default 300, POLL_MS)
+#   LKB_SEND_NOW_QUEUE=1    run mode: between attendance ticks (or alone), take ONE hosted "send bot now" job from
+#                           capture_jobs (scripts/webinar/send-now/queue-worker.ts; needs MONGODB_URL, MONGODB_DB), wait for one
+#                           for at most the rest of the interval, then copy recordings. One meeting at a time (D-231): a long
+#                           job delays the next calendar tick. Its flags: LKB_SEND_NOW_INDEX, LKB_SEND_NOW_TRANSCRIBE, LKB_SEND_NOW_TENANTS.
+#                           NOTE: with the queue on, the legacy `run-pipeline.mjs --run --watch` is NOT started (with or
+#                           without an attendance account); the loop is the only pipeline. On SIGTERM a running job is
+#                           written `failed` at once; its partial recording is not copied (same as an attendance tick).
 #   LKB_APP_DIR             working directory (default /app; tests only)
 # Objects: <prefix>/state.tar.gz (members <profile dir name>/ and <release dir name>/), <prefix>/lease,
 # <prefix>/state.prev.tar.gz (the archive before the latest snapshot), <prefix>/recordings/<path under the recordings dir>.
@@ -77,8 +84,9 @@ PROOF_TIMEOUT="${LKB_PROOF_TIMEOUT_S:-300}"; case "$PROOF_TIMEOUT" in ''|*[!0-9]
 PROOF_MARKER="$RELEASE_DIR/live-proof.json"; PROOF_SIDECAR="$RELEASE_DIR/live-proof.sha256"; PROOF_ROOT="$(pwd -P)"
 ATTENDANCE_ACCOUNT=""; [ "$MODE" = "run" ] && ATTENDANCE_ACCOUNT="${LKB_ATTENDANCE_ACCOUNT:-}"
 ATTENDANCE_S="${LKB_ATTENDANCE_INTERVAL_S:-300}"
+SEND_NOW_QUEUE=""; [ "$MODE" = "run" ] && [ "${LKB_SEND_NOW_QUEUE:-}" = "1" ] && SEND_NOW_QUEUE=1
 SUPERVISE=0
-if [ -n "$BUCKET" ] || [ -n "$ATTENDANCE_ACCOUNT" ]; then SUPERVISE=1; fi
+if [ -n "$BUCKET" ] || [ -n "$ATTENDANCE_ACCOUNT" ] || [ -n "$SEND_NOW_QUEUE" ]; then SUPERVISE=1; fi
 if [ "$MODE" = "record-once" ] && { [ -z "${LKB_RECORD_URL:-}" ] || [ -z "${LKB_RECORD_UNTIL:-}" ]; }; then
   echo "record-once mode needs LKB_RECORD_URL and LKB_RECORD_UNTIL" >&2; exit 1
 fi
@@ -758,7 +766,7 @@ if [ "$SUPERVISE" != 1 ]; then
 fi
 
 PHASE=running
-if [ -z "$ATTENDANCE_ACCOUNT" ]; then
+if [ -z "$ATTENDANCE_ACCOUNT" ] && [ -z "$SEND_NOW_QUEUE" ]; then
   start_child node scripts/webinar/run-pipeline.mjs --run --watch
   start_helpers
   wait_child
@@ -766,17 +774,33 @@ if [ -z "$ATTENDANCE_ACCOUNT" ]; then
 fi
 
 # Attendance loop (D-231): one single-slot tick per interval, never --watch, never two ticks at once.
+# With LKB_SEND_NOW_QUEUE=1 the rest of each interval is spent waiting for one hosted send-now job (same single slot).
 start_helpers
 last_rc=0
 while [ "$STOPPING" = 0 ]; do
   tick_start=$(date +%s)
-  start_child node scripts/webinar/run-pipeline.mjs --run --calendar-attendance-account "$ATTENDANCE_ACCOUNT"
-  wait_child
-  last_rc="$CHILD_RC"
-  if [ "$last_rc" -ne 0 ]; then echo "[bot-attendance] tick failed (exit $last_rc); the loop continues" >&2; else log "attendance tick finished (exit 0)"; fi
-  if [ "$STOPPING" = 1 ]; then break; fi
-  copy_recordings || true
+  if [ -n "$ATTENDANCE_ACCOUNT" ]; then
+    start_child node scripts/webinar/run-pipeline.mjs --run --calendar-attendance-account "$ATTENDANCE_ACCOUNT"
+    wait_child
+    last_rc="$CHILD_RC"
+    if [ "$last_rc" -ne 0 ]; then echo "[bot-attendance] tick failed (exit $last_rc); the loop continues" >&2; else log "attendance tick finished (exit 0)"; fi
+    if [ "$STOPPING" = 1 ]; then break; fi
+    copy_recordings || true
+  fi
   rest=$(( ATTENDANCE_S - ( $(date +%s) - tick_start ) ))
+  if [ -n "$SEND_NOW_QUEUE" ] && [ "$STOPPING" = 0 ]; then
+    wait_s=0; [ "$rest" -gt 0 ] && wait_s="$rest"
+    start_child node --import tsx scripts/webinar/send-now/queue-worker.ts --once --max-wait-s "$wait_s"
+    wait_child
+    queue_rc="$CHILD_RC"
+    if [ "$STOPPING" = 1 ]; then break; fi
+    if [ "$queue_rc" -ne 0 ]; then echo "[send-now-queue] queue step failed (exit $queue_rc); the loop continues" >&2; fi
+    copy_recordings || true
+    rest=$(( ATTENDANCE_S - ( $(date +%s) - tick_start ) ))
+    # 0 (no job / job ended) and 2 (job failed) used the interval: look again at once. Anything else (1 config/db error,
+    # a crash such as 137) naps, so a worker that dies at start never hammers Mongo.
+    case "$queue_rc" in 0|2) rest=0 ;; esac
+  fi
   if [ "$rest" -gt 0 ] && [ "$STOPPING" = 0 ]; then nap "$rest"; fi
 done
 if [ "$STOPPING" = 1 ] && [ "$last_rc" -eq 0 ]; then finish 0; fi

@@ -595,6 +595,56 @@ test('B4-C7 attendance loop works without a bucket (no bucket command), and an o
   } finally { w.cleanup(); }
 });
 
+test('hosted-send-now: LKB_SEND_NOW_QUEUE=1 alone loops the queue worker (never --watch), copies recordings, stops on SIGTERM', T, () => {
+  const w = world();
+  try {
+    const r = w.runWithTerm(w.bucketEnv({LKB_SEND_NOW_QUEUE: '1', LKB_ATTENDANCE_INTERVAL_S: '2', STUB_NODE_SLEEP: '1', STUB_TICK_WRITE: '1', LKB_LEASE_TTL_S: '60'}),
+      {pre: '0.5', waitEnds: 3, timeout: 150000});
+    assert.ok(r.status === 0 || r.status === 143, `exit ${r.status}: ${r.out}`);
+    const calls_ = nodeCalls(w);
+    const queue = calls_.filter((l) => l.includes('queue-worker.ts'));
+    assert.ok(queue.length >= 3, `expected 3+ queue steps, got ${queue.length}: ${calls_.join(' | ')}`);
+    for (const q of queue) assert.match(q, /^node --import tsx scripts\/webinar\/send-now\/queue-worker\.ts --once --max-wait-s \d+$/);
+    assert.ok(!calls_.some((l) => l.includes('run-pipeline.mjs')), 'no calendar tick without an attendance account, and never --watch');
+    assert.ok(!w.log().some((l) => l.startsWith('OVERLAP')), 'one step at a time');
+    assert.equal(calls(w, /recordings\/rec-1\.webm/).length, 1, 'a recording made by a job is copied once');
+    const countAtStop = queue.length;
+    sleepSecs(2);
+    assert.equal(nodeCalls(w).filter((l) => l.includes('queue-worker.ts')).length, countAtStop, 'no queue step after SIGTERM');
+  } finally { w.cleanup(); }
+});
+
+test('hosted-send-now: with an attendance account the queue step follows each tick; a queue error (exit 1) naps, it does not spin', T, () => {
+  const w = world();
+  try {
+    const r = w.runWithTerm(w.env({LKB_SEND_NOW_QUEUE: '1', LKB_ATTENDANCE_ACCOUNT: 'bot@example.org', LKB_ATTENDANCE_INTERVAL_S: '2', STUB_NODE_RC: '1'}), {pre: '5'});
+    assert.ok(r.status === 0 || r.status === 143 || r.status === 1, `exit ${r.status}: ${r.out}`);
+    const seq = nodeCalls(w).filter((l) => !l.includes('setup.mjs')).map((l) => l.includes('queue-worker.ts') ? 'Q' : l.includes('--calendar-attendance-account') ? 'T' : '?');
+    assert.ok(seq.length >= 4 && seq.length <= 8, `bounded by the interval, not a spin: ${seq.join('')}`);
+    assert.match(seq.join(''), /^(TQ)+T?$/, `tick then queue, alternating: ${seq.join('')}`);
+    assert.match(r.out, /queue step failed \(exit 1\)/);
+  } finally { w.cleanup(); }
+});
+
+test('hosted-send-now: a queue step that crashes (exit 137) naps like a config error; only 0 and 2 re-poll at once', T, () => {
+  const w = world();
+  try {
+    const r = w.runWithTerm(w.env({LKB_SEND_NOW_QUEUE: '1', LKB_ATTENDANCE_INTERVAL_S: '2', STUB_NODE_RC: '137'}), {pre: '5'});
+    assert.ok([0, 1, 137, 143].includes(r.status), `exit ${r.status}: ${r.out}`);
+    const queue = nodeCalls(w).filter((l) => l.includes('queue-worker.ts'));
+    assert.ok(queue.length >= 1 && queue.length <= 4, `bounded by the interval, not a spin: ${queue.length} queue steps`);
+  } finally { w.cleanup(); }
+});
+
+test('hosted-send-now: LKB_SEND_NOW_QUEUE is ignored outside run mode', T, () => {
+  const w = world();
+  try {
+    const r = w.run(w.env({BOT_MODE: 'record-once', LKB_RECORD_URL: 'https://x.example/y', LKB_RECORD_UNTIL: '10:00', LKB_SEND_NOW_QUEUE: '1'}));
+    assert.equal(r.status, 0, r.out);
+    assert.ok(!nodeCalls(w).some((l) => l.includes('queue-worker.ts')));
+  } finally { w.cleanup(); }
+});
+
 test('B4-C8 LKB_TRANSCRIPT_QA, WEBINAR_VISION_MODEL and GEMINI_STT_MODEL reach node unchanged in run, record-once and doctor; VNC_PASSWORD never does', T, () => {
   const base = {LKB_TRANSCRIPT_QA: '1', WEBINAR_VISION_MODEL: 'vision-a', GEMINI_STT_MODEL: 'stt-b', VNC_PASSWORD: 'hunter2'};
   for (const [mode, extra, nodeCalls] of [['run', {}, 2], ['record-once', {LKB_RECORD_URL: 'https://x.example/y', LKB_RECORD_UNTIL: '10:00'}, 2], ['doctor', {}, 1]]) {

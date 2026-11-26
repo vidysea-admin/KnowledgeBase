@@ -25,6 +25,16 @@ export function untilHint(raw: string, now: number): string | null {
   return at - now > MAX_AHEAD_MS ? "More than 24 hours ahead; the server refuses that." : null;
 }
 
+/** HH:MM means the user's local time today: send it as a full ISO datetime with this browser's offset, because the
+ * server's clock zone (UTC on Cloud Run) is not the user's. Anything else is sent trimmed; the API stays the authority. */
+export function untilForServer(raw: string, now: number): string {
+  const v = raw.trim(), hm = /^(\d{1,2}):(\d{2})$/.exec(v);
+  if (!hm || Number(hm[1]) > 23 || Number(hm[2]) > 59) return v;
+  const d = new Date(now); d.setHours(Number(hm[1]), Number(hm[2]), 0, 0);
+  const pad = (n: number) => String(Math.abs(n)).padStart(2, "0"), off = -d.getTimezoneOffset();
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}:00${off >= 0 ? "+" : "-"}${pad(Math.trunc(off / 60))}:${pad(off % 60)}`;
+}
+
 type Outcome = { kind: "ok" | "error" | "denied"; text: string } | null;
 
 function describe(e: unknown): Outcome {
@@ -66,7 +76,7 @@ export function SendNowForm({ apiKey }: { apiKey: string | null }): React.ReactE
     const generation = owner.current.generation;
     inFlight.current = true; setBusy(true); setOutcome(null); setJob(null);
     try {
-      const r = await sendBotNow(apiKey, url.trim(), until.trim());
+      const r = await sendBotNow(apiKey, url.trim(), untilForServer(until, Date.now()));
       if (generation !== owner.current.generation) return;
       const id = typeof r?.jobId === "string" ? r.jobId.slice(0, 80) : "";
       setOutcome(r?.status === "launching" && id
