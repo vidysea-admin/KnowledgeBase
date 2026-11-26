@@ -51,7 +51,10 @@ export function createHostBotPrivacyDeps(directory: string): BotPrivacyDeps {
       if(names.length>100)throw new Error("Private controller limit");
       const rows:BotPrivacyCaptureView[]=[];
       for(const name of names){const match=/^(.+)--([a-f0-9-]{36})\.json$/.exec(name);if(!match)continue;
-        const descriptor=read(tenant,match[1]!,match[2]!);try{const state=await send(descriptor,"status");rows.push({tenantId:tenant,sessionId:descriptor.sessionId,generation:descriptor.generation,status:state.status,privacy:state.privacy});}catch{/* A dead descriptor is never live proof. */}}
+        const descriptor=read(tenant,match[1]!,match[2]!);let state:Awaited<ReturnType<typeof send>>|undefined;
+          /* A transient failure gets one retry (fresh requestId). A still-failing descriptor is never live proof, but its row is kept as interrupted/unavailable so a live private capture never vanishes from the UI; privacy is only ever reported from a verified HMAC reply. */
+          try{state=await send(descriptor,"status");}catch{try{state=await send(descriptor,"status");}catch{state=undefined;}}
+          rows.push({tenantId:tenant,sessionId:descriptor.sessionId,generation:descriptor.generation,status:state?state.status:"interrupted",privacy:state?state.privacy:"unavailable"});}
       return rows;
     },
     set: async (tenant,session,generation,action) => {
