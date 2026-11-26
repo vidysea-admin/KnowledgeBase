@@ -13,7 +13,7 @@ dual-trigger: tenancy scripts/webinar/scheduler/dispatch.mjs:51
 **Issues addressed:** none
 **Executor:** claude-sonnet-subagent
 **Executor rationale:** one spec-complete unit; the rejoin rule, the alert identity and the test file share every helper, so one builder.
-**Status:** ready-for-check
+**Status:** checked-PASS (dual check at fix cycle 1, head c42c9559, 2026-11-26: coordinator A PASS 16/16 + 6/6, verdict commit 5e785239; coordinator B PASS 10/10 + 6/6, verdict commit 87f22050; issues qa/issues.H1SELFHEAL.jsonl 001-008, 001 fixed, 002 open medium security awaiting an Approver ruling)
 
 ## What changed
 Worktree `D:/KnowledgeBase/.worktrees/h1-self-heal`, branch `wave/h1-recorder-self-heal`, base `16a44f4cb0c61dde1c11a19727cdac7c6d8e6c3d` (the head of `wave/b10-failure-alert-mail`), head `c42c9559ca7c92fbb1378b41cd90e85404e7ec4b` (fix cycle 1, `c42c9559`, one commit on top of `e327d86b`: C10, see "Fix cycle 1" below; earlier heads: `e327d86bc30307e98ec27d93fd9d1e2fa1a53d06` (build `f2f2bee0`; `c4092966` removed a redundant second join-rules pass the mutation run showed was unobservable; `e327d86b` is the repair before check, D-238, see "Repair before check" below). Six files since fix cycle 1 (`git diff --name-only 16a44f4c..HEAD`): five sources edited in place (the fifth is `packages/meeting-bot/src/autojoin/bot-events.ts`, C10), one new test file.
