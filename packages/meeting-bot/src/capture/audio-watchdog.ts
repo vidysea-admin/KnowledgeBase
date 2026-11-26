@@ -126,6 +126,14 @@ export function createAudioWatchdog(deps: AudioWatchdogDeps): AudioWatchdog {
   };
 }
 
+/** Live 2026-11-26: on the tab backend a page reload ends the captured tab's audio track, so the
+ * silence reconnect would end the recording it is meant to protect (a quiet stretch in a real
+ * meeting killed a capture). The tab backend therefore alerts only; OBS keeps its reconnect. */
+export function silenceReconnect(backend: string, reload: () => unknown, log: (m: string) => void): () => void {
+  if (backend === "tab") return () => log("audio-watchdog: tab capture, not reloading (a reload would end the recording)");
+  return () => { void reload(); };
+}
+
 // ---- real OBS meter wiring -------------------------------------------------
 
 export interface AudioLevelSourceConfig {

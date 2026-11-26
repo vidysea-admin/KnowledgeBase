@@ -138,6 +138,8 @@ LOBBY_PHRASES = [
     "asking to join", "ask to join", "someone will let you in", "waiting for someone to let you in",
     "you'll join the call when someone lets you in", "waiting for the host to let you in",
     "waiting to be let in", "your request to join",
+    # Live 2026-11-26 recorded frame: Meet's knock-wait page for a signed-in account.
+    "still trying to get in", "brings you into the call",
 ]
 # B2 / D-232: the Meet refusal page ("You can't join this video call", straight or typographic apostrophe).
 # Meet only. It is a pre-admission signal: the loop ignores it once `admitted` was emitted (B2-C8), because

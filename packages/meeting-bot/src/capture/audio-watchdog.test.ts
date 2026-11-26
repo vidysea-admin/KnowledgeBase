@@ -317,3 +317,17 @@ test("createRealLevelSource unsubscribe before connect resolves still disconnect
   await flush(); // the deferred .then() branch also sees `stopped` — must not disconnect a 2nd time
   assert.equal(fake.disconnectCount, 1);
 });
+
+// Live 2026-11-26: on the tab backend a page reload ends the captured tab's audio track, so a quiet
+// stretch in a real meeting (nobody speaking for 2 min) killed the whole recording. The tab backend
+// alerts only; the OBS backend keeps its reconnect.
+test("silenceReconnect: tab backend never reloads, OBS backend still does", async () => {
+  const { silenceReconnect } = await import("./audio-watchdog.js");
+  let reloads = 0;
+  const logs: string[] = [];
+  silenceReconnect("tab", () => { reloads += 1; }, (m) => logs.push(m))();
+  assert.equal(reloads, 0);
+  assert.match(logs.join("\n"), /not reloading/);
+  silenceReconnect("obs", () => { reloads += 1; }, (m) => logs.push(m))();
+  assert.equal(reloads, 1);
+});

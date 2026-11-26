@@ -6,7 +6,7 @@ import { createBrowserJoiner } from "../joiners/browser-joiner.js";
 import { detectPlatform } from "../platform.js";
 import { selectJoinStrategy } from "../strategy.js";
 import { createAdmissionGate, settleDeniedCapture } from "./admission-gate.js";
-import { createAudioWatchdog, createRealLevelSource } from "./audio-watchdog.js";
+import { createAudioWatchdog, createRealLevelSource, silenceReconnect } from "./audio-watchdog.js";
 import { type ControllerRecoveryActions, type ControllerRecoveryContext, cleanupOwnedBrowserProfile, finalizeControllerRecording, getProcessStartTime, removeControllerState, writeControllerState } from "./controller-state.js";
 import { AUDIO_INPUT, createObsBrowserDeps, type ObsBrowserConfig, type ObsBrowserDepsOverrides, type ObsClientLike } from "./obs/obs-windows.js";
 import { leanRestorePath, restoreLeanVideoInObs } from "../lean-video-obs.js";
@@ -165,7 +165,7 @@ export async function runRecord(rest: string[], inject: RecordInject = {}): Prom
       return () => clearInterval(id);
     },
     notifySilence: (durationSec) => telegram.notifySilence(durationSec), // T-030's own notifier
-    reconnect: () => bot.triggerReload(sessionHandle),
+    reconnect: silenceReconnect(backend, () => bot.triggerReload(sessionHandle), (m) => console.log(`[bot] ${m}`)),
     log: (m) => console.log(`[bot] ${m}`),
   });
   gate.attach(audioWatchdog); // starts now only if `admitted` already arrived; never while in the lobby

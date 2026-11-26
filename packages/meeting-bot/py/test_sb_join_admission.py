@@ -39,6 +39,10 @@ def test_is_meet_url():
     "asking to join... someone in the call will let you in soon",
     "ready to join? ask to join",
     "waiting for someone to let you in",
+    # Live 2026-11-26 (recorded frame, signed-in bot, no host present): this page shows the full
+    # controls bar, and was wrongly classified in-call, so the watchdog reloaded and killed capture.
+    "still trying to get in... please wait until a meeting host brings you into the call",
+    "please wait until a meeting host brings you into the call",
 ])
 def test_lobby_text_wins_even_if_leave_control_renders(body):
     assert classify_meet_state(True, body) == "lobby"
