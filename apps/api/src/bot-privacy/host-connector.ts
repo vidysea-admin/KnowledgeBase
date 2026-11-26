@@ -49,12 +49,19 @@ export function createHostBotPrivacyDeps(directory: string): BotPrivacyDeps {
     list: async tenant => {
       let names:string[];try{names=readdirSync(tenantPath(tenant));}catch(error){if((error as NodeJS.ErrnoException).code==="ENOENT")return [];throw error;}
       if(names.length>100)throw new Error("Private controller limit");
-      const rows:BotPrivacyCaptureView[]=[];
-      for(const name of names){const match=/^(.+)--([a-f0-9-]{36})\.json$/.exec(name);if(!match)continue;
-        const descriptor=read(tenant,match[1]!,match[2]!);let state:Awaited<ReturnType<typeof send>>|undefined;
-          /* A transient failure gets one retry (fresh requestId). A still-failing descriptor is never live proof, but its row is kept as interrupted/unavailable so a live private capture never vanishes from the UI; privacy is only ever reported from a verified HMAC reply. */
-          try{state=await send(descriptor,"status");}catch{try{state=await send(descriptor,"status");}catch{state=undefined;}}
-          rows.push({tenantId:tenant,sessionId:descriptor.sessionId,generation:descriptor.generation,status:state?state.status:"interrupted",privacy:state?state.privacy:"unavailable"});}
+      /* Validate every descriptor first (read() errors still throw out of list), then probe all in parallel so list() is bounded by one descriptor's worst case (2 attempts), not N of them. */
+      const descriptors:Array<{descriptor:Descriptor;mtime:number;name:string}>=[];
+      for(const name of names.sort()){const match=/^(.+)--([a-f0-9-]{36})\.json$/.exec(name);if(!match)continue;
+        const descriptor=read(tenant,match[1]!,match[2]!);descriptors.push({descriptor,mtime:lstatSync(path.join(tenantPath(tenant),name)).mtimeMs,name});}
+      /* A transient failure gets one retry (fresh requestId). A still-failing descriptor is never live proof, but is kept as interrupted/unavailable so a live private capture never vanishes from the UI; privacy is only ever reported from a verified HMAC reply. */
+      const probed=await Promise.all(descriptors.map(async entry=>{let state:Awaited<ReturnType<typeof send>>|undefined;
+        try{state=await send(entry.descriptor,"status");}catch{try{state=await send(entry.descriptor,"status");}catch{state=undefined;}}
+        return {...entry,state};}));
+      /* The router rejects duplicate sessionIds (a crashed generation plus its restart), so collapse to one row per session: verified rows beat dead ones; among several verified, the newest descriptor file (the restarted recorder) wins, ties broken by file name; a session with no verified descriptor keeps one unavailable row (first by name). */
+      const best=new Map<string,typeof probed[number]>();
+      for(const entry of probed){const held=best.get(entry.descriptor.sessionId);
+        if(!held||(entry.state?1:0)>(held.state?1:0)||(entry.state&&held.state&&entry.mtime>held.mtime))best.set(entry.descriptor.sessionId,entry);}
+      const rows:BotPrivacyCaptureView[]=[...best.values()].map(({descriptor,state})=>({tenantId:tenant,sessionId:descriptor.sessionId,generation:descriptor.generation,status:state?state.status:"interrupted",privacy:state?state.privacy:"unavailable"}));
       return rows;
     },
     set: async (tenant,session,generation,action) => {
