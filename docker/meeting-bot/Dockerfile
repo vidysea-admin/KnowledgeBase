@@ -11,12 +11,25 @@ ARG DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && apt-get install -y --no-install-recommends \
     python3 python3-venv python3-tk python3-xlib python3-dev \
     xvfb x11vnc x11-utils xauth xdotool scrot \
-    pulseaudio pulseaudio-utils ffmpeg tini tzdata ca-certificates curl procps unzip \
+    pulseaudio pulseaudio-utils ffmpeg tini tzdata ca-certificates curl procps util-linux unzip \
     libnss3 libgbm1 libasound2 libxss1 libgtk-3-0 libxtst6 libxkbcommon0 libatk-bridge2.0-0 \
     libcups2 libdrm2 libxcomposite1 libxdamage1 libxfixes3 libxrandr2 libpango-1.0-0 libcairo2 \
     libx11-xcb1 libxshmfence1 libnss3-tools \
     fonts-noto-core fonts-noto-color-emoji fonts-indic fonts-liberation \
   && rm -rf /var/lib/apt/lists/*
+
+# Bucket client for the recorder's external state (D-233, unit B4): `gcloud storage` from Google's signed apt repository
+# (the entrypoint calls cp, cat, rm and objects describe, and needs --if-generation-match for the lease). The build FAILS
+# if the installed client does not offer that flag. No credentials are baked in: Cloud Run's service account supplies them.
+RUN set -eu; \
+    apt-get update; apt-get install -y --no-install-recommends gnupg; \
+    curl -fsSL -o /tmp/cloud-sdk.key https://packages.cloud.google.com/apt/doc/apt-key.gpg; \
+    gpg --dearmor -o /usr/share/keyrings/cloud.google.gpg /tmp/cloud-sdk.key; rm -f /tmp/cloud-sdk.key; \
+    echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" > /etc/apt/sources.list.d/google-cloud-sdk.list; \
+    apt-get update; apt-get install -y --no-install-recommends google-cloud-cli; \
+    gcloud storage cp --help | grep -q -e '--if-generation-match'; \
+    gcloud storage rm --help | grep -q -e '--if-generation-match'; \
+    rm -rf /var/lib/apt/lists/*
 
 # Pinned Linux gws (calendar/mail alerts): official googleworkspace/cli release v0.22.5, x86_64 musl build
 # (fully static, no glibc/libssl coupling). The archive is checked against GWS_SHA256 (the release's
@@ -80,6 +93,7 @@ ENV DISPLAY=:99 \
     LKB_FFMPEG_PATH=/usr/bin/ffmpeg \
     LKB_GWS_PATH=/usr/local/bin/gws \
     LKB_CHROME_NO_SANDBOX=1 \
+    CLOUDSDK_CORE_DISABLE_PROMPTS=1 \
     XDG_RUNTIME_DIR=/tmp/runtime-node \
     PULSE_SERVER=unix:/tmp/runtime-node/pulse/native \
     TZ=Asia/Kolkata \

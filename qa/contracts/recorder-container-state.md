@@ -30,7 +30,7 @@
   SIGTERM, it is killed after the bound and the lease is still released; the manifest names whether the final snapshot is then taken, and a test covers that path.
 - **[B4-C6] `record-once`.** `BOT_MODE=record-once` with the meeting URL and end time in environment variables runs the doctor gate, then ONE record command (the stub `node` sees `record <url> --until ...` as in
   `record-commands.ts:84-86`), never `run-pipeline.mjs`. Afterwards it copies the non-empty `.webm` files of the record directory to the stub bucket (a zero-byte file is skipped and logged), takes a final snapshot,
-  releases the lease and exits with the record command's exit status.
+  releases the lease and exits with the record command's exit status; if that status is 0 and a recording was not copied (the copy failed, or was skipped because the lease is not held), it exits 74. The record command's own non-zero status always wins.
 - **[B4-C7] Attendance loop.** In `run` mode with the attendance account variable set, the entrypoint calls `node scripts/webinar/run-pipeline.mjs --run --calendar-attendance-account <account>` once per interval (default
   300 s, the `POLL_MS` of `scripts/webinar/scheduler/service.mjs:2`; short in the test), never with `--watch`. Ticks never overlap (a stub `node` that outlives the interval is never run twice at once). A failing tick
   is logged with its exit code and the loop continues. New non-empty recordings are copied to the stub bucket after each tick, each file once. SIGTERM stops the loop (C5). With the account variable unset, the current
@@ -67,3 +67,4 @@
   B4-C3 amend (added d: conditional create/replace and a two-entrypoint race; e: no upload after losing the lease); B4-C4 amend (failed tar uploads nothing); B4-C5 amend (child that ignores SIGTERM);
   B4-C6 accept; B4-C7 amend (ticks never overlap, files uploaded once; command-line-only caveat from D-231); B4-C8 accept; B4-I1, I2, I4, I5 accept; B4-I3 amend (SIGTERM still forwarded); added B4-I6
   (no public ACL) and B4-I7 (the five breaking assertions of image.test.mjs are updated, not loosened; the maker's list was filing-only). Gaps recorded under Out of scope, none needs an owner answer.
+- 2026-11-25 · routine · B4-C6 amend (checker, unit b4-recorder-state, cycle 0): exit 74 when the record command succeeded but a recording was not copied; the record command's own non-zero status still wins. Reason: the literal text (exit with the record command's status) would let a recording that was made and lost exit 0; the maker flagged the tension and chose 74 (D-238 item 5). Judged against the amended reading.
