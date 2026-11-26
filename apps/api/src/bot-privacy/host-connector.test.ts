@@ -10,7 +10,7 @@ import { createHostBotPrivacyDeps } from "./host-connector.js";
 // Mode bits are ignored on Windows: make THIS test's own temp directory private (SYSTEM, Administrators, current identity only).
 function makePrivateOnWindows(directory: string): void {
   if (process.platform !== "win32") return;
-  const system32 = path.join(process.env.SystemRoot ?? "C:\Windows", "System32");
+  const system32 = path.join(process.env.SystemRoot ?? "C:\\Windows", "System32");
   const who = spawnSync(path.join(system32, "whoami.exe"), ["/user", "/fo", "csv", "/nh"], { encoding: "utf8", windowsHide: true });
   const sid = /"(S-1-[0-9]+(?:-[0-9]+)+)"/.exec(who.stdout ?? "")?.[1];
   assert.ok(who.status === 0 && sid, "current Windows identity SID required for fixture ACL");
