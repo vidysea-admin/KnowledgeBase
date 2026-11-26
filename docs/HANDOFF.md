@@ -1,36 +1,171 @@
-# HANDOFF — 2026-11-24 (read this first in the next Claude Code session)
+# HANDOFF — 2026-11-25 (read this first in the next Claude Code session)
+
+## Plan of 2026-11-25 (D-227): the single tracker
+
+- Plan file: `C:\Users\Lenovo\.claude\plans\meeting-bot-imperative-starfish-of-3fb8d78b-cac7-406e-9e13-fe76f3d5cd42.md` (approved by Umesh on 2026-11-25, decision D-227).
+- Rule: a row's state changes to PASSED only when its check passed on the real deployment; the date goes in the last column.
+
+### Stage 0 (unblock)
+
+| # | What | State |
+|---|---|---|
+| 0.1 | gcloud sign-in | NOT NEEDED (already signed in as the product account). |
+| 0.2 | rights check | DONE 2026-11-25. Granted: Cloud Run services, jobs and worker pools; the full load-balancer resource set; Cloud Build builds; Secret Manager; bucket creation; service accounts. Denied: project-level storage.objects.create (bucket level untested). Untested: cloudbuild.buildTriggers.update. So B5 and C5 are ours (L5 is deferred by D-228); F0's trigger change is ours if the update is allowed, else the vendor's. |
+| 0.3 | vendor mail 1 | DONE 2026-11-25 13:08 IST. Short status reply sent on Umesh's "send" (Gmail message `1a211a4247c7562f`, to the vendor helpdesk, cc Manish): public link is down, the `kb` DNS request is cancelled, one ask = the AWS redirect (D-228). Old unsent draft deleted. |
+| 0.4 | fetch | DONE. origin/master is still ce5cef49; local master is 19 commits behind it; the release chain (tip a9bbeb98 when checked) was 5 commits ahead of origin/master. The pinned launch commit is 40a0bc76. The head of `release/kb-golive` has moved on to 6df8934c (merges of D4, F0 and D2; not pushed); structure lint is green on it since 2026-11-25 and the push now waits on GitHub write access (see "Gates that need Umesh"). |
+| 0.5 | decision entry | DONE (D-227). |
+| 0.6 | three pending handshakes | CLOSED on disk (sweep 2026-11-25): the three handshakes are checked-PASS in the working tree (ua-web-unverified-login, vector-gap-durability, kb-password-min8-release; files of the Codex session, not committed). No check or fix is owed. The stop hook still counts 5 old HOLD verdicts that wait on live evidence or an owner decision (goal-t013, goal-t045, goal-t057, goal-t058, goal-u32) and 1 stale manifest (u2-4-phase3-precision-regate; left as it is, it has its own pause file). |
+| 0.7 | Codex note | WRITTEN below; Umesh pastes it into the Codex session. |
+| 0.8 | free memory | DONE. No leftover test or bot process exists. 3.6 GB of 23.7 GB is free; the large users are VS Code (7.2 GB), Chrome (2.5 GB), Claude Code (1.6 GB), ChatGPT app (1.1 GB). Builder cap stays at 3 to 4. |
+
+The build trigger has an inline four-step config (not an autodetected Dockerfile): pull, build the default target only, push, `gcloud run services update --image`. A master push would replace the two-container revision. Never push master before F0. The trigger fires only on a push to a branch matching `master` (the pattern is not anchored). Feature and release branches do not match. Master is still not pushed.
+
+Status as of 2026-11-25 14:40 IST: nothing has been deployed today. No row below is PASSED.
+
+### Lane table
+
+State changes to PASSED only when the check in the Check column passed on the real deployment. Units with no row in plan section 4 carry their own check from plan sections 6 and 7.
+
+| Unit | Lane | What | Owner | State | Check (plan section 4 row) | Date passed |
+|---|---|---|---|---|---|---|
+| L1 | Launch | Extend live-verify.mjs with --base and login env names | Claude | checked-PASS (unit `golive-launch-prep`, branch `release/kb-golive`, head 40a0bc76; two blind checkers; verdicts `qa/verdicts/golive-launch-prep.md` and `golive-launch-prep.b.md` on that branch). 11 of 13 criteria pass for L1 and L2 together. Open: L1-C7, the scripted run against the tagged address; it waits on Umesh's yes. Five low findings: ISS-KBGOLIVE-001 to 005. Not PASSED: nothing is deployed. | none (own check: green on test tag; feeds row 1) | |
+| L2 | Launch | Key the rate limiter on the user, not the tenant | Claude | checked-PASS (same unit and verdicts as L1, head 40a0bc76). Open: L2-C6, the two-user 429 / 200 probe on the deployed address; it waits on Umesh's yes. Not PASSED: nothing is deployed. | none (own check: unit tests, two-user probe) | |
+| L3 | Launch | Build images from L2 head; deploy tagged revision, no traffic | Claude + Umesh's yes | dry run shown to Umesh; waits on his yes (asked as A1). Launch commit pinned at 40a0bc76. Preflight 2026-11-25 (read-only): all 8 needed rights are granted to our account. Secrets `lkb-prod-mongodb-url` and `lkb-prod-ollama-api-key` do not exist yet; they are created in the batch. The tag `kb-login-test` follows latest, so it is pinned to revision `00020-7ss` first. | none (own check: smoke 1-7 on tag URL) | |
+| L4 | Launch | Shift traffic to the new revision | Claude + Umesh's yes | dry run shown to Umesh (with L3); waits on his yes (asked as A1). Rollback: traffic back to revision `00015-rbd`. | none (own check: /api/health db ok, root loads) | |
+| L5 | Launch | Build the public load-balancer path | Claude + Umesh's yes | deferred (D-228): add-on, only if the name kb.vidysea.com is wanted later | none | |
+| L6 | Launch | Cloudflare A record for kb host | vendor (Umesh's yes) | deferred (D-228): needed only together with L5 | none | |
+| L7 | Launch | Measure TRUST_PROXY_HOPS with the forged-address loop | Claude + Umesh's yes | waits on Umesh's yes for the `lkb_prod` writes (asked as A2). `mongodump` is not installed on the laptop; install MongoDB Database Tools before the backup step. | none (own check: about 20 refusals then 429) | |
+| L8 | Launch | Fresh sign-up approved as viewer; run the row 1 check | Claude + Umesh's yes | waits on Umesh's yes for the `lkb_prod` writes (asked as A2). The backup step needs MongoDB Database Tools (see L7). | 1 | |
+| L9 | Launch | Vendor changes AWS /knowledgebase* rule to a path-keeping redirect to the Cloud Run service URL (D-228) | vendor (Umesh's yes on the mail) | asked 2026-11-25 13:08 IST (mail sent, message `1a211a4247c7562f`). Done by the vendor on 2026-11-25 (their mail of 13:56 IST, ticket 2164). Verified the same day, read-only: `www.vidysea.com/knowledgebase` answers 302 to `https://vidysea-knowledgebase-5z2zofynhq-el.a.run.app:443/knowledgebase`. Path and query are kept (checked with `/knowledgebase/login?x=1`). Live check 2 is met. The landing path answers 401 until the launch revision takes traffic (L3, L4): traffic is still 100% on `vidysea-knowledgebase-00015-rbd`. The vendor also closed the DNS ticket INC-2169, as asked. | 2 | 2026-11-25 |
+| L10 | Launch | Lock ingress to the load balancer; drop tag URL from CORS | Claude + Umesh's yes | deferred (D-228): needed only together with L5 | 1 (again) | |
+| LINT | Launch | Structure-lint repair on `release/kb-golive` (unit `structure-lint-repair`, D-237) | Claude | unit check PASSED 2026-11-25 (6 of 6 criteria); manifest closed at commit 437bd02b. Three low issues filed: ISS-KBGOLIVE-006, 007, 008. Pre-push check of the merged branch (`a9bbeb98..b03d4108`, 33 commits): no new failing test (every red is already in `qa/checkpoints/baseline-reds.md`), `pnpm lint:structure` OK, `pnpm typecheck` clean; push gate green at 437bd02b. The push to origin was refused with HTTP 403: the signed-in GitHub account has no write access to the origin repository. The branch is local only, not merged. See "Gates that need Umesh". | none (own check: unit check 6 of 6) | |
+| F0 | A | Root cloudbuild.yaml; point trigger at it; then merges | Claude + Umesh's yes | checked-PASS (branch `f0-cloudbuild`, head 36c71ae2); merged into `release/kb-golive` (worktree `.worktrees/kb-golive`, head 6df8934c) with D4 and D2; tests at baseline there (API 2694 pass, 1 known red, 47 skipped; web 1469 pass, 1 known red; typecheck clean). The structure lint is green on that branch since 2026-11-25; the repair passed its check on 2026-11-25 (see row LINT). Not pushed: the push waits on GitHub write access (see "Gates that need Umesh"). The live check F0-C5 and the trigger repoint wait on gate question Q5. | none (own check: throwaway tagged deploy keeps both containers) | |
+| F1 | A | Waiver defect: full speaker turn as evidence, hold dropped conditions | Claude | checked-PASS 6/6 (branch `wave/f1-waiver-condition`, head f7eb479f). NOT in the launch build. Reason: the production hydrator (`apps/api/src/ask/source-context.ts:198`) returns 1024-byte slices, so fast Ask would hold every answer that cites a turn over 1024 bytes. Follow-up unit F1B (`f1-whole-turn-hydration`, ISS-F1WAIVERCONDITION-001, -002) has its own row below. Row 3 cannot pass before it. | 3 | |
+| F1B | A | Whole-turn hydration: the hydrator returns the full speaker turn, not a 1024-byte slice | Claude | first build dropped an over-size cited turn instead of holding the answer; found by review (D-238 item 4; branch `wave/f1-whole-turn-hydration`). Repair built (code f8565d3c); code review Approve. Both blind checks passed at cycle 0 (A cb3c9957, B a44bbc15). Closed out at commit 9d611591 in the worktree; the four low rows from the verdicts are in the lane ledger (`ISS-F1WAIVERCONDITION-007` to `-010`). Not merged, not pushed. | 3 (with F1) | |
+| F2 | A | Index nine sessions; UCAS timing fix; two replacements | Claude + Umesh's yes | not started | 4 | |
+| F3 | A | Retrieval: session diversification in ranking and hybrid arms | Claude | not started | 5 | |
+| F4 | A | Web fallback and ISS-454: retry, explicit sessions-only result. Same wave: the Ask-specific per-user cap as its own small unit with its own check (D-229) | Claude | not started. Q6 is answered (D-229): Ask launches with the per-user rate limit only; the Ask-specific cap is built in wave 2 with F4. | 6 | |
+| F5 | A | ISS-426 text index, ISS-UAAUTH-001, corpus reconcile, listed issues | Claude + Umesh's yes (ISS-453, ISS-446, ISS-455: Codex) | not started | none (own check: 51-route walk re-run) | |
+| B1 | B | Decision entries E1 to E5 for the Cloud Run recorder | Claude | done. Entries landed: D-230 (recorder on a Cloud Run worker pool, one meeting at a time), D-231 (single-slot attendance mode), D-232 (Meet refusal ends the capture as `admission_denied`, with one alert mail), D-233 (state in a bucket tar, lease, host id override), D-234 (registration; blocked on gate question Q3). D-242 and D-243 changed the "one meeting at a time" clause: two clashing meetings are both joined, by one recorder container with 2 capture slots, Meet first. | none (own check: entries land) | 2026-11-25 |
+| B2 | B | Detect Meet refusal early; no zero-byte file | Claude | unit check PASSED 2026-11-25 (branch `wave/b2-admission-denied`, head 95a22efd, 13 of 13 criteria; not merged, not pushed). Decided in D-232. Live check 8 still open: it needs B10 and a real host refusal. | 8 | |
+| B3 | B | Host id override LKB_CAPTURE_HOST_ID | Claude | not started. The hold ended (D-243 item 2): the bot folders are clean in the main tree and the last commit on `run-pipeline.mjs` is f6bf0597 of 2026-10-27. Contract being written (unit `recorder-host-id`). | 7 (in B9) | |
+| B4 | B | Restore, snapshot, lease, shutdown trap, record-once, attendance loop | Claude | first build blocked by a security review before its check (D-238 item 5); repair built (code 98198314, manifest c1cb27f3; branch `wave/b4-recorder-state`). All seven review items are fixed. PASSED at fix cycle 0 on 2026-11-25. Verdict commit b453d0b8; close-out commit a1a31aa2. The checker amended the contract (commit 6b5773f4): the entrypoint exits 74 when the record command exited 0 and a recording was not copied; the record command's own non-zero status wins. Its run of the whole state test file gave 31 of 33 pass under machine load. The 2 that failed are fixed-sleep timing tests, and each passed when run alone. 10 of 10 mutants red. Not measured: real gcloud message text (404 and 412), the Docker image build, the `set -m` fallback on real Linux, and the shutdown time budget on real network latency. Four issue rows are in `qa/issues.B4RECORDERSTATE.jsonl`: ISS-B4RECORDERSTATE-001 (start with empty state when the fetch error is misread as absent), -002 (exit status lost around the child wait) and -003 (record-once exits 0 when nothing was recorded; a product question), all medium, and -004 low. The medium ones are built in B4B, the next unit on the same file. Not merged. | none (own check: restarted container still signed in) | 2026-11-25 |
+| B4B | B | Live-proof media object | Claude | building since 2026-11-25 (unit `recorder-live-proof-object`). Decided in D-236. Built in the B4 worktree on branch `wave/b4-recorder-state` on top of a1a31aa2. Contract: `qa/contracts/recorder-live-proof-object.md`. It also fixes ISS-B4RECORDERSTATE-001 and -002. ISS-B4RECORDERSTATE-003 waits on Umesh's answer: record-once with nothing recorded, fail or success. Not PASSED. | none (own check: set in D-236) | |
+| B5 | B | Cloud resources: bucket, secrets, service account, worker pool, job | Claude + Umesh's yes | not started | none (own check: dry-run output reviewed) | |
+| B6 | B | Google sign-in for the bot; profile tar to bucket | Umesh | not started | 7 (in B8) | |
+| B7 | B | Export gws credentials to Secret Manager | Umesh | not started | 7 (in B9) | |
+| B8 | B | First proof: record-once job joins a meeting Umesh hosts | Umesh | not started | 7 (first half) | |
+| B9 | B | Single-slot attendance mode: skip slot check unless autonomous | Claude | not started. Decided in D-231. The hold on the Codex edits ended (D-243 item 2). It waits on the owner's answer on slot acceptance (see the gate list). | 7 (second half) | |
+| B10 | B | Failure alert by email when Telegram is unset | Claude | built (code 6a2cbd7c, manifest 51185fdd) on branch `wave/b10-failure-alert-mail`, created from `wave/b2-admission-denied` at 063a9b79. Decided in D-232 and D-236. The mail path already exists; the work is the reason lookup plus carrying the failure name from the capture child to the failed row. Built for the default (non-graph) pipeline mode; graph mode is a filed candidate and `LKB_PIPELINE_GRAPH=1` must not be set on the recorder until it is built (D-238 item 3). B2 is closed; B10 no longer waits for B9. Two contract clauses could not be met inside the unit's files; D-239 item 5 and D-240 record the default: no capture id in the mail in this unit, and a hung mail tool can hold a tick for 60 s. Review returned Warning. The hyphen repair is built (code c8071e2e, manifest 47f76149). The checker amended the contract (commit 1fffeefe): the capture id is asserted on the alert input, not in the mail text; the hang ceiling is 3 attempts of 30 s, with 60 s measured; the hyphen is out of the delimiter. The check ran on the repaired commit c8071e2e. PASSED at fix cycle 0 on 2026-11-25. Verdict commit 98b3be8e; close-out commit 16a44f4c; contract amendment 1fffeefe. 12 of 12 criteria met; 11 of 12 mutants red and the twelfth judged equivalent. One low process issue row (ISS-B10FAILUREALERTMAIL-001). Not measured: a real mail send, a real Meet refusal and the live recipient address; they belong to the go-live check. Not merged. | 8 | 2026-11-25 |
+| B11 | B | Calendar in the hosted app via the worker bridge | Claude + Umesh's yes | not started | 9 | |
+| B12 | B | Auto-registration in attendance mode; Umesh picks the webinar | Claude + Umesh's yes | replaced by R1 (D-243). Was: not started; held on Umesh's answer (gate question Q3, see D-234). | 10 | |
+| H1 | B | Recorder self-heal: after a crash, rejoin a meeting that is still running, and send an alert (unit `recorder-self-heal-rejoin`, D-243) | Claude | not started. Contract being written. Builds on branch `wave/b10-failure-alert-mail`. | none (own check: set in the unit check) | |
+| R1 | B | Registration with no approval per webinar (unit `webinar-registration-unattended`, D-243; replaces B12) | Claude | not started. Contract being written. Comes after H1 on the shared files. A live registration on an outside site stays a separate gate. | 10 | |
+| T1 | B | The open Calendar page refreshes by itself (unit `calendar-page-freshness`, D-243) | Claude | not started. Contract being written. | none (own check: set in the unit check) | |
+| P1 | B | The container runs the watching scheduler with 2 slots, gets a larger size, and clears stale slot locks at start (D-243) | Claude | not started. Waits on the owner's answer on slot acceptance and on B4B freeing the entrypoint. | none (own check: set in the unit check) | |
+| P2 | B | A slot becomes ready with no person (D-243) | Claude + Umesh's answer | not started. The question is put to the owner (see the gate list). | none | |
+| H2 | B | Keep the interrupted partial recording (D-243) | Claude | not started. Later, not now. | none | |
+| C1 | C | Archiver-repo decision: patch, /svc/v1 listener, Cloud Run, key store | Claude | decisions recorded: archiver repo entries D-023, D-024, D-025 on its branch `wave/hosted-service` (worktree `.worktrees/wa-hosted`, not pushed); KB entry D-235. Not PASSED. | none (own check: entry lands in archiver repo) | |
+| C2 | C | Baileys companion_reg_refresh patch (unit `wa-baileys-patch`) | Claude | built, not checked: manifest a25ce7f0 at head be5a090f (earlier head a99295ac) on branch `wave/c2-baileys-patch` (from 583750d in the archiver repo). The builder counts 67 of 67 tests and 29 mutants killed. Four contract clauses were not met as written: they need the `patch-package` tool and its install command was refused, so the unit carries a small Node applier that reads the same patch format. The install was not run. Code review returned Warning; the repair is in progress at fix cycle 0. The checker amended the contract (commit a37e9cc6): the Node applier is the mechanism and no package is installed. The dual check is running. A second review returned Warning with five findings; they were forwarded to both checkers as input. Not measured: a real phone pairing. Cause of the pairing stall is known: upstream Baileys pull request 2765; our patch is a backport of it. Reading waits on Umesh (asked as E): the patch sends only the handshake ack. Code may be built; nothing merges to the archiver's main branch before he answers. | none (own check: real phone pairs, no stall) | |
+| C3 | C | Minimum /svc/v1 routes, session-key store, Dockerfile | Claude | split into C3A, C3B and C3C below | none (own check: local /svc/v1/health returns 200) | |
+| C3A | C | /svc/v1 route surface (unit `wa-svc-surface`) | Claude | built at d6935956 in the archiver worktree (branch `wave/c3a-svc-surface`; declaration commit c4bb66b3). First review result Warning, no Block. Repairs built (head 548921c6 on `wave/c3a-svc-surface`, manifest d8d9ca43); second review Approve. PASSED at cycle 0 on 2026-11-25 by the dual check (verdict A commit d8a56f18, verdict B commit 5ff1c9fe); close-out commit 32f50c97; five issue rows in `qa/issues.C3ASVCSURFACE.jsonl` (one medium, four low). Unit check is in `qa/contracts/wa-svc-surface.md`. Not merged to the archiver's main branch: it waits for the Approver on the two readings in archiver D-023 (asked as E; the routes take the owner id from the URL path under the service token). Joint check C3AB-J1 waits for C3B. | none (own check: local /svc/v1/health returns 200) | 2026-11-25 |
+| C3B | C | Session-key store (unit `wa-key-store`) | Claude | built at e05642e6 (manifest 86cb4696) in the archiver worktree `.worktrees/wa-c3b`, branch `wave/c3b-key-store`, from c4bb66b3. Contract ruling 34c987a0. Code review Warning (write after unlink, restore conflict, restore retry); being repaired before its check, at fix cycle 0. The dual check follows the repair. Same hold on merging as C3A. Not PASSED. | none (own check: set in the unit check) | |
+| C3C | C | Dockerfile (unit `wa-dockerfile`) | Claude | not started; starts after C2. Unit check is written and goes into the contracts next. Same hold on merging as C3A. | none (own check: set in the unit check) | |
+| C4 | C | Database connection and user for the archiver | Claude | not started | none (own check: connection test from archiver) | |
+| C5 | C | Deploy the archiver; set three API env settings | Claude + Umesh's yes (or vendor) | not started | none (own check: API health call reaches archiver) | |
+| C6 | C | Pin bump here and the section 3 amendment (E6) | Claude | not started | none (own check: pin equals archiver tip) | |
+| C7 | C | Scan the QR on the hosted link screen | Umesh | not started | 11 | |
+| C8 | C | Groups and tracking routes; scheduled ingest into the knowledge base | Claude | not started | 12 | |
+| D1 | D | Real speaker names: roster overlay, speakerLabel in quotes | Claude | not started | 13 | |
+| D2 | D | Claims review: machine-checked tier, review route, thresholds | Claude | checked-PASS 6/6 (branch `d2-extraction-harness`, head a23f5656); merged into `release/kb-golive` (head 6df8934c; not pushed, see F0). Two code reviews gave Warning with three high fail-open items; one follow-up fix unit after gate question Q1 is answered. The harness cannot judge row 14 yet: its bar file says `proposed`. | 14 | |
+| D3 | D | Counsellor page: multi-turn history on POST /ask, names | Claude | not started | 15 | |
+| D4 | D | Championship rehearsal: 92 questions, pairwise judges, win rate | Claude | checked-PASS (branch `d4-pairwise-judge`, head d100eefa); merged into `release/kb-golive` (head 6df8934c; not pushed, see F0). | 16 | |
+| E | E | Database hardening: replica-set rehearsal, auth, cutover | Codex (rehearsal tooling); vendor (shared server); Umesh's yes | not started | 17 | |
+
+Owner gate file: `qa/gates/golive-owner-questions-2026-11-25.md`. Q1 to Q5 are open. Q6 is answered (D-229): Ask launches with the per-user rate limit only; the Ask-specific cap is built in wave 2 with F4; a provider spend alert is set on launch day.
+
+### Fixed file order (one owner at a time)
+
+| File | Order |
+|---|---|
+| `apps/api/src/answer-policy/answer-evidence.ts` | F1, D1, F4 |
+| `apps/api/src/answer-policy/answer-workflow.ts` | F4, D4, D3 |
+| `packages/ask/src/ask-v2.ts` | F1, F3 |
+| `apps/api/src/claims/router.ts` | D1, D2 |
+| `scripts/webinar/run-pipeline.mjs`, `run-pipeline-deps.mjs` | B9, B10, B12 |
+
+### Note for the Codex session (Umesh pastes this into Codex)
+
+1. One plan was approved on 2026-11-25 (decision D-227). Plan file: `C:\Users\Lenovo\.claude\plans\meeting-bot-imperative-starfish-of-3fb8d78b-cac7-406e-9e13-fe76f3d5cd42.md`. Tracker: the lane table in docs/HANDOFF.md.
+2. Codex owns: `codex/t051-recorder-readiness` (rebase and the colliding D-216); `docker-compose.yml`; `docker/meeting-bot/image.test.mjs`; `packages/meeting-bot/src/capture/record-consent/private-acl*`; the Lane E local replica-set rehearsal tooling; ISS-453 and ISS-446 in `apps/web`; ISS-455 in `packages/ingest`.
+3. Claude owns every other file named in lanes A to D, including `docker/meeting-bot/entrypoint.sh`, `docker/meeting-bot/Dockerfile`, `packages/meeting-bot/py/*`, `scripts/webinar/*`, `apps/api/src/**` and `packages/ask/**`.
+4. `docs/DECISIONS.md` and `TASKS.md` have ONE writer: the Claude main session. Codex writes the entry text under "Codex lane" in docs/HANDOFF.md and Claude appends it through `scripts/append_decision.ps1`. This avoids the id race (ISS-362). The D-216 on `codex/t051-recorder-readiness` collides with a different D-216 on `docs/cloud-run-golive`: at rebase, drop that DECISIONS hunk and hand the entry text over the same way; it gets the next free id.
+5. Claude's unit B4 edits `entrypoint.sh` and the bot `Dockerfile`, which will break five assertions in `docker/meeting-bot/image.test.mjs`. Claude does not edit that file. Claude lists the changed behaviours under "B4 changes for Codex" in docs/HANDOFF.md; Codex updates the test from that list. The five assertions, with line ranges in that file as read on 2026-11-25:
+   1. Test "entrypoint has run, doctor and login modes and cleans stale state" (:42-51). Needle `run-pipeline.mjs --run --watch` (:47) and `assert.match(e, /exec node scripts\/webinar\/run-pipeline\.mjs --run --watch/)` (:49) fail once `exec` is replaced by a child process and a loop. Needle `.lkb-tab-capture.lock` (:46) fails only if that line at `entrypoint.sh:32` is removed or renamed.
+   2. Test "entrypoint ... BEFORE any daemon starts (ISS-409)" (:65-76). It requires lines that start exactly `pulseaudio -D` and `Xvfb :99` at column 0 (`/^pulseaudio -D/m`, `/^Xvfb :99/m`). Wrapping them in a function or indenting them breaks it. A restore step placed before them must not read `$VNC_PASSWORD` (the test requires every read to come before the `unset`).
+   3. Test "removes the VNC pass file when x11vnc fails (ISS-410)" (:78-83). It looks for the literal `trap 'rm -f "$VNC_PASSFILE"' EXIT` before `x11vnc`. A second `trap ... EXIT` for shutdown would replace it in `sh`. So the shutdown trap must be armed only after the login branch, in a different signal slot or a combined handler that still contains that literal text.
+   4. Test "Dockerfile sets the Linux bot environment and carries no secrets" (:33-40). It breaks if a new `ENV` line matches `(API_KEY|TOKEN|PASSWORD|SECRET|MONGODB_URL)\s*=\s*\S`, for example a variable named with SECRET and given a value.
+   5. Built-image tests (:129-152, skipped unless `LKB_DOCKER_TESTS=1` and `BOT_IMAGE`): "doctor passes" and "doctor gate fails closed when node itself fails" break if doctor mode starts to need a bucket or a lease.
+6. Never push or merge to master. The vendor's build trigger deploys on every master push and would remove the web container. Feature branches and draft pull requests only, until F0 lands.
+7. Each session edits docs/HANDOFF.md only under its own lane heading.
+8. Consent stays out of scope (D-210). No units, issues, checks or questions about it.
+
+### Codex lane
+
+Codex writes here.
+
+### B4 changes for Codex
+
+Source: the "What changed" section of `qa/manifests/b4-recorder-state.md` (branch `wave/b4-recorder-state`, code 98198314). Scope is `docker/meeting-bot/` only: `entrypoint.sh`, `Dockerfile`, and the new `entrypoint-state.test.mjs`.
+
+`docker/meeting-bot/image.test.mjs` itself was not changed by this unit. It runs 11 pass, 4 skipped, because the edit kept every text that file matches. Check it again after Codex's own edits to the image. The changes below are what the Codex session needs to know.
+
+- New env names: `LKB_STATE_BUCKET`, `LKB_STATE_PREFIX`, `LKB_SNAPSHOT_INTERVAL_S`, `LKB_LEASE_TTL_S`, `LKB_LEASE_RENEW_S`, `LKB_STOP_WAIT_S` (default 3), `LKB_GCLOUD_TIMEOUT_S` (default 120), `LKB_SHUTDOWN_BUDGET_S` (default 5), `LKB_ATTENDANCE_ACCOUNT`, `LKB_ATTENDANCE_INTERVAL_S`, `LKB_RECORD_URL`, `LKB_RECORD_UNTIL`, `LKB_RECORD_ARGS`, `LKB_RELEASE_DIR`. The Dockerfile ENV block also gains `CLOUDSDK_CORE_DISABLE_PROMPTS=1` (no secret).
+- New modes: `record-once` (one record command, then the recordings are copied to the bucket) and an attendance loop (one tick per `LKB_ATTENDANCE_INTERVAL_S`). With no bucket and no attendance account the original `exec node scripts/webinar/run-pipeline.mjs --run --watch` is untouched. `BOT_MODE=doctor` and `login` never read the bucket variable.
+- New exit codes: 75 (lease held elsewhere or lost) and 74 (record-once: the recording was made but the copy to the bucket failed or was skipped). A failed record command keeps its own status.
+- Added packages: `gnupg` and `google-cloud-cli` (from Google's signed apt repository; the build fails if `gcloud storage cp --help` or `rm --help` lacks `--if-generation-match`), and `util-linux` (for `setsid`). `USER node`, the gws pin and the tini ENTRYPOINT are unchanged. The new RUN block was not built in this unit.
+- Changed start order: the lease and the state restore now run before the pipeline. The lease is renewed once right after the doctor gate, before the helpers and the pipeline start; a lost lease exits 75 without starting the pipeline. The pipeline runs as a background child in its own process group. On SIGTERM the entrypoint forwards the signal, waits at most `LKB_STOP_WAIT_S`, stops the group, takes a final snapshot, and releases the lease.
+- Unchanged and still matched by `image.test.mjs`: the login VNC block, the `trap 'rm -f "$VNC_PASSFILE"' EXIT`, the `unset VNC_PASSWORD` ordering, the stale-lock `rm` lines, and the whole doctor gate.
+- `docker-compose.yml` will need the new env names and the `LKB_STATE_BUCKET` wiring. That is plan B5 and was not requested of B4.
+
+---
 
 ## Where things stand
 - master = ce5cef49 and it DOES contain d521fec0 (git merge-base --is-ancestor d521fec0 origin/master: yes). It has the go-live build:
   user accounts, Ask, compose fixes D-212/D-213, Docker-only indexer fix (d521fec0).
-- The public link is DOWN. The vendor stopped VM 34.47.136.12 on 2026-11-23. www.vidysea.com/knowledgebase still 302s to
-  https://34.47.136.12:8081/ (dead). kb.vidysea.com has no DNS.
+- Status 2026-11-25 13:50 IST: nothing has been deployed today. The launch commit is 40a0bc76 on `release/kb-golive`. The lane table above is the current state; the older text below is history.
+- The public link now redirects (row L9, done by the vendor and verified on 2026-11-25). www.vidysea.com/knowledgebase answers 302 to the Cloud Run service address and keeps path and query. It answers 401 until L3 and L4 put the launch revision on traffic. The vendor stopped VM 34.47.136.12 on 2026-11-23; the old redirect to it is gone. kb.vidysea.com has no DNS (deferred, D-228). Nothing is pending from the vendor for the Knowledge Base.
 - The Knowledge Base default Cloud Run revision is API-only. The separate `kb-login-test` tag serves both web and API with sign-in against `lkb_prod`. The signed-in UC retest on `00020-7ss` returned exactly the matching speaker and turn, but broadened a school-specific waiver. The external NASA answer passed on `00019-jvc`. Wording candidate `def9078d` is local and failed the final independent check. See D-218 before another release or live Ask. The current release evidence and test link are in [the Cloud Run runbook](DEVOPS-REDEPLOY-2026-11-01.md).
-- Maker loop stays PAUSED (qa/.paused) until go-live passes. Builds resume afterwards (ISS-362 first needs Approved-by).
+- Maker loop: the pause was lifted on 2026-11-25 for the units of the approved plan only (D-227); `qa/.paused` is removed. Work outside the plan stays stopped. Decision entries and `TASKS.md` are written by the main Claude session only, which sidesteps the id race in ISS-362; the fix for ISS-362 itself still needs Approved-by.
 
 ## Decision
 - D-215 (2026-11-24) supersedes D-214: go-live on that Cloud Run service as ONE service, TWO containers (web ingress + api sidecar
-  on 127.0.0.1:3300), built from the root Dockerfile by the vendor's Cloud Build trigger from master. Public host
-  https://kb.vidysea.com through a Google HTTPS load balancer; after our checks the AWS ALB /knowledgebase* becomes a 302 to it.
+  on 127.0.0.1:3300), built from the root Dockerfile by the vendor's Cloud Build trigger from master.
+  [Changed by D-228, 2026-11-25: the launch address is the Cloud Run service address. The load balancer and the name kb.vidysea.com
+  are deferred (L5, L6, L10). The AWS ALB /knowledgebase* rule became a path-keeping redirect to the Cloud Run service address (L9, done 2026-11-25).]
   No code change. Runbook: docs/DEVOPS-REDEPLOY-2026-11-01.md, section "Cloud Run go-live (D-215...)". Topology: docs/HLD.md section 5.
 
 ## Next steps (in order)
-1. Show Umesh the vendor reply mail first; send only on his yes.
-2. We supply the names and values through an agreed secure channel; the vendor applies them in Cloud Run and Secret Manager
-   (lkb_prod, accounts on, CORS and origin = https://kb.vidysea.com; AUTH_CSRF_SECRET is generated by the vendor directly in Secret Manager).
+1. DONE 2026-11-25 13:08 IST: the vendor reply mail was shown to Umesh and sent on his yes (row 0.3). Mail 2 (row L9) was sent the same day; the vendor replied at 13:56 IST and the redirect is verified (row L9).
+2. [Superseded: our account has the needed rights (row 0.2 and L3), so we create the secrets and set the Cloud Run settings ourselves in the L3 batch, on Umesh's yes. Old text: we supply the names and values through an agreed secure channel; the vendor applies them in Cloud Run and Secret Manager
+   (lkb_prod, accounts on, CORS and origin = https://kb.vidysea.com; AUTH_CSRF_SECRET is generated by the vendor directly in Secret Manager).]
 3. We run the smoke checks on the run.app URL (runbook checks 1-7).
-4. Vendor builds the LB, serverless NEG and certificate; Cloudflare A record kb -> LB IP (DNS only). LB redirects / to /knowledgebase/.
+4. DEFERRED by D-228 (rows L5, L6): the load balancer, the serverless NEG, the certificate and the Cloudflare A record for kb.
 5. First admin from a laptop (create-admin.mjs), then sign-in check and the forged X-Forwarded-For loop; this sets TRUST_PROXY_HOPS.
 6. Index sessions from the laptop (sync-session.mjs --index-existing --grounded-notes, about 35 min each).
-7. Smoke checks again on kb.vidysea.com; then, on Umesh's yes, the vendor flips the AWS ALB rule and locks ingress to internal + Cloud Load Balancing.
+7. Smoke checks again on the Cloud Run service address; the vendor's AWS ALB /knowledgebase* rule change (row L9) is already done and verified. The ingress lock (row L10) is deferred by D-228.
 8. /maker resume, then the deferred list.
 
 ## Gates that need Umesh
-- Merging to master triggers the vendor's Cloud Build deploy; do not merge or push to master without Umesh's yes and a heads-up to the vendor.
+- Merging to master triggers the vendor's Cloud Build deploy; do not merge or push to master without Umesh's yes and a heads-up to the vendor. The trigger fires only on a push to a branch matching `master` (pattern not anchored); feature and release branches do not match.
 - Every vendor mail, and every DNS / LB / ALB / server step: dry run first, then his yes.
 - First admin, the sign-in check with the forged X-Forwarded-For loop, and indexing all write lkb_prod: explicit yes each. Session ids to index: ask Umesh.
-- The ALB flip and the ingress lock come last, only after the checks pass.
+- The AWS ALB rule change (L9) is done by the vendor and verified on 2026-11-25; nothing is pending from the vendor for the Knowledge Base. The ingress lock is deferred by D-228 (L10).
 - ISS-362 needs an Approved-by entry before builds resume.
+- The Virtual Counsellor service needs a search-only Knowledge Base key (env name `VC_KB_ANON_API_KEY`, scopes `search` and `sources`). Creating it writes a row to `api_keys` in the live database, so it needs Umesh's yes. `scripts/mint-key.mjs` cannot make a search-only key today, because it always adds the default scopes; the `POST /keys` route can. No key has been created.
+- GitHub write access. Pushing any branch to origin is refused (403) for the signed-in account. Umesh either gets write access for that account on the origin repository or signs in to git with an account that has it; a second option he was offered is pushing feature branches to the `legacy` remote, which was not done. Until this is settled: no CI on GitHub, no draft pull requests, no master merge. The launch deploy batch does not need a push. Asked in chat on 2026-11-25; not answered.
+- Update 2026-11-25: Umesh answered four defaults (D-242). The recorder must recover by itself after a crash and also send an alert. Registration needs no person. Two clashing meetings must both be joined, in parallel; this replaces "one meeting at a time" in Lane B, and the route is being designed, not chosen yet. The credentials question was answered; the move to Secret Manager is a separate batch after launch. All other gates in this section are still open.
+- Slot acceptance (2026-11-25, D-243 item 3). Today each recording slot needs a person's signed acceptance after its first real capture, and again after any capture error. Proposal put to Umesh: readiness by machine check (a real admitted capture with audio and video), re-checked by itself after an error, with an alert each time, behind a setting that restores the person's step. B9, P1 and P2 wait on his answer.
 
 ## Deferred (ledger, not launch blockers)
 ISS-443..451 web polish, ISS-453 8 web test reds, ISS-454 timeout labelled stale, ISS-455 strict-index error.

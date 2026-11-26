@@ -4,6 +4,8 @@ import { chmodSync, existsSync, linkSync, mkdirSync, mkdtempSync, readFileSync, 
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { randomUUID } from "node:crypto";
+import os from "node:os";
+import { createHash } from "node:crypto";
 import { createRequire, syncBuiltinESMExports } from "node:module";
 import { selectTabCaptureWorkspace } from "./tab-session-workspace.js";
 import { createCaptureSlotReadinessObserver, readCaptureSlotObservation } from "./capture-slot-readiness.js";
@@ -91,4 +93,73 @@ test("hardlinked authority cannot be used as trusted acceptance",()=>{
     const receipt=f.observe().receipt;f.review(receipt);const registry=captureAcceptanceRegistryPath(f.root),pointer=path.join(registry,readdirSync(registry).find(v=>v.endsWith(".current"))!);
     linkSync(pointer,path.join(f.root,"alias"));assert.equal(f.accept(receipt),false);
   }finally{f.clean();}
+});
+
+// ---- B3 (recorder-host-id): LKB_CAPTURE_HOST_ID through the real acceptor and the real registry files. Ids are computed here with node:crypto. ----
+const SETTING="LKB_CAPTURE_HOST_ID";
+const sha=(parts:unknown[])=>createHash("sha256").update(JSON.stringify(parts)).digest("hex");
+const idUnder=(value:string)=>sha(["lkb-capture-host-id",value,process.platform]);
+function onHost<T>(host:string,setting:string|undefined,run:()=>T):T {
+  const realHostname=os.hostname,had=Object.hasOwn(process.env,SETTING),prev=process.env[SETTING];
+  os.hostname=()=>host;syncBuiltinESMExports();
+  if(setting===undefined)delete process.env[SETTING];else process.env[SETTING]=setting;
+  try {return run();}
+  finally {os.hostname=realHostname;syncBuiltinESMExports();if(had)process.env[SETTING]=prev;else delete process.env[SETTING];}
+}
+test("B3-C2 c a signed acceptance published under one hostname is honoured under another only with the same setting",()=>{
+  const f=fixture();try{
+    const receipt=onHost("host-A","prod-1",()=>{const r=f.observe().receipt;f.review(r);return r;});
+    assert.equal(receipt.hostId,idUnder("prod-1"));
+    assert.equal(onHost("host-A","prod-1",()=>f.accept(receipt)),true);
+    assert.equal(onHost("host-B","prod-1",()=>f.accept(receipt)),true,"new hostname, same setting: the signed acceptance survives the restart");
+    assert.equal(onHost("host-B",undefined,()=>f.accept(receipt)),false,"new hostname, no setting: refused");
+    const next=onHost("host-B","prod-1",()=>f.observe());
+    assert.equal(onHost("host-C","prod-1",()=>f.accept(next.receipt)),true,"a later observation on another new hostname is still counted");
+  }finally{f.clean();}
+});
+test("B3-C3 without the setting the acceptor and the publisher use today's hostname id",()=>{
+  const f=fixture();try{
+    const receipt=onHost("legacy-host",undefined,()=>{const r=f.observe().receipt;f.review(r);return r;});
+    assert.equal(receipt.hostId,sha(["legacy-host",process.platform]));
+    assert.equal(onHost("legacy-host",undefined,()=>f.accept(receipt)),true);
+    assert.equal(onHost("other-host",undefined,()=>f.accept(receipt)),false);
+    assert.equal(onHost("legacy-host",undefined,()=>f.review(receipt)).evidenceHash,receipt.evidenceHash);
+  }finally{f.clean();}
+});
+test("B3-C4 the acceptor compares to exactly one id: V1, V2, no setting and the hostname id never stand in for each other",()=>{
+  const f=fixture();try{
+    const underV1=onHost("host-A","prod-1",()=>{const r=f.observe().receipt;f.review(r);return r;});
+    assert.equal(onHost("host-A","prod-2",()=>f.accept(underV1)),false,"acceptance under V1 refused under V2");
+    assert.equal(onHost("host-A",undefined,()=>f.accept(underV1)),false,"acceptance under V1 refused with no setting, even on the host that wrote it");
+    assert.throws(()=>onHost("host-A","prod-2",()=>f.review(underV1)),/stale, foreign or synthetic/,"a person cannot accept a receipt written under another id");
+    assert.equal(onHost("host-A","prod-1",()=>f.accept(underV1)),true);
+    const underHost=onHost("host-A",undefined,()=>{const r=f.observe().receipt;f.review(r);return r;});
+    assert.equal(underHost.hostId,sha(["host-A",process.platform]));
+    assert.equal(onHost("host-A","prod-1",()=>f.accept(underHost)),false,"acceptance under the hostname id refused once the setting is on");
+    assert.equal(onHost("host-A",undefined,()=>f.accept(underHost)),true);
+  }finally{f.clean();}
+});
+test("B3-C7 the setting does not widen acceptance: issuer key, registry and every other binding still refuse",()=>{
+  const f=fixture(),g=fixture();try{
+    const receipt=onHost("host-A","prod-1",()=>{const r=f.observe().receipt;f.review(r);return r;});
+    const accept=(r:typeof receipt)=>onHost("host-B","prod-1",()=>f.accept(r));
+    assert.equal(accept(receipt),true,"positive control");
+    // (b) same V, a registry that never saw the signing, or a different issuer key
+    assert.equal(onHost("host-B","prod-1",()=>g.accept(receipt)),false,"another deployment's acceptor, same V");
+    const keyFile=path.join(captureAcceptanceRegistryPath(f.root),".issuer-key"),genuine=readFileSync(keyFile);
+    writeFileSync(keyFile,Buffer.alloc(32,7));assert.equal(accept(receipt),false,"same V, different issuer key");
+    writeFileSync(keyFile,genuine);assert.equal(accept(receipt),true,"key restored");
+    // (c) every other binding, with V set
+    const R=receipt as any;
+    for(const [name,variant] of Object.entries({tenantId:{...R,tenantId:"tenant-b"},slot:{...R,slot:"second"},profileDir:{...R,profileDir:R.profileDir+"-other"},
+      recordDir:{...R,recordDir:R.recordDir+"-other"},platform:{...R,platform:"zoom"},fixtureKind:{...R,evidenceKind:"fixture"},rawHostId:{...R,hostId:"prod-1"},otherHostId:{...R,hostId:idUnder("prod-2")}}))
+      assert.equal(accept(variant as typeof receipt),false,name+" must still refuse");
+    f.setTenant("tenant-b");assert.equal(accept(receipt),false,"verified tenant");f.setTenant("tenant-a");
+    f.env.LKB_TENANT_ID="tenant-b";assert.equal(accept(receipt),false,"configured tenant");f.env.LKB_TENANT_ID="tenant-a";
+    const consentPath=path.join(f.workspace.recordDir,"record-consent",receipt.tenantId,`${receipt.sessionId}.json`),consent=JSON.parse(readFileSync(consentPath,"utf8"));
+    delete consent.mediaStartedAt;writeFileSync(consentPath,JSON.stringify(consent));assert.equal(accept(receipt),false,"missing durable media origin");
+    const second=onHost("host-B","prod-1",()=>f.observe());onHost("host-B","prod-1",()=>f.review(second.receipt));
+    assert.equal(accept(second.receipt),true);
+    second.observer.onCaptureEvent({event:"capture-error"});assert.equal(accept(second.receipt),false,"a newer failure marker");
+  }finally{f.clean();g.clean();}
 });
