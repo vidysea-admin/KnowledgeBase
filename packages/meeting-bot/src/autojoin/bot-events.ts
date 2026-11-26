@@ -30,9 +30,18 @@ export interface BotFeedEvent {
 const MAX_BYTES = 2 * 1024 * 1024;
 export const botEventsPath = (stateDir: string): string => path.join(stateDir, "bot-events.jsonl");
 
-/** Strips control chars and URLs, collapses whitespace, caps length. */
+/** Join credentials outside an https URL (H1-C10): a scheme-less link (host/path, or a known conferencing host), `key=value` credentials, and passcode sentences. */
+const CONF_HOST = String.raw`(?:[a-z0-9-]+\.)*(?:zoom\.us|zoom\.com|zoho\.(?:com|in|eu)|meet\.google\.com|teams\.microsoft\.com|teams\.live\.com|webex\.com|gotomeeting\.com)`;
+const BARE_LINK = new RegExp(String.raw`(?<![\w@.-])(?:${CONF_HOST}\b|(?:[a-z0-9-]+\.)+[a-z]{2,}(?=/))\S*`, "gi");
+const CRED_PAIR = /\b(?:pwd|passcode|password|passwd|token|secret|key)=\S+/gi;
+const CRED_WORD = String.raw`(?:pass\s?code|passwd|password|pwd)`;
+const CRED_VALUE = String.raw`[^\s,;]+(?:\s\d+\b)*`;
+const CRED_SENTENCE = new RegExp(String.raw`\b${CRED_WORD}\s*(?:(?:is|are)\b\s*[:=]?|[:=])\s*${CRED_VALUE}|\b${CRED_WORD}\s+(?=[^\s,;]*\d)${CRED_VALUE}`, "gi");
+
+/** Strips control chars, URLs and join credentials (passcode sentences, pwd=, scheme-less links), collapses whitespace, caps length. */
 export function cleanBotText(value: unknown, max: number): string {
-  return String(value ?? "").replace(/https?:\/\/\S+/gi, "[link removed]").replace(/[\u0000-\u001f\u007f]+/g, " ").replace(/\s+/g, " ").trim().slice(0, max);
+  return String(value ?? "").replace(/https?:\/\/\S+/gi, "[link removed]").replace(BARE_LINK, "[link removed]").replace(CRED_PAIR, "[passcode removed]")
+    .replace(CRED_SENTENCE, "[passcode removed]").replace(/[\u0000-\u001f\u007f]+/g, " ").replace(/\s+/g, " ").trim().slice(0, max);
 }
 
 export function appendBotEvent(stateDir: string, ev: Omit<BotFeedEvent, "id">): BotFeedEvent {

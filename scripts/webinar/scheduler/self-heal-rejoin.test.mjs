@@ -316,7 +316,52 @@ test('H1-C10: a link in a title is removed from the interruption subject by the 
   } finally {rmSync(dir, {recursive: true, force: true});}
 });
 
-const STOP = {tenantId: 'fixture', sessionId: ID, generation: '11111111-1111-4111-8111-111111111111', reason: 'cancelled', requestedAt: '2026-09-30T12:10:00.000Z'};
+/** H1-C10 cycle 1: the contract's literal scenario, the credential sits in the TITLE. The first four rows are the recorded reproductions of checker B
+ * (verdict recorder-self-heal-rejoin.b.md, probe-c10 and finding 1), verbatim; the rest extend them. Each says what it must NOT carry. */
+const C10_TITLES = [
+  ['B: url + passcode sentence', 'Career webinar https://meet.google.com/abc-defg-hij?pwd=FAKEPWD99 passcode is FAKEPASSCODE5521', ['FAKEPWD99', 'FAKEPASSCODE5521', 'meet.google.com']],
+  ['B: scheme-less link with pwd=', 'Career webinar meet.google.com/abc-defg-hij pwd=FAKEPWD99', ['FAKEPWD99', 'meet.google.com', 'abc-defg-hij']],
+  ['B: url only', 'Career webinar https://meet.google.com/abc-defg-hij?pwd=FAKEPWD99', ['FAKEPWD99', 'meet.google.com']],
+  ['B finding 1: zoom url + Passcode: sentence', 'Webinar https://x.zoom.us/j/1?pwd=abc Passcode: 123456', ['pwd=abc', '123456', 'x.zoom.us']],
+  ['A low: Meeting password is sentence', 'Career webinar Meeting password is FAKEWORD8841', ['FAKEWORD8841']],
+  ['Passcode: digits only', 'Career webinar Passcode: 123456', ['123456']],
+  ['passcode with no delimiter', 'Career webinar passcode 987654', ['987654']],
+  ['bare conferencing host, no path', 'Career webinar join at us02web.zoom.us now', ['zoom.us']],
+  ['token and password key=value', 'Career webinar token=FAKETOKEN77 password=FAKEPW66', ['FAKETOKEN77', 'FAKEPW66']],
+  ['grouped passcode digits', 'Career webinar Passcode: 123 456 789', ['123', '456', '789']],
+];
+const c10Mail = async title => {
+  const dir = mkdtempSync(join(tmpdir(), 'lkb-h1-c10b-')), calls = [];
+  try {
+    const alert = canonicalOperationAlert('c10-t', {tenantId: 'tenant', status: 'queued', reason: 'interrupted-rejoining', interruption: {n: 1, outcome: 'rejoining'},
+      title, careerGuidance: true, testData: false});
+    await raiseAlert({stateDir: dir, tenantId: 'tenant', cfg: CFG, now: () => '2026-10-14T12:00:00.000Z', log: () => {}, gws: async args => {calls.push(args); return '{}';}}, alert);
+    assert.equal(calls.length, 1); const feed = readFileSync(join(dir, 'bot-events.jsonl'), 'utf8');
+    return {mail: decodeMail(calls[0]), feed};
+  } finally {rmSync(dir, {recursive: true, force: true});}
+};
+test('H1-C10: a credential in the meeting TITLE (url with pwd, scheme-less pwd link, passcode sentence) never reaches the decoded mail or the feed; the title still names the meeting', async () => {
+  for (const [name, title, secrets] of C10_TITLES) {
+    const {mail, feed} = await c10Mail(title), text = `${mail.subject}\n${mail.body}`;
+    for (const secret of secrets) {assert.ok(!text.includes(secret), `${name}: ${secret} in mail`); assert.ok(!feed.includes(secret), `${name}: ${secret} in feed`);}
+    assert.match(mail.subject, /Career webinar|Webinar/, `${name}: the subject still names the meeting`);
+  }
+});
+test('H1-C10: through the real recovery path, a title carrying a pwd link and a passcode sentence is redacted in the rejoin mail', () => withFixture(async f => {
+  serviceFixture(f);
+  seed(f, {[ID]: crashRow({title: 'Career webinar https://meet.google.com/abc-defg-hij?pwd=FAKEPWD99 Passcode: FAKEPASSCODE5521 or pwd=FAKEPWD99'})});
+  await restartAndDie(f); assert.equal(f.mails().length, 1);
+  const text = `${f.mails()[0].subject}\n${f.mails()[0].body}`;
+  for (const secret of ['FAKEPWD99', 'FAKEPASSCODE5521', 'meet.google.com']) assert.ok(!text.includes(secret), secret);
+  assert.match(f.mails()[0].subject, /Career webinar/);
+}, true));
+test('H1-C10: ordinary titles that mention the words are kept as they are', async () => {
+  for (const title of ['Password security for students', 'Pin your career goals', 'How to join a webinar: a guide']) {
+    const {mail} = await c10Mail(title); assert.ok(mail.subject.includes(title), `${title} -> ${mail.subject}`);
+  }
+});
+
+const STOP ={tenantId: 'fixture', sessionId: ID, generation: '11111111-1111-4111-8111-111111111111', reason: 'cancelled', requestedAt: '2026-09-30T12:10:00.000Z'};
 test('H1-C7: a row that already carries a stop request is never rejoined (a rejoin could not be stopped again); it keeps today handling and alert', () => withFixture(async f => {
   for (const [name, row] of [['recording + cancelled stop', crashRow({stopDisposition: STOP})],
     ['recording + controller-disconnected stop, acknowledged', crashRow({stopDisposition: {...STOP, reason: 'controller-disconnected', acknowledged: 'accepted'}})],
