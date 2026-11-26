@@ -60,6 +60,7 @@ This project runs dev work through the maker-checker pair:
 - **The maker↔checker handshake is files, never memory:** maker's request = manifest at
   `Status: ready-for-check` (with `Fix cycle: N`); checker's reply = `qa/verdicts/<same-slug>.md`
   (with `Cycle checked: N`); maker's close-out = manifest flip to `checked-PASS`.
+- **Lean arm (D-249, 2026-11-26):** when `AIOS_LEAN=1` is set (SessionStart prints `LEAN ARM ACTIVE`), this section's handshake, AUTO-CONTINUE and manual overrides are replaced by `D:/ai_os/.claude/skills/maker/references/lean-arm.md`: no new manifests, verdict files or ScheduleWakeup loops. The Lab Protocol rules above and the hard boundaries are unchanged.
 - **AUTO-CONTINUE (no human hand-crank):** on session start, if the hook line or `qa/` shows
   pending state (unchecked manifest · PASS not closed out · open issues / TODO queue rows ·
   stale `.last-tick`), run `/maker continue "D:\KnowledgeBase"` **before anything else**. The

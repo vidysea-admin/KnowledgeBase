@@ -116,9 +116,11 @@ if (Test-Path 'docs/FEATURES.jsonl') {
     Write-Output ("FEATURE CHANGED: " + $evt.feature + " " + $evt.event + " on " + $evt.date + " -- " + $evt.reason)
   }
 }
+# D-249 (Approved-by: Umesh): AIOS_LEAN=1 runs maker LITE; the AUTO-CONTINUE directive below is suppressed in that arm only.
+if ($env:AIOS_LEAN -ceq '1') { Write-Output "LEAN ARM ACTIVE (AIOS_LEAN=1): dev work runs maker LITE per D:/ai_os/.claude/skills/maker/references/lean-arm.md (build, test, one fresh reviewer, commit). Do not run /maker continue. Existing manifests and verdicts are history; a manifest still in a fix cycle is finished by the session that owns it." }
 if (Test-Path 'qa/.paused') {
   Write-Output ("PAUSED by user: " + (Get-Content 'qa/.paused' -TotalCount 1) + " - auto-continue SUSPENDED. Do not run /maker continue; the user lifts it with /maker resume (or by deleting qa/.paused).")
-} elseif ($pending.Count -or $unclosed.Count -or $asleep -or ($sweepAge -lt 0) -or ($sweepAge -gt 120)) {
+} elseif (($env:AIOS_LEAN -cne '1') -and ($pending.Count -or $unclosed.Count -or $asleep -or ($sweepAge -lt 0) -or ($sweepAge -gt 120))) {
   Write-Output ("AUTO-CONTINUE REQUIRED: pending maker-checker state found. Run /maker continue " + [char]34 + $ROOT + [char]34 + " BEFORE anything else this session (it reconciles close-outs, dispatches pending checks and the due sweep, then pulls the next unit and self-continues via ScheduleWakeup). Do not wait to be asked.")
 }
 exit 0
