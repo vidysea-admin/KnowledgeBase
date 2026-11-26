@@ -182,7 +182,7 @@ test('B10-C1: queued, recording, processing and ready captures send no failure a
     try {
       h.alerts.update('cap-z', {status, title: 'Career webinar', careerGuidance: true, testData: false}); await h.alerts.wait(); await h.ticks(2);
       assert.equal(h.failures().length, 0, status);
-      assert.deepEqual(h.mails().map(mail => mail.subject.split(':')[0]), status === 'ready' ? ['[LKB bot] Recording finished'] : [], status);
+      assert.deepEqual(h.mails().map(mail => mail.subject.split(' (session ')[0]), status === 'ready' ? ['[LKB bot] Recording finished'] : [], status);
     } finally {h.done();}
   }
   const directory = mkdtempSync(join(tmpdir(), 'lkb-b10-cfg-'));
@@ -224,7 +224,7 @@ test('B10-C3: the mail names the event and the matched name only; no secret from
     const reason = `admission_denied: ${secrets[5]} key ${secrets[0]} token ${secrets[1]} join https://meet.google.com/abc-defg-hij?${secrets[2]} passcode is ${secrets[3]} transcript: ${secrets[4]}`;
     h.alerts.update('cap-x', failedRow({reason, title: 'Career webinar https://meet.google.com/abc-defg-hij?pwd=TITLEPWD'})); await h.alerts.wait(); await h.ticks(2);
     assert.equal(h.mails().length, 1); const [mail] = h.mails(), text = `${mail.subject}\n${mail.body}`;
-    assert.match(mail.subject, /^\[LKB bot\] Recording FAILED: Career webinar \[link removed\]$/); assert.ok(mail.body.split('\n').includes('Coverage: admission_denied.'));
+    assert.equal(mail.subject, '[LKB bot] Recording FAILED (session cap-x)'); assert.ok(!text.includes('Career webinar'), 'ISS-H1SELFHEAL-002: no title in the mail'); assert.ok(mail.body.split('\n').includes('Coverage: admission_denied.'));
     for (const secret of [...secrets, 'TITLEPWD', 'meet.google.com']) { assert.ok(!text.includes(secret), secret); assert.ok(!h.logs.join('\n').includes(secret), `log: ${secret}`); }
     assert.ok(!JSON.stringify(h.inputs).includes('FAKE'), 'the alert input carries only the matched name');
   } finally {

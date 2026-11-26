@@ -194,3 +194,75 @@ test("ISS-AUTOJOIN-001 verbatim repro: 12 about-to-join then 12 capture-failed o
     assert.equal(emails(), 10, "later failures in the same hour are queued, not emailed");
   } finally { s.done(); }
 });
+
+/** ISS-H1SELFHEAL-002 (owner ruling 2026-11-26): the free-text meeting title never enters an alert mail; the mail names the reason and the session key. */
+const ISS_H1SELFHEAL_002_TITLES = [
+  // the ledger row's 7 leaking shapes, verbatim
+  "Career talk PIN 4455", "passcode - 445566", "passcode for the meeting is 667788", "Passcode：334455", "Access code 556677", "access_token=ATOKSEC", "api_key=AKEYSEC",
+  // the rest of the checker's probe list (verdict recorder-self-heal-rejoin.md, cycle 1, line 13)
+  "Career talk https://us02web.zoom.us/j/123?pwd=ZZPWD1 Passcode: 778899", "Passcode: 123 456", "meet.google.com/abc-defg-hij", "zoom.us/j/1?pwd=XQX", "PWD=PWDSEC",
+  "PASSCODE IS 5566", "pwd = PWDSEC2", "Passcode:\n 991122", "Pass code: 7788", "teams.microsoft.com/l/meetup-join/TEAMSSEC", "pwd%3DPCTSEC", "Talk (Passcode: 121314)", "Pwd: PWDSEC3",
+  "Password security for students", "Passcode hygiene workshop", "Intro to CS v2.0 - Q&A (Dr. Rao)",
+];
+const decodeMail = (call: string[]): { subject: string; body: string } => {
+  const mime = Buffer.from(JSON.parse(call[call.indexOf("--json") + 1]!).raw, "base64url").toString("utf8");
+  const [head, body] = mime.split("\r\n\r\n");
+  const subject = [...head!.matchAll(/=\?UTF-8\?B\?([^?]*)\?=/g)].map((m) => Buffer.from(m[1]!, "base64").toString("utf8")).join("");
+  return { subject, body: Buffer.from(body!.replace(/\r\n/g, ""), "base64").toString("utf8") };
+};
+/** Every word of 3+ characters from the title (so no part of it can hide), plus each digit run. */
+const titleParts = (t: string): string[] => [...new Set((t.match(/[\p{L}\p{N}_]{3,}/gu) ?? []).filter((w) => !/^(?:https|the|for|and)$/i.test(w)))];
+
+test("ISS-H1SELFHEAL-002: no part of the meeting title reaches the alert mail subject, body or digest; the mail names the reason and the session key", async () => {
+  const limits = { rateLimit: { emailPerHour: 500, failureEmailPerHour: 500, calendarMinGapSeconds: 60 } };
+  const s = setup(limits), base = setup(limits); // base renders the same alert with a neutral title
+  try {
+    let n = 0;
+    for (const title of ISS_H1SELFHEAL_002_TITLES) {
+      for (const a of [{ kind: "about-to-join" as const }, { kind: "capture-failed" as const, detail: "The bot did not start recording." },
+        { kind: "capture-failed" as const, interruption: { n: 1, outcome: "rejoining" as const } }]) {
+        const sessionKey = `cal:sess${n++}`;
+        await raiseAlert(s.deps, { ...A, ...a, sessionKey, title: `Zqtitle ${title}` });
+        await raiseAlert(base.deps, { ...A, ...a, sessionKey, title: "Neutral" });
+        const got = decodeMail(s.calls.filter((c) => c[0] === "gmail").at(-1)!), neutral = decodeMail(base.calls.filter((c) => c[0] === "gmail").at(-1)!);
+        const mail = `${got.subject}
+${got.body}`, neutralMail = `${neutral.subject}
+${neutral.body}`;
+        assert.equal(mail, neutralMail, `the title changed the mail for ${JSON.stringify(title)}`);
+        for (const part of ["Zqtitle", ...titleParts(title)]) assert.ok(!mail.includes(part) || neutralMail.includes(part), `title part ${JSON.stringify(part)} of ${JSON.stringify(title)} leaked: ${JSON.stringify(mail)}`);
+        assert.ok(got.subject.includes(sessionKey) && got.body.includes(sessionKey), `session key missing: ${JSON.stringify(mail)}`);
+        const reason = a.interruption ? "Recorder interrupted" : a.kind === "capture-failed" ? "Recording FAILED" : "Bot will join";
+        assert.ok(got.subject.includes(reason) && got.body.includes(reason), `reason missing: ${JSON.stringify(mail)}`);
+      }
+    }
+    // the hourly digest path: queue failures beyond the cap, then flush
+    const d = setup({ rateLimit: { emailPerHour: 6, failureEmailPerHour: 1, calendarMinGapSeconds: 60 } });
+    try {
+      for (const [i, title] of ISS_H1SELFHEAL_002_TITLES.entries()) await raiseAlert(d.deps, { kind: "capture-failed", ...A, sessionKey: `cal:dig${i}`, title: `Zqtitle ${title}` });
+      d.tick(6 * 60_000);
+      assert.equal(await flushFailureDigest(d.deps), true);
+      const { subject, body } = decodeMail(d.calls.filter((c) => c[0] === "gmail").at(-1)!);
+      const digest = `${subject}
+${body}`;
+      assert.ok(!digest.includes("Zqtitle"), `digest leaked the title: ${JSON.stringify(digest)}`);
+      for (const secret of ["4455", "445566", "667788", "334455", "556677", "ATOKSEC", "AKEYSEC", "778899", "ZZPWD1", "TEAMSSEC", "PWDSEC", "PCTSEC", "121314", "991122"])
+        assert.ok(!digest.includes(secret), `digest leaked ${secret}`);
+      assert.ok(body.includes(`cal:dig${ISS_H1SELFHEAL_002_TITLES.length - 1}`) && body.includes("Recording FAILED"), "digest names the session key and reason");
+    } finally { d.done(); }
+  } finally { s.done(); base.done(); }
+});
+
+test("ISS-H1SELFHEAL-002: a state file from before the change (pending digest row and queued retry still holding a title) mails no title", async () => {
+  const s = setup({ rateLimit: { emailPerHour: 6, failureEmailPerHour: 3, calendarMinGapSeconds: 60 } });
+  try {
+    const old = new Date(Date.parse(NOW) - 10 * 60_000).toISOString();
+    writeFileSync(path.join(s.stateDir, "autojoin-alert-state.ten-a.json"), JSON.stringify({ version: 1, done: {}, failed: {}, emailLog: [], failLog: [], digestLog: [], calendar: {},
+      pending: [{ sessionKey: "cal:old1", kind: "capture-failed", title: "LEGACYTITLE passcode 9911", at: old }],
+      retries: [{ tenantId: "ten-a", at: old, input: { kind: "capture-failed", sessionKey: "cal:retry1", title: "RETRYTITLE PIN 4455" } }] }));
+    assert.equal(await flushFailureDigest(s.deps), true);
+    const mails = s.calls.filter((c) => c[0] === "gmail").map(decodeMail), all = mails.map((m) => `${m.subject}\n${m.body}`).join("\n");
+    assert.equal(mails.length, 2, "the retry replay and the digest");
+    for (const leak of ["LEGACYTITLE", "RETRYTITLE", "9911", "4455"]) assert.ok(!all.includes(leak), `${leak} leaked: ${JSON.stringify(all)}`);
+    assert.ok(all.includes("cal:retry1") && all.includes("cal:old1") && all.includes("Recording FAILED"));
+  } finally { s.done(); }
+});

@@ -311,7 +311,7 @@ test('H1-C10: a link in a title is removed from the interruption subject by the 
     const alert = canonicalOperationAlert('c10-x', {tenantId: 'tenant', status: 'queued', reason: 'interrupted-rejoining', interruption: {n: 1, outcome: 'rejoining'},
       title: 'Career webinar https://meet.google.com/abc-defg-hij?pwd=FAKEPWD99', careerGuidance: true, testData: false});
     await raiseAlert({stateDir: dir, tenantId: 'tenant', cfg: CFG, now: () => '2026-10-14T12:00:00.000Z', log: () => {}, gws: async args => {calls.push(args); return '{}';}}, alert);
-    const [mail] = calls.map(decodeMail); assert.match(mail.subject, /\[link removed\]/);
+    const [mail] = calls.map(decodeMail); assert.equal(mail.subject, '[LKB bot] Recorder interrupted (session c10-x)'); // ISS-H1SELFHEAL-002: no title at all
     assert.ok(!`${mail.subject}${mail.body}`.includes('FAKEPWD99'));
   } finally {rmSync(dir, {recursive: true, force: true});}
 });
@@ -340,11 +340,12 @@ const c10Mail = async title => {
     return {mail: decodeMail(calls[0]), feed};
   } finally {rmSync(dir, {recursive: true, force: true});}
 };
-test('H1-C10: a credential in the meeting TITLE (url with pwd, scheme-less pwd link, passcode sentence) never reaches the decoded mail or the feed; the title still names the meeting', async () => {
+test('H1-C10: a credential in the meeting TITLE (url with pwd, scheme-less pwd link, passcode sentence) never reaches the decoded mail or the feed; the mail names the reason and session key, never the title (ISS-H1SELFHEAL-002)', async () => {
   for (const [name, title, secrets] of C10_TITLES) {
     const {mail, feed} = await c10Mail(title), text = `${mail.subject}\n${mail.body}`;
     for (const secret of secrets) {assert.ok(!text.includes(secret), `${name}: ${secret} in mail`); assert.ok(!feed.includes(secret), `${name}: ${secret} in feed`);}
-    assert.match(mail.subject, /Career webinar|Webinar/, `${name}: the subject still names the meeting`);
+    assert.ok(!/Career webinar|Webinar/.test(text) && mail.subject === '[LKB bot] Recorder interrupted (session c10-t)' && mail.body.includes('c10-t'), `${name}: ${text}`);
+    assert.match(feed, /Career webinar|Webinar/, `${name}: the dashboard feed still names the meeting (cleanBotText)`);
   }
 });
 test('H1-C10: through the real recovery path, a title carrying a pwd link and a passcode sentence is redacted in the rejoin mail', () => withFixture(async f => {
@@ -353,11 +354,12 @@ test('H1-C10: through the real recovery path, a title carrying a pwd link and a 
   await restartAndDie(f); assert.equal(f.mails().length, 1);
   const text = `${f.mails()[0].subject}\n${f.mails()[0].body}`;
   for (const secret of ['FAKEPWD99', 'FAKEPASSCODE5521', 'meet.google.com']) assert.ok(!text.includes(secret), secret);
-  assert.match(f.mails()[0].subject, /Career webinar/);
+  assert.ok(!text.includes('Career webinar') && f.mails()[0].subject.startsWith('[LKB bot] Recorder interrupted (session '), text); // ISS-H1SELFHEAL-002
 }, true));
-test('H1-C10: ordinary titles that mention the words are kept as they are', async () => {
+test('H1-C10: ordinary titles that mention the words are kept as they are in the feed, and stay out of the mail (ISS-H1SELFHEAL-002)', async () => {
   for (const title of ['Password security for students', 'Pin your career goals', 'How to join a webinar: a guide']) {
-    const {mail} = await c10Mail(title); assert.ok(mail.subject.includes(title), `${title} -> ${mail.subject}`);
+    const {mail, feed} = await c10Mail(title); assert.ok(!`${mail.subject}\n${mail.body}`.includes(title), `${title} -> ${mail.subject}`);
+    assert.equal(JSON.parse(feed.trim().split('\n').at(-1)).title, title, `${title}: cleanBotText keeps it in the feed`);
   }
 });
 

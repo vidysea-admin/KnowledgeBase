@@ -37,7 +37,7 @@ export interface AlertDeps { cfg: AutojoinConfig; stateDir: string; tenantId: st
 
 interface AlertState {
   version: 1; done: Record<string, string>; failed: Record<string, number>; emailLog: string[];
-  failLog: string[]; digestLog: string[]; pending: { sessionKey: string; kind: AlertKind; title: string; at: string; interrupted?: boolean }[];
+  failLog: string[]; digestLog: string[]; pending: { sessionKey: string; kind: AlertKind; at: string; interrupted?: boolean }[];
   calendar: Record<string, { eventId: string; lastAt: string; lines: string[]; eventAt?: string; kind?: AlertKind }>;
   /** Additive version-1 field: one-shot alerts survive a transport outage/restart. */
   retries: { tenantId: string; at: string; input: AlertInput }[];
@@ -125,8 +125,12 @@ function saveState(file: string, s: AlertState): void {
 
 const labelOf = (a: { kind: AlertKind; interruption?: unknown }): string => a.interruption ? "Recorder interrupted" : LABEL[a.kind];
 
-export function describeAlert(a: AlertInput): string {
-  const lines = [`${labelOf(a)}: ${cleanBotText(a.title, 200)}`];
+/** ISS-H1SELFHEAL-002: mail never carries the free-text title (a redactor over free text cannot be complete); it names the reason and the session key. */
+const mailSubject = (a: AlertInput): string => `[LKB bot] ${labelOf(a)} (session ${cleanBotText(a.sessionKey, 120)})`;
+
+/** `withTitle: false` is the mail form: the first line names the reason and the session key instead of the meeting title. */
+export function describeAlert(a: AlertInput, withTitle = true): string {
+  const lines = [withTitle ? `${labelOf(a)}: ${cleanBotText(a.title, 200)}` : `${labelOf(a)}. Session: ${cleanBotText(a.sessionKey, 120)}`];
   if (a.startTime) lines.push(`Scheduled: ${a.startTime}${a.endTime ? ` to ${a.endTime}` : ""}`);
   if (a.careerGuidance !== undefined) lines.push(a.careerGuidance ? `Topic: career guidance (priority)${a.matchedKeywords?.length ? `; matched: ${a.matchedKeywords.join(", ")}` : ""}` : "Topic: not career guidance (test data, staging only)");
   if (a.detail) lines.push(cleanBotText(a.detail, 300));
@@ -204,12 +208,12 @@ async function deliverAlert(deps: AlertDeps, a: AlertInput, flushDigest: boolean
     if (!fresh("email")) res.email = "duplicate";
     else if (a.testData && !cfg.alerts.emailTestData && !FAILURE.has(a.kind)) { st.done[key("email")] = nowIso; res.email = "skipped-test-data"; }
     else if (FAILURE.has(a.kind) && st.failLog.length >= cfg.rateLimit.failureEmailPerHour && a.interruption?.outcome !== "stopped") { // H1: the stop alert is never held for a digest
-      st.pending.push({ sessionKey: a.sessionKey, kind: a.kind, title: cleanBotText(a.title, 120), at: nowIso, ...(a.interruption ? { interrupted: true } : {}) }); st.done[key("email")] = nowIso; res.email = "digest-queued";
+      st.pending.push({ sessionKey: a.sessionKey, kind: a.kind, at: nowIso, ...(a.interruption ? { interrupted: true } : {}) }); st.done[key("email")] = nowIso; res.email = "digest-queued";
       log(`  alert email: failure cap (${cfg.rateLimit.failureEmailPerHour}/hour) reached; ${a.kind} queued for the hourly digest`);
     }
     else if (a.kind !== "rules-degraded" && !FAILURE.has(a.kind) && st.emailLog.length >= cfg.rateLimit.emailPerHour) { res.email = "rate-limited"; log(`  alert email rate-limited (${cfg.rateLimit.emailPerHour}/hour): ${a.kind} not emailed this tick`); }
     else try {
-      await sendAlertEmail(deps.gws, cfg.alerts.emailTo, `[LKB bot] ${labelOf(a)}: ${cleanBotText(a.title, 120)}`, text + "\n\n-- LKB bot (automatic alert)\n");
+      await sendAlertEmail(deps.gws, cfg.alerts.emailTo, mailSubject(a), describeAlert(a, false) + "\n\n-- LKB bot (automatic alert)\n");
       st.done[key("email")] = nowIso; if (a.kind !== "rules-degraded") (FAILURE.has(a.kind) ? st.failLog : st.emailLog).push(nowIso); res.email = "sent";
     } catch (e) { fail("email", e); res.email = "failed"; }
   }
@@ -241,7 +245,7 @@ async function deliverAlert(deps: AlertDeps, a: AlertInput, flushDigest: boolean
 async function sendDigestIfDue(deps: AlertDeps, st: AlertState, now: number): Promise<boolean> {
   const { cfg } = deps;
   if (!cfg.alerts.email || st.pending.length === 0 || st.digestLog.length > 0 || now - Date.parse(st.pending[0]!.at) < DIGEST_AFTER_MS) return false;
-  const lines = st.pending.map((p) => `- ${p.interrupted ? "Recorder interrupted" : LABEL[p.kind]}: ${p.title} (${p.at})`);
+  const lines = st.pending.map((p) => `- ${p.interrupted ? "Recorder interrupted" : LABEL[p.kind]}: session ${cleanBotText(p.sessionKey, 120)} (${p.at})`); // no title (ISS-H1SELFHEAL-002), even from an older state file
   try {
     const text = [`These failures exceeded the ${cfg.rateLimit.failureEmailPerHour}/hour individual email limit. Each is also on the dashboard and calendar.`, "", ...lines, "", "-- LKB bot (automatic alert)", ""].join("\n");
     await sendAlertEmail(deps.gws, cfg.alerts.emailTo, `[LKB bot] ${st.pending.length} more recording problem(s) (digest)`, text);
