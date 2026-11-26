@@ -3049,3 +3049,20 @@ Master is not pushed, and nothing is merged to master or to the archiver's main 
 - installing a new package
 - any enforcement path
 **Links:** D-227, D-247, plan section 6
+
+## D-249 | 2026-11-26 | type: decision | status: ACTIVE
+**What:** Switch this project's dev flow from the full maker-checker flow to maker LITE, activated by the environment variable `AIOS_LEAN=1` for any NEW Claude Code session opened in this repo. Maker LITE is the policy in `D:/ai_os/.claude/skills/maker/references/lean-arm.md`: build, test, one fresh reviewer, commit; no new manifests, verdict files or ScheduleWakeup loops. The full flow stays available: remove the env line and the repo behaves as before.
+**Why:** Evidence from the AIOS session, `D:/ai_os/umesh/research/2026-11-26-claude-code-harness-scaffolding/ab-phase-3.md`: LITE passed 3 of 3 replayed tasks, 32% cheaper, 60% faster, with no worse defects than the full flow. Measured in this repo on 2026-11-25: 116 of 145 commits were check/record files, not product code (the same pattern as the 2026-09-08 measurement behind the backlog priority override).
+**Result:** Applied in one commit after this entry. Hook test on both arms: AIOS_LEAN unset prints the same output as before; AIOS_LEAN=1 prints the LEAN ARM ACTIVE line and no AUTO-CONTINUE REQUIRED line. Carried state:
+- `recorder-self-heal-rejoin` is in fix cycle 1; it finishes its fix cycle and repair check under the full flow in the existing session that owns it.
+- `calendar-page-freshness` (T1) and `recorder-live-proof-object` (B4B) continue under LITE; their state is in docs/HANDOFF.md rows T1 and B4B.
+- goal-t013, goal-t045, goal-t057, goal-t058 and goal-u32 stay VERDICT: HOLD on their live gates; this decision lifts none of them.
+- Existing `qa/verdicts/` files are kept, because `scripts/lib/tracker-audit.mjs` reads those paths.
+- Rollback: delete the `"env": {"AIOS_LEAN": "1"}` block from `.claude/settings.local.json`. The hook lean branch and the CLAUDE.md line are inert without it.
+**Changes-authorized:** exactly three files:
+- `.claude/settings.local.json` (env block only)
+- `.claude/hooks/mc-sessionstart.ps1` (lean branch only; output unchanged when AIOS_LEAN is unset)
+- `.claude/CLAUDE.md` (one line in the maker-checker section, above the AUTO-CONTINUE paragraph)
+Not authorized: `.claude/settings.json`, ARCHITECTURE.md, contracts/, the Lab Protocol rules, the hard boundaries, the Backlog priority override, any change to existing manifests or verdicts.
+**Approved-by:** Umesh, 2026-11-26, in the AIOS session, answering "shall I make all three changes with a DECISIONS entry carrying Approved-by: Umesh?": "haan teeno changes kar do, manifests pehle check karwa do". The manifest checks were then run by this repo's own session: wa-dockerfile PASS, wa-c3ab-integration PASS; recorder-self-heal-rejoin is in fix cycle 1.
+**Links:** D-006, D-014, D-248, docs/HANDOFF.md (rows T1, B4B), D:/ai_os/.claude/skills/maker/references/lean-arm.md, D:/ai_os/umesh/research/2026-11-26-claude-code-harness-scaffolding/ab-phase-3.md
