@@ -99,7 +99,7 @@ export function createAudioWatchdog(deps: AudioWatchdogDeps): AudioWatchdog {
     const silentForSec = (deps.now() - lastAudibleAt) / 1000;
     if (silentForSec <= SILENT_TRIGGER_SEC) return;
     alarmed = true; // gates both calls below until the next confirmed non-silent reading
-    log(`audio-watchdog: silent for ${Math.round(silentForSec)}s — alerting + reconnecting`);
+    log(`audio-watchdog: silent for ${Math.round(silentForSec)}s — alerting (reconnect per backend)`);
     deps.notifySilence(silentForSec);
     deps.reconnect();
   }
