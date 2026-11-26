@@ -16,7 +16,7 @@ function badgeClass(status: Gap["status"]): string {
   return "badge badge-bad";
 }
 
-type Panel<T> = { state: "loading" } | { state: "ok"; data: T } | { state: "error"; note: string };
+type Panel<T> = { state: "loading" } | { state: "ok"; data: T } | { state: "error"; note: string; forbidden?: boolean } | { state: "hidden" };
 
 /** One short inline note per failed panel. 503 is the unconfigured-hosting case (`hosting_unavailable`). */
 function failureNote(label: string, err: unknown): string {
@@ -45,13 +45,18 @@ export function DashboardPage(): React.ReactElement {
     const track = <T, U>(label: string, load: Promise<T>, pick: (v: T) => U, set: (p: Panel<U>) => void): void => {
       load.then(
         (v) => { if (!cancelled) set({ state: "ok", data: pick(v) }); },
-        (err: unknown) => { if (!cancelled) set({ state: "error", note: failureNote(label, err) }); },
+        (err: unknown) => {
+          if (!cancelled) set({ state: "error", note: failureNote(label, err), forbidden: err instanceof ApiError && err.status === 403 });
+        },
       );
     };
     setSessions({ state: "loading" }); setSources({ state: "loading" }); setKeys({ state: "loading" }); setGaps({ state: "loading" });
     track("Sessions", listSessions(apiKey), (r) => r.sessions, setSessions);
     track("Sources", listSources(apiKey), (r) => r.sources.length, setSources);
-    track("API keys", listKeys(apiKey), (r) => r.keys.filter((k) => !k.revokedAt).length, setKeys);
+    // `keys` is an operator-only scope (OPERATOR_ONLY_SCOPES in user-accounts/roles.ts): no signed-in role
+    // ever holds it, so a 403 here is the expected answer for a user session, not a failure. Hide the panel.
+    track("API keys", listKeys(apiKey), (r) => r.keys.filter((k) => !k.revokedAt).length, (p) =>
+      setKeys(p.state === "error" && p.forbidden ? { state: "hidden" } : p));
     track("Knowledge health", listGaps(apiKey), (r) => r.gaps, setGaps);
     return () => { cancelled = true; };
   }, [apiKey]);

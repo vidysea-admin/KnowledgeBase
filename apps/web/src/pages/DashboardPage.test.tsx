@@ -85,6 +85,26 @@ describe("DashboardPage", () => {
     expect(screen.getByText(/no recording yet/)).toBeInTheDocument();
   });
 
+  test("a 403 on /keys (signed-in user; keys is operator-only) hides the panel with no error note", async () => {
+    mockAll();
+    vi.spyOn(keysApi, "listKeys").mockRejectedValue(new ApiError(403, 'this key is missing the required "keys" scope'));
+    renderPage();
+    await waitFor(() => expect(screen.getByText("Newer Session")).toBeInTheDocument());
+    await waitFor(() => expect(screen.queryByText(/Loading/)).not.toBeInTheDocument());
+    expect(screen.queryByText(/API keys unavailable/)).not.toBeInTheDocument();
+    expect(screen.queryByRole("note")).not.toBeInTheDocument();
+    expect(screen.queryByText("Active API keys")).not.toBeInTheDocument();
+    expect(screen.getByText("Sessions")).toBeInTheDocument();
+    expect(screen.getByText("Open gaps")).toBeInTheDocument();
+  });
+
+  test("a 403 on another panel (/gaps) still shows its note: only /keys hides on 403", async () => {
+    mockAll();
+    vi.spyOn(gapsApi, "listGaps").mockRejectedValue(new ApiError(403, 'this key is missing the required "gaps" scope'));
+    renderPage();
+    await waitFor(() => expect(screen.getByText(/Knowledge health unavailable/)).toBeInTheDocument());
+  });
+
   test("a failed /gaps only blanks the knowledge-health panel", async () => {
     mockAll();
     vi.spyOn(gapsApi, "listGaps").mockRejectedValue(new ApiError(500, "boom"));
