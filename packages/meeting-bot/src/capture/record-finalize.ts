@@ -247,7 +247,14 @@ export function normalizeCapture(video: string, lean = false): string {
   if (normalized.status !== 0) throw new Error("WebM finalization failed; original stream retained");
   return normalizeLeanCapture(output, { enabled: lean, log: message => console.log(message) });
 }
-export function processRecordingArtifacts(video: string, sessionId: string, rest: string[]): void {
+/** Plan A7 (D-257): argv for the --index step. LKB_INDEX_PRODUCTION=1 (exactly) forwards D-204's production flag; the
+  * other two parts of that opt-in (MONGODB_DB=lkb_prod, MONGO_WORK_DB=lkb_prod) are still checked by sync-session.mjs itself. */
+export function syncSessionIndexArgs(sessionId: string, env: Record<string, string | undefined> = process.env): string[] {
+  const args = [path.join(REPO_ROOT, "scripts", "webinar", "sync-session.mjs"), sessionId, "--emit-files", "--index"];
+  return env.LKB_INDEX_PRODUCTION === "1" ? [...args, "--i-know-this-is-production"] : args;
+}
+/** `run` is the process seam (tests); production always uses spawnSync. */
+export function processRecordingArtifacts(video: string, sessionId: string, rest: string[], run: typeof spawnSync = spawnSync): void {
   if (!rest.includes("--process-video")) return;
   if (!rest.includes("--transcribe")) throw new Error("--process-video requires --transcribe");
   const state = path.join(REPO_ROOT, "data", "toc-migrated", sessionId, "pipeline-state.json");
@@ -256,19 +263,18 @@ export function processRecordingArtifacts(video: string, sessionId: string, rest
   const report = (status: string, error?: string) => writeFileSync(state, JSON.stringify({ ...proof, sessionId, stage, status, error, updatedAt: new Date().toISOString() }) + "\n");
   report("processing");
   try {
-    const processed = spawnSync("node", [path.join(REPO_ROOT, "scripts", "webinar", "process-video.mjs"),
+    const processed = run("node", [path.join(REPO_ROOT, "scripts", "webinar", "process-video.mjs"),
       sessionId, "--recording", path.relative(REPO_ROOT, video)], { cwd: REPO_ROOT, stdio: "inherit", timeout: 3_600_000 });
     if (processed.status !== 0) throw new Error("screen processing failed; recording retained for retry");
     if (rest.includes("--index")) {
       stage = "index"; report("processing");
-      const indexed = spawnSync("node", [path.join(REPO_ROOT, "scripts", "webinar", "sync-session.mjs"),
-        sessionId, "--emit-files", "--index"], { cwd: REPO_ROOT, stdio: "inherit", timeout: 3_600_000 });
+      const indexed = run("node", syncSessionIndexArgs(sessionId), { cwd: REPO_ROOT, stdio: "inherit", timeout: 3_600_000 });
       if (indexed.status !== 0) throw new Error("knowledge indexing failed; retry from retained artifacts");
       proof = validateIndexProof(path.dirname(state), sessionId);
     }
     report("done");
   } catch (error) { report("failed", String(error)); throw error; }
 }
-export function validateIndexProof(dir: string, sessionId: string, expectedWorkDb = process.env.MONGO_WORK_DB): Record<string, unknown> {
+export function validateIndexProof(dir: string, sessionId: string, expectedWorkDb = process.env.MONGO_WORK_DB?.trim()): Record<string, unknown> {
   return validateCaptureIndexProof(dir, sessionId, expectedWorkDb);
 }
