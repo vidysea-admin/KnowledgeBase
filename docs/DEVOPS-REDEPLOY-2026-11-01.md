@@ -233,7 +233,7 @@ WhatsApp, with an API key that has scope `whatsapp-admin` (`read -rs K`, then `-
 | `LKB_INDEX_PRODUCTION` | bot | `1` | Forwards D-204's production flag from the recorder (A7) and the calendar scheduler (A8). Without it notes never reach `lkb_prod`. | `record-finalize.ts`, `run-pipeline.mjs` (`validateRunGate`), `graph-finalize.mjs` |
 | `GEMINI_API_KEY` | API + bot | **Secret.** The API already reads it as a secret reference; the bot gets the same Secret Manager secret (no new key). | Transcript (Gemini). | `transcribe-long-session.mjs:65` |
 | `OLLAMA_API_KEY` | API + bot | **Secret.** The API already reads it (Ollama cloud, `https://ollama.com`, no Ollama server needed); the bot gets the same Secret Manager secret. | KB notes (summarize, claims, topics: `config/ai-routing.yaml`) and slide vision (`vision/plan.mjs`). The start-up check refuses the queue with indexing, the calendar, and record-once `--process-video` without it (exit 78). | `production.ts:93`, `vision/chain.ts:242` |
-| `LKB_STATE_BUCKET` | bot | `vidysea-prod-kb-bot` `[ASSUMPTION: proposed name; created in Phase C]`, with a lifecycle rule that deletes `recorder/recordings/` after N days (Umesh gives N; default proposal 30) | Signed-in Chrome profile, state, lease and recordings. | `entrypoint.sh:72` |
+| `LKB_STATE_BUCKET` | bot | `vidysea-prod-kb-bot` `[ASSUMPTION: proposed name; created in Phase C]`, with a lifecycle rule that deletes `recorder/recordings/` after **30 days** (Umesh, 2026-11-27) | Signed-in Chrome profile, state, lease and recordings. | `entrypoint.sh:72` |
 | `LKB_STATE_PREFIX` | bot | `recorder` (the default) | Object prefix in the bucket. | `entrypoint.sh:73` |
 | `LKB_SEND_NOW_QUEUE` | API + bot | `1` on both | Turns the pasted-link queue on (API) and the queue loop on (bot, run mode). | `send-now-queue.ts:118`, `entrypoint.sh:87` |
 | `LKB_SEND_NOW_INDEX` | bot | `1` | A pasted-link job also runs `--process-video --index`. | `queue-worker.ts:34` |
@@ -245,16 +245,18 @@ WhatsApp, with an API key that has scope `whatsapp-admin` (`read -rs K`, then `-
 | `LKB_SLOT_READINESS` | bot | leave unset (machine check: the live-proof recording must hold audio and video). `operator` brings back the person's signed slot acceptance and then needs 2 to 8 slots in `LKB_CAPTURE_SLOTS`. | D-257 answer 2. | `calendar-attendance-source.mjs` `checkCalendarAttendanceReady` |
 | `LKB_API_URL` | bot | `https://vidysea-knowledgebase-5z2zofynhq-el.a.run.app/knowledgebase/api` `[ASSUMPTION: path checked in the Phase C dry run with one GET /webinar-operations]` | Hosted API for the calendar, join rules and tenant check. Defaults to `localhost:3300`. | `run-pipeline-deps.mjs:32` |
 | `LKB_API_KEY` | bot | **Secret.** Created once with `MONGODB_DB=lkb_prod node scripts/mint-key.mjs --tenant toc --label kb-bot --i-know-this-is-production` (writes one hashed key row to `lkb_prod`: needs Umesh's yes), then piped straight into Secret Manager `lkb-prod-bot-api-key`, never printed to chat. | The bot's key for the API (calendar mode). | `run-pipeline-deps.mjs:43` |
-| `LKB_ATTENDANCE_ACCOUNT` | bot | **Umesh gives it:** the Google account the bot signs in as in Phase B, and whose calendar it attends. | Calendar auto-join (finish-line test 2). | `entrypoint.sh:85` |
+| `LKB_ATTENDANCE_ACCOUNT` | bot | The bot account Umesh named on 2026-11-27 (the one signed in during Phase B; given in chat, not written here because `origin` is public). | Calendar auto-join (finish-line test 2). | `entrypoint.sh:85` |
 | `LKB_JOIN_RULES_ENFORCE` | bot | `fail-closed` | Join-rule mode; required in calendar mode. | `run-pipeline.mjs:63`, `deps-runtime.mjs:60` |
 | `LKB_AUTOJOIN_DISCOVERY`, `LKB_AUTOJOIN_WEBINARS`, `LKB_AUTOJOIN_CAREER_PRIORITY`, `LKB_AUTOJOIN_TEST_DATA_ROUTING` | bot | `true` (all four) | The auto-join flags; `run-pipeline.mjs:67` refuses otherwise. | `autojoin/config.ts:63-66` |
+| `LKB_BROWSER_PROFILE_DIRECTORY` | bot | `Profile 1` | **Found in Phase B (2026-11-27).** When the bot account signs in, Chrome moves the Google account into a new subprofile `Profile 1`; `Default` keeps only signed-out cookies. Without this setting the recorder opens `Default`, Meet shows "What's your name?" and the bot waits as a guest until the job ends. Check after every new sign-in: `Local State` → `profile.last_used`. | `browser-profile.ts:25` (`selectedBrowserProfile`), `sb_join_profile.py` |
+| `LKB_CAPTURE_APPROVED_BY`, `LKB_CAPTURE_APPROVAL_REF`, `LKB_CAPTURE_RECORDED_BY` | bot | `Umesh`, `D-257`, `kb-bot` | **Found in Phase B.** The recorder refuses every job with "Invalid or mismatched live capture consent receipt" when they are unset. Existing record code; only the values are set here (D-210: the code is not changed). | `record-consent/context.ts` (`createRecordConsent`) |
 | `VNC_PASSWORD` | bot | **Secret, one-time.** Claude generates a random one on the laptop for the Phase B sign-in only; it is never stored. Not set on the server. | `BOT_MODE=login` only. | `entrypoint.sh:64` |
 
 ### Alerts
 
 | Name | Where | Value / who fills | Why |
 |---|---|---|---|
-| `LKB_ALERT_EMAIL`, `LKB_ALERT_EMAIL_TO` | bot | `true`; **Umesh gives the address** that should get failure and slot-readiness alerts (D-257). | Alert mail through gws. |
+| `LKB_ALERT_EMAIL`, `LKB_ALERT_EMAIL_TO` | bot | `true`; the address is the bot account itself (Umesh, 2026-11-27, given in chat; not written here because this repo's `origin` is public). | Alert mail through gws. |
 | `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID` | bot | Optional. Leave unset unless Umesh wants Telegram too (no token = alerts off, logged once). | Telegram alerts. |
 
 ### Leave alone or unset
@@ -327,6 +329,17 @@ Before starting:
 
    Umesh reads it before Phase C. In Phase C this recording and the signed-in profile go to the bucket through `BOT_MODE=publish-proof`.
 7. Anything that breaks is fixed as code with tests, and steps 4 and 5 are repeated until one run is clean. Then all containers are stopped and removed.
+
+### What Phase B found (2026-11-27, real Meet, image `lkb-bot:bot-live-a92fff86`)
+
+| # | Found | Effect | Fix |
+|---|---|---|---|
+| B-1 | The three capture-approval settings were missing from this list. | Every job failed: "Invalid or mismatched live capture consent receipt". | Settings rows added above (values only; the code is not changed, D-210). |
+| B-2 | A container stopped with `docker rm -f` leaves `SingletonLock/Cookie/Socket` in the profile, naming the old container's hostname. The bucket path skips them on restore and snapshot; the laptop (no-bucket) start does not remove them. | The next Chrome start fails: "cannot connect to chrome at 127.0.0.1:9222". | Laptop: remove `Singleton*` before a start. Server: covered by the bucket restore. Code fix for the no-bucket start: see the plan's after-live list. |
+| B-3 | Chrome moved the signed-in Google account into `Profile 1`; the recorder opened `Default`. A first sign-in at 12:38 also ended up signed out (`Default` lost its `SID` cookies), cause not proven. | The bot reached Meet as a guest ("What's your name?") and never joined. | `LKB_BROWSER_PROFILE_DIRECTORY=Profile 1` (row above). Proven: a restarted browser on `Profile 1` opens Meet signed in, and the bot then joined the real Meet. |
+| B-4 | The transcript coverage check counts every 30 s span without speech as missing speech, including silence at the start, in a break or at the end. | A 7.2 min recording with audio and video (vp8 + opus, mean -25 dB) and a complete Gemini transcript (36 turns, to the last second) was refused: "unresolved transcript leading gap" (the host was muted for the first 3 minutes). Most real meetings would fail the same way. | Being fixed on `wave/silence-coverage`: spans that ffmpeg measures as silent are not counted as missing speech; audible spans without a transcript are still refused. |
+
+Measured on the real Meet at 2 vCPU / 4 GB: about 37% CPU and 1.66 GB memory while recording. The 4 GB size holds.
 
 ## Server bot: Phase C, the cloud batch (dry run first; nothing is applied before Umesh's yes)
 
