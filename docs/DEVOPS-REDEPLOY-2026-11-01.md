@@ -347,6 +347,33 @@ The dry run is the list below. Each item shows its exact command, and the read-o
 | C9 | Server proof: `BOT_MODE=record-once` in a Meet Umesh hosts. Shows whether Google asks the server for "verify it's you" and whether Admit works from the server | redeploy with record-once settings | redeploy doctor |
 | C10 | Run mode: queue and calendar on | redeploy with run settings | scale to 0 |
 
+**Read-only facts, 2026-11-27, after `gcloud auth login` (names only, no value printed):**
+
+- **Worker pools:** none exist yet. The listing in `asia-south1` answers without error, so the region offers them.
+- **Bucket:** no bot bucket exists.
+- **Service account:** no `kb-bot` account exists.
+- **Required APIs:** run, cloudbuild, secretmanager, storage, artifactregistry and iam are all on.
+- **Image repository:** Artifact Registry `cloud-run-source-deploy` in `asia-south1`.
+- **API service `vidysea-knowledgebase` (container `api`, 1 vCPU, 1 GiB):**
+  - Two values come from Secret Manager:
+    - `AUTH_CSRF_SECRET` from `lkb-prod-auth-csrf`.
+    - `GEMINI_API_KEY` from `lkb-prod-web-grounding`.
+  - Everything else is a **plain env var** on the service, including `MONGODB_URL`, `OLLAMA_API_KEY`, `ANTHROPIC_API_KEY` and the WhatsApp Mongo URL. Anyone who can view the service in the console can read them.
+  - Other plain values: `WEBINAR_VISION_MODEL=gemini-2.5-flash` and `OLLAMA_CLOUD_BASE_URL`.
+  - The service runs as the default compute service account.
+- **Network:** the API uses Direct VPC egress: network `vidysea-prod-vpc`, subnet `vidysea-prod-subnet-1`, `vpc-access-egress=all-traffic`, gen2.
+  - The worker pool takes the **same network settings**, so it reaches Mongo the way the API does. `[ASSUMPTION: Mongo allows the VPC's address; proven by the doctor-mode start in C8]`
+
+What this changes in the batch:
+
+| Item | Change |
+|---|---|
+| C3 | Unchanged: `lkb-prod-mongodb-url` is still created, and its value is copied from the API service's plain env var. |
+| C5 | `GEMINI_API_KEY` for the bot comes from the existing secret `lkb-prod-web-grounding`. |
+| C5 | For `OLLAMA_API_KEY` there is no secret today. Claude creates `lkb-prod-ollama-api-key` from the API service's plain value, without printing it. No new key is made. |
+| C8 | Add `--network vidysea-prod-vpc --subnet vidysea-prod-subnet-1 --vpc-egress all-traffic`. |
+| Later (not this batch) | Moving the API's plain keys into Secret Manager, and giving the API its own service account, are after-live items. |
+
 Umesh gives three things with the yes:
 - N, the number of days recordings are kept (30 is the proposal);
 - the alert address;
