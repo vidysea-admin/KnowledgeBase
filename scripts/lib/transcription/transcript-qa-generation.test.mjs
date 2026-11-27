@@ -73,3 +73,14 @@ test("privacy generation intervals must be finite, ordered and inside audio", ()
     assert.throws(() => buildTranscriptQaGeneration({ ...args(), privacy: { receiptSha256: "a".repeat(64), sanitizedAudioSha256: "b".repeat(64), publicIntervals } }), /privacy/);
   }
 });
+
+test("silence evidence is optional, strictly shaped and bound to the recording duration", () => {
+  const silence = { version: 1, detector: "ffmpeg-silencedetect", noiseDb: -50, minSeconds: 10, audioSha256: "a".repeat(64), intervals: [{ tStart: 0, tEnd: 4 }] };
+  assert.equal(buildTranscriptQaGeneration(args()).silence, undefined);
+  assert.deepEqual(buildTranscriptQaGeneration({ ...args(), silence }).silence, silence);
+  for (const patch of [{ version: 2 }, { detector: "" }, { noiseDb: "x" }, { minSeconds: 0 }, { audioSha256: "z" }, { intervals: null },
+    { intervals: [{ tStart: 4, tEnd: 1 }] }, { intervals: [{ tStart: 0, tEnd: 5 }, { tStart: 4, tEnd: 6 }] }, { intervals: [{ tStart: 0, tEnd: 11 }] }, { extra: true }]) {
+    assert.throws(() => buildTranscriptQaGeneration({ ...args(), silence: { ...silence, ...patch } }), /QA report: invalid silence evidence/, JSON.stringify(patch));
+  }
+  assert.throws(() => buildTranscriptQaGeneration({ ...args(), silence: null }), /invalid silence evidence/);
+});

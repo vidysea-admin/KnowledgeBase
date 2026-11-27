@@ -1,10 +1,9 @@
 #!/usr/bin/env node
 /**
- * scripts/transcribe-long-session.mjs — T-003 long-audio-chunking. For a session whose real
- * audio exceeds a single request, extracts bounded chunks and recovers incomplete tails.
+ * scripts/transcribe-long-session.mjs — T-003 long-audio-chunking. For audio exceeding one request, extracts bounded chunks and recovers incomplete tails.
  * Single-call opt-in attempts once before fallback. Current durable capture receipt and proved
- * immutable public media guard upload; intentional private silence never becomes missing speech.
- * Public turns and original provider-anomaly audits stay generation-bound. No synthetic turns.
+ * immutable public media guard upload; private windows and ffmpeg-confirmed silence of the hashed snapshot
+ * (persisted in transcript-qa.json) never become missing speech. Audits stay generation-bound. No synthetic turns.
  *
  * Usage: node scripts/transcribe-long-session.mjs <sessionId> [chunkSeconds=2400] [--allow-partial] [--range START:END]
  *
@@ -33,7 +32,7 @@ import { immutableTranscriptTurns, writeTranscriptGeneration } from "./lib/trans
 import { validateTurns } from "./webinar/process-video.mjs";
 import { dispatchRecordingTranscription } from "./lib/transcription/recording-dispatch.mjs";
 import { buildTranscriptQaGeneration } from "./lib/transcription/transcript-qa-generation.mjs";
-import { loadTrustedRecordingPrivacy, recordingSpanCoverage, readSealedCaptureInput, resolveSealedCaptureAudio } from "./lib/transcription/private-recording.mjs";
+import { loadTrustedRecordingPrivacy, recordingSpanCoverage, readSealedCaptureInput, resolveSealedCaptureAudio, snapshotSilenceEvidence } from "./lib/transcription/private-recording.mjs";
 import {
   SINGLE_CALL_FLAG, TRANSCRIPT_QA_FLAG, flagOn, applyTranscriptQa, summariseQaReport, planTranscriptionPath,
   boundariesForPlan, GAP_THRESHOLD_SECONDS, SHORTFALL_THRESHOLD_SECONDS,
@@ -136,7 +135,7 @@ async function main() {
 
   const tmpDir = mkdtempSync(join(tmpdir(), "lkb-chunk-"));
   const snapshotAudioPath = join(tmpDir, `recording${ext}`);
-  let audioSha256;
+  let audioSha256, silence = null; // silence: evidence for the hashed snapshot, set before any provider call; null == full guard
   const spanQaReports = []; // T-044: per-attempt clamp reports (the merged report no longer sees drift already clamped per span)
   const providerAttempts = [];
   const protocolRequests = { upload: 0, poll: 0, generate: 0 };
@@ -144,7 +143,7 @@ async function main() {
     protocolRequests[req.method === "GET" ? "poll" : req.url.includes(":generateContent") ? "generate" : "upload"]++;
     return realUploadTransport(req);
   };
-  const coverage = (turns, offsetSeconds, durationSeconds) => recordingSpanCoverage({ privacy, turns, offsetSeconds, durationSeconds, findTimeGaps, gapThresholdSeconds: GAP_THRESHOLD_SECONDS, tailThresholdSeconds: SHORTFALL_THRESHOLD_SECONDS });
+  const coverage = (turns, offsetSeconds, durationSeconds, silent = silence?.intervals ?? [], requireTurns = false) => recordingSpanCoverage({ privacy, turns, offsetSeconds, durationSeconds, findTimeGaps, gapThresholdSeconds: GAP_THRESHOLD_SECONDS, tailThresholdSeconds: SHORTFALL_THRESHOLD_SECONDS, silentIntervals: silent, requireTurns });
   const privacyProof = privacy ? { receiptSha256: privacy.receiptSha256, sanitizedAudioSha256: privacy.sanitizedAudioSha256, publicIntervals: privacy.publicIntervals } : undefined;
 
   function checkedAttempt(once, mediaDurationSeconds, label, attempt, offsetSeconds) {
@@ -192,7 +191,7 @@ async function main() {
    * tail; never throws on incompleteness, just returns the best it could get. */
   async function transcribeSpan(spanStart, spanEnd, depth, label) {
     const spanDuration = spanEnd - spanStart;
-    if (privacy && !coverage([], spanStart, spanDuration).expectedPublicSeconds) return [];
+    if (privacy && !coverage([], spanStart, spanDuration, []).expectedPublicSeconds) return []; // private-window skip only; silence never skips the provider
     const spanPath = join(tmpDir, `span-${label}${ext}`);
     ffmpegExtractChunk(snapshotAudioPath, spanStart, spanEnd, spanPath);
     const mediaDurationSeconds = Math.min(ffprobeDurationSeconds(spanPath), spanDuration);
@@ -252,9 +251,10 @@ async function main() {
     audioSha256 = createHash("sha256").update(readFileSync(snapshotAudioPath)).digest("hex");
     if (privacy && audioSha256 !== privacy.sanitizedAudioSha256) throw new Error("Immutable audio is not the proved public capture");
     if (ffprobeDurationSeconds(snapshotAudioPath) !== durationSeconds) throw new Error("recording changed before transcription; publication refused");
+    silence = snapshotSilenceEvidence({ audioPath: snapshotAudioPath, audioSha256, durationSeconds, log: console.log });
     dispatch = await dispatchRecordingTranscription({ plan, durationSeconds, chunkedBoundaries, log: console.log,
       singleAttempt: async () => checkedAttempt(await transcribeSpanOnce(readFileSync(snapshotAudioPath), "single-a1", durationSeconds), durationSeconds, "single", 1, 0).turns,
-      complete: turns => { const c = coverage(turns, 0, durationSeconds); return c.leadingShortfall <= GAP_THRESHOLD_SECONDS && c.complete; },
+      complete: turns => { const c = coverage(turns, 0, durationSeconds, undefined, true); return c.leadingShortfall <= GAP_THRESHOLD_SECONDS && c.complete; },
       chunkAttempt: (start, end, i) => transcribeSpan(start, end, 0, `c${i}`),
     });
     if (dispatch.provenance.actualPath === "single") {
@@ -276,9 +276,8 @@ async function main() {
   const turnsPath = join(DATA_DIR, sessionId, "turns.json");
   const existingTurns = existsSync(turnsPath) ? JSON.parse(readFileSync(turnsPath, "utf8")) : [];
 
-  if (mergedTurns.length === 0 && existingTurns.length > 0) {
-    throw new Error(`merged 0 turns for "${sessionId}" but ${existingTurns.length} existing turn(s) are on disk — refusing to overwrite.`);
-  }
+  if (mergedTurns.length === 0) throw new Error(existingTurns.length > 0 ? `merged 0 turns for "${sessionId}" but ${existingTurns.length} existing turn(s) are on disk — refusing to overwrite.`
+    : "recording captured no transcript turns; publication refused"); // a capture of nothing never publishes, even if all silent
 
   const lastTEnd = mergedTurns.length > 0 ? mergedTurns[mergedTurns.length - 1].tEnd : 0;
   const coveragePercent = ((lastTEnd / durationSeconds) * 100).toFixed(1);
@@ -306,14 +305,14 @@ async function main() {
 
   validateTurns(immutableTranscriptTurns(tenantId, sessionId, mergedTurns), durationSeconds, { tenantId, sessionId });
   // Validate report structure before transcript publication; the final proof uses actual committed bytes below.
-  if (qa.report) buildTranscriptQaGeneration({ turnsBytes: Buffer.alloc(0), durationSec: durationSeconds, spans: spanQaReports, merged: qa.report, privacy: privacyProof });
+  if (qa.report) buildTranscriptQaGeneration({ turnsBytes: Buffer.alloc(0), durationSec: durationSeconds, spans: spanQaReports, merged: qa.report, privacy: privacyProof, silence: silence ?? undefined });
   await privacy?.verifyCurrent();
   if (qaOn || singleOn || privacy) publishJson(join(DATA_DIR, sessionId, "validation.json"), { stage: "transcript", status: "failed", transcriptValidated: false,
     error: "new transcript/QA generation requires independent validation" });
   const realTurns = writeTranscriptGeneration(join(DATA_DIR, sessionId), tenantId, sessionId, mergedTurns);
   console.log(`wrote ${realTurns.length} real diarized turns -> ${turnsPath} (replaced ${existingTurns.length} placeholder turn(s))`);
   const turnsBytes = readFileSync(turnsPath);
-  if (qa.report) publishJson(join(DATA_DIR, sessionId, "transcript-qa.json"), buildTranscriptQaGeneration({ turnsBytes, durationSec: durationSeconds, spans: spanQaReports, merged: qa.report, privacy: privacyProof }));
+  if (qa.report) publishJson(join(DATA_DIR, sessionId, "transcript-qa.json"), buildTranscriptQaGeneration({ turnsBytes, durationSec: durationSeconds, spans: spanQaReports, merged: qa.report, privacy: privacyProof, silence: silence ?? undefined }));
   if (singleOn) publishJson(join(DATA_DIR, sessionId, "transcription-path.json"), { version: 1, tenantId, sessionId,
     ...dispatch.provenance, model: process.env.GEMINI_STT_MODEL || "gemini-3.5-flash", durationSeconds,
     audioSha256,

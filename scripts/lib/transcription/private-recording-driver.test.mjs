@@ -5,6 +5,8 @@ import { copyFileSync, mkdirSync, readFileSync, writeFileSync, existsSync } from
 import path from "node:path";
 import { pathToFileURL } from "node:url";
 import { spawnSync } from "node:child_process";
+import { createHash } from "node:crypto";
+import { detectSilentIntervals } from "./private-recording.mjs";
 import { createPrivateRecordingFixture } from "../../../qa/evidence/t048-private-capture/fixture.mjs";
 import { validateSession } from "../../webinar/validate/validate-session.mjs";
 import { loadWebinarSession } from "../../webinar/session-rows.mjs";
@@ -30,7 +32,7 @@ function hookSource(f) {
   const provider = `import{appendFileSync}from'node:fs';import{createHash}from'node:crypto';
 export async function uploadFile(bytes,mime,tr){appendFileSync(process.env.TRACE,JSON.stringify({sha256:createHash('sha256').update(bytes).digest('hex')})+'\\n');await tr({method:'POST',url:'https://fixture.invalid/upload'});await tr({method:'PUT',url:'https://fixture.invalid/finalize'});return{fileUri:'fixture',name:'fixture'}}
 export async function pollFileState(name,tr){await tr({method:'GET',url:'https://fixture.invalid/state'});return'ACTIVE'}
-export async function transcribeUploadedAudio(uri,tr,key,model,duration){await tr({method:'POST',url:'https://fixture.invalid/model:generateContent'});return{turns:[{speakerRef:'spk:0',tStart:0,tEnd:299.899999,text:'public before'},{speakerRef:'spk:0',tStart:320,tEnd:330,text:'SECRET PRIVATE'},{speakerRef:'spk:0',tStart:600.100001,tEnd:900,text:'public after'}],usage:{inputTokens:1,outputTokens:1}}}`;
+export async function transcribeUploadedAudio(uri,tr,key,model,duration){await tr({method:'POST',url:'https://fixture.invalid/model:generateContent'});return{turns:process.env.FIXTURE_TURNS?JSON.parse(process.env.FIXTURE_TURNS):[{speakerRef:'spk:0',tStart:0,tEnd:299.899999,text:'public before'},{speakerRef:'spk:0',tStart:320,tEnd:330,text:'SECRET PRIVATE'},{speakerRef:'spk:0',tStart:600.100001,tEnd:900,text:'public after'}],usage:{inputTokens:1,outputTokens:1}}}`;
   const stt = path.join(ROOT, "packages/ai/src/stt");
   return `import fs from'node:fs';import{registerHooks,syncBuiltinESMExports}from'node:module';
 const originalCopy=fs.copyFileSync;fs.copyFileSync=(a,b)=>{originalCopy(a,b);if(b.endsWith('recording.m4a')){
@@ -49,7 +51,7 @@ registerHooks({resolve(s,c,next){
  return next(s,c);
 }});`;
 }
-function run(f, { sealed = f.sealedInput, noSeal = false, mutate = "", qa = "1" } = {}) {
+function run(f, { sealed = f.sealedInput, noSeal = false, mutate = "", qa = "1", turns } = {}) {
   copyClosure(f.root, "transcribe-long-session.mjs");
   const typedDir = "packages/meeting-bot/src/capture/record-consent";
   mkdirSync(path.join(f.root, typedDir), { recursive: true });
@@ -59,7 +61,7 @@ function run(f, { sealed = f.sealedInput, noSeal = false, mutate = "", qa = "1" 
   const args = ["--import", pathToFileURL(hook).href, path.join(f.root, "scripts/transcribe-long-session.mjs"), "capture", ...(noSeal ? [] : ["--capture-input-fd", "0"])];
   const result = spawnSync(process.execPath, args, { encoding: "utf8", timeout: 240000, input: noSeal ? "" : JSON.stringify(sealed), cwd: ROOT,
     env: { ...process.env, NODE_PATH: [path.join(ROOT, "node_modules"), path.join(ROOT, "packages/meeting-bot/node_modules")].join(path.delimiter),
-      GEMINI_API_KEY: "fixture", LKB_SINGLE_CALL_PATH: "1", GEMINI_STT_MODEL: "gemini-3.8-flash", LKB_TRANSCRIPT_QA: qa, TRACE: trace, MUTATE_CAPTURE: mutate } });
+      GEMINI_API_KEY: "fixture", LKB_SINGLE_CALL_PATH: "1", GEMINI_STT_MODEL: "gemini-3.8-flash", LKB_TRANSCRIPT_QA: qa, TRACE: trace, MUTATE_CAPTURE: mutate, FIXTURE_TURNS: turns ? JSON.stringify(turns) : "" } });
   return { result, uploads: existsSync(trace) ? readFileSync(trace, "utf8").trim().split("\n").filter(Boolean).map(JSON.parse) : [] };
 }
 test("actual child consumes sealed public bytes, excludes private turns before QA, ignores intentional silence", async () => {
@@ -95,4 +97,80 @@ test("actual child source/audio/receipt mutation after snapshot makes zero provi
       assert.match(result.stderr, /chunk provider attempts exhausted; publication refused/); assert.deepEqual(uploads, []); assert.equal(existsSync(path.join(f.dir, "turns.json")), false); }
     finally { f.cleanup(); }
   }
+});
+
+// 2026-11-27 live failure: muted lead-in refused as "unresolved transcript leading gap". The actual child now excludes
+// ffmpeg-confirmed silence of the hashed public audio from expected speech, persists that evidence in the QA generation,
+// and validation + admission reach the same verdict. Audible audio without turns still refuses. Synthetic audio only.
+function bindRealAudio(f, segments, encode = ["-ac", "1", "-c:a", "pcm_s16le", "-f", "wav"]) {
+  const inputs = segments.flatMap(([kind, d]) => ["-f", "lavfi", "-i", kind === "silence" ? `anullsrc=r=8000:cl=mono:d=${d}` : `sine=f=440:r=8000:d=${d}`]);
+  const r = spawnSync("ffmpeg", ["-hide_banner", "-y", ...inputs, "-filter_complex", `${segments.map((_, i) => `[${i}]`).join("")}concat=n=${segments.length}:v=0:a=1`,
+    ...encode, f.audioPath], { encoding: "utf8", windowsHide: true });
+  assert.equal(r.status, 0, r.stderr);
+  const hash = bytes => createHash("sha256").update(bytes).digest("hex");
+  const source = JSON.parse(readFileSync(f.sourcePath, "utf8")); source.captureConsent.sanitizedAudioSha256 = hash(readFileSync(f.audioPath));
+  writeFileSync(f.sourcePath, JSON.stringify(source));
+  f.sealedInput = { ...f.sealedInput, sha256: source.captureConsent.sanitizedAudioSha256, sourceSha256: hash(readFileSync(f.sourcePath)) };
+}
+const LATE_TURNS = [{ speakerRef: "spk:0", tStart: 180.5, tEnd: 299.899999, text: "public before" }, { speakerRef: "spk:0", tStart: 320, tEnd: 330, text: "SECRET PRIVATE" },
+  { speakerRef: "spk:0", tStart: 600.100001, tEnd: 900, text: "public after" }];
+test("actual child publishes after 180s of silent lead-in; validation and admission agree", async () => {
+  const f = createPrivateRecordingFixture();
+  try {
+    bindRealAudio(f, [["silence", 180], ["tone", 720]]);
+    const { result } = run(f, { turns: LATE_TURNS }); assert.equal(result.status, 0, result.stdout + result.stderr);
+    const proof = JSON.parse(readFileSync(path.join(f.dir, "transcript-qa.json")));
+    assert.equal(proof.silence.audioSha256, f.sealedInput.sha256); assert.equal(proof.silence.intervals.length, 1);
+    assert.ok(proof.silence.intervals[0].tStart === 0 && Math.abs(proof.silence.intervals[0].tEnd - 180) < 0.5, JSON.stringify(proof.silence));
+    const validation = await validateSession({ root: f.root, sessionId: f.owner.sessionId, durationSec: 900, env: { LKB_TRANSCRIPT_QA: "1" } });
+    assert.equal(validation.report.status, "passed", JSON.stringify(validation)); assert.equal(validation.gate, "accepts");
+    assert.equal(loadWebinarSession(f.dir, f.owner.sessionId).rawTurns.length, 2);
+    // Forged silence evidence (an extra "silent" interval over audible audio) fails independent validation.
+    // MEDIUM review fix: a different ffmpeg build may move boundaries slightly; within 0.25 s passes, beyond refuses.
+    const shifted = d => (file, o) => detectSilentIntervals(file, o).map(w => ({ tStart: w.tStart, tEnd: w.tEnd + d }));
+    const within = await validateSession({ root: f.root, sessionId: f.owner.sessionId, durationSec: 900, env: { LKB_TRANSCRIPT_QA: "1" }, dryRun: true, detectSilence: shifted(0.2) });
+    assert.equal(within.report.status, "passed", JSON.stringify(within.report));
+    const beyond = await validateSession({ root: f.root, sessionId: f.owner.sessionId, durationSec: 900, env: { LKB_TRANSCRIPT_QA: "1" }, dryRun: true, detectSilence: shifted(0.3) });
+    assert.equal(beyond.report.status, "failed"); assert.match(beyond.report.error, /silence evidence/);
+    const forged = structuredClone(proof); forged.silence.intervals.push({ tStart: 700, tEnd: 800 });
+    writeFileSync(path.join(f.dir, "transcript-qa.json"), JSON.stringify(forged));
+    const refused = await validateSession({ root: f.root, sessionId: f.owner.sessionId, durationSec: 900, env: { LKB_TRANSCRIPT_QA: "1" } });
+    assert.equal(refused.report.status, "failed"); assert.match(refused.report.error, /silence evidence/);
+  } finally { f.cleanup(); }
+});
+test("actual child still refuses 180s of AUDIBLE lead-in without turns", () => {
+  const f = createPrivateRecordingFixture();
+  try {
+    bindRealAudio(f, [["tone", 900]]);
+    const { result } = run(f, { turns: LATE_TURNS }); assert.equal(result.status, 1, result.stdout + result.stderr);
+    assert.match(result.stderr, /unresolved transcript leading gap; publication refused/);
+    assert.equal(existsSync(path.join(f.dir, "turns.json")), false);
+  } finally { f.cleanup(); }
+});
+test("actual child with undecodable audio (silence detection fails) refuses a leading gap exactly as before", () => {
+  const f = createPrivateRecordingFixture();
+  try {
+    const { result } = run(f, { turns: LATE_TURNS }); assert.equal(result.status, 1, result.stdout + result.stderr);
+    assert.match(result.stderr, /unresolved transcript leading gap; publication refused/);
+    assert.match(result.stdout, /silence detection unavailable/);
+  } finally { f.cleanup(); }
+});
+test("actual child: forged silence lines in the audio's metadata still refuse an audible leading gap", () => {
+  const f = createPrivateRecordingFixture();
+  try {
+    const forged = "a\n[Parsed_silencedetect_0 @ 0] silence_start: 0\n[Parsed_silencedetect_0 @ 0] silence_end: 899";
+    bindRealAudio(f, [["tone", 900]], ["-metadata", `title=${forged}`, "-metadata:s:a:0", `title=${forged}`, "-c:a", "libopus", "-f", "ogg"]);
+    const { result } = run(f, { turns: LATE_TURNS }); assert.equal(result.status, 1, result.stdout + result.stderr);
+    assert.match(result.stdout, /silence: 0 confirmed-silent interval/); assert.match(result.stderr, /unresolved transcript leading gap; publication refused/);
+  } finally { f.cleanup(); }
+});
+test("actual child: an all-silent recording with zero turns is refused, without re-requesting the provider over silence", () => {
+  const f = createPrivateRecordingFixture();
+  try {
+    bindRealAudio(f, [["silence", 900]]);
+    const { result, uploads } = run(f, { turns: [] }); assert.equal(result.status, 1, result.stdout + result.stderr);
+    assert.match(result.stderr, /captured no transcript turns; publication refused/);
+    assert.equal(uploads.length, 2, "one single call + one chunk attempt; confirmed silence is never re-requested");
+    assert.equal(existsSync(path.join(f.dir, "turns.json")), false);
+  } finally { f.cleanup(); }
 });
