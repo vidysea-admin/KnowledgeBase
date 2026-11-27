@@ -71,7 +71,7 @@ export async function runPipelineTick(deps, run = false, {watch = false, signal}
   if (attendance) {
     attendance.assertOwner(tenantId);
     await deps.validateTenant(); await attendance.verifyAccount();
-    if (run) await attendance.checkReady(deps, validateRunGate);
+    if (run) await attendance.checkReady(deps, validateRunGate, {autonomous});
   }
   if (run && (!tenantId || !/^[a-zA-Z0-9][a-zA-Z0-9._-]{0,99}$/.test(tenantId))) throw new Error('LKB_TENANT_ID must explicitly identify this capture lane owner');
   const work = run ? validateRunGate(root, env) : undefined;
@@ -290,7 +290,7 @@ if (process.argv[1] && pathToFileURL(resolve(process.argv[1])).href === import.m
     if (accountIndex >= 0) {
       const {configureCalendarAttendance} = await import('./calendar-attendance-source.mjs');
       const deps = await configureCalendarAttendance(createPipelineDeps(), process.argv[accountIndex + 1]);
-      if (process.argv.includes('--check-ready')) { await deps.calendarAttendance.checkReady(deps, validateRunGate); console.log('Attendance readiness checks passed; no scheduling or work writes'); }
+      if (process.argv.includes('--check-ready')) { await deps.calendarAttendance.checkReady(deps, validateRunGate, {autonomous: !process.argv.includes('--one-meeting') || process.argv.includes('--watch')}); console.log('Attendance readiness checks passed; no scheduling or work writes'); }
       else await runPipelineWatch({run, watch, discoveryOnly}, {signal: shutdown.signal, tick: () => discoveryOnly ? deps.calendarAttendance.publishDiscovery() : runPipelineTick(deps, run, {watch, signal: shutdown.signal})});
     } else {
       if (process.argv.includes('--check-ready')) throw new Error('--check-ready requires an explicit attendance account');

@@ -400,3 +400,36 @@ test('worker never discards on unauthenticated rejection, protocol/read failure,
     assert.equal(readFileSync(file,'utf8'),before,kind); assert.equal(f.methods.filter(method=>method==='GET').length,1,kind); assert.deepEqual(f.sent.map(row=>row.sequence),[1,1]);
   });
 });
+
+test('A9 (D-257, D-258): one meeting at a time needs no signed pool-slot acceptance; the pool, the default and operator sign-off still do', () => fixture(async f => {
+  const media = async () => ({streams: [{codec_type: 'audio', channels: 2}, {codec_type: 'video', width: 1280, height: 720}], format: {duration: 5}});
+  let slotChecks = 0;
+  Object.assign(f.deps, {captureSlots: ['career-a'], validateCaptureSlots: async () => {slotChecks++; throw new Error('Each capture slot requires reviewed real host capability evidence');}});
+  Object.assign(f.deps.env, {LKB_CALENDAR_WORKER_HOST_ID: 'kb-bot-1', LKB_API_URL: 'https://api.example.test'});
+  await checkCalendarAttendanceReady(f.deps, validateRunGate, media, {autonomous: false});
+  assert.equal(slotChecks, 0, 'single-meeting mode skips the pool-slot acceptance');
+  await assert.rejects(checkCalendarAttendanceReady(f.deps, validateRunGate, media), /reviewed real host capability/, 'a caller that does not say single-meeting stays strict');
+  await assert.rejects(checkCalendarAttendanceReady(f.deps, validateRunGate, media, {autonomous: true}), /reviewed real host capability/, 'the parallel pool stays strict');
+  for (const value of ['operator', ' operator', 'OPERATOR']) {
+    f.deps.env.LKB_SLOT_READINESS = value;
+    await assert.rejects(checkCalendarAttendanceReady(f.deps, validateRunGate, media, {autonomous: false}), /reviewed real host capability/, `${JSON.stringify(value)} restores the person sign-off`);
+  }
+  f.deps.env.LKB_SLOT_READINESS = 'machine';
+  await checkCalendarAttendanceReady(f.deps, validateRunGate, media, {autonomous: false});
+  delete f.deps.env.LKB_SLOT_READINESS;
+  await assert.rejects(checkCalendarAttendanceReady(f.deps, validateRunGate, async () => ({streams: [], format: {duration: 1}}), {autonomous: false}), /audio\/video/, 'the proof media probe (the machine check) still runs');
+  delete f.deps.env.LKB_CALENDAR_WORKER_HOST_ID;
+  await assert.rejects(checkCalendarAttendanceReady(f.deps, validateRunGate, media, {autonomous: false}), /hosted worker/, 'the hosted worker binding is still required');
+  assert.equal(f.calls.length, 0);
+}, {proof: true}));
+
+test('A9 wiring: a one-shot --run tick with one unsigned slot reaches the runner; operator sign-off mode refuses it', () => fixture(async f => {
+  let slotChecks = 0;
+  Object.assign(f.deps, {captureSlots: ['career-a'], validateCaptureSlots: async () => {slotChecks++; throw new Error('Each capture slot requires reviewed real host capability evidence');}});
+  Object.assign(f.deps.env, {LKB_CALENDAR_WORKER_HOST_ID: 'kb-bot-1', LKB_API_URL: 'https://api.example.test'});
+  await runPipelineTick(f.deps, true);
+  assert.equal(slotChecks, 0); assert.equal(f.calls.length, 1, 'the one meeting is recorded');
+  f.deps.env.LKB_SLOT_READINESS = 'operator';
+  await assert.rejects(runPipelineTick(f.deps, true), /reviewed real host capability/);
+  assert.equal(f.calls.length, 1, 'operator sign-off mode blocks before any new capture');
+}, {proof: true}));
