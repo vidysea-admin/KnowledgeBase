@@ -316,3 +316,55 @@ test('B10-C6: Telegram and email are independent; with Telegram set one failure 
     } finally {h.done();}
   }
 });
+
+// ---- Alert delivery problems never stop capture (live 2026-11-27: a full per-carrier outbox threw and halted all scheduling). ----
+const stuck = async () => ({email: 'failed', dashboard: 'failed', calendar: 'disabled'});
+const recovered = n => ({kind: 'discovery-recovered', sessionKey: `discovery-calendar-${String(n).padStart(24, '0')}`, title: 'Webinar discovery calendar', detail: 'Connected discovery recovered.'});
+const failedFeed = n => ({status: 'failed', checkedAt: NOW, lastSuccessAt: `2026-10-14T11:00:0${n}.000Z`});
+
+test('a full outbox of discovery-recovered entries never throws: the new alert coalesces with the stale ones', async () => {
+  const state = {operations: {}, discovery: {calendar: {status: 'healthy', checkedAt: NOW, schedulerAlertOutbox: Array.from({length: 8}, (_, n) => recovered(n))}}};
+  const f = fixture(state, stuck);
+  for (let n = 0; n < 3; n++) {
+    const before = failedFeed(n);
+    assert.doesNotThrow(() => f.alerts.discovery('calendar', before, {status: 'healthy', checkedAt: NOW, lastSuccessAt: NOW, schedulerAlertOutbox: state.discovery.calendar.schedulerAlertOutbox}));
+  }
+  await f.alerts.wait();
+  const outbox = state.discovery.calendar.schedulerAlertOutbox;
+  assert.equal(outbox.length, 1, 'the eight stale recovered entries coalesce into the newest'); assert.deepEqual([...new Set(outbox.map(a => a.kind))], ['discovery-recovered']);
+  assert.ok(outbox.some(a => a.sessionKey !== recovered(0).sessionKey && !Array.from({length: 8}, (_, n) => recovered(n).sessionKey).includes(a.sessionKey)), 'newest alert is kept');
+});
+
+test('a flapping feed keeps one pending entry per kind instead of growing the outbox', async () => {
+  const state = {operations: {}, discovery: {calendar: {status: 'healthy', checkedAt: NOW}}}, f = fixture(state, stuck);
+  const healthy = n => ({status: 'healthy', checkedAt: NOW, lastSuccessAt: `2026-10-14T12:00:0${n}.000Z`}), peer = {status: 'healthy', checkedAt: NOW};
+  for (let n = 0; n < 6; n++) {
+    f.alerts.acquireDiscovery({calendar: failedFeed(n), gmail: peer});
+    f.alerts.acquireDiscovery({calendar: healthy(n), gmail: peer});
+  }
+  await f.alerts.wait();
+  const kinds = state.discovery.calendar.schedulerAlertOutbox.map(a => a.kind).sort();
+  assert.deepEqual(kinds, ['discovery-degraded', 'discovery-recovered']);
+});
+
+test('at capacity a capture-failed alert evicts a flapping entry and capture-failed entries are never the ones dropped', async () => {
+  const mixed = [{kind: 'capture-failed', sessionKey: 'session-a', title: 'T'}, ...Array.from({length: 7}, (_, n) => recovered(n))];
+  const state = {operations: {'session-a': {...row('failed'), schedulerAlertOutbox: mixed}}}, f = fixture(state, stuck);
+  assert.doesNotThrow(() => f.alerts.update('session-a', {status: 'failed', reason: 'retry-limit'}));
+  const kinds = state.operations['session-a'].schedulerAlertOutbox.map(a => a.kind);
+  assert.ok(kinds.includes('capture-failed')); assert.equal(kinds.filter(k => k === 'capture-failed').length, 1);
+  assert.equal(state.operations['session-a'].status, 'failed'); assert.equal(f.notices.length, 1, 'the state change still completes');
+  const full = {operations: {'session-b': {...row('failed'), schedulerAlertOutbox: Array.from({length: 8}, (_, n) => ({kind: 'capture-failed', sessionKey: 'session-b', title: 'T', interruption: {n: n + 1, outcome: 'rejoining'}}))}}};
+  const g = fixture(full, stuck);
+  assert.doesNotThrow(() => g.alerts.update('session-b', {status: 'failed'}));
+  assert.equal(full.operations['session-b'].schedulerAlertOutbox.length, 8); assert.ok(full.operations['session-b'].schedulerAlertsDropped >= 1, 'the loss is counted durably');
+  assert.equal(g.logs.filter(l => /backlog full/.test(l)).length, 1, 'one log line instead of a throw');
+});
+
+test('acquireDiscovery with a full outbox does not throw and keeps the dropped counter across acquisitions', async () => {
+  const old = {status: 'failed', checkedAt: NOW, lastSuccessAt: '2026-10-14T11:00:00.000Z', schedulerAlertsDropped: 4,
+    schedulerAlertOutbox: Array.from({length: 8}, (_, n) => recovered(n))};
+  const state = {operations: {}, discovery: {calendar: old, gmail: {status: 'healthy', checkedAt: NOW}}}, f = fixture(state, stuck);
+  assert.doesNotThrow(() => f.alerts.acquireDiscovery({calendar: {status: 'healthy', checkedAt: NOW, lastSuccessAt: NOW}, gmail: {status: 'healthy', checkedAt: NOW}}));
+  assert.ok(state.discovery.calendar.schedulerAlertsDropped >= 4); assert.ok(state.discovery.calendar.schedulerAlertOutbox.length <= 8);
+});
