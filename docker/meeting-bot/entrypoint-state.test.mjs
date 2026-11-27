@@ -201,8 +201,8 @@ function world(extraStubs = {}) {
   w.release = (f) => join(dir, 'rel/webinar-release', f);
   w.env = (extra = {}) => {
     const e = {...process.env};
-    for (const k of Object.keys(e)) if (/^(LKB_|BOT_|STUB_|VNC_|WEBINAR_|GEMINI_)/.test(k)) delete e[k];
-    return {...e, PATH: join(dir, 'bin') + delimiter + (process.env.PATH ?? ''), TMPDIR: w.posix('tmp'), XDG_RUNTIME_DIR: w.posix('xdg'),
+    for (const k of Object.keys(e)) if (/^(LKB_|BOT_|STUB_|VNC_|WEBINAR_|GEMINI_|MONGO)/.test(k)) delete e[k];
+    return {...e, ...SETTINGS, PATH: join(dir, 'bin') + delimiter + (process.env.PATH ?? ''), TMPDIR: w.posix('tmp'), XDG_RUNTIME_DIR: w.posix('xdg'),
       LKB_APP_DIR: w.posix('app'), LKB_BOT_PROFILE_DIR: w.posix('prof/bot-profile'), LKB_RELEASE_DIR: w.posix('rel/webinar-release'),
       LKB_RECORD_DIR: w.posix('rec'), LKB_STATE_PREFIX: PFX, LKB_SNAPSHOT_INTERVAL_S: '60', LKB_LEASE_RENEW_S: '30', LKB_STOP_WAIT_S: '3',
       STUB_LOG: w.posix('stub.log'), STUB_DIR: w.posix('stub'), STUB_BUCKET_DIR: w.posix('bucket'), ...extra};
@@ -250,6 +250,10 @@ const noPublicOrIam = (lines) => {
   const bad = lines.filter((l) => /\b(acl|iam)\b|--canned-acl|--predefined-acl|allUsers|allAuthenticatedUsers|-a (public|private)/i.test(l));
   assert.deepEqual(bad, [], 'a stub call sets an ACL, a public object or IAM');
 };
+// plan A4: the settings the start-up check asks for, as harmless stubs; the A4 test removes them one at a time.
+const SETTINGS = {MONGODB_URL: 'mongodb://stub.invalid:27017', MONGODB_DB: 'lkb_work_test', MONGO_WORK_DB: 'lkb_work_test', GEMINI_API_KEY: 'stub-gemini-key', OLLAMA_API_KEY: 'stub-ollama-key',
+  LKB_API_URL: 'http://stub.invalid', LKB_API_KEY: 'stub-api-key', LKB_TENANT_ID: 'toc', LKB_CALENDAR_WORKER_HOST_ID: 'kb-bot-1', LKB_CAPTURE_SLOTS: 'career-a',
+  LKB_ALLOW_NO_BUCKET: '1'};
 const nodeCalls = (w) => w.log().filter((l) => /^node (scripts|--import)/.test(l));
 const calls = (w, re) => w.log().filter((l) => l.startsWith('gcloud ') && re.test(l));
 const stateUploads = (w) => calls(w, /^gcloud storage cp \S+ gs:\/\/testbucket\/recorder\/state\.tar\.gz/);
@@ -980,4 +984,100 @@ test('B4-C3 repair: the lease is renewed once right before the pipeline starts (
     assert.ok(!w2.log().some((l) => l.includes('run-pipeline.mjs')));
     assert.match(readFileSync(w2.bucketFile('lease'), 'utf8'), /holder=intruder/, 'the other holder lease is left alone');
   } finally { w2.cleanup(); }
+});
+
+test('plan A4 (D-257): a missing or wrong setting stops the start with the setting named (never its value), before any bucket call or node', T, () => {
+  const SECRET = 'do-not-print-this-value';
+  const once = {BOT_MODE: 'record-once', LKB_RECORD_URL: 'https://x.example/y', LKB_RECORD_UNTIL: '10:00', STUB_WRITE_WEBM: '1'};
+  const refused = [
+    ['queue: Mongo URL', {LKB_SEND_NOW_QUEUE: '1'}, ['MONGODB_URL'], /MONGODB_URL/],
+    ['queue: Mongo database', {LKB_SEND_NOW_QUEUE: '1'}, ['MONGODB_DB'], /MONGODB_DB/],
+    ['queue: Gemini key', {LKB_SEND_NOW_QUEUE: '1'}, ['GEMINI_API_KEY'], /GEMINI_API_KEY/],
+    ['queue + index: work database', {LKB_SEND_NOW_QUEUE: '1', LKB_SEND_NOW_INDEX: '1'}, ['MONGO_WORK_DB'], /MONGO_WORK_DB/],
+    ['queue + index: the two names differ', {LKB_SEND_NOW_QUEUE: '1', LKB_SEND_NOW_INDEX: '1', MONGO_WORK_DB: 'lkb_other'}, [], /MONGODB_DB and MONGO_WORK_DB must be the same/],
+    ['queue: no bucket', {LKB_SEND_NOW_QUEUE: '1'}, ['LKB_ALLOW_NO_BUCKET'], /LKB_STATE_BUCKET/],
+    ['calendar: API URL', {LKB_ATTENDANCE_ACCOUNT: 'bot@example.org'}, ['LKB_API_URL'], /LKB_API_URL/],
+    ['calendar: API key', {LKB_ATTENDANCE_ACCOUNT: 'bot@example.org'}, ['LKB_API_KEY'], /LKB_API_KEY/],
+    ['calendar: tenant', {LKB_ATTENDANCE_ACCOUNT: 'bot@example.org'}, ['LKB_TENANT_ID'], /LKB_TENANT_ID/],
+    ['calendar: host binding', {LKB_ATTENDANCE_ACCOUNT: 'bot@example.org'}, ['LKB_CALENDAR_WORKER_HOST_ID'], /LKB_CALENDAR_WORKER_HOST_ID/],
+    ['calendar, operator sign-off mode: slots', {LKB_ATTENDANCE_ACCOUNT: 'bot@example.org', LKB_SLOT_READINESS: ' Operator '}, ['LKB_CAPTURE_SLOTS'], /LKB_CAPTURE_SLOTS/],
+    ['calendar: work database', {LKB_ATTENDANCE_ACCOUNT: 'bot@example.org'}, ['MONGO_WORK_DB'], /MONGO_WORK_DB/],
+    ['calendar: Gemini key', {LKB_ATTENDANCE_ACCOUNT: 'bot@example.org'}, ['GEMINI_API_KEY'], /GEMINI_API_KEY/],
+    ['calendar: no bucket', {LKB_ATTENDANCE_ACCOUNT: 'bot@example.org'}, ['LKB_ALLOW_NO_BUCKET'], /LKB_STATE_BUCKET/],
+    ['record-once --transcribe: Gemini key', {...once, LKB_RECORD_ARGS: '--transcribe'}, ['GEMINI_API_KEY'], /GEMINI_API_KEY/],
+    ['record-once --index: Mongo URL', {...once, LKB_RECORD_ARGS: '--process-video --transcribe --index'}, ['MONGODB_URL'], /MONGODB_URL/],
+    ['record-once --index: work database', {...once, LKB_RECORD_ARGS: '--process-video --transcribe --index'}, ['MONGO_WORK_DB'], /MONGO_WORK_DB/],
+    ['record-once flags split by tabs and newlines', {...once, LKB_RECORD_ARGS: '--process-video\t--transcribe\n--index'}, ['MONGO_WORK_DB'], /MONGO_WORK_DB/],
+    ['a value of only spaces is missing', {LKB_SEND_NOW_QUEUE: '1', MONGODB_URL: '  \t '}, [], /missing setting\(s\): MONGODB_URL/],
+    ['calendar: a blank API key is missing', {LKB_ATTENDANCE_ACCOUNT: 'bot@example.org', LKB_API_KEY: '   '}, [], /LKB_API_KEY/],
+    ['production opt-in with a work database', {...once, LKB_INDEX_PRODUCTION: '1'}, [], /LKB_INDEX_PRODUCTION=1 needs MONGODB_DB and MONGO_WORK_DB both lkb_prod/],
+    ...[['lkb_prod', {}], ['LKB', {}], ['global_university_db', {}], ['lkb_staging', {}], ['LKB_Staging', {LKB_ALLOW_STAGING: 'lkb_staging'}]].map(([db, more]) =>
+      [`index into protected ${db} without the opt-in`, {LKB_SEND_NOW_QUEUE: '1', LKB_SEND_NOW_INDEX: '1', MONGODB_DB: db, MONGO_WORK_DB: db, ...more}, [], /MONGO_WORK_DB names a protected database/]),
+    ['calendar: no Ollama key for KB notes and slide vision', {LKB_ATTENDANCE_ACCOUNT: 'bot@example.org'}, ['OLLAMA_API_KEY'], /OLLAMA_API_KEY/],
+    ['queue + index: no Ollama key', {LKB_SEND_NOW_QUEUE: '1', LKB_SEND_NOW_INDEX: '1'}, ['OLLAMA_API_KEY'], /OLLAMA_API_KEY/],
+    ['record-once --process-video: no vision provider', {...once, LKB_RECORD_ARGS: '--process-video --transcribe'}, ['OLLAMA_API_KEY'], /OLLAMA_API_KEY/],
+    ['record-once index: a vision model alone does not write KB notes', {...once, LKB_RECORD_ARGS: '--process-video --transcribe --index', WEBINAR_VISION_MODEL: 'gemini-x'}, ['OLLAMA_API_KEY'], /OLLAMA_API_KEY/],
+    ['queue: staging database without its allow', {LKB_SEND_NOW_QUEUE: '1', MONGODB_DB: 'lkb_staging', MONGO_WORK_DB: 'lkb_staging'}, [], /MONGODB_DB=lkb_staging needs LKB_ALLOW_STAGING/],
+    ['calendar, operator sign-off mode: one slot', {LKB_ATTENDANCE_ACCOUNT: 'bot@example.org', LKB_SLOT_READINESS: 'operator', LKB_CAPTURE_SLOTS: 'career-a'}, [], /needs 2 to 8 capture slots/],
+    ['calendar, operator sign-off mode: one slot named twice', {LKB_ATTENDANCE_ACCOUNT: 'bot@example.org', LKB_SLOT_READINESS: 'operator', LKB_CAPTURE_SLOTS: 'a, a ,'}, [], /needs 2 to 8 capture slots/],
+    ['queue + index: a work database name requireWorkDatabase refuses', {LKB_SEND_NOW_QUEUE: '1', LKB_SEND_NOW_INDEX: '1', MONGODB_DB: 'my work.db', MONGO_WORK_DB: 'my work.db'}, [], /MONGO_WORK_DB may hold only/],
+    ['two wrong settings are both reported', {...once, LKB_RECORD_ARGS: '--process-video --transcribe --index', LKB_INDEX_PRODUCTION: '1', MONGODB_DB: 'lkb_prod', MONGO_WORK_DB: 'x'}, [], /must be the same database; .*both lkb_prod/],
+    ['production opt-in, one name only', {...once, LKB_INDEX_PRODUCTION: '1', MONGODB_DB: 'lkb_prod'}, [], /both lkb_prod/],
+  ];
+  for (const [label, extra, drop, want] of refused) {
+    for (const bucket of [false, true]) {
+      if (drop.includes('LKB_ALLOW_NO_BUCKET') && bucket) continue;
+      const w = world();
+      try {
+        const env = (bucket ? w.bucketEnv : w.env)({GEMINI_API_KEY: SECRET, LKB_API_KEY: SECRET, OLLAMA_API_KEY: SECRET, ...extra});
+        for (const k of drop) delete env[k];
+        const r = w.run(env);
+        assert.equal(r.status, 78, `${label}: ${r.out}`);
+        assert.match(r.out, want, label);
+        assert.match(r.out, /\[bot-settings\] cannot start/, label);
+        assert.ok(!r.out.includes(SECRET), `${label}: a value was printed`);
+        assert.equal(calls(w, /.*/).length, 0, `${label}: no bucket call`);
+        assert.equal(nodeCalls(w).length, 0, `${label}: nothing started`);
+      } finally { w.cleanup(); }
+    }
+  }
+  const allowed = [
+    ['record-once with no index or transcribe flags needs no Mongo or Gemini', {...once}, ['MONGODB_URL', 'MONGODB_DB', 'MONGO_WORK_DB', 'GEMINI_API_KEY'], 0],
+    ['production opt-in with both names lkb_prod', {...once, LKB_INDEX_PRODUCTION: '1', MONGODB_DB: ' lkb_prod', MONGO_WORK_DB: 'lkb_prod'}, [], 0],
+    ['record-once --index without --process-video indexes nothing, so needs no work database', {...once, LKB_RECORD_ARGS: '--transcribe --index'}, ['MONGODB_URL', 'MONGO_WORK_DB'], 0],
+    ['staging with its own allow passes the gate', {...once, LKB_RECORD_ARGS: '--process-video --transcribe --index', MONGODB_DB: 'lkb_staging', MONGO_WORK_DB: 'lkb_staging', LKB_ALLOW_STAGING: 'lkb_staging'}, [], 0],
+    ['record-once --process-video with a Gemini vision model needs no Ollama key', {...once, LKB_RECORD_ARGS: '--process-video --transcribe', WEBINAR_VISION_MODEL: 'gemini-x'}, ['OLLAMA_API_KEY'], 0],
+    ['doctor mode checks no setting', {BOT_MODE: 'doctor'}, Object.keys(SETTINGS), 0],
+  ];
+  for (const [label, extra, drop, want] of allowed) {
+    const w = world();
+    try {
+      const env = w.env(extra);
+      for (const k of drop) delete env[k];
+      const r = w.run(env);
+      assert.equal(r.status, want, `${label}: ${r.out}`);
+      assert.doesNotMatch(r.out, /bot-settings/, label);
+    } finally { w.cleanup(); }
+  }
+  const w = world();   // the queue with transcribe off needs no Gemini key: it starts (SIGTERM ends the loop)
+  try {
+    const env = w.env({LKB_SEND_NOW_QUEUE: '1', LKB_SEND_NOW_TRANSCRIBE: '0', LKB_ATTENDANCE_INTERVAL_S: '2', STUB_NODE_SLEEP: '1'});
+    delete env.GEMINI_API_KEY;
+    const r = w.runWithTerm(env);
+    assert.doesNotMatch(r.out, /bot-settings/, r.out);
+    assert.ok(nodeCalls(w).some((l) => l.includes('queue-worker.ts')), 'the queue worker started');
+  } finally { w.cleanup(); }
+  for (const [label, extra, drop, worker] of [
+    ['queue with index on and transcribe off indexes nothing, so needs no work database', {LKB_SEND_NOW_QUEUE: '1', LKB_SEND_NOW_INDEX: '1', LKB_SEND_NOW_TRANSCRIBE: '0'}, ['MONGO_WORK_DB', 'GEMINI_API_KEY'], 'queue-worker.ts'],
+    ['one calendar meeting at a time needs no capture slots (A9, D-258)', {LKB_ATTENDANCE_ACCOUNT: 'bot@example.org'}, ['LKB_CAPTURE_SLOTS'], 'run-pipeline.mjs'],
+  ]) {
+    const w2 = world();
+    try {
+      const env = w2.env({...extra, LKB_ATTENDANCE_INTERVAL_S: '2', STUB_NODE_SLEEP: '1'});
+      for (const k of drop) delete env[k];
+      const r = w2.runWithTerm(env);
+      assert.doesNotMatch(r.out, /bot-settings/, `${label}: ${r.out}`);
+      assert.ok(nodeCalls(w2).some((l) => l.includes(worker)), `${label}: ${worker} started`);
+    } finally { w2.cleanup(); }
+  }
 });

@@ -203,7 +203,7 @@ async function gate() {
   const dirTmp = mkdtempSync(join(tmpdir(), 'b4b-gate-')), file = join(dirTmp, 'gate.mjs');
   writeFileSync(file, `import {existsSync, readFileSync, realpathSync, statSync} from 'node:fs';
 import {join, resolve, relative, isAbsolute} from 'node:path';
-import {isProtectedWorkDbName} from ${JSON.stringify(pathToFileURL(join(root, 'scripts/lib/transcript-provenance.mjs')).href)};
+import {isProtectedWorkDbName, productionIndexOptIn} from ${JSON.stringify(pathToFileURL(join(root, 'scripts/lib/transcript-provenance.mjs')).href)};
 ${m[0]}`);
   gateFn = (await import(pathToFileURL(file).href)).validateRunGate; gateHow = 'extracted';
   return gateFn;

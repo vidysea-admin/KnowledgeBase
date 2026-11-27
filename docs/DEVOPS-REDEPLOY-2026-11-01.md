@@ -231,7 +231,8 @@ WhatsApp, with an API key that has scope `whatsapp-admin` (`read -rs K`, then `-
 | `MONGODB_DB` | API + bot | `lkb_prod` (identical on both) | The API writes `capture_jobs` there and the bot's queue worker reads it there. | `apps/api/src/db-name.ts:25`, `queue-worker.ts:96` |
 | `MONGO_WORK_DB` | bot | `lkb_prod` | The database `--index` writes the notes to; must equal `MONGODB_DB`. | `transcript-provenance.mjs:97` |
 | `LKB_INDEX_PRODUCTION` | bot | `1` | Forwards D-204's production flag from the recorder (A7) and the calendar scheduler (A8). Without it notes never reach `lkb_prod`. | `record-finalize.ts`, `run-pipeline.mjs` (`validateRunGate`), `graph-finalize.mjs` |
-| `GEMINI_API_KEY` | API + bot | **Secret.** The API already reads it as a secret reference; the bot gets the same Secret Manager secret (no new key). | Transcript, slide vision and indexing. | `transcribe-long-session.mjs:65` |
+| `GEMINI_API_KEY` | API + bot | **Secret.** The API already reads it as a secret reference; the bot gets the same Secret Manager secret (no new key). | Transcript (Gemini). | `transcribe-long-session.mjs:65` |
+| `OLLAMA_API_KEY` | API + bot | **Secret.** The API already reads it (Ollama cloud, `https://ollama.com`, no Ollama server needed); the bot gets the same Secret Manager secret. | KB notes (summarize, claims, topics: `config/ai-routing.yaml`) and slide vision (`vision/plan.mjs`). The start-up check refuses the queue with indexing, the calendar, and record-once `--process-video` without it (exit 78). | `production.ts:93`, `vision/chain.ts:242` |
 | `LKB_STATE_BUCKET` | bot | `vidysea-prod-kb-bot` `[ASSUMPTION: proposed name; created in Phase C]`, with a lifecycle rule that deletes `recorder/recordings/` after N days (Umesh gives N; default proposal 30) | Signed-in Chrome profile, state, lease and recordings. | `entrypoint.sh:72` |
 | `LKB_STATE_PREFIX` | bot | `recorder` (the default) | Object prefix in the bucket. | `entrypoint.sh:73` |
 | `LKB_SEND_NOW_QUEUE` | API + bot | `1` on both | Turns the pasted-link queue on (API) and the queue loop on (bot, run mode). | `send-now-queue.ts:118`, `entrypoint.sh:87` |
@@ -240,7 +241,8 @@ WhatsApp, with an API key that has scope `whatsapp-admin` (`read -rs K`, then `-
 | `LKB_SEND_NOW_TENANTS` | API + bot | `toc` on both | The tenants the queue serves; must match on both sides. | `send-now-queue.ts:59` |
 | `LKB_CAPTURE_HOST_ID` | bot | `kb-bot-1` | Stable host id. A bad value stops the bot at start (A2). | `capture-slot-readiness.ts:18-28` |
 | `LKB_CALENDAR_WORKER_HOST_ID` | bot | `kb-bot-1` | Binds this worker to the hosted calendar; calendar mode refuses to start without it. | `calendar-attendance-source.mjs:142` |
-| `LKB_CAPTURE_SLOTS` | bot | `career-a` (one slot, D-257). **Today the code refuses one slot: plan A9 is needed first.** | Capture slot name(s). | `deps-runtime.mjs:23`, `service.mjs:6-10` |
+| `LKB_CAPTURE_SLOTS` | bot | leave unset for one meeting at a time (A9, D-258). Needed only with `LKB_SLOT_READINESS=operator` or the later parallel pool. | Capture slot name(s). | `deps-runtime.mjs:23`, `service.mjs:6-10` |
+| `LKB_SLOT_READINESS` | bot | leave unset (machine check: the live-proof recording must hold audio and video). `operator` brings back the person's signed slot acceptance and then needs 2 to 8 slots in `LKB_CAPTURE_SLOTS`. | D-257 answer 2. | `calendar-attendance-source.mjs` `checkCalendarAttendanceReady` |
 | `LKB_API_URL` | bot | `https://vidysea-knowledgebase-5z2zofynhq-el.a.run.app/knowledgebase/api` `[ASSUMPTION: path checked in the Phase C dry run with one GET /webinar-operations]` | Hosted API for the calendar, join rules and tenant check. Defaults to `localhost:3300`. | `run-pipeline-deps.mjs:32` |
 | `LKB_API_KEY` | bot | **Secret.** Created once with `MONGODB_DB=lkb_prod node scripts/mint-key.mjs --tenant toc --label kb-bot --i-know-this-is-production` (writes one hashed key row to `lkb_prod`: needs Umesh's yes), then piped straight into Secret Manager `lkb-prod-bot-api-key`, never printed to chat. | The bot's key for the API (calendar mode). | `run-pipeline-deps.mjs:43` |
 | `LKB_ATTENDANCE_ACCOUNT` | bot | **Umesh gives it:** the Google account the bot signs in as in Phase B, and whose calendar it attends. | Calendar auto-join (finish-line test 2). | `entrypoint.sh:85` |
@@ -258,12 +260,12 @@ WhatsApp, with an API key that has scope `whatsapp-admin` (`read -rs K`, then `-
 ### Leave alone or unset
 
 - `LKB_ALLOW_STAGING`: unset on the server.
-- Ollama settings (`OLLAMA_API_KEY`, `OLLAMA_BASE_URL`): unset; there is no Ollama on Cloud Run, so slide vision is Gemini only.
+- `OLLAMA_BASE_URL`, `WEBINAR_VISION_MODEL`: unset. `OLLAMA_API_KEY` alone points at Ollama cloud for both notes and slide vision. (Corrected 2026-11-27 after the A4 review: this line earlier said Ollama stays unset, which would have recorded the meeting and then failed the screen and notes stages.)
 - Image defaults set in the Dockerfile (`LKB_PYTHON`, `LKB_BROWSER_EXECUTABLE`, `LKB_CAPTURE_BACKEND=tab`, `LKB_FFMPEG_PATH`, `TZ=Asia/Kolkata`, `DISPLAY`, `PULSE_SERVER`, `LKB_BOT_PROFILE_DIR`): leave them.
 - Tuning with safe defaults: `LKB_SNAPSHOT_INTERVAL_S` (300), `LKB_LEASE_TTL_S` (120), `LKB_LEASE_RENEW_S` (30), `LKB_STOP_WAIT_S` (3), `LKB_GCLOUD_TIMEOUT_S` (120), `LKB_ATTENDANCE_INTERVAL_S` (300).
 
 ### Known gaps (each has a plan unit)
 
-- **A4, the start-up check:** today several settings above are first read mid-meeting or after it (Mongo at the first queue loop, `GEMINI_API_KEY` after the meeting, `LKB_API_URL`/`LKB_API_KEY` at the first tick, a missing bucket never), and `BOT_MODE=doctor` checks binaries only.
-- **A9, one calendar slot:** `validateSlots` refuses fewer than two slots, and each slot needs an operator-reviewed capability file. D-257 chose one slot with a machine check plus an alert, so calendar mode cannot start until A9 lands.
+- **A4, the start-up check (built, branch `wave/a4-startup-check`):** in run and record-once mode the entrypoint now stops with exit **78** before any bucket call when a setting the chosen flow needs is missing, blank, or wrong (two different database names, a protected work database without the production opt-in, `LKB_INDEX_PRODUCTION=1` without both names `lkb_prod`). The line names the setting, never its value. `LKB_ALLOW_NO_BUCKET=1` lets a queue or calendar run start without a bucket: laptop rehearsal only, never on the server. It checks that settings are present, not that Mongo answers: a wrong Mongo URL still shows up at the first queue loop.
+- **A9, one calendar meeting (built, branch `wave/a9-one-slot`):** a one-shot calendar run no longer needs the signed pool-slot acceptance; the live-proof media check (audio and video in a real recording) is the machine check. The parallel pool (`--watch`) keeps the signed acceptance.
 - Not verified: whether Cloud Run reads the image `HEALTHCHECK` (it expects `run-pipeline.mjs`, which queue-only mode never starts). The `docker-compose.yml` bot service does not forward the bucket, send-now, attendance or capture settings (affects only a compose run).
