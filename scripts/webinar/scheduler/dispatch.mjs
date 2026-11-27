@@ -4,6 +4,19 @@ import {join, resolve} from 'node:path';
 
 const REFUSAL_REASONS = ['overlap-lost', 'needs-registration', 'needs-review', 'invalid-time', 'unsafe-join-link', 'rule-denied', 'opted-out', 'rules-unevaluable'];
 const ATTEMPT_LIMIT = 3;
+const PRELAUNCH_TRANSIENT_LIMIT = 5;
+
+/**
+ * A network blip in the pre-launch steps (live 2026-11-27: `fetch failed` on /webinar-operations, attempts 0). Deliberately narrow: a bare
+ * TypeError 'fetch failed', an abort/timeout, or a socket-level `cause.code`. Anything else keeps the ordinary failure path.
+ */
+export function isTransientNetworkError(error) {
+  if (!error || typeof error !== 'object') return false;
+  if (error.name === 'AbortError' || error.name === 'TimeoutError') return true;
+  if (error instanceof TypeError && error.message === 'fetch failed') return true;
+  const code = error.cause?.code ?? error.cause?.cause?.code;
+  return typeof code === 'string' && (['ECONNRESET', 'ECONNREFUSED', 'ETIMEDOUT'].includes(code) || code.startsWith('UND_ERR_'));
+}
 
 /**
  * H1 (recorder-self-heal-rejoin): what became of a capture whose owner is gone. `undefined` means "not an interruption" and the older recovery paths decide.
@@ -135,8 +148,15 @@ export async function runSchedulerCycle(c) {
         status: 'queued', reason, title: item.title, startTime: item.startTime, endTime: item.endTime, ...topic});
       continue;
     }
+    // Pre-launch transient: stay re-dispatchable while the meeting runs (bounded), then surface as action_required so it alerts.
+    const prelaunchTransient = id => {
+      const retries = (state.operations[id]?.prelaunchRetries ?? 0) + 1;
+      return retries > PRELAUNCH_TRANSIENT_LIMIT ? {status: 'action_required', reason: 'prelaunch-transient-limit'}
+        : {status: 'queued', reason: 'prelaunch-transient', prelaunchRetries: retries};
+    };
     const capture = async () => {
       const priorAttempts = state.operations[id]?.attempts ?? 0;
+      let launching = false; // true once the row is written `recording`; before that a failure has launched nothing
       try {
         if (stopped()) return;
         await deps.validateTenant();
@@ -156,8 +176,9 @@ export async function runSchedulerCycle(c) {
         if (stopped()) return;
         if (pool) await deps.validateCaptureSlot(slot, item);
         if (stopped()) return;
+        launching = true;
         update(id, {status: 'recording', reason: undefined, title: item.title, startTime: item.startTime, endTime: item.endTime,
-          ...(pool ? {captureSlot: slot} : {}), attempts: (state.operations[id]?.attempts ?? 0) + 1});
+          ...(state.operations[id]?.prelaunchRetries ? {prelaunchRetries: undefined} : {}), ...(pool ? {captureSlot: slot} : {}), attempts: (state.operations[id]?.attempts ?? 0) + 1});
         const args = ['record', item.meetingUrl, '--backend', 'tab', '--until', item.endTime,
           '--session-id', id, '--title', item.title, '--tenant', c.tenantId, ...(pool ? ['--capture-slot', slot] : [])];
         if (c.graphEnabled(env)) {
@@ -173,6 +194,7 @@ export async function runSchedulerCycle(c) {
       } catch (error) { update(id, error?.code === 'SCHEDULER_STOPPED' ? {status: 'queued', reason: 'service-stopped', attempts: priorAttempts}
         : error?.code === 'SCHEDULER_PRIVACY_UNAVAILABLE' ? {status: 'action_required', reason: 'privacy-controller-unavailable'}
         : error?.code === 'SCHEDULER_OWNERSHIP_UNVERIFIED' ? {status: 'action_required', reason: 'coverage-review'}
+        : !launching && isTransientNetworkError(error) && Date.parse(item.endTime) > Date.parse(now()) ? prelaunchTransient(id)
         : {status: 'failed', reason: c.safeText(error.message)}); }
     };
     update(id, {status: 'queued', reason: undefined, title: item.title, startTime: item.startTime, endTime: item.endTime, ...topic});
