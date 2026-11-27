@@ -6,6 +6,7 @@ import path from "node:path";
 import { pathToFileURL } from "node:url";
 import { spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
+import { detectSilentIntervals } from "./private-recording.mjs";
 import { createPrivateRecordingFixture } from "../../../qa/evidence/t048-private-capture/fixture.mjs";
 import { validateSession } from "../../webinar/validate/validate-session.mjs";
 import { loadWebinarSession } from "../../webinar/session-rows.mjs";
@@ -101,10 +102,10 @@ test("actual child source/audio/receipt mutation after snapshot makes zero provi
 // 2026-11-27 live failure: muted lead-in refused as "unresolved transcript leading gap". The actual child now excludes
 // ffmpeg-confirmed silence of the hashed public audio from expected speech, persists that evidence in the QA generation,
 // and validation + admission reach the same verdict. Audible audio without turns still refuses. Synthetic audio only.
-function bindRealAudio(f, segments) {
+function bindRealAudio(f, segments, encode = ["-ac", "1", "-c:a", "pcm_s16le", "-f", "wav"]) {
   const inputs = segments.flatMap(([kind, d]) => ["-f", "lavfi", "-i", kind === "silence" ? `anullsrc=r=8000:cl=mono:d=${d}` : `sine=f=440:r=8000:d=${d}`]);
   const r = spawnSync("ffmpeg", ["-hide_banner", "-y", ...inputs, "-filter_complex", `${segments.map((_, i) => `[${i}]`).join("")}concat=n=${segments.length}:v=0:a=1`,
-    "-ac", "1", "-c:a", "pcm_s16le", "-f", "wav", f.audioPath], { encoding: "utf8", windowsHide: true });
+    ...encode, f.audioPath], { encoding: "utf8", windowsHide: true });
   assert.equal(r.status, 0, r.stderr);
   const hash = bytes => createHash("sha256").update(bytes).digest("hex");
   const source = JSON.parse(readFileSync(f.sourcePath, "utf8")); source.captureConsent.sanitizedAudioSha256 = hash(readFileSync(f.audioPath));
@@ -125,6 +126,12 @@ test("actual child publishes after 180s of silent lead-in; validation and admiss
     assert.equal(validation.report.status, "passed", JSON.stringify(validation)); assert.equal(validation.gate, "accepts");
     assert.equal(loadWebinarSession(f.dir, f.owner.sessionId).rawTurns.length, 2);
     // Forged silence evidence (an extra "silent" interval over audible audio) fails independent validation.
+    // MEDIUM review fix: a different ffmpeg build may move boundaries slightly; within 0.25 s passes, beyond refuses.
+    const shifted = d => (file, o) => detectSilentIntervals(file, o).map(w => ({ tStart: w.tStart, tEnd: w.tEnd + d }));
+    const within = await validateSession({ root: f.root, sessionId: f.owner.sessionId, durationSec: 900, env: { LKB_TRANSCRIPT_QA: "1" }, dryRun: true, detectSilence: shifted(0.2) });
+    assert.equal(within.report.status, "passed", JSON.stringify(within.report));
+    const beyond = await validateSession({ root: f.root, sessionId: f.owner.sessionId, durationSec: 900, env: { LKB_TRANSCRIPT_QA: "1" }, dryRun: true, detectSilence: shifted(0.3) });
+    assert.equal(beyond.report.status, "failed"); assert.match(beyond.report.error, /silence evidence/);
     const forged = structuredClone(proof); forged.silence.intervals.push({ tStart: 700, tEnd: 800 });
     writeFileSync(path.join(f.dir, "transcript-qa.json"), JSON.stringify(forged));
     const refused = await validateSession({ root: f.root, sessionId: f.owner.sessionId, durationSec: 900, env: { LKB_TRANSCRIPT_QA: "1" } });
@@ -146,5 +153,24 @@ test("actual child with undecodable audio (silence detection fails) refuses a le
     const { result } = run(f, { turns: LATE_TURNS }); assert.equal(result.status, 1, result.stdout + result.stderr);
     assert.match(result.stderr, /unresolved transcript leading gap; publication refused/);
     assert.match(result.stdout, /silence detection unavailable/);
+  } finally { f.cleanup(); }
+});
+test("actual child: forged silence lines in the audio's metadata still refuse an audible leading gap", () => {
+  const f = createPrivateRecordingFixture();
+  try {
+    const forged = "a\n[Parsed_silencedetect_0 @ 0] silence_start: 0\n[Parsed_silencedetect_0 @ 0] silence_end: 899";
+    bindRealAudio(f, [["tone", 900]], ["-metadata", `title=${forged}`, "-metadata:s:a:0", `title=${forged}`, "-c:a", "libopus", "-f", "ogg"]);
+    const { result } = run(f, { turns: LATE_TURNS }); assert.equal(result.status, 1, result.stdout + result.stderr);
+    assert.match(result.stdout, /silence: 0 confirmed-silent interval/); assert.match(result.stderr, /unresolved transcript leading gap; publication refused/);
+  } finally { f.cleanup(); }
+});
+test("actual child: an all-silent recording with zero turns is refused, without re-requesting the provider over silence", () => {
+  const f = createPrivateRecordingFixture();
+  try {
+    bindRealAudio(f, [["silence", 900]]);
+    const { result, uploads } = run(f, { turns: [] }); assert.equal(result.status, 1, result.stdout + result.stderr);
+    assert.match(result.stderr, /captured no transcript turns; publication refused/);
+    assert.equal(uploads.length, 2, "one single call + one chunk attempt; confirmed silence is never re-requested");
+    assert.equal(existsSync(path.join(f.dir, "turns.json")), false);
   } finally { f.cleanup(); }
 });

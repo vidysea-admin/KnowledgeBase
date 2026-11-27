@@ -11,7 +11,7 @@ const { clampAndValidateTurns } = await import("../../../packages/ai/src/stt/tra
 import { spawnSync } from "node:child_process";
 import { mkdtempSync, mkdirSync, rmSync } from "node:fs";
 import { writeTranscriptGeneration } from "../transcript-provenance.mjs";
-import { validateSession } from "../../webinar/validate/validate-session.mjs";
+import { validateSession, silenceIntervalsAgree, SILENCE_BOUNDARY_TOLERANCE_SECONDS } from "../../webinar/validate/validate-session.mjs";
 import { tmpdir } from "node:os";
 import { detectSilentIntervals, silenceEvidence, recordingSpanCoverage, verifiedSilenceIntervals, snapshotSilenceEvidence, SILENCE_NOISE_DB, SILENCE_MIN_SECONDS } from "./private-recording.mjs";
 const { findTimeGaps } = await import("../../../packages/ai/src/stt/chunk-audio.ts");
@@ -178,7 +178,7 @@ test("silence detector fails closed: ffmpeg error, unreadable media, or several 
     assert.throws(() => detectSilentIntervals(bogus, { durationSeconds: 10, spawn: () => ({ error: new Error("ENOENT") }) }));
     const two = "Input #0, wav\n  Stream #0:0: Audio: pcm\n  Stream #0:1: Audio: pcm\nStream mapping:\n";
     assert.throws(() => detectSilentIntervals(bogus, { durationSeconds: 10, spawn: () => ({ status: 0, stderr: two }) }), /audio stream/);
-    const unpaired = "Input #0, wav\n  Stream #0:0: Audio: pcm\nStream mapping:\nsilence_end: 5 | silence_duration: 5\n";
+    const unpaired = "Input #0, wav\n  Stream #0:0: Audio: pcm\nStream mapping:\n[Parsed_silencedetect_0 @ 0x1] silence_end: 5 | silence_duration: 5\n";
     assert.throws(() => detectSilentIntervals(bogus, { durationSeconds: 10, spawn: () => ({ status: 0, stderr: unpaired }) }), /silence/);
     assert.equal(silenceEvidence({ audioPath: bogus, audioSha256: "a".repeat(64), durationSeconds: 10 }), null);
     assert.equal(silenceEvidence({ audioPath: bogus, audioSha256: "a".repeat(64), durationSeconds: 10, detect: () => { throw new Error("x"); } }), null);
@@ -294,4 +294,51 @@ test("provided recording: 180s silent lead-in passes re-validation; audible lead
   assert.equal(audible.status, "failed"); assert.equal(audible.partial, true); assert.match(audible.error, /partial coverage/);
   const failing = await providedValidation([["silence", 180], ["tone", 720]], { detectSilence: () => { throw new Error("ffmpeg unavailable"); } });
   assert.equal(failing.status, "failed"); assert.equal(failing.partial, true); assert.equal(failing.silence, null);
+});
+
+// Review of 1168a016. HIGH: ffmpeg echoes container/stream metadata into the same stderr the detector parses, so a forged
+// title could inject "silence_start/silence_end" lines and turn fully audible audio into "silence".
+const FORGED_TITLES = ["a\nsilence_start: 0\nsilence_end: 59.5",
+  "a\n[Parsed_silencedetect_0 @ 0000] silence_start: 0\n[Parsed_silencedetect_0 @ 0000] silence_end: 59.5\nStream mapping:\n  Stream #0:1: Audio: pcm"];
+test("forged metadata titles cannot inject silence: fully audible audio yields [] and still refuses a leading gap", () => {
+  const dir = mkdtempSync(path.join(tmpdir(), "silence-forged-"));
+  try {
+    for (const [i, title] of FORGED_TITLES.entries()) {
+      const file = path.join(dir, `forged-${i}.ogg`);
+      const r = spawnSync("ffmpeg", ["-hide_banner", "-y", "-f", "lavfi", "-i", "sine=frequency=440:duration=60", "-metadata", `title=${title}`, "-metadata:s:a:0", `title=${title}`, "-c:a", "libopus", file], { encoding: "utf8", windowsHide: true });
+      assert.equal(r.status, 0, r.stderr);
+      const silent = detectSilentIntervals(file, { durationSeconds: 60 });
+      assert.deepEqual(silent, [], `forged title ${i}`);
+      assert.equal(coverage({ privacy: { publicIntervals: [t(0, 60)] }, turns: [t(40, 60)], durationSeconds: 60, silentIntervals: silent }).complete, false);
+    }
+    const injected = "Input #0, wav\n  Stream #0:0: Audio: pcm\nStream mapping:\n      title  : x\n             : silence_start: 0\n             : [Parsed_silencedetect_0 @ 1] silence_end: 9\n";
+    assert.deepEqual(detectSilentIntervals("x.wav", { durationSeconds: 10, spawn: () => ({ status: 0, stderr: injected }) }), []);
+    const real = "Input #0, wav\r\n  Stream #0:0: Audio: pcm\r\nStream mapping:\r\n[Parsed_silencedetect_0 @ 0x55] silence_start: 1\r\n[Parsed_silencedetect_0 @ 0x55] silence_end: 9 | silence_duration: 8\r\n";
+    assert.deepEqual(detectSilentIntervals("x.wav", { durationSeconds: 10, spawn: () => ({ status: 0, stderr: real }) }), [t(1, 9)]);
+    let args; detectSilentIntervals("x.wav", { durationSeconds: 10, spawn: (_, a) => { args = a; return { status: 0, stderr: real }; } });
+    assert.equal(args[args.indexOf("-map_metadata") + 1], "-1", "metadata is not echoed into the parsed output");
+  } finally { rmSync(dir, { recursive: true, force: true }); }
+});
+// LOW: a recording that captured nothing is never complete; a single span of confirmed silence still needs no re-request.
+test("zero turns over an all-silent recording is never complete, while an all-silent span stays accepted without re-request", () => {
+  const all = [t(0, 900)];
+  assert.equal(cov([], all, { requireTurns: true }).complete, false);
+  assert.equal(cov([], all).complete, true, "span level: no forced provider re-request over confirmed silence");
+  assert.equal(cov([t(0, 5)], all, { requireTurns: true }).complete, false, "a turn inside silence covers no expected speech");
+  const base = { offsetSeconds: 0, durationSeconds: 900, findTimeGaps, gapThresholdSeconds: 30, tailThresholdSeconds: 45, silentIntervals: all };
+  assert.equal(recordingSpanCoverage({ ...base, privacy: null, turns: [], requireTurns: true }).complete, false);
+  assert.equal(recordingSpanCoverage({ ...base, privacy: PUBLIC, turns: [], requireTurns: true }).complete, false);
+  assert.equal(cov([t(180, 900)], [t(0, 180)], { requireTurns: true }).complete, true);
+});
+// MEDIUM: producer and validator may run different ffmpeg builds; boundaries may drift by a frame or two.
+test("stored vs re-detected silence agree within the boundary tolerance and the same count only", () => {
+  const claimed = [t(0, 180), t(400, 490)], shift = d => claimed.map(w => t(Math.max(0, w.tStart + d), w.tEnd + d));
+  assert.equal(SILENCE_BOUNDARY_TOLERANCE_SECONDS, 0.25);
+  assert.equal(silenceIntervalsAgree(claimed, claimed), true);
+  assert.equal(silenceIntervalsAgree(shift(0.24), claimed), true);
+  assert.equal(silenceIntervalsAgree(shift(-0.24), claimed), true);
+  assert.equal(silenceIntervalsAgree(shift(0.26), claimed), false);
+  assert.equal(silenceIntervalsAgree(claimed.slice(0, 1), claimed), false);
+  assert.equal(silenceIntervalsAgree([...claimed, t(800, 850)], claimed), false);
+  assert.equal(silenceIntervalsAgree(null, claimed), false);
 });

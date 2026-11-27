@@ -164,7 +164,7 @@ export function verifyTrustedRecordingPrivacyAdmission({ root, sessionId, source
       context.filterSpanTurns(turns, 0, durationSeconds).privacy.excludedIndices.length) throw new Error("Protected or invalid committed capture turns");
   // Same silence the producer used and validation independently re-detected; bound by qaSha256 and the sanitized-audio hash.
   const silentIntervals = verifiedSilenceIntervals(qa.silence, context.sanitizedAudioSha256);
-  if (!evaluateRecordingCoverage({ privacy: context, turns, durationSeconds, silentIntervals }).complete && validation.partialAccepted !== true) throw new Error("Genuine public speech missing from validated capture");
+  if (!evaluateRecordingCoverage({ privacy: context, turns, durationSeconds, silentIntervals, requireTurns: true }).complete && validation.partialAccepted !== true) throw new Error("Genuine public speech missing from validated capture");
   context.verifyCurrent();
   if (fileHash(qaFile) !== validation.qaSha256 || fileHash(confined(path.resolve(root), path.join(dir, "turns.json"))) !== validation.turnsSha256) throw new Error("Capture QA/turns changed during admission");
   return context;
@@ -190,16 +190,16 @@ const silenceFail = message => { throw new Error(message); };
 /** Silent intervals of the (already hashed) audio file; throws on ANY ffmpeg/parse doubt, so callers fail closed. */
 export function detectSilentIntervals(audioPath, { durationSeconds, spawn = childProcess.spawnSync } = {}) {
   if (typeof audioPath !== "string" || !audioPath || !Number.isFinite(durationSeconds) || durationSeconds <= 0 || typeof spawn !== "function") silenceFail("Invalid silence detection input");
-  const r = spawn("ffmpeg", ["-hide_banner", "-nostdin", "-nostats", "-i", audioPath, "-map", "0:a:0", "-vn", "-sn", "-dn",
+  const r = spawn("ffmpeg", ["-hide_banner", "-nostdin", "-nostats", "-i", audioPath, "-map", "0:a:0", "-map_metadata", "-1", "-vn", "-sn", "-dn",
     "-af", `silencedetect=noise=${SILENCE_NOISE_DB}dB:d=${SILENCE_MIN_SECONDS}`, "-f", "null", "-"],
   { encoding: "utf8", timeout: 30 * 60 * 1000, maxBuffer: 64 * 1024 * 1024, windowsHide: true });
   if (!r || r.error || r.status !== 0 || typeof r.stderr !== "string") silenceFail("silence detection failed");
-  const at = r.stderr.indexOf("Stream mapping:");
-  if (at < 0) silenceFail("silence detection output unrecognised");
-  // A second audio stream could carry speech the detector never measured: refuse rather than guess.
-  if ((r.stderr.slice(0, at).match(/Stream #0:\d+[^\n]*?: Audio:/g) ?? []).length !== 1) silenceFail("silence detection needs exactly one audio stream");
+  // Line-anchored only: ffmpeg echoes (forgeable) metadata as indented ": ..." continuation lines; only lines the filter
+  // itself logs count, a second audio stream (unmeasured speech) refuses, and -map_metadata -1 drops output tags.
+  const lines = r.stderr.split(/\r?\n/), at = lines.indexOf("Stream mapping:");
+  if (at < 0 || lines.slice(0, at).filter(l => /^\s*Stream #0:\d+.*?: Audio:/.test(l)).length !== 1) silenceFail("silence detection needs exactly one audio stream");
   const intervals = []; let open = null;
-  for (const m of r.stderr.slice(at).matchAll(/silence_(start|end): (-?\d+(?:\.\d+)?(?:e[-+]?\d+)?)/g)) {
+  for (const m of lines.slice(at).map(l => /^\[Parsed_silencedetect_\d+ @ [^\]]+\] silence_(start|end): (-?\d+(?:\.\d+)?(?:e[-+]?\d+)?)(?: |$)/.exec(l)).filter(Boolean)) {
     const value = Number(m[2]);
     if (!Number.isFinite(value) || (m[1] === "start") !== (open === null)) silenceFail("unpaired silence start/end");
     if (m[1] === "start") open = value; else { intervals.push([open, value]); open = null; }
@@ -259,16 +259,16 @@ function withoutSilence(intervals, silent) {
 }
 
 /** Compute genuine missing public time; trusted private silence never creates synthetic turns. */
-export function recordingSpanCoverage({ privacy, turns, offsetSeconds, durationSeconds, findTimeGaps, gapThresholdSeconds, tailThresholdSeconds, silentIntervals = [] }) {
-  if (privacy) return evaluateRecordingCoverage({ privacy, turns, offsetSeconds, durationSeconds, gapThresholdSeconds, tailThresholdSeconds, silentIntervals });
+export function recordingSpanCoverage({ privacy, turns, offsetSeconds, durationSeconds, findTimeGaps, gapThresholdSeconds, tailThresholdSeconds, silentIntervals = [], requireTurns = false }) {
+  if (privacy) return evaluateRecordingCoverage({ privacy, turns, offsetSeconds, durationSeconds, gapThresholdSeconds, tailThresholdSeconds, silentIntervals, requireTurns });
   // Provided (non-captured) audio: the whole span is expected speech minus confirmed silence; no silence -> unchanged path.
   if (silentIntervals.length) return evaluateRecordingCoverage({ privacy: { publicIntervals: [{ tStart: 0, tEnd: offsetSeconds + durationSeconds }] },
-    turns, offsetSeconds, durationSeconds, gapThresholdSeconds, tailThresholdSeconds, silentIntervals });
+    turns, offsetSeconds, durationSeconds, gapThresholdSeconds, tailThresholdSeconds, silentIntervals, requireTurns });
   const gaps = findTimeGaps(turns, gapThresholdSeconds), tailShortfall = durationSeconds - (turns.at(-1)?.tEnd ?? 0);
   return { gaps, leadingShortfall: turns[0]?.tStart ?? durationSeconds, tailShortfall,
     complete: turns.length > 0 && gaps.length === 0 && tailShortfall <= tailThresholdSeconds };
 }
-export function evaluateRecordingCoverage({ privacy, turns, offsetSeconds = 0, durationSeconds, gapThresholdSeconds = 30, tailThresholdSeconds = 45, silentIntervals = [] }) {
+export function evaluateRecordingCoverage({ privacy, turns, offsetSeconds = 0, durationSeconds, gapThresholdSeconds = 30, tailThresholdSeconds = 45, silentIntervals = [], requireTurns = false }) {
   if (!Number.isFinite(offsetSeconds) || offsetSeconds < 0 || !Number.isFinite(durationSeconds) || durationSeconds <= 0 ||
       !Array.isArray(turns) || !Array.isArray(privacy?.publicIntervals)) throw new Error("Invalid public coverage input");
   let previousEnd = 0;
@@ -300,6 +300,6 @@ export function evaluateRecordingCoverage({ privacy, turns, offsetSeconds = 0, d
   const tailShortfall = expectedPublicSeconds - cursor;
   const atAudio = point => { let sum = 0; for (const w of expected) { const length = w.tEnd - w.tStart; if (point <= sum + length) return w.tStart + point - sum; sum += length; } return end; };
   const gaps = missing.filter(g => g.end - g.start > gapThresholdSeconds).map(g => ({ gapStart: atAudio(g.start), gapEnd: atAudio(g.end), gapSeconds: g.end - g.start }));
-  return { complete: expected.length === 0 || projected.length > 0 && gaps.length === 0 && leadingShortfall <= gapThresholdSeconds && tailShortfall <= tailThresholdSeconds,
+  return { complete: expected.length === 0 && !requireTurns || projected.length > 0 && gaps.length === 0 && leadingShortfall <= gapThresholdSeconds && tailShortfall <= tailThresholdSeconds,
     gaps, leadingShortfall, tailShortfall, expectedPublicSeconds, coveredPublicSeconds };
 }

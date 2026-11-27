@@ -41,6 +41,18 @@ import { loadTrustedRecordingPrivacy, evaluateRecordingCoverage, detectSilentInt
 const DEFAULT_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..", "..", "..");
 const sha = (bytes) => createHash("sha256").update(bytes).digest("hex");
 const round = (n, places = 3) => Math.round(n * 10 ** places) / 10 ** places;
+/**
+ * Stored silence (producer) vs independent re-detection (validator) may come from different ffmpeg builds whose decoders
+ * frame audio differently (AAC 1024 samples ~21 ms, Opus 20 ms, MP3 1152 samples ~26 ms) and round silencedetect
+ * boundaries to a frame or two. 0.25 s tolerates ~10 frames of that drift yet is < 1% of the 30 s gap threshold, so even
+ * a deliberately stretched claim could hide at most 0.5 s of audio per interval. Count must match exactly; the STORED
+ * intervals are what coverage uses, because admission can only read those (identical verdicts on both paths).
+ */
+export const SILENCE_BOUNDARY_TOLERANCE_SECONDS = 0.25;
+export function silenceIntervalsAgree(detected, claimed, tolerance = SILENCE_BOUNDARY_TOLERANCE_SECONDS) {
+  return Array.isArray(detected) && Array.isArray(claimed) && detected.length === claimed.length &&
+    detected.every((d, i) => Math.abs(d.tStart - claimed[i].tStart) <= tolerance && Math.abs(d.tEnd - claimed[i].tEnd) <= tolerance);
+}
 
 export function probeDurationSeconds(audioPath) {
   const out = execFileSync("ffprobe", ["-v", "error", "-show_entries", "format=duration", "-of", "default=noprint_wrappers=1:nokey=1", audioPath],
@@ -103,7 +115,7 @@ export async function validateSession({ root = DEFAULT_ROOT, sessionId, duration
   }
   const lastTEnd = turns.length ? Math.max(...turns.map((t) => (Number.isFinite(t.tEnd) ? t.tEnd : 0))) : 0;
   // Silence-aware coverage (2026-11-27), agreeing with transcribe time and admission:
-  //  - stored QA silence evidence is used only if this validator independently re-detects the identical intervals from
+  //  - stored QA silence evidence is used only if this validator independently re-detects matching intervals (silenceIntervalsAgree) from
   //    the hashed audio (privacy: the receipt-bound sanitized audio, re-hashed by verifyCurrent below); else refuse;
   //  - provided audio without stored evidence uses a fresh detection; captured audio without it uses none, because
   //    admission (verifyTrustedRecordingPrivacyAdmission) can only read the qaSha256-bound evidence;
@@ -117,13 +129,13 @@ export async function validateSession({ root = DEFAULT_ROOT, sessionId, duration
   if (claimedSilence !== undefined) {
     step(() => {
       const claimed = verifiedSilenceIntervals(claimedSilence, privacy ? privacy.sanitizedAudioSha256 : silenceAudio ? sha(readFileSync(silenceAudio)) : null);
-      if (!detected || JSON.stringify(detected) !== JSON.stringify(claimed)) throw new Error("QA silence evidence differs from the independently detected silence of the hashed audio");
+      if (!silenceIntervalsAgree(detected, claimed)) throw new Error("QA silence evidence differs from the independently detected silence of the hashed audio");
       silentIntervals = claimed; silenceApplied = true;
     });
   } else if (!privacy && detected) { silentIntervals = detected; silenceApplied = true; }
   const silenceAware = !privacy && silentIntervals.length > 0;
   const publicCoverage = privacy || silenceAware ? evaluateRecordingCoverage({ privacy: privacy ?? { publicIntervals: [{ tStart: 0, tEnd: duration }] }, turns, durationSeconds: duration,
-    gapThresholdSeconds: GAP_THRESHOLD_SECONDS, tailThresholdSeconds: SHORTFALL_THRESHOLD_SECONDS, silentIntervals }) : null;
+    gapThresholdSeconds: GAP_THRESHOLD_SECONDS, tailThresholdSeconds: SHORTFALL_THRESHOLD_SECONDS, silentIntervals, requireTurns: true }) : null;
   const gaps = publicCoverage ? publicCoverage.gaps : turns.length ? findTimeGaps(turns, GAP_THRESHOLD_SECONDS) : [];
   const shortfallSec = publicCoverage ? publicCoverage.tailShortfall : duration - lastTEnd;
   const coverage = round(publicCoverage ? (publicCoverage.expectedPublicSeconds > 0 ? publicCoverage.coveredPublicSeconds / publicCoverage.expectedPublicSeconds : 1) : Math.min(lastTEnd / duration, 1), 4);

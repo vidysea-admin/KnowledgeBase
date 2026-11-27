@@ -143,7 +143,7 @@ async function main() {
     protocolRequests[req.method === "GET" ? "poll" : req.url.includes(":generateContent") ? "generate" : "upload"]++;
     return realUploadTransport(req);
   };
-  const coverage = (turns, offsetSeconds, durationSeconds, silent = silence?.intervals ?? []) => recordingSpanCoverage({ privacy, turns, offsetSeconds, durationSeconds, findTimeGaps, gapThresholdSeconds: GAP_THRESHOLD_SECONDS, tailThresholdSeconds: SHORTFALL_THRESHOLD_SECONDS, silentIntervals: silent });
+  const coverage = (turns, offsetSeconds, durationSeconds, silent = silence?.intervals ?? [], requireTurns = false) => recordingSpanCoverage({ privacy, turns, offsetSeconds, durationSeconds, findTimeGaps, gapThresholdSeconds: GAP_THRESHOLD_SECONDS, tailThresholdSeconds: SHORTFALL_THRESHOLD_SECONDS, silentIntervals: silent, requireTurns });
   const privacyProof = privacy ? { receiptSha256: privacy.receiptSha256, sanitizedAudioSha256: privacy.sanitizedAudioSha256, publicIntervals: privacy.publicIntervals } : undefined;
 
   function checkedAttempt(once, mediaDurationSeconds, label, attempt, offsetSeconds) {
@@ -254,7 +254,7 @@ async function main() {
     silence = snapshotSilenceEvidence({ audioPath: snapshotAudioPath, audioSha256, durationSeconds, log: console.log });
     dispatch = await dispatchRecordingTranscription({ plan, durationSeconds, chunkedBoundaries, log: console.log,
       singleAttempt: async () => checkedAttempt(await transcribeSpanOnce(readFileSync(snapshotAudioPath), "single-a1", durationSeconds), durationSeconds, "single", 1, 0).turns,
-      complete: turns => { const c = coverage(turns, 0, durationSeconds); return c.leadingShortfall <= GAP_THRESHOLD_SECONDS && c.complete; },
+      complete: turns => { const c = coverage(turns, 0, durationSeconds, undefined, true); return c.leadingShortfall <= GAP_THRESHOLD_SECONDS && c.complete; },
       chunkAttempt: (start, end, i) => transcribeSpan(start, end, 0, `c${i}`),
     });
     if (dispatch.provenance.actualPath === "single") {
@@ -276,9 +276,8 @@ async function main() {
   const turnsPath = join(DATA_DIR, sessionId, "turns.json");
   const existingTurns = existsSync(turnsPath) ? JSON.parse(readFileSync(turnsPath, "utf8")) : [];
 
-  if (mergedTurns.length === 0 && existingTurns.length > 0) {
-    throw new Error(`merged 0 turns for "${sessionId}" but ${existingTurns.length} existing turn(s) are on disk — refusing to overwrite.`);
-  }
+  if (mergedTurns.length === 0) throw new Error(existingTurns.length > 0 ? `merged 0 turns for "${sessionId}" but ${existingTurns.length} existing turn(s) are on disk — refusing to overwrite.`
+    : "recording captured no transcript turns; publication refused"); // a capture of nothing never publishes, even if all silent
 
   const lastTEnd = mergedTurns.length > 0 ? mergedTurns[mergedTurns.length - 1].tEnd : 0;
   const coveragePercent = ((lastTEnd / durationSeconds) * 100).toFixed(1);
