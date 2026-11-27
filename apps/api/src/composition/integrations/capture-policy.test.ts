@@ -410,3 +410,37 @@ test("cycle1 snapshot HTTP rejects forged freshness metadata, foreign scope, sta
   } finally {rmSync(root, {recursive: true, force: true});} });
 
 test("new worker bootstrap exposes unknown counts without allowing snapshot acquisition",async()=>{   const f=workerFixture();assert.equal(await f.integration.gmailSummary("toc"),undefined); await assert.rejects(f.integration.listGmailCandidates("toc"),refuses(503)); const {generation}=await beginWorker(f);await f.integration.calendar.worker!.publish(principal,snapshot(f,generation)); assert.equal(await f.integration.gmailSummary("toc"),undefined);f.tick(11*60_000);assert.equal(await f.integration.gmailSummary("toc"),undefined);await assert.rejects(f.integration.listGmailCandidates("toc"),refuses(503)); });
+
+test("fresh worker deployment: /webinar-operations answers an explicit empty state for the bound tenant only, so the bot's tenant check can pass before first publish", async () => {
+  for (const begun of [false, true]) {
+    const f = workerFixture(); if (begun) await beginWorker(f);
+    const server = await startTestServer(buildTestDeps({calendar: f.integration.calendar, brain: {...buildTestDeps().brain, listWebinarOperations: f.integration.listWebinarOperations}, keyStore: fakeKeyStore({
+      operator: {tenantId: "toc", scopes: ["calendar", "sessions"]}, foreign: {tenantId: "other-tenant", scopes: ["calendar", "sessions"]},
+      noScope: {tenantId: "toc", scopes: ["calendar"]}})}));
+    const get = (key: string) => fetch(server.baseUrl+"/webinar-operations", {headers: {authorization: "Bearer "+key}});
+    try {
+      const ok = await get("operator"); assert.equal(ok.status, 200);
+      assert.equal(ok.headers.get("x-lkb-tenant"), "toc"); assert.equal(ok.headers.get("cache-control"), "private, no-store");
+      const body = await ok.json() as any;
+      assert.deepEqual(body.operations, []); assert.equal(body.omitted, 0); assert.equal(body.state, "awaiting-first-publish");
+      assert.equal(body.worker.status, "unavailable"); assert.equal(body.worker.complete, false);
+      assert.equal(body.discovery, undefined, "no discovery health may be claimed before a worker publish");
+      // Every other check is unchanged: no key, wrong scope, a tenant with no worker binding, and a revoked bound key are all refused.
+      assert.equal((await fetch(server.baseUrl+"/webinar-operations")).status, 401);
+      assert.equal((await get("noScope")).status, 403);
+      const foreign = await get("foreign"); assert.equal(foreign.status, 503); assert.equal(foreign.headers.get("x-lkb-tenant"), null);
+      f.data.api_keys![0].revokedAt = f.date();
+      const revoked = await get("operator"); assert.equal(revoked.status, 503); assert.equal(revoked.headers.get("x-lkb-tenant"), null);
+    } finally { await server.close(); }
+  }
+});
+test("the empty bootstrap state ends at the first publish and never masks a corrupt or missing accepted snapshot", async () => {
+  const f = workerFixture(), {generation} = await beginWorker(f);
+  assert.equal((await f.integration.listWebinarOperations("toc") as any).state, "awaiting-first-publish");
+  await f.integration.calendar.worker!.publish(principal, snapshot(f, generation));
+  const after = await f.integration.listWebinarOperations("toc") as any;
+  assert.equal(after.state, undefined); assert.equal(after.worker.status, "fresh"); assert.ok(after.discovery.calendar);
+  f.data.watch_state![0].workerSnapshot.state.meetings = [];
+  await assert.rejects(f.integration.listWebinarOperations("toc"), refuses(503));
+  await assert.rejects(f.integration.listWebinarOperations("foreign"), refuses(403));
+});

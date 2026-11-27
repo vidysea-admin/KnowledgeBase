@@ -43,7 +43,9 @@ export interface WebinarOperation {
   updatedAt?: string; startTime?: string; endTime?: string;
 }
 export interface WebinarDiscoveryHealth { status: "healthy" | "failed"; checkedAt: string; lastSuccessAt?: string }
-export interface WebinarOperations { operations: WebinarOperation[]; omitted: number; discovery?: Record<"calendar" | "gmail", WebinarDiscoveryHealth>; worker?: import("./calendar.js").CalendarWorkerHealth }
+export interface WebinarOperations { operations: WebinarOperation[]; omitted: number; discovery?: Record<"calendar" | "gmail", WebinarDiscoveryHealth>; worker?: import("./calendar.js").CalendarWorkerHealth;
+  /** Set only for a bound calendar worker that has not yet published its first snapshot: an explicit empty state, not an error. */
+  state?: "awaiting-first-publish" }
 
 export function projectWebinarOperations(input: unknown): WebinarOperations {
   const value = input as {operations?: unknown; omitted?: unknown};

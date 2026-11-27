@@ -238,7 +238,11 @@ export function buildCalendarWorkerIntegrations({db, env, now = () => new Date()
       return [...rows.filter(row => !["calendar", "gmail"].includes(row.sourceType)), ...await workerHeartbeats(tenantId)];
     },
     async listWebinarOperations(tenantId) {
-      const value = await load(tenantId); if (!value.operationSnapshot) workerError(503);
+      // `load` has already required the tenant's worker binding and its active, unrevoked key, and fails closed (503/403) on any corrupt or
+      // mismatched fence/snapshot. An absent operation snapshot therefore means only "bound worker has not published yet": answer an explicit
+      // empty state (no discovery health is claimed) so the bot's tenant check can pass and let it publish the first snapshot.
+      const value = await load(tenantId);
+      if (!value.operationSnapshot) return {operations: [], omitted: 0, state: "awaiting-first-publish", worker: value.worker};
       const operations = projectWebinarOperations(value.operationSnapshot.state.operations);
       const discovery = Object.fromEntries((["calendar", "gmail"] as const).map(feed => [feed, {status: value.worker.status === "fresh" ? "healthy" : "failed",
         checkedAt: value.operationSnapshot!.state.checkedAt, lastSuccessAt: value.fence!.receivedAt}])) as NonNullable<WebinarOperations["discovery"]>;
