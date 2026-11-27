@@ -15,6 +15,7 @@ import { createMongoSearchDeps } from "../search-store.js";
 import { createRouteDeps } from "../route/route-store.js";
 import { createSessionDecisionsDeps } from '../session-decisions/reader.js';
 import { buildCalendarWorkerIntegrations, buildCapturePolicyIntegrations } from './integrations/capture-policy.js';
+import { withHostedSendNow } from '../join-rules/send-now-queue.js';
 import { createMongoWhatsAppDeps } from "../whatsapp/store.js";
 import { createDbBackedWhatsAppOwners } from "../whatsapp/owner-config.js";
 import { realTransport } from "../ai-transport.js";
@@ -179,7 +180,8 @@ export function buildProductionDeps(options: { onIndexCommitted?: IndexCommitted
     // D-173: dormant semantic routes cannot be enabled through an old environment flag.
     semanticSearch: undefined,
     graph: createMongoGraphReadDeps(),
-    calendar: worker?.calendar ?? createGwsCalendarReadDeps(),
+    // hosted-send-now: LKB_SEND_NOW_QUEUE=1 queues "send bot now" in capture_jobs for the recorder container.
+    calendar: withHostedSendNow(worker?.calendar ?? createGwsCalendarReadDeps(), db, process.env),
     meetingCandidates: { ...createMeetingCandidatesDeps(undefined, undefined, undefined, undefined, worker?.listGmailCandidates, worker || process.env.LKB_JOIN_RULES_ENABLED === "1" ? {joinRules: capturePolicy.joinRules, ownedDomains: worker?.ownedDomains, gmailSummary: worker?.gmailSummary} : undefined), ...(publicWebinars.configured ? { discoverPublicWebinars: publicWebinars.discover } : {}) },
     whatsapp: createMongoWhatsAppDeps(undefined, { resolveOwners: createDbBackedWhatsAppOwners({ rawMap: process.env.WHATSAPP_TENANT_OWNER_MAP, db }) }) /* W4: links are authoritative; the env map only seeds legacy links. W11 G4: no indexer is bound, WhatsApp text is never indexed by a model */,
     keys: createMongoKeysDeps(),

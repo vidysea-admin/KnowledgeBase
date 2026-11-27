@@ -9,8 +9,12 @@ export interface ManualWorkerDeps {
   launch(root: string, args: string[], env: NodeJS.ProcessEnv, onLine: (line: string) => void, onControl: (control: RecordingControl) => void): Promise<void>;
   schedule(fn: () => void): () => void;
   publishPrivate?(owner: { tenantId: string; sessionId: string }, control: RecordingControl): Promise<() => Promise<void>>;
+  /** Flags appended to `record` (e.g. --transcribe --process-video --index for the hosted queue worker). Fixed values, never user input. */
+  recordArgs?: readonly string[];
 }
-const defaults: ManualWorkerDeps = {
+/** What the worker needs from a job store: the file store, or the hosted Mongo mirror (scripts/webinar/send-now/queue-store.ts). */
+export type ManualWorkerStore = Pick<ManualJobStore, "now" | "readRequest" | "claimWorker" | "writeProgress" | "cancellation">;
+export const defaultManualWorkerDeps: ManualWorkerDeps = {
   launch: launchControlledRecording,
   schedule(fn) { const timer = setInterval(fn, 1000); return () => clearInterval(timer); },
   async publishPrivate(owner, control) {
@@ -24,7 +28,7 @@ const defaults: ManualWorkerDeps = {
   },
 };
 
-export async function runManualWorker(root: string, store: ManualJobStore, tenantId: string, jobId: string, deps: ManualWorkerDeps = defaults): Promise<void> {
+export async function runManualWorker(root: string, store: ManualWorkerStore, tenantId: string, jobId: string, deps: ManualWorkerDeps = defaultManualWorkerDeps): Promise<void> {
   const request = store.readRequest(tenantId, jobId);
   if (!request) throw new Error("manual job not found");
   const req = request;
@@ -73,7 +77,7 @@ export async function runManualWorker(root: string, store: ManualJobStore, tenan
   let succeeded = false;
   try {
     await deps.launch(root, ["record", plan.request.meetingUrl, "--until", req.until, "--tenant", tenantId,
-      "--session-id", jobId, "--title", `manual ${req.platform}`], { ...process.env, LKB_TENANT_ID: tenantId },
+      "--session-id", jobId, "--title", `manual ${req.platform}`, ...(deps.recordArgs ?? [])], { ...process.env, LKB_TENANT_ID: tenantId },
       line => {
         // This fixed recorder line occurs after installCaptureControl and joiner setup. It is NOT admission evidence.
         if (line.startsWith("[bot] recording until ")) {

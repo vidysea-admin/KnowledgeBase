@@ -1,7 +1,7 @@
 import { render, screen, cleanup, fireEvent, waitFor } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import { afterEach, beforeEach, describe, test, expect, vi } from "vitest";
-import { SendNowForm, untilHint } from "./SendNowForm.js";
+import { SendNowForm, untilForServer, untilHint } from "./SendNowForm.js";
 import { MeetingBotPage } from "../MeetingBotPage.js";
 import * as sessions from "../../api/sessions.js";
 import * as calendar from "../../api/calendar.js";
@@ -29,7 +29,10 @@ describe("SendNowForm", () => {
     const [path, init] = fetchMock.mock.calls[0]!;
     expect(String(path)).toMatch(/\/calendar\/send-now$/);
     expect(init.method).toBe("POST");
-    expect(JSON.parse(init.body)).toEqual({ meetingUrl: "https://meet.google.com/abc-defg-hij", until: "23:59" });
+    // HH:MM is the user's local time: it is sent as a full ISO datetime with the browser's offset (the server's zone may be UTC).
+    const body = JSON.parse(init.body);
+    expect(body).toEqual({ meetingUrl: "https://meet.google.com/abc-defg-hij", until: untilForServer("23:59", Date.now()) });
+    expect(body.until).toMatch(/^\d{4}-\d{2}-\d{2}T23:59:00[+-]\d{2}:\d{2}$/);
     expect(init.headers.authorization).toBe(`Bearer ${KEY}`);
   });
 
@@ -152,5 +155,17 @@ describe("untilHint (advisory only)", () => {
   ])("%s", (v, expected) => {
     const h = untilHint(v, now);
     if (expected === null) expect(h).toBeNull(); else expect(h).toContain(expected);
+  });
+});
+
+describe("untilForServer", () => {
+  test("HH:MM becomes today at that local time with the local offset; anything else passes through trimmed", () => {
+    const now = new Date(2026, 10, 26, 10, 0, 0).getTime();
+    const v = untilForServer(" 18:30 ", now);
+    expect(v).toMatch(/^2026-11-26T18:30:00[+-]\d{2}:\d{2}$/);
+    expect(Date.parse(v)).toBe(new Date(2026, 10, 26, 18, 30, 0).getTime());
+    expect(untilForServer("2026-11-26T18:30:00+05:30", now)).toBe("2026-11-26T18:30:00+05:30");
+    expect(untilForServer("25:00", now)).toBe("25:00");
+    expect(untilForServer(" noon ", now)).toBe("noon");
   });
 });
