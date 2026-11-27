@@ -3,7 +3,7 @@ import {execFile} from 'node:child_process';
 import {promisify} from 'node:util';
 import {readFileSync, existsSync, statSync, mkdirSync, lstatSync, openSync, writeFileSync, fsyncSync, closeSync, renameSync, unlinkSync} from 'node:fs';
 import {join, resolve, isAbsolute, delimiter} from 'node:path';
-import {ATTENDANCE_ACCOUNT, attendanceFingerprint, attendanceSessionKey, rawAttendanceObservation, selectVerifiedCalendarMeetings} from './calendar-attendance-policy.mjs';
+import {ATTENDANCE_ACCOUNT, MAIL_SAME_MEETING_MS, attendanceFingerprint, attendanceSessionKey, mailOrder, mailSessionKey, meetingKey, rawAttendanceObservation, selectVerifiedCalendarMeetings} from './calendar-attendance-policy.mjs';
 import {randomUUID, createHash} from 'node:crypto';
 const {webinarIdentity} = await import('../../packages/meeting-bot/src/calendar/auto-record-policy.ts');
 const {acquireLock, lockStillOwned, releaseLock} = await import('../../packages/meeting-bot/src/calendar/join-rules/join-rules-store-lock.ts');
@@ -63,6 +63,20 @@ export function createCalendarAttendanceSource({account, tenantId, run, acquire,
     },
     assertAcquisition: loaded => { if (!generationValid || loaded.failed || (loaded.calendarAcquisition && loaded.calendarAcquisition.tenantId !== tenantId)) throw new Error('Attendance acquisition owner proof is required before writes'); },
     activeStopReason: (id, prepared) => {
+      // D-261: a mail-sourced capture stops when its mail (or any mail for the same meeting) is now rejected, cancelled,
+      // registration-only, under review, office/internal or unauthenticated, or when the calendar now holds that meeting
+      // and refuses it (declined / cancelled / office). An attendable calendar copy hands over: the capture keeps running.
+      const mail = prepared.candidates?.filter(row => row.meetingUrl && row.startTime && mailSessionKey(row.meetingUrl, row.startTime) === id).sort(mailOrder)[0];
+      if (mail) {
+        const key = meetingKey(mail.meetingUrl), start = Date.parse(mail.startTime), own = ATTENDANCE_ACCOUNT.split('@')[1];
+        const office = sender => { const domain = String(sender ?? '').toLowerCase().split('@')[1]; return Boolean(domain) && (domain === own || domain.endsWith('.' + own)); };
+        const same = row => row.meetingUrl && meetingKey(row.meetingUrl) === key && Math.abs(Date.parse(row.startTime) - start) <= MAIL_SAME_MEETING_MS;
+        if (mail.senderAuthenticated !== true) return 'cancelled';
+        if (prepared.candidates.some(row => same(row) && (row.status === 'rejected' || row.cancelled || row.registrationOnly || row.evidenceIssue !== undefined || office(row.senderEmail)))) return 'cancelled';
+        const calendar = prepared.calendarEvents.filter(same);
+        if (calendar.some(event => { const seen = observationFor(event); return event.cancelled || office(event.organizer) || (seen && ['rejected', 'cancelled', 'office-internal'].includes(seen.approval)); })) return 'cancelled';
+        return undefined;
+      }
       const event = prepared.calendarEvents.find(row => attendanceSessionKey(row) === id), observation = event && observationFor(event);
       if (event && prepared.candidates?.some(row => row.evidenceIssue !== undefined && row.meetingUrl && row.startTime && webinarIdentity(row.meetingUrl, row.startTime) === webinarIdentity(event.meetingUrl, event.startTime))) return 'cancelled';
       return observation && observation.approval !== 'accepted' && !(attendanceMode === 'all' && observation.approval === 'unanswered') ? 'cancelled' : undefined;

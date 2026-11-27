@@ -433,3 +433,125 @@ test('A9 wiring: a one-shot --run tick with one unsigned slot reaches the runner
   await assert.rejects(runPipelineTick(f.deps, true), /reviewed real host capability/);
   assert.equal(f.calls.length, 1, 'operator sign-off mode blocks before any new capture');
 }, {proof: true}));
+
+// D-261 (U1): a direct join link that arrives in a plain mail to the bot mailbox is attended in attendance mode 'all'.
+const ZOOM = 'https://us02web.zoom.us/w/81234567890?tk=personal-token';
+const mail = changes => ({id: 'mail-1', title: 'Career webinar', status: 'pending', senderEmail: 'no-reply@zoom.us', senderDomain: 'zoom.us',
+  senderAuthenticated: true, meetingUrl: ZOOM, startTime: START, endTime: END, ...changes});
+const mailInput = (candidates, changes = {}) => ({calendarEvents: [], candidates, now: NOW, leadMinutes: 5, alreadyScheduled: [], attendanceMode: 'all', ...changes});
+const pickMail = (candidates, changes) => selectVerifiedCalendarMeetings(mailInput(candidates, changes), () => undefined);
+
+test('D-261: a plain-mail direct join link is scheduled in attendance mode all', () => {
+  const out = pickMail([mail({})]);
+  assert.equal(out.toSchedule.length, 1);
+  const row = out.toSchedule[0];
+  assert.equal(row.source, 'gmail'); assert.equal(row.sourceId, 'mail-1'); assert.equal(row.meetingUrl, ZOOM);
+  assert.equal(row.startTime, START); assert.equal(row.endTime, END); assert.equal(row.sender, 'no-reply@zoom.us');
+  for (const url of ['https://meet.google.com/abc-defg-hij', 'https://zoom.us/j/81234567890?pwd=x', 'https://teams.microsoft.com/l/meetup-join/19%3ameeting'])
+    assert.equal(pickMail([mail({meetingUrl: url})]).toSchedule.length, 1, url);
+});
+
+test('D-261: mail links are never scheduled outside attendance mode all', () => {
+  for (const attendanceMode of [undefined, 'accepted', 'none']) assert.equal(pickMail([mail({})], {attendanceMode}).toSchedule.length, 0, String(attendanceMode));
+});
+
+for (const [name, change] of [
+  ['registration-only', {registrationOnly: true}], ['evidence issue', {evidenceIssue: 'time-unclear'}], ['rejected', {status: 'rejected'}],
+  ['cancelled', {cancelled: true}], ['unauthenticated sender', {senderAuthenticated: false}], ['missing authentication', {senderAuthenticated: undefined}],
+  ['authentication not literally true', {senderAuthenticated: 'true'}],
+  ['registration page', {meetingUrl: 'https://zoom.us/webinar/register/WN_abc'}], ['zoho link', {meetingUrl: 'https://meeting.zoho.com/meeting/register?sessionId=1'}],
+  ['look-alike host', {meetingUrl: 'https://meet.google.com.evil.test/abc-defg-hij'}], ['look-alike zoom', {meetingUrl: 'https://zoom.us.evil.test/j/81234567890'}],
+  ['http scheme', {meetingUrl: 'http://meet.google.com/abc-defg-hij'}], ['userinfo', {meetingUrl: 'https://u:p@meet.google.com/abc-defg-hij'}],
+  ['no link', {meetingUrl: undefined}], ['no end time', {endTime: undefined}], ['end before start', {endTime: START, startTime: END}],
+  ['past', {startTime: new Date(Date.parse(NOW) - 7200000).toISOString(), endTime: new Date(Date.parse(NOW) - 3600000).toISOString()}],
+]) test(`D-261: mail link refused (silently: no alert row) when ${name}`, () => {
+  const out = pickMail([mail(change)]);
+  assert.equal(out.toSchedule.length, 0); assert.deepEqual(out.skipped, []);
+});
+
+test('D-261: an office sender mail is refused and listed once as office/internal (unchanged)', () => {
+  const out = pickMail([mail({senderEmail: 'host@vidysea.com'})]);
+  assert.equal(out.toSchedule.length, 0); assert.deepEqual(out.skipped.map(row => row.reason), ['rule-denied']);
+});
+
+test('D-261: a mail link more than the lead window away waits (neither scheduled nor skipped)', () => {
+  const later = new Date(Date.parse(NOW) + 3600000).toISOString(), end = new Date(Date.parse(NOW) + 7200000).toISOString();
+  const out = pickMail([mail({startTime: later, endTime: end})]);
+  assert.equal(out.toSchedule.length, 0); assert.equal(out.skipped.length, 0);
+});
+
+test('D-261: the calendar wins over a mail for the same meeting; repeats of one mail link are scheduled once', () => {
+  const observation = rawAttendanceObservation(raw({}));
+  const same = mail({meetingUrl: 'https://meet.google.com/abc-defg-hij'});
+  const both = selectVerifiedCalendarMeetings({...mailInput([same]), calendarEvents: [observation.event]}, () => observation);
+  assert.equal(both.toSchedule.length, 1); assert.equal(both.toSchedule[0].source, 'calendar');
+  // a declined calendar invite for the same meeting is not overridden by the mail
+  const declined = rawAttendanceObservation(raw({attendees: [{email: ATTENDANCE_ACCOUNT, self: true, responseStatus: 'declined'}]}));
+  assert.equal(selectVerifiedCalendarMeetings({...mailInput([same]), calendarEvents: [declined.event]}, () => declined).toSchedule.length, 0);
+  const twice = pickMail([mail({}), mail({id: 'mail-2', meetingUrl: ZOOM.replace('personal-token', 'other')})]);
+  assert.equal(twice.toSchedule.length, 1);
+  const first = twice.toSchedule[0];
+  assert.equal(pickMail([mail({})], {alreadyScheduled: [first.sessionKey]}).toSchedule.length, 0);
+});
+
+// review A: matching is by the meeting (code / number / Teams path) within a time window, never by link text.
+const meetVariants = ['https://meet.google.com/abc-defg-hij?authuser=0', 'https://meet.google.com/abc-defg-hij/', 'https://meet.google.com/abc-defg-hij?hs=224'];
+test('D-261 review A: a declined calendar invite is never overridden by a variant link or a shifted mail time', () => {
+  const declined = rawAttendanceObservation(raw({attendees: [{email: ATTENDANCE_ACCOUNT, self: true, responseStatus: 'declined'}]}));
+  const shifted = new Date(Date.parse(START) + 60000).toISOString();
+  for (const meetingUrl of meetVariants) for (const startTime of [START, shifted])
+    assert.equal(selectVerifiedCalendarMeetings({...mailInput([mail({meetingUrl, startTime})]), calendarEvents: [declined.event]}, () => declined).toSchedule.length, 0, meetingUrl + startTime);
+});
+test('D-261 review A: one meeting is scheduled once across link variants (Meet query, Zoom subdomain, Zoom /j vs /w)', () => {
+  const groups = [meetVariants.concat('https://meet.google.com/abc-defg-hij'),
+    ['https://us02web.zoom.us/j/81234567890', 'https://zoom.us/j/81234567890', 'https://us02web.zoom.us/w/81234567890?tk=a', 'https://us06web.zoom.us/w/81234567890?tk=b']];
+  for (const urls of groups) {
+    const out = pickMail(urls.map((meetingUrl, n) => mail({id: 'mail-' + n, meetingUrl})));
+    assert.equal(out.toSchedule.length, 1, urls[0]);
+    const again = pickMail(urls.map((meetingUrl, n) => mail({id: 'next-' + n, meetingUrl})), {alreadyScheduled: [out.toSchedule[0].sessionKey]});
+    assert.equal(again.toSchedule.length, 0, 'a later tick with another variant is the same session');
+  }
+  // two different meetings both go
+  assert.equal(pickMail([mail({}), mail({id: 'other', meetingUrl: 'https://zoom.us/j/99999999999'})]).toSchedule.length, 2);
+});
+test('D-261 review A: a rejected, cancelled, review or office sibling mail for the same meeting blocks the good one', () => {
+  for (const sibling of [{status: 'rejected'}, {cancelled: true}, {evidenceIssue: 'unresolved-body'}, {registrationOnly: true}, {senderEmail: 'x@vidysea.com'}])
+    assert.equal(pickMail([mail({}), mail({id: 'sib', meetingUrl: 'https://zoom.us/j/81234567890', ...sibling})]).toSchedule.length, 0, JSON.stringify(sibling));
+});
+test('D-261 review A: a mail-sourced capture stops when its mail turns bad or the calendar takes the meeting', () => fixture(async f => {
+  const acquired = await f.deps.calendarAttendance.load(), good = mail({});
+  const selected = f.deps.calendarAttendance.select({...input([]), candidates: [good], attendanceMode: 'all'});
+  assert.equal(selected.toSchedule.length, 1); const id = selected.toSchedule[0].sessionKey;
+  const stop = (candidates, calendarEvents = []) => f.deps.calendarAttendance.activeStopReason(id, {calendarEvents, candidates});
+  assert.equal(stop([good]), undefined);
+  for (const change of [{status: 'rejected'}, {cancelled: true}, {evidenceIssue: 'unresolved-body'}]) assert.equal(stop([{...good, ...change}]), 'cancelled', JSON.stringify(change));
+  assert.equal(stop([good, mail({id: 'sib', meetingUrl: 'https://zoom.us/j/81234567890', status: 'rejected'})]), 'cancelled');
+  assert.equal(stop([{...good, senderAuthenticated: false}]), 'cancelled');
+  assert.equal(stop([good, mail({id: 'sib', meetingUrl: 'https://zoom.us/j/81234567890', senderEmail: 'x@vidysea.com'})]), 'cancelled');
+  const copy = {...acquired.meetings[0], meetingUrl: 'https://zoom.us/j/81234567890', startTime: START, endTime: END};
+  assert.equal(stop([good], [{...copy, cancelled: true}]), 'cancelled', 'a cancelled calendar copy stops it');
+  assert.equal(stop([good], [{...copy, organizer: 'host@vidysea.com'}]), 'cancelled', 'an office calendar copy stops it');
+  assert.equal(stop([good], [copy]), undefined, 'an attendable calendar copy hands over: the live capture keeps running');
+  assert.equal(stop([good], acquired.meetings), undefined, 'another calendar meeting does not stop it');
+}));
+
+// review B
+test('D-261 review B: the mail session key is the reconciler key for that mail row', async () => {
+  const {webinarIdentity, webinarSessionKey} = await import('../../packages/meeting-bot/src/calendar/auto-record-policy.ts');
+  assert.equal(pickMail([mail({})]).toSchedule[0].sessionKey, webinarSessionKey(webinarIdentity(ZOOM, START)));
+  // the representative mail is the oldest received, so the key is stable when a newer variant arrives
+  const out = pickMail([mail({id: 'z-new', receivedAt: '2026-11-27T10:00:00Z', meetingUrl: 'https://zoom.us/j/81234567890'}), mail({id: 'a-old', receivedAt: '2026-11-20T10:00:00Z'})]);
+  assert.equal(out.toSchedule.length, 1); assert.equal(out.toSchedule[0].sourceId, 'a-old');
+});
+test('D-261 review B: a mail meeting longer than 8 hours is refused', () => {
+  assert.equal(pickMail([mail({endTime: new Date(Date.parse(START) + 9 * 3600000).toISOString()})]).toSchedule.length, 0);
+  assert.equal(pickMail([mail({endTime: new Date(Date.parse(START) + 7 * 3600000).toISOString()})]).toSchedule.length, 1);
+});
+test('D-261 review B: while a mail session runs, a calendar copy of the meeting is a duplicate, not a second capture', () => {
+  const variant = 'https://meet.google.com/abc-defg-hij?authuser=0', running = pickMail([mail({meetingUrl: variant})]).toSchedule[0].sessionKey;
+  const observation = rawAttendanceObservation(raw({}));
+  const out = selectVerifiedCalendarMeetings({...mailInput([mail({meetingUrl: variant})]), calendarEvents: [observation.event], alreadyScheduled: [running]}, () => observation);
+  assert.equal(out.toSchedule.length, 0); assert.ok(out.skipped.some(row => row.source === 'calendar' && row.reason === 'duplicate-session'));
+  // without a running mail session the calendar item is scheduled as before
+  assert.equal(selectVerifiedCalendarMeetings({...mailInput([]), calendarEvents: [observation.event]}, () => observation).toSchedule.length, 1);
+});
