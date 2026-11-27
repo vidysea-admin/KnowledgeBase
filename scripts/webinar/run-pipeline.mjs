@@ -4,7 +4,7 @@ import { existsSync, mkdirSync, readFileSync, realpathSync, statSync } from 'nod
 import { dirname, join, resolve, relative, isAbsolute } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import {randomUUID, createHash} from 'node:crypto';
-import {isProtectedWorkDbName} from '../lib/transcript-provenance.mjs';
+import {isProtectedWorkDbName, productionIndexOptIn} from '../lib/transcript-provenance.mjs';
 import { register } from 'tsx/esm/api';
 import {validateSlots, createCapturePool, runAutonomousCycles, POLL_MS} from './scheduler/service.mjs';
 import {runSchedulerCycle} from './scheduler/dispatch.mjs';
@@ -42,7 +42,8 @@ function confined(root, file) {
 }
 export function validateRunGate(root, env) {
   const work = env.MONGO_WORK_DB?.trim();
-  if (isProtectedWorkDbName(work, env)) throw new Error('MONGO_WORK_DB must identify an isolated work database; production writes refused');
+  // A8 (D-257): lkb_prod only on the full D-204 opt-in; sync-session.mjs re-checks all three parts before any write.
+  if (!productionIndexOptIn(env) && isProtectedWorkDbName(work, env)) throw new Error('MONGO_WORK_DB must identify an isolated work database; production writes refused');
   const file = join(root, 'data/webinar-release/live-proof.json');
   if (!existsSync(file)) throw new Error('Manual live audio/video proof is required before unattended --run; see docs/webinar-release.md');
   const proof = load(file);

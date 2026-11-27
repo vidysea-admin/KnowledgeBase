@@ -6,6 +6,7 @@ import {join, relative} from 'node:path';
 import {runNodeScript, classifyStageFailure} from './stage-process.mjs';
 import {ownedDirectory,writeProofMarker} from './proof-marker.mjs';
 import {acknowledgedCompletion} from './completed-session.mjs';
+import {PRODUCTION_FLAG} from '../../lib/transcript-provenance.mjs';
 export {runNodeScript} from './stage-process.mjs';
 
 export const graphEnabled = (env = process.env) => env.LKB_PIPELINE_GRAPH === '1';
@@ -70,7 +71,8 @@ export function createSessionHandlers({root, id, title, artifact, capture, env, 
     }),
     index: guard(async (ctx) => {
       assertTenant(ctx);
-      await runScript(root, 'scripts/webinar/sync-session.mjs', [id, '--emit-files', '--index'], env, {signal: ctx?.signal});
+      // A8 (D-257): same fixed opt-in as the sequential path (record-finalize syncSessionIndexArgs); sync-session checks the other two parts.
+      await runScript(root, 'scripts/webinar/sync-session.mjs', [id, '--emit-files', '--index', ...(env?.LKB_INDEX_PRODUCTION === '1' ? [PRODUCTION_FLAG] : [])], env, {signal: ctx?.signal});
       ctx?.signal?.throwIfAborted();
       const proof = validateIndexProof(dir, id);
       // Same marker the sequential path writes (processRecordingArtifacts report("done")); run-pipeline's complete() reads it.

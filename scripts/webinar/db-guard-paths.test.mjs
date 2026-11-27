@@ -398,3 +398,20 @@ test('D-207 source: both paths call the one guardDatabase(); the migrated and ex
   assert.ok(s.indexOf('function guardDatabase') < s.indexOf('guardDatabase(undefined)'));
   assert.match(code('scripts/lib/transcript-provenance.mjs'), /\["lkb", "lkb_prod", "global_university_db"\]\.includes\(n\.toLowerCase\(\)\) \|\| stagingRefused\(n, env\)/);
 });
+
+// Plan A8 (D-257): the calendar scheduler may target lkb_prod only under the same three-part opt-in sync-session enforces,
+// with the fixed setting LKB_INDEX_PRODUCTION=1 standing in for the argv flag (the scheduler forwards it to the record child).
+test('A8: validateRunGate lets lkb_prod past the DB check only with LKB_INDEX_PRODUCTION=1 + MONGO_WORK_DB=lkb_prod + MONGODB_DB=lkb_prod', () => {
+  const empty = mkdtempSync(join(tmpdir(), 'gate-'));
+  const all = {LKB_INDEX_PRODUCTION: '1', MONGO_WORK_DB: 'lkb_prod', MONGODB_DB: 'lkb_prod'};
+  assert.throws(() => validateRunGate(empty, all), /Manual live audio\/video proof is required/);
+  assert.throws(() => validateRunGate(empty, {...all, MONGO_WORK_DB: ' lkb_prod ', MONGODB_DB: ' lkb_prod '}), /Manual live audio\/video proof is required/);
+  for (const env of [
+    {MONGO_WORK_DB: 'lkb_prod', MONGODB_DB: 'lkb_prod'},
+    {...all, LKB_INDEX_PRODUCTION: 'true'}, {...all, LKB_INDEX_PRODUCTION: ''}, {...all, LKB_INDEX_PRODUCTION: ' 1'},
+    {...all, MONGODB_DB: undefined}, {...all, MONGODB_DB: 'lkb'}, {...all, MONGODB_DB: 'lkb_work_x'},
+    {...all, MONGO_WORK_DB: 'LKB_PROD', MONGODB_DB: 'LKB_PROD'},
+    {...all, MONGO_WORK_DB: 'lkb', MONGODB_DB: 'lkb'}, {...all, MONGO_WORK_DB: 'global_university_db', MONGODB_DB: 'global_university_db'},
+    {...all, MONGO_WORK_DB: 'lkb', MONGODB_DB: 'lkb_prod'}, {...all, MONGO_WORK_DB: undefined},
+  ]) assert.throws(() => validateRunGate(empty, env), /isolated work database; production writes refused/, JSON.stringify(env));
+});
