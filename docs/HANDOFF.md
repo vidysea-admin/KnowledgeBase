@@ -23,7 +23,7 @@ Finish line, both on the live site with nobody typing a command: (1) a pasted Me
 
 Waiting on Umesh, now: the bot's Google account (`LKB_ATTENDANCE_ACCOUNT`) and the address for alert mails (`LKB_ALERT_EMAIL_TO`).
 
-After live (frozen): two parallel meetings (B9 pool part, P1, P2), automatic bot image build on master, a per-tenant cap and a schema for `capture_jobs`, keeping a half-finished recording on shutdown (H2), auto-registration (R1), calendar inside the hosted app (B11), credentials to Secret Manager (B7), page auto-refresh (T1).
+After live (frozen): two parallel meetings (B9 pool part, P1, P2), automatic bot image build on master, a per-tenant cap and a schema for `capture_jobs`, keeping a half-finished recording on shutdown (H2), auto-registration (R1), calendar inside the hosted app (B11), credentials to Secret Manager (B7), page auto-refresh (T1), and cost and size tuning from real use (O1): after a few weeks live, read the bot's CPU and memory peaks per meeting and the meeting times from `capture_jobs` and the calendar, then decide the vCPU and memory size and whether to scale the worker pool to 0 outside meeting hours (a worker pool is billed for every running hour, meeting or not).
 
 Rows in the lane table below that this section replaces: B3 and B4 are merged into `integrate/bot-live` (70d066a7, e32ea0ca); B4B is merged; B9's one-slot part is A9; P2 was answered by D-257 answer 2; the H1 alert-title issue ISS-H1SELFHEAL-002 is closed (D-254); B5 to B8 are Phases B and C above.
 
