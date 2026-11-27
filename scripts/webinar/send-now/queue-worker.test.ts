@@ -57,8 +57,11 @@ test("a queued job is claimed, recorded with the fixed flags and ends completed;
   const deps: ManualWorkerDeps = { ...noTicks, async launch(_root, args, env, onLine) {
     argv = args; assert.equal(env.LKB_TENANT_ID, "a");
     onLine("[bot] recording until 11:00");
-    await new Promise(resolve => setTimeout(resolve, 50));
-    seenRunning = (await queue.detail("a", jobId))!.state;
+    // Poll (not a fixed 50 ms): under machine load the coalesced "running" write can take longer to land.
+    for (let i = 0; i < 60 && seenRunning !== "running"; i++) {
+      await new Promise(resolve => setTimeout(resolve, 50));
+      seenRunning = (await queue.detail("a", jobId))!.state;
+    }
   } };
   const result = await runQueueOnce({ queue, tenants: ["a"], root, maxWaitS: 0, recordArgs: ["--transcribe"], deps, ...quiet });
   assert.deepEqual(result, { job: jobId, state: "completed" });
@@ -147,4 +150,10 @@ test("review A3/B-low: close() after a completed final write returns; ownership 
   const m2 = new QueueJobMirror(queue, job, "w1", timers);
   m2.writeProgress(m2.request, "failed");
   await assert.rejects(m2.close(), /ownership was lost/);
+}));
+
+test("ISS-B3HOSTID-001: a bad LKB_CAPTURE_HOST_ID refuses before any claim, so the job stays queued", { skip }, () => withQueued(async ({ queue, db }) => {
+  await assert.rejects(runQueueOnce({ queue, tenants: ["a"], root, maxWaitS: 0, recordArgs: [], env: { LKB_CAPTURE_HOST_ID: "" },
+    deps: { ...noTicks, launch: async () => { throw new Error("must not launch"); } }, ...quiet }), /LKB_CAPTURE_HOST_ID refused: empty/);
+  assert.equal((await db.collection(CAPTURE_JOBS).findOne({}))?.state, "queued");
 }));

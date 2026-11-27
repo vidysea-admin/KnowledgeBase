@@ -10,7 +10,7 @@ import { startServer } from "../../apps/api/src/server.js";
 import { buildProductionDeps } from "../../apps/api/src/composition/production.js";
 import type { HostCaptureReadinessAdapter } from "../../apps/api/src/capture-readiness/types.js";
 import { selectTabCaptureWorkspace } from "../../packages/meeting-bot/src/capture/workspace/tab-session-workspace.js";
-import { readCaptureSlotObservation, captureSlotHostId } from "../../packages/meeting-bot/src/capture/workspace/capture-slot-readiness.js";
+import { assertCaptureHostIdSetting, readCaptureSlotObservation, captureSlotHostId } from "../../packages/meeting-bot/src/capture/workspace/capture-slot-readiness.js";
 import { publishCaptureSlotAcceptance, revokeCaptureSlotAcceptance } from "../../packages/meeting-bot/src/capture/workspace/capture-slot-acceptance.js";
 import { createNativeArchiveProductionService } from "./production.js";
 import type { NativeArchiveServerService } from "../../packages/meeting-bot/src/capture/native/native-archive-join-types.js";
@@ -21,6 +21,7 @@ export const nativeWorkspaceRoot = path.resolve(path.dirname(fileURLToPath(impor
 /** Supported host bridge lives at this trusted root launcher; ordinary API startup has no host.
  * Construction performs no reads. Existing API auth/tenant/slot gates precede every operation. */
 export function createTrustedCaptureReadinessHost(root: string, env: NodeJS.ProcessEnv): HostCaptureReadinessAdapter {
+  assertCaptureHostIdSetting(env);   // ISS-B3HOSTID-001: refuse a bad host id when the host is built, not on the first receipt
   const selected = (tenantId: string, slot: string) => selectTabCaptureWorkspace(["--capture-slot", slot], {
     tenantId, profileDir: path.resolve(env.LKB_BOT_PROFILE_DIR ?? path.join(root, "data/bot-profile")),
     recordDir: path.resolve(env.LKB_RECORD_DIR ?? path.join(root, "raw/webinars")),
@@ -172,6 +173,7 @@ export function installNativeCliShutdown(server: Server, options: NativeCliShutd
   options.signals.on("SIGINT", interrupt); options.signals.on("SIGTERM", terminate);
 }
 export async function startNativeServer(env: NodeJS.ProcessEnv = process.env, overrides: Partial<NativeServerRuntime> = {}) {
+  assertCaptureHostIdSetting(env);   // review A2: refuse before connect and the archive drain, not inside buildDeps
   const runtime: NativeServerRuntime = { connect, getDb, service: configuredNativeArchiveService,
     buildDeps: buildProductionDeps, startServer, watchedSupervisor: runWatchedSourceSupervisor,
     log: message => console.error(message), onStop: () => undefined, ...overrides };

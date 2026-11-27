@@ -22,6 +22,7 @@ import { CaptureJobQueue, type CaptureJobDoc } from "../../../apps/api/src/join-
 import { requireDatabaseName } from "../../../apps/api/src/db-name.js";
 import { servedTenants } from "../../../apps/api/src/join-rules/send-now-queue.js";
 import { defaultManualWorkerDeps, runManualWorker, type ManualWorkerDeps } from "../../../packages/meeting-bot/src/manual-jobs/worker.js";
+import { assertCaptureHostIdSetting } from "../../../packages/meeting-bot/src/capture/workspace/capture-slot-readiness.js";
 import { QueueJobMirror } from "./queue-store.js";
 
 /** The slice of the driver used here, typed from the queue's own Db so no second `mongodb` copy is resolved for types. */
@@ -47,6 +48,8 @@ export interface QueueWorkerOptions {
   mirror?: (job: CaptureJobDoc, ownerId: string) => QueueJobMirror;
   /** Aborted on container SIGTERM: stop waiting for a claim, or end a claimed job `failed` at once. */
   stop?: AbortSignal;
+  /** The environment checked before any claim (default process.env). */
+  env?: NodeJS.ProcessEnv;
 }
 export type QueueWorkerResult = { job: null } | { job: string; state: string };
 
@@ -54,6 +57,8 @@ export async function runQueueOnce(o: QueueWorkerOptions): Promise<QueueWorkerRe
   const log = o.log ?? (line => console.log(line));
   const sleep = o.sleep ?? (ms => new Promise<void>(resolve => setTimeout(resolve, ms)));
   const ownerId = o.ownerId ?? `${os.hostname().slice(0, 40)}-${process.pid}-${randomBytes(4).toString("hex")}`;
+  // ISS-B3HOSTID-001: a bad host id refuses before any claim, so a job is never taken and then burnt.
+  assertCaptureHostIdSetting(o.env ?? process.env);
   const deadline = o.queue.now().getTime() + o.maxWaitS * 1000;
   let job: CaptureJobDoc | null = null;
   for (;;) {

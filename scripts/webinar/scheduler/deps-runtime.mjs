@@ -9,13 +9,16 @@ const {raiseAlert, raiseRulesDegraded, clearRulesDegraded, flushFailureDigest} =
 const {createGwsRunner} = await import('../../../packages/meeting-bot/src/autojoin/gws-channels.ts');
 const {enforceJoinRules} = await import('../../../packages/meeting-bot/src/calendar/join-rules/join-rules-enforce.ts');
 const {selectTabCaptureWorkspace} = await import('../../../packages/meeting-bot/src/capture/workspace/tab-session-workspace.ts');
-const {listCaptureSlotReadiness, validateCaptureSlotReadiness} = await import('../../../packages/meeting-bot/src/capture/workspace/capture-slot-readiness.ts');
+const {assertCaptureHostIdSetting, listCaptureSlotReadiness, validateCaptureSlotReadiness} = await import('../../../packages/meeting-bot/src/capture/workspace/capture-slot-readiness.ts');
 const {createCaptureSlotEvidenceAcceptor} = await import('../../../packages/meeting-bot/src/capture/workspace/capture-slot-acceptance.ts');
 const {publishCapturePrivacyController} = await import('../../../packages/meeting-bot/src/capture/record-consent/controller-bridge.ts');
 const {detectPlatform} = await import('../../../packages/meeting-bot/src/platform.ts');
 const FLAGS = ['discovery', 'webinarAutoJoin', 'careerPriority', 'testDataRouting'];
 
 export function createSchedulerRuntime(root, env, log, verifiedTenant) {
+  // ISS-B3HOSTID-001: a bad LKB_CAPTURE_HOST_ID stops the process here, at start, with its reason. Below, the slot
+  // capability reader catches every error, which used to hide it as "no reviewed host capability evidence".
+  assertCaptureHostIdSetting(env);
   const stateDir = join(root, 'raw/webinars'), tenantId = env.LKB_TENANT_ID;
   const captureSlots = typeof env.LKB_CAPTURE_SLOTS === 'string' ? env.LKB_CAPTURE_SLOTS.split(',').map(value => value.trim()) : [];
   const configuredRoot = (name, fallback) => {
