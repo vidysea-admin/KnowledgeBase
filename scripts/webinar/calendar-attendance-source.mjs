@@ -102,7 +102,7 @@ export async function configureCalendarAttendance(deps, account, dependencies = 
   const hostId = deps.env.LKB_CALENDAR_WORKER_HOST_ID;
   const publisher = hostId ? createCalendarWorkerPublisher({stateDir: deps.stateDir, account, hostId, tenantId: deps.env.LKB_TENANT_ID,
     apiUrl: deps.env.LKB_API_URL, apiKey: deps.env.LKB_API_KEY, fetch: dependencies.fetch, now: deps.now}) : undefined;
-  source.checkReady = (configured, gate) => checkCalendarAttendanceReady(configured, gate, dependencies.probe);
+  source.checkReady = (configured, gate, options) => checkCalendarAttendanceReady(configured, gate, dependencies.probe, options);
   source.publishDiscovery = async () => {
     if (!publisher) throw new Error('Discovery-only mode requires an authenticated hosted worker binding');
     try {
@@ -134,13 +134,16 @@ export async function checkCalendarAttendanceReady(deps, validateRunGate, probe 
   if (!isAbsolute(binary)) throw new Error('Attendance media executable must be an absolute path');
   const {stdout} = await execute(binary, ['-v', 'error', '-show_streams', '-show_format', '-of', 'json', file], {timeout: 15000, maxBuffer: 1024 * 1024, windowsHide: true});
   return JSON.parse(stdout);
-}) {
+}, {autonomous = true} = {}) {
   deps.calendarAttendance.assertOwner(deps.env.LKB_TENANT_ID);
   validateRunGate(deps.root, deps.env);
   await deps.validateTenant(); await deps.calendarAttendance.verifyAccount();
   if (Array.isArray(deps.captureSlots)) {
     if (!deps.env.LKB_CALENDAR_WORKER_HOST_ID || !deps.env.LKB_API_URL) throw new Error('Explicit hosted worker account/host binding is required before unattended activation');
-    await deps.validateCaptureSlots(deps.captureSlots);
+    // A9 (D-257, D-258): one meeting at a time is proven by the live-proof media probe below (a real
+    // recording with audio and video); the signed pool-slot acceptance guards only the parallel pool
+    // (autonomous). LKB_SLOT_READINESS=operator brings back the person's sign-off for any mode.
+    if (autonomous !== false || String(deps.env.LKB_SLOT_READINESS ?? '').trim().toLowerCase() === 'operator') await deps.validateCaptureSlots(deps.captureSlots);
   }
   const proof = JSON.parse(readFileSync(join(deps.root, 'data/webinar-release/live-proof.json'), 'utf8'));
   const media = await probe(resolve(deps.root, proof.recording), deps.env);
