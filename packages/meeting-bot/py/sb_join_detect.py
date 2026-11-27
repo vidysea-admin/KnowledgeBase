@@ -1,5 +1,6 @@
 """sb_join: join/end phrases, click gate and the T-029 reconnect state machine (moved verbatim from sb_join.py; browser-free)."""
 import os
+import re
 from urllib.parse import urlsplit
 
 JOIN_TEXTS = [
@@ -151,6 +152,13 @@ REFUSED_PHRASES = ["you can't join this video call", "you can’t join this vide
 # After admission_timeout the browser stays open this long for the controller's flush + stop file.
 FLUSH_GRACE_S = 45
 ADMISSION_TIMEOUT_S = 15 * 60  # default lobby wait before giving up (--admission-timeout overrides)
+# ISS-ADMISSION-STABLE-001 (live 2026-11-27): Meet renders the call-controls bar about a second BEFORE the lobby text
+# ("please wait until a meeting host brings you into the call"), so one in-call tick is not admission. The loop ticks
+# every 2 s: admitted needs this many consecutive in-call ticks with no lobby text.
+ADMISSION_CONFIRM_TICKS = 3
+# After admission, a Meet tab on a page outside its meeting (sent back to meet.google.com/home after a removal or a
+# lost knock) for this many consecutive ticks has left the meeting: one "ended" so the controller stops recording.
+LEFT_MEETING_TICKS = 10
 
 
 def is_meet_url(url):
@@ -159,6 +167,55 @@ def is_meet_url(url):
         return (urlsplit(url or "").hostname or "").lower() == "meet.google.com"
     except ValueError:
         return False
+
+
+def _meet_code(url):
+    try:
+        parts = urlsplit(url or "")
+    except ValueError:
+        return None
+    if (parts.hostname or "").lower() != "meet.google.com":
+        return None
+    return parts.path.strip("/").split("/")[0].lower()
+
+
+_MEET_HOME_PAGES = frozenset({"", "home", "landing"})
+_MEET_CODE_RE = re.compile(r"^[a-z]{3}-?[a-z]{4}-?[a-z]{3}$")
+
+
+def _code_key(segment):
+    return segment.replace("-", "") if segment and _MEET_CODE_RE.match(segment) else None
+
+
+# ISS-ADMISSION-STABLE-001 rule (b): Meet's own removed / left screen, not the broad DENIED_PHRASES set (those are
+# substrings of ordinary chat and captions, review round 2). Both a phrase AND the screen's "return to home screen"
+# button must be in the body; unverified live, so a miss fails safe (no early stop).
+LEFT_SCREEN_PHRASES = ("you've been removed from the meeting", "you have been removed from the meeting",
+                       "you were removed from the meeting", "you left the meeting", "you've left the meeting",
+                       "you have left the meeting")
+LEFT_SCREEN_BUTTON = "return to home screen"
+
+
+def is_left_screen(body_lower):
+    body = body_lower or ""
+    return LEFT_SCREEN_BUTTON in body and any(p in body for p in LEFT_SCREEN_PHRASES)
+
+
+def is_outside_meeting(meeting_url, current_url):
+    """Pure: True only when the meeting is a Meet URL and the tab now sits on a Meet page that is positively NOT this
+    meeting: the home / landing / root page, or a different code-shaped meeting. Anything else is False -- an empty,
+    non-Meet, unparseable or unrecognised path (/lookup/..., /_meet/..., /u/1/...), because a /lookup/ or nickname link
+    redirects to the real code and a live capture must never end on a URL we cannot read (review A, 2026-11-27)."""
+    own = _meet_code(meeting_url)
+    if own is None:
+        return False
+    current = _meet_code(current_url)
+    if current is None:
+        return False
+    if current in _MEET_HOME_PAGES:
+        return True
+    own_key, current_key = _code_key(own), _code_key(current)
+    return own_key is not None and current_key is not None and own_key != current_key
 
 
 def classify_meet_state(in_call_dom, body_lower):
@@ -254,10 +311,12 @@ class AdmissionState:
     that was never preceded by a blocked tick is NOT a failure: the bot is assumed to be in the call
     ("assumed") instead of aborting. Any blocked tick makes the timeout strict again."""
 
-    def __init__(self, started, timeout_s=ADMISSION_TIMEOUT_S, lenient=False):
+    def __init__(self, started, timeout_s=ADMISSION_TIMEOUT_S, lenient=False, confirm_ticks=1):
         self.started = started
         self.timeout_s = timeout_s
         self.lenient = lenient
+        self.confirm_ticks = max(1, int(confirm_ticks))  # ISS-ADMISSION-STABLE-001: consecutive in-call ticks needed
+        self.streak = 0
         self.admitted = False
         self.timed_out = False
         self.blocked_seen = False
@@ -266,8 +325,12 @@ class AdmissionState:
         if self.admitted or self.timed_out:
             return None
         if admitted_now:
-            self.admitted = True
-            return "admitted"
+            self.streak += 1
+            if self.streak >= self.confirm_ticks:
+                self.admitted = True
+                return "admitted"
+        else:
+            self.streak = 0
         if blocked:
             self.blocked_seen = True
         if self.timeout_s and self.timeout_s > 0 and now - self.started > self.timeout_s:

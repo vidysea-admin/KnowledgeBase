@@ -66,6 +66,8 @@ const FAKE = [
   'if (scenario === "admitted") { while (!has("release") && Date.now() < giveUp) await sleep(10); out({event: "admitted"}); }',
   'if (scenario === "admitted-first") { await sleep(1500); out({event: "admitted"}); }',
   'if (scenario === "timeout") out({event: "admission_timeout", seconds: 901, limit: 900});',
+  // ISS-ADMISSION-STABLE-001: admitted, then sb_join reports the tab was sent back outside the meeting.
+  'if (scenario === "left" || scenario === "ended-phrase") { await sleep(500); out({event: "admitted"}); await sleep(500); out(scenario === "left" ? {event: "ended", reason: "left-meeting"} : {event: "ended", reason: "meeting has ended"}); }',
   'for (;;) { if (Date.now() > giveUp) process.exit(0); if (has("quit") || (await (await post("/control", "{}")).json()).stop) break; await sleep(30); }',
   'await ev({event: "capture-stopped", failed: false}); process.exit(0);',
 ].join("\n");
@@ -77,6 +79,7 @@ async function drive(scenario: string, untilMs: number) {
   const states: string[] = [], joined: number[] = [];
   const mark = (n: string) => writeFileSync(join(dir, n), "1");
   let startingSamples = 0;
+  const startedAt = Date.now();
   const telegram = new Proxy({ enabled: false, notifyJoined: () => { joined.push(states.length); } } as any,
     { get: (t, k) => (k in t ? t[k] : () => {}) });
   try {
@@ -93,7 +96,8 @@ async function drive(scenario: string, untilMs: number) {
             const s = JSON.parse(readFileSync(join(recordDir, f), "utf8")).state; if (states[states.length - 1] !== s) states.push(s);
             // Barrier: release the held bot only after "starting" was observed; quit only after the outcome was.
             if (s === "starting") { startingSamples++; if (scenario === "admitted") mark("release"); if (scenario === "lobby" && startingSamples >= 25) mark("quit"); }
-            if (s === "recording") mark("quit");
+            if (s === "recording" && scenario !== "left" && scenario !== "ended-phrase") mark("quit");
+            if (scenario === "ended-phrase" && s === "recording" && Date.now() - startedAt > 8000) mark("quit");
           }
         } catch { /* mid-write */ }
       },
@@ -101,7 +105,7 @@ async function drive(scenario: string, untilMs: number) {
         extensionDir: join(REPO_ROOT, "packages/meeting-bot/py/tab-capture"), sessionId: "capadmit", tenantId: "fixture",
         startupTimeoutMs: 15000, log: () => {}, onEvent }),
     }).catch((e) => { error = e; });
-    return { error: error as Error | undefined, states, joined };
+    return { error: error as Error | undefined, states, joined, elapsedMs: Date.now() - startedAt, quitByFake: existsSync(join(dir, "quit")) };
   } finally { delete process.env.FAKE_CAPADMIT; rmSync(dir, { recursive: true, force: true }); }
 }
 const T = { timeout: 60000 };
@@ -119,6 +123,22 @@ test("runRecord: admitted -> status goes starting -> recording; exactly one Join
   assert.ok(i > 0 && r.states[i - 1] === "starting", `states ${r.states}`);
   assert.equal(r.joined.length, 1);
   assert.ok((r.joined[0] ?? 0) >= 1, "Joined fired before any status sample, i.e. not at join time: " + r.joined);
+});
+
+test("ISS-ADMISSION-STABLE-001: ended reason left-meeting stops the capture early through the controller, no failure", T, async () => {
+  const r = await drive("left", 120000);
+  // the fake writes "partial-media", not a real WebM, so only WebM finalization may fail (same as every fake run here)
+  assert.ok(r.error === undefined || /^WebM finalization failed/.test(r.error.message), String(r.error?.message));
+  assert.ok(r.states.includes("recording"), `states ${r.states}`);
+  assert.equal(r.quitByFake, false, "the fake quit by itself: the controller did not stop it");
+  assert.ok(r.elapsedMs < 30000, `stopped after ${r.elapsedMs} ms, not early (until was 120 s)`);
+});
+
+test("ISS-ADMISSION-STABLE-001: other ended reasons keep the old rule (no early stop before end-not-before)", T, async () => {
+  const r = await drive("ended-phrase", 120000);
+  // the fake writes "partial-media", not a real WebM, so only WebM finalization may fail (same as every fake run here)
+  assert.ok(r.error === undefined || /^WebM finalization failed/.test(r.error.message), String(r.error?.message));
+  assert.equal(r.quitByFake, true, `the controller stopped a webinar on an ended phrase before end-not-before (${r.elapsedMs} ms)`);
 });
 
 test("runRecord: admission_timeout -> typed failure, never 'recording', no Joined", T, async () => {

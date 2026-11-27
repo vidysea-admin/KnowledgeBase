@@ -112,6 +112,7 @@ export async function runRecord(rest: string[], inject: RecordInject = {}): Prom
   try {
   seeded = seedSlotFromArgs(rest, workspace); profileDirectory = selectedBrowserProfile(rest, profileDir); // w24: fresh signed-in slot copy, fail-closed
   let endedAt: number | undefined;
+  let leftMeeting = false;
   const gaps: GapWindow[] = [];
   const telegram = inject.telegram ?? createTelegramNotifier();
   let captureFailure: string | undefined;
@@ -124,6 +125,9 @@ export async function runRecord(rest: string[], inject: RecordInject = {}): Prom
     if (ev.event === "admitted" && !joinedNotified) { joinedNotified = true; telegram.notifyJoined(title, platform, { assumed: (ev as { assumed?: unknown }).assumed === true }); } // T-030, now only once admitted (ISS-CAPTUREFIX-001)
     owner.until = (until = onairUntilFromEvent(ev as { event?: unknown; seconds?: unknown }, Date.now()) ?? until).getTime(); // the capture-control gap end follows the adjusted end
     if (ev.event === "ended" && endedAt === undefined) endedAt = Date.now();
+    // ISS-ADMISSION-STABLE-001: sb_join emits this only after admission, once the tab sat outside the meeting
+    // (sent back to Meet home) for LEFT_MEETING_TICKS ticks. The bot is no longer in the call: stop now, not at --until.
+    if (ev.event === "ended" && (ev as { reason?: unknown }).reason === "left-meeting") leftMeeting = true;
     if (ev.event === "capture-error") captureFailure = gateFailure ?? String(ev.error ?? "capture failed");
     if (ev.event === "admission_timeout") captureFailure ??= gateFailure;
     if (ev.event === "admission_denied" && gateFailure) { admissionDenied = true; captureFailure ??= gateFailure; } // B2 / D-232: Meet refusal, pre-admission only
@@ -190,6 +194,7 @@ export async function runRecord(rest: string[], inject: RecordInject = {}): Prom
         if (captureFailure) throw new Error(captureFailure);
         if (now >= until.getTime()) { console.log("[bot] --until reached"); break; }
         if (gone) { console.log("[bot] bot browser exited"); break; }
+        if (leftMeeting) { console.log("[bot] bot is no longer in the meeting (left-meeting)"); break; }
         if (endedAt !== undefined && now >= endNotBefore.getTime() && now - endedAt > 60_000) {
           console.log("[bot] webinar reported ended"); break;
         }
