@@ -162,7 +162,10 @@ test('accepted ordinary meeting reaches actual runner and downstream CLI backend
   assert.equal(env.LKB_TENANT_ID, 'fixture'); assert.equal(recordingBackend(args.slice(1), env), 'tab');
   assert.equal(Object.values(result.operations).filter(row => row.status === 'failed').length, 1);
   assert.equal(existsSync(join(f.stateDir, 'poller.lock')), false); assert.equal(f.sideEffects().registrations, 0); assert.ok(f.sideEffects().sends > 0);
-  await runPipelineTick(f.deps, true); assert.equal(f.calls.length, 1, 'restart must not rejoin the failed occurrence without its explicit recovery flow');
+  // D-244 (H1 self-heal, f2f2bee0): a capture that failed with its own error and no recording file, while the meeting still runs,
+  // is rejoined like a crash on the next tick, up to ATTEMPT_LIMIT (3) attempts in all; after that it stays failed.
+  for (let tick = 2; tick <= 5; tick++) await runPipelineTick(f.deps, true);
+  assert.equal(f.calls.length, 3, 'rejoined by itself, but never past the attempt limit');
 }, {proof: true}));
 
 test('T-036 (ISS-T036CAL-009): the attendance selector never attends a link whose source is not conference data', () => {
