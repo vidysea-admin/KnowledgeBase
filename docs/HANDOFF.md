@@ -11,7 +11,7 @@ Finish line, both on the live site with nobody typing a command: (1) a pasted Me
 | A1 | Merge the send-now queue and the bot-privacy fixes | Claude | done | merges 5285c54c, 75f3db08 |
 | A2 | A wrong `LKB_CAPTURE_HOST_ID` stops the start (ISS-B3HOSTID-001) | Claude | done | 8c48b12b, merge f73368e5 |
 | A3 | An empty record-once is Failed, exit 73 (ISS-B4RECORDERSTATE-003) | Claude | done | 0405d2dc, merge 8662b360 |
-| A4 | Start-up check: a missing or wrong setting stops the start, exit 78 | Claude | built on `wave/a4-startup-check`, reviewed by two blind reviewers; full docker suite run pending, then merge | entrypoint.sh |
+| A4 | Start-up check: a missing or wrong setting stops the start, exit 78 | Claude | done (docker test files 64 pass, 0 fail; 13 of 13 mutants red; two blind reviewers) | 26e894e5, merge 3f8b492b |
 | A5 | One settings list for the bot and the API | Claude | done (Ollama row corrected by the A4 review) | `docs/DEVOPS-REDEPLOY-2026-11-01.md`, "Server bot: settings list" |
 | A6 | This table | Claude | done | here |
 | A7 | Recorder `--index` can reach the live KB on `LKB_INDEX_PRODUCTION=1` | Claude | done | 7e68c157, merge 46884db6 |
