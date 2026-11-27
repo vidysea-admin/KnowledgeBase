@@ -268,4 +268,86 @@ WhatsApp, with an API key that has scope `whatsapp-admin` (`read -rs K`, then `-
 
 - **A4, the start-up check (built, branch `wave/a4-startup-check`):** in run and record-once mode the entrypoint now stops with exit **78** before any bucket call when a setting the chosen flow needs is missing, blank, or wrong (two different database names, a protected work database without the production opt-in, `LKB_INDEX_PRODUCTION=1` without both names `lkb_prod`). The line names the setting, never its value. `LKB_ALLOW_NO_BUCKET=1` lets a queue or calendar run start without a bucket: laptop rehearsal only, never on the server. It checks that settings are present, not that Mongo answers: a wrong Mongo URL still shows up at the first queue loop.
 - **A9, one calendar meeting (built, branch `wave/a9-one-slot`):** a one-shot calendar run no longer needs the signed pool-slot acceptance; the live-proof media check (audio and video in a real recording) is the machine check. The parallel pool (`--watch`) keeps the signed acceptance.
-- Not verified: whether Cloud Run reads the image `HEALTHCHECK` (it expects `run-pipeline.mjs`, which queue-only mode never starts). The `docker-compose.yml` bot service does not forward the bucket, send-now, attendance or capture settings (affects only a compose run).
+- Image `HEALTHCHECK`: Cloud Run does not read it (worker pools support only HTTP, TCP or gRPC probes and have no default probe; checked in the Cloud Run worker-pool health-check docs on 2026-11-27). The bot serves no port, so it runs on Cloud Run without a probe: the instance restarts when the entrypoint exits, and failures reach people through the alert mails. Locally, the check used to report the queue and calendar loops as unhealthy; fixed on `wave/hc-loop-modes` (the loop shell counts as alive). The `docker-compose.yml` bot service does not forward the bucket, send-now, attendance or capture settings (affects only a compose run).
+
+## Server bot: size (measured 2026-11-27)
+
+Measured on the laptop in the bot image with no network, no sound card, no camera and no monitor: a 90 s Meet-like page (4 moving video tiles and a tone) recorded with the recorder's own settings (1280x720, 5 fps, VP8 500 kbps, Opus 64 kbps).
+
+| Limit | CPU (100% = one core) | Memory peak | Page frame rate | Recording |
+|---|---|---|---|---|
+| 1 vCPU, 2 GB | average 90%, peak 107% (full) | 416 MB | 56 fps | complete, 8.2 MB |
+| 2 vCPU, 4 GB | average 84%, peak 161% | 407 MB | 61 fps | complete, 8.3 MB |
+
+Server size: **2 vCPU, 4 GB**. One vCPU is already full on this test, and a real Meet decodes more video. The rehearsal (Phase B) confirms it on a real Meet with `docker stats`.
+
+`/dev/shm`: the test used 1 GB. Chrome is started without `--disable-dev-shm-usage`. On the worker pool, mount an in-memory volume at `/dev/shm` (1 GiB) `[ASSUMPTION: checked in Phase C doctor mode with df -h /dev/shm]`. Phase B also runs once with Docker's default 64 MB to see whether it matters.
+
+## Server bot: Phase B, the laptop rehearsal (nothing here touches production)
+
+Before starting:
+- The image `lkb-bot:bot-live-<commit>` is built from `integrate/bot-live` (`docker build -f docker/meeting-bot/Dockerfile`).
+- The throwaway Mongo `lkb-sendnow-test-mongo` is on `127.0.0.1:27099`. The work database is `lkb_rehearsal`, never `lkb_prod` or `lkb_staging`.
+- The `.env` holds `GEMINI_API_KEY` and `OLLAMA_API_KEY`. Values are passed with `-e NAME` (a name only, no value on the command line).
+- A VNC viewer on the laptop (for example TigerVNC Viewer). None is installed today.
+- The test Meet carries no student data. The recording goes to Gemini and Ollama.
+
+1. **Sign-in (Umesh, about 5 min).** A Windows Chrome profile does not work in the Linux container: its cookies are encrypted with Windows DPAPI. So the sign-in happens once, inside the container.
+   - Create the profile volume, then start login mode:
+     - `docker volume create lkb-bot-profile`
+     - `docker run --name lkb-bot-login -p 127.0.0.1:5900:5900 -e BOT_MODE=login -e VNC_PASSWORD -v lkb-bot-profile:/data/bot-profile <image>`
+   - Umesh opens `127.0.0.1:5900` in the VNC viewer and signs in to Google as the bot account.
+   - Stop and remove the container. The profile stays in the volume.
+2. **Doctor:** `docker run --name lkb-bot-doctor -e BOT_MODE=doctor -v lkb-bot-profile:/data/bot-profile <image>` must exit 0.
+3. **Local API and website** from the `integrate/bot-live` worktree, with these settings:
+   - `MONGODB_URL=mongodb://127.0.0.1:27099`
+   - `MONGODB_DB=lkb_rehearsal`
+   - `LKB_SEND_NOW_QUEUE=1`
+   - `LKB_SEND_NOW_TENANTS=toc`
+   - Start the API with `pnpm --filter api dev` (port 3300) and the website with `pnpm --filter web dev`.
+4. **The bot in run mode, the server's way**:
+   - Limits: `--cpus=2 --memory=4g --shm-size=1g`.
+   - Network: `--add-host=host.docker.internal:host-gateway`, with `MONGODB_URL=mongodb://host.docker.internal:27099`.
+   - Database: `MONGODB_DB=MONGO_WORK_DB=lkb_rehearsal`.
+   - Queue: `LKB_SEND_NOW_QUEUE=1`, `LKB_SEND_NOW_INDEX=1`, `LKB_SEND_NOW_TENANTS=toc`, `LKB_TENANT_ID=toc`, `LKB_CAPTURE_HOST_ID=kb-bot-1`.
+   - Keys: `GEMINI_API_KEY`, `OLLAMA_API_KEY`.
+   - No bucket on the laptop: `LKB_ALLOW_NO_BUCKET=1`.
+   - Record `docker stats --no-stream` every 5 s into a file while it runs.
+5. **The Meet (Umesh, about 10 min).** Umesh hosts a 5-minute Meet, pastes its link in the local website, and clicks Admit. Claude then checks:
+   - the job row reaches `completed`;
+   - `ffprobe` finds audio and video in the `.webm`, with an audio level above silence;
+   - the transcript exists;
+   - the notes are in `lkb_rehearsal` and Ask finds them;
+   - the CPU and memory peaks;
+   - a second link pasted during the meeting waits rather than running at the same time, and Cancel works.
+6. **Live-proof marker for the calendar.** Calendar mode refuses to start without `data/webinar-release/live-proof.json` (`docs/webinar-release.md:73`). From the step 5 recording, after the checks pass, Claude writes it with:
+   - `status: "passed"`, `backend: "tab"`, `platform: "linux"`;
+   - `audio: true`, `video: true`;
+   - the session id, the time and the recording path.
+
+   Umesh reads it before Phase C. In Phase C this recording and the signed-in profile go to the bucket through `BOT_MODE=publish-proof`.
+7. Anything that breaks is fixed as code with tests, and steps 4 and 5 are repeated until one run is clean. Then all containers are stopped and removed.
+
+## Server bot: Phase C, the cloud batch (dry run first; nothing is applied before Umesh's yes)
+
+Before the dry run, `gcloud auth login` on the laptop (Umesh). The saved login expired on 2026-11-27, so not even the read-only listing works.
+
+The dry run is the list below. Each item shows its exact command, and the read-only checks are run and shown before anything is applied.
+
+| # | Resource | Command (shape) | Undo |
+|---|---|---|---|
+| C1 | Bucket `vidysea-prod-kb-bot`, `asia-south1`, uniform access, no public access. Lifecycle rule: delete `recorder/recordings/` after N days | `gcloud storage buckets create` + `gcloud storage buckets update --lifecycle-file` | `gcloud storage rm -r gs://...` |
+| C2 | Service account `kb-bot` with object read and write on that bucket only, secret access on the secrets in C3 only, and log writing | `gcloud iam service-accounts create`, then bucket-level and secret-level `add-iam-policy-binding` | delete the bindings and the account |
+| C3 | Secret `lkb-prod-mongodb-url` (copied from the API service's current value, never printed) | `gcloud secrets create` with the value piped in | `gcloud secrets delete` |
+| C4 | Secret `lkb-prod-bot-api-key`. `mint-key.mjs --tenant toc --label kb-bot --i-know-this-is-production` writes one hashed key row to `lkb_prod` (a production write: a separate yes in the same batch), and its output is piped straight into the secret | as in the settings list | revoke the key row, delete the secret |
+| C5 | The existing `GEMINI_API_KEY` and `OLLAMA_API_KEY` secrets: access for `kb-bot` only, no new key | `gcloud secrets add-iam-policy-binding` | remove the binding |
+| C6 | Bot image from `integrate/bot-live` at the named commit (no git push) | `gcloud builds submit --config` with an inline build step for `docker/meeting-bot/Dockerfile` | delete the image tag |
+| C7 | Profile and live-proof upload: one local `BOT_MODE=publish-proof` run with the Phase B volume and marker, `LKB_STATE_BUCKET` set, and the laptop's gcloud login mounted read-only | `docker run ... -e BOT_MODE=publish-proof` | `gcloud storage rm` the objects |
+| C8 | Worker pool `kb-bot`, 1 instance, 2 vCPU, 4 GiB, `/dev/shm` in-memory volume, service account `kb-bot`, settings from the list above. Starts in `BOT_MODE=doctor` | `gcloud run worker-pools deploy` | `gcloud run worker-pools delete` |
+| C9 | Server proof: `BOT_MODE=record-once` in a Meet Umesh hosts. Shows whether Google asks the server for "verify it's you" and whether Admit works from the server | redeploy with record-once settings | redeploy doctor |
+| C10 | Run mode: queue and calendar on | redeploy with run settings | scale to 0 |
+
+Umesh gives three things with the yes:
+- N, the number of days recordings are kept (30 is the proposal);
+- the alert address;
+- a separate yes for C4, because it writes to `lkb_prod`.
