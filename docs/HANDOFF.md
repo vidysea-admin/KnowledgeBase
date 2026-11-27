@@ -1,6 +1,33 @@
 # HANDOFF — 2026-11-25 (read this first in the next Claude Code session)
 
-## Plan of 2026-11-25 (D-227): the single tracker
+## Server bot finish line (D-257, D-258; 2026-11-27): the only tracker for the bot
+
+**Status: not live.** The bot has never run on the server. The status becomes "live" only when both finish-line tests below are shown here with their commands and output.
+
+Finish line, both on the live site with nobody typing a command: (1) a pasted Meet link is joined, recorded to the bucket, transcribed by Gemini and found by Ask; (2) one calendar meeting is joined and processed the same way. Scope is frozen to what these need; everything else is in "After live" below.
+
+| # | Work | Owner | State | Where |
+|---|---|---|---|---|
+| A1 | Merge the send-now queue and the bot-privacy fixes | Claude | done | merges 5285c54c, 75f3db08 |
+| A2 | A wrong `LKB_CAPTURE_HOST_ID` stops the start (ISS-B3HOSTID-001) | Claude | done | 8c48b12b, merge f73368e5 |
+| A3 | An empty record-once is Failed, exit 73 (ISS-B4RECORDERSTATE-003) | Claude | done | 0405d2dc, merge 8662b360 |
+| A4 | Start-up check: a missing or wrong setting stops the start, exit 78 | Claude | built on `wave/a4-startup-check`, reviewed by two blind reviewers; full docker suite run pending, then merge | entrypoint.sh |
+| A5 | One settings list for the bot and the API | Claude | done (Ollama row corrected by the A4 review) | `docs/DEVOPS-REDEPLOY-2026-11-01.md`, "Server bot: settings list" |
+| A6 | This table | Claude | done | here |
+| A7 | Recorder `--index` can reach the live KB on `LKB_INDEX_PRODUCTION=1` | Claude | done | 7e68c157, merge 46884db6 |
+| A8 | Calendar scheduler indexing under the same opt-in | Claude | done | b7378c9c, merge 46884db6 |
+| A9 | One calendar meeting needs no signed pool-slot acceptance | Claude | done | cba0cc7e, merge 16491364, D-258 |
+| B | Laptop Docker rehearsal with a real Meet | Claude + Umesh (Google sign-in as the bot, host a 5-minute Meet, click Admit) | not started; next after A4 merges | plan Phase B |
+| C | Cloud batch: bucket with an expiry rule, secrets, service account, bot image, worker pool, profile upload, one record-once proof | Claude, dry run first, then Umesh's yes and the number of days recordings are kept | not started | plan Phase C |
+| D | Master merge, API queue settings, the two finish-line tests | Umesh's yes, then Claude | not started | plan Phase D |
+
+Waiting on Umesh, now: the bot's Google account (`LKB_ATTENDANCE_ACCOUNT`) and the address for alert mails (`LKB_ALERT_EMAIL_TO`).
+
+After live (frozen): two parallel meetings (B9 pool part, P1, P2), automatic bot image build on master, a per-tenant cap and a schema for `capture_jobs`, keeping a half-finished recording on shutdown (H2), auto-registration (R1), calendar inside the hosted app (B11), credentials to Secret Manager (B7), page auto-refresh (T1).
+
+Rows in the lane table below that this section replaces: B3 and B4 are merged into `integrate/bot-live` (70d066a7, e32ea0ca); B4B is merged; B9's one-slot part is A9; P2 was answered by D-257 answer 2; the H1 alert-title issue ISS-H1SELFHEAL-002 is closed (D-254); B5 to B8 are Phases B and C above.
+
+## Plan of 2026-11-25 (D-227): the single tracker (bot rows superseded by the finish-line table above)
 
 - Plan file: `C:\Users\Lenovo\.claude\plans\meeting-bot-imperative-starfish-of-3fb8d78b-cac7-406e-9e13-fe76f3d5cd42.md` (approved by Umesh on 2026-11-25, decision D-227).
 - Rule: a row's state changes to PASSED only when its check passed on the real deployment; the date goes in the last column.
