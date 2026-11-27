@@ -67,3 +67,19 @@ test('transcript checkpoint requires sanctioned validation, not just child succe
     assert.deepEqual(calls,[],'foreign source refuses before the indexing child can write');
   } finally {rmSync(root,{recursive:true,force:true});}
 });
+
+test('A8 (D-257): the graph index stage forwards the D-204 flag only under LKB_INDEX_PRODUCTION=1', async () => {
+  const root = mkdtempSync(join(tmpdir(), 'lkb-stage-a8-'));
+  try {
+    const dir = join(root, 'data', 'toc-migrated', 'session'); mkdirSync(dir, {recursive: true});
+    writeFileSync(join(dir, 'source.json'), JSON.stringify({tenantId: 'tenant-a'}));
+    for (const [env, want] of [[{}, false], [{LKB_INDEX_PRODUCTION: '1'}, true], [{LKB_INDEX_PRODUCTION: 'yes'}, false]]) {
+      let seen;
+      const handlers = createSessionHandlers({root, id: 'session', env, validateIndexProof: () => { throw new Error('stop after the child'); },
+        runScript: async (_root, script, args) => { if (script.endsWith('sync-session.mjs')) seen = args; }});
+      await handlers.index({tenantId: 'tenant-a', runKey: 'session'});
+      assert.deepEqual(seen?.slice(0, 3), ['session', '--emit-files', '--index'], JSON.stringify(env));
+      assert.equal(seen.includes('--i-know-this-is-production'), want, JSON.stringify(env));
+    }
+  } finally { rmSync(root, {recursive: true, force: true}); }
+});

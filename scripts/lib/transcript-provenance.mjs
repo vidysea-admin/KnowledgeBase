@@ -148,6 +148,11 @@ export function requireBackfillDatabase(env, {legacyUnbound = false} = {}) {
 }
 
 export const PRODUCTION_FLAG = "--i-know-this-is-production";
+/** Plan A8 (D-257): a long-running parent (the calendar scheduler) that will spawn the indexer with PRODUCTION_FLAG may target
+ *  lkb_prod only under the same three parts sync-session enforces, with the fixed setting LKB_INDEX_PRODUCTION=1 for the flag. */
+export function productionIndexOptIn(env) {
+  return env.LKB_INDEX_PRODUCTION === "1" && env.MONGO_WORK_DB?.trim() === "lkb_prod" && env.MONGODB_DB?.trim() === "lkb_prod";
+}
 /**
  * ISS-LEGACYSEED-001/003/005/006 shared guard for scripts that used to default MONGODB_DB to `lkb`.
  * No default database. Isolated work DB / lkb_staging go through requireLegacyUnboundDatabase unchanged.
