@@ -1,7 +1,7 @@
 /** Capture finalization with current consent, actual source EOF and pre-upload privacy proof. */
 import { createHash, randomUUID } from "node:crypto";
 import { execFileSync, spawnSync } from "node:child_process";
-import { existsSync, mkdirSync, readFileSync, writeFileSync, statSync, lstatSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, writeFileSync, appendFileSync, statSync, lstatSync, openSync, readSync, closeSync, ftruncateSync, writeSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
 import { normalizeLeanCapture } from '../lean-video-ffmpeg.js';
@@ -253,8 +253,68 @@ export function syncSessionIndexArgs(sessionId: string, env: Record<string, stri
   const args = [path.join(REPO_ROOT, "scripts", "webinar", "sync-session.mjs"), sessionId, "--emit-files", "--index"];
   return env.LKB_INDEX_PRODUCTION === "1" ? [...args, "--i-know-this-is-production"] : args;
 }
+/** Index-step log: only the tail is kept so a long-lived session dir cannot grow without bound. */
+const INDEX_LOG_MAX_BYTES = 200 * 1024;
+/** 2 retries after the first attempt (3 total): short backoff, because the observed failure was transient (LLM/Mongo). */
+const INDEX_RETRY_BACKOFF_MS = [30_000, 90_000];
+const syncSleep = (ms: number): void => { if (ms > 0) Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, ms); };
+
+/** Strip credentials before child output is persisted: URL userinfo, bearer tokens, KEY/TOKEN/SECRET/PASSWORD=value pairs. */
+export function redactSecrets(text: string): string {
+  return text
+    .replace(/\b([a-z][a-z0-9+.-]*:\/\/)[^\s/@]+@/gi, "$1***@")
+    .replace(/\b(Bearer)\s+[A-Za-z0-9._~+/=-]+/gi, "$1 ***")
+    .replace(/\b([A-Za-z0-9_]*(?:API_?KEY|TOKEN|SECRET|PASSWORD|PASSWD)[A-Za-z0-9_]*)(\s*[=:]\s*)[^\s"',;]+/gi, "$1$2***");
+}
+
+/** Append to the log, then keep only its last INDEX_LOG_MAX_BYTES (UTF-8 boundary tolerated: a split char is replaced, not fatal). */
+function appendIndexLog(file: string, text: string): void {
+  appendFileSync(file, text);
+  const size = statSync(file).size;
+  if (size <= INDEX_LOG_MAX_BYTES) return;
+  const fd = openSync(file, "r+");
+  try {
+    const tail = Buffer.alloc(INDEX_LOG_MAX_BYTES);
+    readSync(fd, tail, 0, INDEX_LOG_MAX_BYTES, size - INDEX_LOG_MAX_BYTES);
+    ftruncateSync(fd, 0);
+    writeSync(fd, tail, 0, tail.length, 0);
+  } finally { closeSync(fd); }
+}
+
+export interface IndexRetryOptions { backoffMs?: number[]; sleep?: (ms: number) => void; }
+
+/** Runs the sync-session --index child with piped output teed to the console AND data/toc-migrated/<id>/index.log, retrying
+  * after a failed exit. Retrying is safe: sync-session.mjs is idempotent (generation-swap upserts of this session's turns/edges,
+  * upserted source/session/speaker/org rows, $addToSet topics; indexSession rewrites summary/claims/chunks), and a failed run only
+  * flips status.index to failed, which the next run sets back to processing. Throws after the last attempt. */
+function runIndexWithRetry(run: typeof spawnSync, sessionId: string, dir: string, opts: IndexRetryOptions): void {
+  const backoff = opts.backoffMs ?? INDEX_RETRY_BACKOFF_MS;
+  const sleep = opts.sleep ?? syncSleep;
+  const logFile = path.join(dir, "index.log");
+  const attempts = backoff.length + 1;
+  let lastDetail = "";
+  for (let attempt = 1; attempt <= attempts; attempt++) {
+    const started = new Date().toISOString();
+    const indexed = run("node", syncSessionIndexArgs(sessionId), { cwd: REPO_ROOT, stdio: ["ignore", "pipe", "pipe"], encoding: "utf8",
+      maxBuffer: 64 * 1024 * 1024, timeout: 3_600_000 });
+    const text = (v: unknown) => (v == null ? "" : String(v));
+    const out = redactSecrets(text(indexed.stdout)), err = redactSecrets(text(indexed.stderr));
+    const failure = indexed.status === 0 ? "" : `exit ${indexed.status ?? `signal ${indexed.signal ?? "none"}`}${indexed.error ? ` (${redactSecrets(String(indexed.error.message ?? indexed.error))})` : ""}`;
+    const nl = (t: string) => (t === "" || t.endsWith("\n") ? t : `${t}\n`);
+    if (out) process.stdout.write(nl(out));
+    if (err) process.stderr.write(nl(err));
+    try {
+      appendIndexLog(logFile, `=== index attempt ${attempt}/${attempts} ${started} -> ${failure || "exit 0"} ===\n${nl(out)}${err ? `[stderr]\n${nl(err)}` : ""}`);
+    } catch (logError) { console.error(`[bot] index.log write failed: ${String(logError)}`); }
+    if (!failure) return;
+    lastDetail = failure;
+    if (attempt < attempts) { console.error(`[bot] knowledge indexing attempt ${attempt}/${attempts} failed (${failure}); retrying`); sleep(backoff[attempt - 1]!); }
+  }
+  throw new Error(`knowledge indexing failed after ${attempts} attempts (${lastDetail}); see ${toPosix(path.relative(REPO_ROOT, logFile))}; retry from retained artifacts`);
+}
+
 /** `run` is the process seam (tests); production always uses spawnSync. */
-export function processRecordingArtifacts(video: string, sessionId: string, rest: string[], run: typeof spawnSync = spawnSync): void {
+export function processRecordingArtifacts(video: string, sessionId: string, rest: string[], run: typeof spawnSync = spawnSync, retry: IndexRetryOptions = {}): void {
   if (!rest.includes("--process-video")) return;
   if (!rest.includes("--transcribe")) throw new Error("--process-video requires --transcribe");
   const state = path.join(REPO_ROOT, "data", "toc-migrated", sessionId, "pipeline-state.json");
@@ -268,8 +328,7 @@ export function processRecordingArtifacts(video: string, sessionId: string, rest
     if (processed.status !== 0) throw new Error("screen processing failed; recording retained for retry");
     if (rest.includes("--index")) {
       stage = "index"; report("processing");
-      const indexed = run("node", syncSessionIndexArgs(sessionId), { cwd: REPO_ROOT, stdio: "inherit", timeout: 3_600_000 });
-      if (indexed.status !== 0) throw new Error("knowledge indexing failed; retry from retained artifacts");
+      runIndexWithRetry(run, sessionId, path.dirname(state), retry);
       proof = validateIndexProof(path.dirname(state), sessionId);
     }
     report("done");
