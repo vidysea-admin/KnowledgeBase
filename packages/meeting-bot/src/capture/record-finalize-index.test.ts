@@ -40,7 +40,7 @@ test("A7 wiring (review): processRecordingArtifacts spawns sync-session with the
       if (value === undefined) delete process.env.LKB_INDEX_PRODUCTION; else process.env.LKB_INDEX_PRODUCTION = value;
       const seen: string[][] = [];
       const run = ((_cmd: string, args: readonly string[]) => { seen.push([...args]); return { status: args[0]!.endsWith("sync-session.mjs") ? 1 : 0 }; }) as never;
-      assert.throws(() => processRecordingArtifacts("x.webm", sessionId, ["--process-video", "--transcribe", "--index"], run), /knowledge indexing failed/);
+      assert.throws(() => processRecordingArtifacts("x.webm", sessionId, ["--process-video", "--transcribe", "--index"], run, { backoffMs: [0, 0], sleep: () => {} }), /knowledge indexing failed/);
       const sync = seen.find(a => a[0]!.endsWith("sync-session.mjs"));
       assert.ok(sync, "the index step spawned sync-session");
       assert.equal(sync!.includes(FLAG), want, String(value));

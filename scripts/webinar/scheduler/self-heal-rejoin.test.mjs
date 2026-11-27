@@ -408,3 +408,16 @@ test('H1-I5: a row of another tenant is left exactly as found', () => withFixtur
   assert.equal(launches(f).length, 0); assert.equal(JSON.parse(readFileSync(statePath(f), 'utf8')).operations[ID].tenantId, 'foreign');
   assert.ok(existsSync(statePath(f)));
 }, true));
+
+test('a full discovery alert outbox (alert channel broken) never stops capture: the due meeting is still rejoined', () => withFixture(async f => {
+  serviceFixture(f); stubLaunch(f);
+  const recovered = n => ({kind: 'discovery-recovered', sessionKey: `discovery-calendar-${String(n).padStart(24, '0')}`, title: 'Webinar discovery calendar'});
+  writeFileSync(statePath(f), JSON.stringify({version: 1, tenantId: 'fixture', operations: {[ID]: crashRow()},
+    discovery: {calendar: {status: 'failed', checkedAt: '2026-09-30T12:00:00.000Z', lastSuccessAt: '2026-09-30T11:00:00.000Z',
+      schedulerAlertOutbox: Array.from({length: 8}, (_, n) => recovered(n))}, gmail: {status: 'healthy', checkedAt: '2026-09-30T12:00:00.000Z'}}}));
+  f.deps.autojoin.raise = async () => ({email: 'failed', dashboard: 'failed', calendar: 'disabled'}); // gws "insufficient authentication scopes"
+  await restart(f);
+  assert.equal(launches(f).length, 1);
+  assert.equal(readOps(f)[ID].status, 'ready');
+  assert.ok(!f.logs.some(l => /capacity reached/.test(l)));
+}, true));

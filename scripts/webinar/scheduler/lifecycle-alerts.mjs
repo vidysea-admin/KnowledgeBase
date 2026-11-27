@@ -21,6 +21,8 @@ const interruptionOf = row => {
 };
 /** Identity of one alert in the durable outbox: an interruption is told apart by its number, every other alert by session and kind alone. */
 const alertKey = alert => `${alert.sessionKey}:${alert.kind}${alert.interruption ? `#${alert.interruption.n}` : ''}`;
+/** Alert delivery must never stop capture: a full per-carrier outbox sheds the least valuable entry instead of throwing. Flapping discovery alerts go first; capture-failed alerts last. */
+const OUTBOX_MAX = 8, FLAPPING = new Set(['discovery-degraded', 'discovery-recovered']);
 const LIMIT = 50, REPLAY = 25, LOOKBACK = 2 * 24 * 60 * 60 * 1000;
 const HANDOFF = new Set(['sent', 'duplicate', 'disabled', 'digest-queued', 'skipped-test-data', 'created', 'updated', 'skipped-no-times', 'superseded']);
 
@@ -44,6 +46,7 @@ export function canonicalOperationAlert(id, row, tags = {}, event) {
 export function createCanonicalAlerts({state, tenantId, autojoin, flush, assertOwned, save, enqueueNotification, log, now}) {
   let tail = Promise.resolve(), cursor = 0;
   let overflow = false;
+  const dropNoted = new Set();
   const pending = new Set(), unsupported = new Set(), kinds = new Set(ALERT_KINDS);
   const carrier = (collection, id) => state[collection]?.[id];
   const enqueue = (key, body) => {
@@ -73,10 +76,27 @@ export function createCanonicalAlerts({state, tenantId, autojoin, flush, assertO
       ...(input.interruption ? {interruption: input.interruption} : {})};
     const key = alertKey(snapshot);
     const outbox = Array.isArray(row.schedulerAlertOutbox) ? row.schedulerAlertOutbox : [];
-    const changed = !outbox.some(saved => saved && alertKey(saved) === key);
+    let changed = !outbox.some(saved => saved && alertKey(saved) === key);
     if (changed) {
-      if (outbox.length >= 8) {log('Scheduler durable alert backlog full; coverage requires review'); throw new Error('Scheduler alert outbox capacity reached');}
-      assertOwned(); row.schedulerAlertOutbox = [...outbox, snapshot];
+      assertOwned();
+      // A newer flapping alert replaces the pending one of its kind: only the latest discovery state is worth telling.
+      const next = FLAPPING.has(snapshot.kind) ? outbox.filter(saved => saved?.kind !== snapshot.kind) : [...outbox];
+      let dropped = 0, keep = true;
+      while (next.length >= OUTBOX_MAX) {
+        const flapping = next.findIndex(saved => FLAPPING.has(saved?.kind));
+        if (flapping >= 0) next.splice(flapping, 1);
+        else if (FLAPPING.has(snapshot.kind)) {keep = false; dropped++; break;}
+        else {const other = next.findIndex(saved => saved?.kind !== 'capture-failed'); next.splice(other >= 0 ? other : 0, 1);}
+        dropped++;
+      }
+      if (keep) next.push(snapshot);
+      if (dropped) {
+        row.schedulerAlertsDropped = (Number.isSafeInteger(row.schedulerAlertsDropped) ? row.schedulerAlertsDropped : 0) + dropped;
+        const tag = `${collection}:${id}`;
+        if (!dropNoted.has(tag)) {dropNoted.add(tag); log(`Scheduler durable alert backlog full for ${tag}; oldest low-value alert dropped and counted, capture continues`);}
+      }
+      if (dropped || keep) row.schedulerAlertOutbox = next; else changed = false;
+      changed = changed || dropped > 0;
     }
     return {changed, dispatch: () => enqueue(key, async () => {
       const result = await autojoin()?.raise?.(snapshot);
@@ -91,6 +111,10 @@ export function createCanonicalAlerts({state, tenantId, autojoin, flush, assertO
     const prepared = prepare(input, collection, id);
     if (prepared?.changed) save();
     prepared?.dispatch();
+  };
+  const keepOutbox = (from, to) => {
+    to.schedulerAlertOutbox = [...from.schedulerAlertOutbox];
+    if (Number.isSafeInteger(from.schedulerAlertsDropped)) to.schedulerAlertsDropped = from.schedulerAlertsDropped;
   };
   const operationInput = (id, event) => {
     const row = state.operations[id];
@@ -112,7 +136,7 @@ export function createCanonicalAlerts({state, tenantId, autojoin, flush, assertO
     operation,
     preserveDiscovery(previous, current) {
       for (const feed of ['calendar', 'gmail']) if (Array.isArray(previous?.[feed]?.schedulerAlertOutbox))
-        current[feed].schedulerAlertOutbox = [...previous[feed].schedulerAlertOutbox];
+        keepOutbox(previous[feed], current[feed]);
       return current;
     },
     update(id, changes, event) {
@@ -126,7 +150,7 @@ export function createCanonicalAlerts({state, tenantId, autojoin, flush, assertO
       assertOwned();
       const previous = state.discovery;
       for (const feed of ['calendar', 'gmail']) if (Array.isArray(previous?.[feed]?.schedulerAlertOutbox))
-        current[feed].schedulerAlertOutbox = [...previous[feed].schedulerAlertOutbox];
+        keepOutbox(previous[feed], current[feed]);
       state.discovery = current;
       const prepared = ['calendar', 'gmail'].map(feed => prepare(discoveryInput(feed, previous?.[feed], current[feed]), 'discovery', feed));
       save();
@@ -135,7 +159,7 @@ export function createCanonicalAlerts({state, tenantId, autojoin, flush, assertO
     discovery(feed, previous, current) {
       if (!['calendar', 'gmail'].includes(feed)) return;
       if (previous?.schedulerAlertOutbox?.length && !current.schedulerAlertOutbox) {
-        assertOwned(); current.schedulerAlertOutbox = previous.schedulerAlertOutbox; save();
+        assertOwned(); keepOutbox(previous, current); save();
       }
       raise(discoveryInput(feed, previous, current), 'discovery', feed);
     },
