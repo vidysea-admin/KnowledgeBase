@@ -1,8 +1,9 @@
 """sb_join: the hold-the-window polling loop (moved verbatim from main())."""
 import json
 
-from sb_join_detect import (ADMISSION_TIMEOUT_S, END_PHRASES, FLUSH_GRACE_S, JOIN_TEXTS, AdmissionState, ReconnectState, apply_reload,
-                            classify_admission, click_gate, detect_trouble, is_blocked_text, platform_of, should_force_reload)
+from sb_join_detect import (ADMISSION_CONFIRM_TICKS, ADMISSION_TIMEOUT_S, END_PHRASES, FLUSH_GRACE_S, JOIN_TEXTS, LEFT_MEETING_TICKS,
+                            AdmissionState, ReconnectState, apply_reload, classify_admission, click_gate, detect_trouble,
+                            is_blocked_text, is_left_screen, is_outside_meeting, platform_of, should_force_reload)
 from sb_join_scripts import BODY_TEXT_JS, CLICK_JS, IN_CALL_JS_BY_PLATFORM
 
 
@@ -22,9 +23,14 @@ def run_session(sb, a, *, os, time, emit):
     # wait that ends with no lobby or denied text ever seen is assumed admitted (assumed=True), not aborted.
     platform = platform_of(a.url)
     in_call_js = IN_CALL_JS_BY_PLATFORM[platform]
-    admission = AdmissionState(started, getattr(a, "admission_timeout", None), lenient=platform != "meet")
+    # ISS-ADMISSION-STABLE-001: a one-tick controls-bar glimpse before the lobby text renders is not admission.
+    # Meet only: other platforms' probes are unverified live and keep their old one-tick contract (review B).
+    admission = AdmissionState(started, getattr(a, "admission_timeout", None), lenient=platform != "meet",
+                               confirm_ticks=ADMISSION_CONFIRM_TICKS if platform == "meet" else 1)
     if admission.timeout_s is None:
         admission.timeout_s = ADMISSION_TIMEOUT_S
+    outside_ticks = 0  # consecutive post-admission ticks on a Meet page outside this meeting
+    left_emitted = False
     while not os.path.exists(a.stop_file):
         if errors >= 10:
             # Only a browser with no windows left ends the run; a page that is merely
@@ -79,6 +85,26 @@ def run_session(sb, a, *, os, time, emit):
                 emit("admission_timeout", seconds=int(now - started), limit=admission.timeout_s)
                 hold_for_flush = True
                 break
+
+            # ISS-ADMISSION-STABLE-001: after admission on Meet, the bot is no longer in the meeting when, for
+            # LEFT_MEETING_TICKS consecutive ticks, either (a) its only tab sits on a Meet page that is positively not
+            # this meeting (home / landing / another code), or (b) the call controls are gone AND Meet shows its
+            # own removed / left screen (phrase + 'return to home screen') (those screens keep the meeting URL). One "ended" so the controller stops.
+            # Never before admission (that is the admission timeout's job), never on an unknown URL, never with a
+            # second tab open (the call may still be live in the other one), never on text while the controls show
+            # (a caption or chat line saying "meeting ended" is not the end).
+            if platform == "meet" and admission.admitted and not left_emitted:
+                try:
+                    single_tab = len(sb.driver.window_handles) == 1
+                    current_url = sb.get_current_url()
+                except Exception:
+                    single_tab, current_url = False, ""
+                gone = (single_tab and is_outside_meeting(a.url, current_url)) or (
+                    not in_call_dom and is_left_screen(body))
+                outside_ticks = outside_ticks + 1 if gone else 0
+                if outside_ticks >= LEFT_MEETING_TICKS:
+                    left_emitted = True
+                    emit("ended", reason="left-meeting")
 
             # T-031: forced reload from the Node-side audio watchdog — independent of T-029's
             # own DOM-banner detection below (silence has no banner). No gap is recorded here:
