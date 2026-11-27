@@ -35,7 +35,8 @@
 # Exit statuses worth knowing: 75 lease held elsewhere or lost, 74 a recording was made but not copied to the bucket,
 # 73 record-once: the record command succeeded but wrote no non-empty .webm under the recordings dir after it started
 #    (restored proof media does not count; with or without a bucket),
-# 76 publish-proof failed.
+# 76 publish-proof failed, 78 a setting the flow needs is missing or wrong (plan A4; the line names it, never its value).
+#    LKB_ALLOW_NO_BUCKET=1 lets the queue or calendar run start without LKB_STATE_BUCKET: laptop rehearsal only.
 #
 # Live-proof media (D-236 part B, unit B4B). The marker $LKB_RELEASE_DIR/live-proof.json (written by a human, never by this
 # script) names a recording. That recording is kept as its own bucket object gs://<bucket>/live-proof/<sha256>.<ext>, created once
@@ -96,6 +97,86 @@ if [ "$MODE" = "record-once" ] && { [ -z "${LKB_RECORD_URL:-}" ] || [ -z "${LKB_
 fi
 if [ "$MODE" = "publish-proof" ] && [ -z "$BUCKET" ]; then
   echo "[bot-state] proof publish failed: LKB_STATE_BUCKET is not set" >&2; exit 76
+fi
+
+# ---- plan A4 (D-257): start-up settings check (run and record-once). A setting the flow needs that is missing or wrong
+# stops the start HERE, before the lease, any bucket call or any daemon, instead of mid-meeting. Names only, never values.
+# Exit 78 (configuration error). doctor, login and publish-proof are not checked.
+SETTINGS_MISSING=""; SETTINGS_BAD=""
+# Every wrong setting is reported, not only the last one found (review A4).
+bad_setting() { SETTINGS_BAD="${SETTINGS_BAD:+$SETTINGS_BAD; }$1"; }
+trimmed() { eval "printf '%s' \"\${$1:-}\"" | tr '\t\r\n' '   ' | sed 's/^ *//; s/ *$//'; }
+# A value of only spaces counts as missing (review A4 b).
+need_setting() { for n in "$@"; do [ -n "$(trimmed "$n")" ] || case " $SETTINGS_MISSING " in *" $n "*) ;; *) SETTINGS_MISSING="$SETTINGS_MISSING $n" ;; esac; done; }
+# The same names the recorder and the run gate refuse (scripts/lib/transcript-provenance.mjs isProtectedWorkDbName).
+protected_work_db() {
+  wl=$(printf '%s' "$1" | tr '[:upper:]' '[:lower:]')
+  case "$wl" in ""|lkb|lkb_prod|global_university_db) return 0 ;; lkb_staging) [ "$1" = lkb_staging ] && [ "${LKB_ALLOW_STAGING:-}" = lkb_staging ] && return 1; return 0 ;; esac
+  return 1
+}
+# Tabs and newlines separate flags too (review A4 a).
+RECORD_ARGS_N=" $(printf '%s' "${LKB_RECORD_ARGS:-}" | tr '\t\r\n' '   ') "
+SLOT_READINESS=$(trimmed LKB_SLOT_READINESS | tr '[:upper:]' '[:lower:]')
+staging_refused() { wl=$(printf '%s' "$1" | tr '[:upper:]' '[:lower:]'); [ "$wl" = lkb_staging ] && ! { [ "$1" = lkb_staging ] && [ "${LKB_ALLOW_STAGING:-}" = lkb_staging ]; }; }
+NEEDS_INDEX=0; NEEDS_VIDEO=0
+if [ -n "$SEND_NOW_QUEUE" ] || [ -n "$ATTENDANCE_ACCOUNT" ]; then
+  [ -n "$BUCKET" ] || [ "${LKB_ALLOW_NO_BUCKET:-}" = 1 ] || need_setting LKB_STATE_BUCKET
+fi
+if [ -n "$SEND_NOW_QUEUE" ]; then
+  need_setting MONGODB_URL MONGODB_DB
+  [ "${LKB_SEND_NOW_TRANSCRIBE:-}" = 0 ] || need_setting GEMINI_API_KEY
+  [ "${LKB_SEND_NOW_INDEX:-}" = 1 ] && [ "${LKB_SEND_NOW_TRANSCRIBE:-}" != 0 ] && NEEDS_INDEX=1 && NEEDS_VIDEO=1
+  # The queue worker refuses this name on every loop (apps/api/src/db-name.ts requireDatabaseName; review A4).
+  if staging_refused "$(trimmed MONGODB_DB)"; then bad_setting "MONGODB_DB=lkb_staging needs LKB_ALLOW_STAGING=lkb_staging"; fi
+fi
+if [ -n "$ATTENDANCE_ACCOUNT" ]; then
+  need_setting LKB_API_URL LKB_API_KEY LKB_TENANT_ID LKB_CALENDAR_WORKER_HOST_ID GEMINI_API_KEY
+  # One meeting at a time needs no capture slots (A9, D-258); the person's sign-off mode checks them, so it needs them.
+  [ "$SLOT_READINESS" = operator ] && need_setting LKB_CAPTURE_SLOTS
+  # The signed slot check needs 2 to 8 distinct slots (scheduler/service.mjs validateSlots; review A4).
+  if [ "$SLOT_READINESS" = operator ] && [ -n "$(trimmed LKB_CAPTURE_SLOTS)" ] && \
+     [ "$(printf '%s\n' "${LKB_CAPTURE_SLOTS:-}" | tr ',' '\n' | sed 's/^[[:space:]]*//; s/[[:space:]]*$//' | grep -v '^$' | sort -u | wc -l)" -lt 2 ]; then
+    bad_setting "LKB_SLOT_READINESS=operator needs 2 to 8 capture slots in LKB_CAPTURE_SLOTS"
+  fi
+  NEEDS_INDEX=1; NEEDS_VIDEO=1
+fi
+if [ "$MODE" = "record-once" ]; then
+  case "$RECORD_ARGS_N" in *" --transcribe "*|*" --index "*) need_setting GEMINI_API_KEY ;; esac
+  # The recorder indexes only with --index and --process-video (record-finalize.ts processRecordingArtifacts; review A4 d).
+  case "$RECORD_ARGS_N" in *" --index "*) case "$RECORD_ARGS_N" in *" --process-video "*) NEEDS_INDEX=1 ;; esac ;; esac
+  case "$RECORD_ARGS_N" in *" --process-video "*) NEEDS_VIDEO=1 ;; esac
+fi
+# KB notes run on Ollama cloud (config/ai-routing.yaml summarize/claims); the screen stage needs a vision provider
+# (scripts/webinar/vision/plan.mjs visionPlan: OLLAMA_API_KEY or OLLAMA_BASE_URL, or GEMINI_API_KEY with WEBINAR_VISION_MODEL).
+if [ "$NEEDS_VIDEO" = 1 ] && [ -z "$(trimmed OLLAMA_API_KEY)" ] && [ -z "$(trimmed OLLAMA_BASE_URL)" ] && \
+   { [ -z "$(trimmed WEBINAR_VISION_MODEL)" ] || [ -z "$(trimmed GEMINI_API_KEY)" ]; }; then
+  need_setting OLLAMA_API_KEY
+fi
+if [ "$NEEDS_INDEX" = 1 ]; then
+  need_setting MONGODB_URL MONGO_WORK_DB OLLAMA_API_KEY
+  wd=$(trimmed MONGO_WORK_DB)
+  if [ -n "$wd" ]; then
+    case "$wd" in *[!A-Za-z0-9_-]*) bad_setting "MONGO_WORK_DB may hold only letters, digits, _ and - (64 at most)" ;;
+      *) [ "${#wd}" -le 64 ] || bad_setting "MONGO_WORK_DB may hold only letters, digits, _ and - (64 at most)" ;; esac
+  fi
+  if [ -n "${MONGODB_DB:-}" ] && [ -n "${MONGO_WORK_DB:-}" ] && [ "$(trimmed MONGODB_DB)" != "$(trimmed MONGO_WORK_DB)" ]; then
+    bad_setting "MONGODB_DB and MONGO_WORK_DB must be the same database"
+  fi
+  # Without the production opt-in, a protected work database would pass here and fail after the meeting (review A4 c).
+  if [ -n "$(trimmed MONGO_WORK_DB)" ] && ! { [ "${LKB_INDEX_PRODUCTION:-}" = 1 ] && [ "$(trimmed MONGO_WORK_DB)" = lkb_prod ] && [ "$(trimmed MONGODB_DB)" = lkb_prod ]; }      && protected_work_db "$(trimmed MONGO_WORK_DB)"; then
+    bad_setting "MONGO_WORK_DB names a protected database; production needs LKB_INDEX_PRODUCTION=1 with MONGODB_DB and MONGO_WORK_DB both lkb_prod"
+  fi
+fi
+if [ "${LKB_INDEX_PRODUCTION:-}" = 1 ] && { [ "$MODE" = "run" ] || [ "$MODE" = "record-once" ]; }; then
+  if [ "$(trimmed MONGODB_DB)" != lkb_prod ] || [ "$(trimmed MONGO_WORK_DB)" != lkb_prod ]; then
+    bad_setting "LKB_INDEX_PRODUCTION=1 needs MONGODB_DB and MONGO_WORK_DB both lkb_prod"
+  fi
+fi
+if [ -n "$SETTINGS_MISSING" ] || [ -n "$SETTINGS_BAD" ]; then
+  [ -n "$SETTINGS_MISSING" ] && echo "[bot-settings] cannot start: missing setting(s):$SETTINGS_MISSING" >&2
+  case " $SETTINGS_MISSING " in *" LKB_STATE_BUCKET "*) echo "[bot-settings] (LKB_ALLOW_NO_BUCKET=1 skips the bucket, for a laptop run only: state and recordings then stay in the container)" >&2 ;; esac
+  [ -n "$SETTINGS_BAD" ] && echo "[bot-settings] cannot start: $SETTINGS_BAD" >&2
+  exit 78
 fi
 
 STAGE=""; CHILD=""; CHILD_PG=""; WATCH_PID=""; RENEW_PID=""; SNAP_PID=""; NAP_PID=""; SHUT_DEADLINE=0
