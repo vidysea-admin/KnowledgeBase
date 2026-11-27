@@ -118,6 +118,7 @@ fi
 if [ -n "\${STUB_TICK_WRITE:-}" ]; then
   mkdir -p "$LKB_RECORD_DIR"; printf 'video%s' "$n" > "$LKB_RECORD_DIR/rec-$n.webm"; : > "$LKB_RECORD_DIR/empty-$n.webm"
 fi
+if [ -n "\${STUB_WRITE_ZERO_ONLY:-}" ]; then mkdir -p "$LKB_RECORD_DIR"; : > "$LKB_RECORD_DIR/zero.webm"; fi
 if [ -n "\${STUB_WRITE_WEBM:-}" ]; then
   mkdir -p "$LKB_RECORD_DIR"; printf 'recorded-bytes' > "$LKB_RECORD_DIR/meeting.webm"; : > "$LKB_RECORD_DIR/zero.webm"
 fi
@@ -546,6 +547,12 @@ test('B4-C6 record-once: doctor gate, ONE record command (never run-pipeline), n
       const r2 = w2.run(w2.env({BOT_MODE: 'record-once', LKB_RECORD_URL: 'https://x.example/y', LKB_RECORD_UNTIL: '10:00', STUB_NODE_RC: '9'}));
       assert.equal(r2.status, 9);
       assert.equal(calls(w2, /.*/).length, 0);
+      // review A3: with no bucket an empty record-once is failed too (D-257), still without any bucket command
+      const r2b = w2.run(w2.env({BOT_MODE: 'record-once', LKB_RECORD_URL: 'https://x.example/y', LKB_RECORD_UNTIL: '10:00'}));
+      assert.equal(r2b.status, 73, r2b.out); assert.match(r2b.out, /nothing was recorded; exiting 73/);
+      assert.equal(calls(w2, /.*/).length, 0);
+      const r2c = w2.run(w2.env({BOT_MODE: 'record-once', LKB_RECORD_URL: 'https://x.example/y', LKB_RECORD_UNTIL: '10:00', STUB_WRITE_WEBM: '1'}));
+      assert.equal(r2c.status, 0, r2c.out); assert.equal(calls(w2, /.*/).length, 0);
     } finally { w2.cleanup(); }
     // missing variables: refuses before touching anything
     const w3 = world();
@@ -639,7 +646,7 @@ test('hosted-send-now: a queue step that crashes (exit 137) naps like a config e
 test('hosted-send-now: LKB_SEND_NOW_QUEUE is ignored outside run mode', T, () => {
   const w = world();
   try {
-    const r = w.run(w.env({BOT_MODE: 'record-once', LKB_RECORD_URL: 'https://x.example/y', LKB_RECORD_UNTIL: '10:00', LKB_SEND_NOW_QUEUE: '1'}));
+    const r = w.run(w.env({BOT_MODE: 'record-once', LKB_RECORD_URL: 'https://x.example/y', LKB_RECORD_UNTIL: '10:00', LKB_SEND_NOW_QUEUE: '1', STUB_WRITE_WEBM: '1'}));   // a recording is made: an empty record-once exits 73 (plan A3)
     assert.equal(r.status, 0, r.out);
     assert.ok(!nodeCalls(w).some((l) => l.includes('queue-worker.ts')));
   } finally { w.cleanup(); }
@@ -647,7 +654,7 @@ test('hosted-send-now: LKB_SEND_NOW_QUEUE is ignored outside run mode', T, () =>
 
 test('B4-C8 LKB_TRANSCRIPT_QA, WEBINAR_VISION_MODEL and GEMINI_STT_MODEL reach node unchanged in run, record-once and doctor; VNC_PASSWORD never does', T, () => {
   const base = {LKB_TRANSCRIPT_QA: '1', WEBINAR_VISION_MODEL: 'vision-a', GEMINI_STT_MODEL: 'stt-b', VNC_PASSWORD: 'hunter2'};
-  for (const [mode, extra, nodeCalls] of [['run', {}, 2], ['record-once', {LKB_RECORD_URL: 'https://x.example/y', LKB_RECORD_UNTIL: '10:00'}, 2], ['doctor', {}, 1]]) {
+  for (const [mode, extra, nodeCalls] of [['run', {}, 2], ['record-once', {LKB_RECORD_URL: 'https://x.example/y', LKB_RECORD_UNTIL: '10:00', STUB_WRITE_WEBM: '1'}, 2], ['doctor', {}, 1]]) {
     for (const bucket of [false, true]) {
       if (mode === 'doctor' && bucket) continue;
       const w = world();
@@ -879,14 +886,22 @@ test('B4-C4 repair: the generation is remembered across uploads (each match is t
   } finally { w2.cleanup(); }
 });
 
-test('B4-C6 repair: record-once exits non-zero (74) when the recording was made but its copy failed; the record command own status wins; a clean copy still exits 0', T, () => {
+test('B4-C6 repair: record-once exits non-zero (74) when the recording was made but its copy failed, 73 when nothing was recorded; the record command own status wins; a clean copy still exits 0', T, () => {
   const base = {BOT_MODE: 'record-once', LKB_RECORD_URL: 'https://meet.example.com/abc-defg', LKB_RECORD_UNTIL: '18:30', LKB_LEASE_TTL_S: '60'};
   for (const [label, extra, want] of [['upload fails', {STUB_FAIL_UPLOAD: 'recordings/', STUB_WRITE_WEBM: '1'}, 74], ['record failed too', {STUB_FAIL_UPLOAD: 'recordings/', STUB_WRITE_WEBM: '1', STUB_NODE_RC: '7'}, 7],
-    ['upload works', {STUB_WRITE_WEBM: '1'}, 0], ['nothing recorded', {}, 0]]) {
+    ['upload works', {STUB_WRITE_WEBM: '1'}, 0], ['nothing recorded', {}, 73], ['only an empty file', {STUB_WRITE_ZERO_ONLY: '1'}, 73],
+    ['nothing recorded, record failed', {STUB_NODE_RC: '7'}, 7], ['no recordings dir', {}, 73]]) {   // ledger ISS-B4RECORDERSTATE-003: no dir, no .webm, only 0-byte files
     const w = world();
     try {
-      const r = w.run(w.bucketEnv({...base, ...extra}));
+      const env = w.bucketEnv({...base, ...extra});
+      if (label === 'no recordings dir') env.LKB_RECORD_DIR = w.posix('no-such-dir');
+      const r = w.run(env);
       assert.equal(r.status, want, `${label}: ${r.out}`);
+      if (want === 73) {   // plan A3 / ISS-B4RECORDERSTATE-003 (D-257: an empty record-once is failed)
+        assert.match(r.out, /nothing was recorded; exiting 73/);
+        assert.equal(stateUploads(w).length, 1, 'the final snapshot is still taken');
+        assert.equal(existsSync(w.bucketFile('lease')), false, 'and the lease released');
+      }
       if (label === 'upload fails') {
         assert.match(r.out, /recording copy failed/); assert.match(r.out, /could not be copied/);
         assert.equal(existsSync(w.bucketFile('recordings/meeting.webm')), false);

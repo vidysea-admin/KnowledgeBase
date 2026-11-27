@@ -10,7 +10,8 @@
 #               docker compose --profile bot run --rm -p 127.0.0.1:5900:5900 -e BOT_MODE=login bot
 #
 # External state (D-233, unit B4). Active in run and record-once ONLY when LKB_STATE_BUCKET is set; with it unset
-# no bucket command is ever called and the sequence is the one this file always had (exec, no supervision).
+# no bucket command is ever called and run mode keeps the sequence this file always had (exec, no supervision);
+# record-once is always supervised (plan A3) so it can report "nothing recorded" (73).
 # The bucket client is `gcloud storage` (cp, cat, rm, objects describe); no ACL or IAM command is ever used.
 #   LKB_STATE_BUCKET        bucket name (gs:// prefix optional)       LKB_STATE_PREFIX   object prefix (default recorder)
 #   LKB_BOT_PROFILE_DIR     Chrome profile (image default /data/bot-profile)
@@ -32,6 +33,8 @@
 # Objects: <prefix>/state.tar.gz (members <profile dir name>/ and <release dir name>/), <prefix>/lease,
 # <prefix>/state.prev.tar.gz (the archive before the latest snapshot), <prefix>/recordings/<path under the recordings dir>.
 # Exit statuses worth knowing: 75 lease held elsewhere or lost, 74 a recording was made but not copied to the bucket,
+# 73 record-once: the record command succeeded but wrote no non-empty .webm under the recordings dir after it started
+#    (restored proof media does not count; with or without a bucket),
 # 76 publish-proof failed.
 #
 # Live-proof media (D-236 part B, unit B4B). The marker $LKB_RELEASE_DIR/live-proof.json (written by a human, never by this
@@ -87,6 +90,7 @@ ATTENDANCE_S="${LKB_ATTENDANCE_INTERVAL_S:-300}"
 SEND_NOW_QUEUE=""; [ "$MODE" = "run" ] && [ "${LKB_SEND_NOW_QUEUE:-}" = "1" ] && SEND_NOW_QUEUE=1
 SUPERVISE=0
 if [ -n "$BUCKET" ] || [ -n "$ATTENDANCE_ACCOUNT" ] || [ -n "$SEND_NOW_QUEUE" ]; then SUPERVISE=1; fi
+[ "$MODE" = "record-once" ] && SUPERVISE=1   # review A3 (D-257): an empty record-once must fail with or without a bucket
 if [ "$MODE" = "record-once" ] && { [ -z "${LKB_RECORD_URL:-}" ] || [ -z "${LKB_RECORD_UNTIL:-}" ]; }; then
   echo "record-once mode needs LKB_RECORD_URL and LKB_RECORD_UNTIL" >&2; exit 1
 fi
@@ -746,8 +750,8 @@ renew_before_start   # the slow part of the start is over; refresh the lease rig
 # record-once: the command and its flags. LKB_RECORD_ARGS is split on spaces (no globbing).
 if [ "$MODE" = "record-once" ]; then
   set -f; set -- ${LKB_RECORD_ARGS:-}; set +f
-  if [ "$SUPERVISE" != 1 ]; then exec node --import tsx packages/meeting-bot/src/cli.ts record "$LKB_RECORD_URL" --until "$LKB_RECORD_UNTIL" "$@"; fi
   PHASE=running
+  : >"$STAGE/record-start"   # plan A3: only a .webm written after this counts as recorded (restored proof media is older)
   start_child node --import tsx packages/meeting-bot/src/cli.ts record "$LKB_RECORD_URL" --until "$LKB_RECORD_UNTIL" "$@"
   start_helpers
   wait_child
@@ -756,6 +760,11 @@ if [ "$MODE" = "record-once" ]; then
   if [ "$REC_RC" -eq 0 ] && [ "$copy_rc" -ne 0 ]; then
     echo "[bot-state] the recording finished but could not be copied to the bucket; exiting 74" >&2
     REC_RC=74
+  elif [ "$REC_RC" -eq 0 ] && [ -z "$(find "$RECORD_DIR" -type f -name '*.webm' -size +0 -newer "$STAGE/record-start" 2>/dev/null | head -n 1)" ]; then
+    # plan A3 / ISS-B4RECORDERSTATE-003 (D-257): a record command that succeeded without writing one non-empty .webm
+    # (after its start; restored proof media does not count) captured nothing, and that is a failure for the job runner.
+    echo "[bot-state] the record command succeeded but nothing was recorded; exiting 73" >&2
+    REC_RC=73
   fi
   finish "$REC_RC"
 fi

@@ -356,7 +356,7 @@ test('B4B-C4 restore at start: after a restart the media is back at the path the
       const n = restarted(w);
       try {
         await gateThrows(n);   // before the start there is no marker and no media
-        const extra = mode === 'record-once' ? {BOT_MODE: 'record-once', LKB_RECORD_URL: 'https://meet.example/x', LKB_RECORD_UNTIL: '2026-11-26T10:00:00Z'} : {};
+        const extra = mode === 'record-once' ? {BOT_MODE: 'record-once', LKB_RECORD_URL: 'https://meet.example/x', LKB_RECORD_UNTIL: '2026-11-26T10:00:00Z', STUB_WRITE_WEBM: '1'} : {};
         const r = n.run(n.bucketEnv({...extra, STUB_NODE_SLEEP: '3', LKB_SNAPSHOT_INTERVAL_S: '1'}));
         assert.equal(r.status, 0, `${mode}: ${r.out}`);
         assert.equal(Buffer.compare(readFileSync(n.app(REC)), MEDIA), 0, `${mode}: media byte-equal at exactly the path the marker names`);
@@ -374,6 +374,21 @@ test('B4B-C4 restore at start: after a restart the media is back at the path the
         clean(n, r);
       } finally { n.cleanup(); }
     }
+  } finally { w.cleanup(); }
+});
+
+test('plan A3 (D-257): restored proof media is not a recording: a record-once that wrote nothing after the restore exits 73', T, async () => {
+  const w = world();
+  try {
+    w.putProof();
+    assert.equal(w.publish().status, 0);
+    const n = restarted(w);
+    try {
+      const r = n.run(n.bucketEnv({BOT_MODE: 'record-once', LKB_RECORD_URL: 'https://meet.example/x', LKB_RECORD_UNTIL: '2026-11-26T10:00:00Z', STUB_NODE_SLEEP: '1'}));
+      assert.equal(Buffer.compare(readFileSync(n.app(REC)), MEDIA), 0, 'the proof media was restored');
+      assert.equal(r.status, 73, r.out);
+      assert.match(r.out, /nothing was recorded; exiting 73/);
+    } finally { n.cleanup(); }
   } finally { w.cleanup(); }
 });
 
@@ -552,7 +567,7 @@ test('B4B-I1/I5 no bucket variable: neither the new mode nor the restore calls a
     w = world();
     try {
       seedBucket(w, 'recorder/state.tar.gz', stateTar());
-      const extra = mode === 'record-once' ? {BOT_MODE: 'record-once', LKB_RECORD_URL: 'https://meet.example/x', LKB_RECORD_UNTIL: '2026-11-26T10:00:00Z'} : {};
+      const extra = mode === 'record-once' ? {BOT_MODE: 'record-once', LKB_RECORD_URL: 'https://meet.example/x', LKB_RECORD_UNTIL: '2026-11-26T10:00:00Z', STUB_WRITE_WEBM: '1'} : {};   // a recording is made: an empty record-once exits 73 (plan A3)
       const r = w.run(w.bucketEnv(extra));
       assert.equal(r.status, 0, `${mode}: ${r.out}`);
       assert.equal(proofCalls(w).length, 0, `${mode}: no proof-object call`);
