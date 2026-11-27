@@ -1081,3 +1081,30 @@ test('plan A4 (D-257): a missing or wrong setting stops the start with the setti
     } finally { w2.cleanup(); }
   }
 });
+
+// Healthcheck (docker/meeting-bot/healthcheck.sh): run for real with stub xdpyinfo and pgrep on PATH. The pgrep stub
+// matches its -f pattern (extended regex, like procps) against the command lines in $STUB_PROCS, one per line.
+test('healthcheck: healthy in every run-mode shape (exec pipeline, queue loop, calendar loop between ticks); unhealthy without one', T, () => {
+  const dir = mkdtempSync(join(tmpdir(), 'lkb-hc-'));
+  try {
+    const bin = join(dir, 'bin'); mkdirSync(bin);
+    const profile = join(dir, 'profile'); mkdirSync(profile);
+    const procs = join(dir, 'procs');
+    writeFileSync(join(bin, 'xdpyinfo'), '#!/bin/sh\nexit 0\n'); chmodSync(join(bin, 'xdpyinfo'), 0o755);
+    writeFileSync(join(bin, 'pgrep'), '#!/bin/sh\n[ "$1" = -f ] || exit 3\ngrep -E -q -- "$2" "$STUB_PROCS"\n'); chmodSync(join(bin, 'pgrep'), 0o755);
+    const run = (lines, extra = {}) => {
+      writeFileSync(procs, lines.join('\n') + '\n');
+      return spawnSync(SH, [posix(join(root, 'docker/meeting-bot/healthcheck.sh'))], {encoding: 'utf8', env: {
+        ...process.env, PATH: bin + delimiter + (process.env.PATH ?? ''),
+        STUB_PROCS: posix(procs), LKB_BOT_PROFILE_DIR: posix(profile), BOT_MODE: 'run', ...extra}}).status;
+    };
+    const tini = '/usr/bin/tini -s -- /usr/local/bin/bot-entrypoint';
+    assert.equal(run([tini, 'node scripts/webinar/run-pipeline.mjs --run --watch']), 0, 'exec-ed legacy pipeline');
+    assert.equal(run([tini, '/bin/sh /usr/local/bin/bot-entrypoint', 'node --import tsx scripts/webinar/send-now/queue-worker.ts --once --max-wait-s 300']), 0, 'queue loop');
+    assert.equal(run([tini, '/bin/sh /usr/local/bin/bot-entrypoint', 'sleep 120']), 0, 'calendar or queue loop between steps');
+    assert.equal(run([tini, '/bin/sh /usr/local/bin/bot-healthcheck', 'Xvfb :99']), 1, 'neither the pipeline nor the entrypoint loop is alive');
+    assert.equal(run([tini, 'sh -c /bin/sh /usr/local/bin/bot-entrypoint', 'Xvfb :99']), 1, 'only a command line that STARTS with the entrypoint shell counts');
+    assert.equal(run(['Xvfb :99'], {BOT_MODE: 'doctor'}), 0, 'doctor mode: display only');
+    assert.equal(run([tini, '/bin/sh /usr/local/bin/bot-entrypoint'], {LKB_BOT_PROFILE_DIR: posix(join(dir, 'missing'))}), 1, 'profile dir missing');
+  } finally { rmSync(dir, {recursive: true, force: true}); }
+});
