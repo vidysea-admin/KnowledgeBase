@@ -218,3 +218,48 @@ WhatsApp, with an API key that has scope `whatsapp-admin` (`read -rs K`, then `-
 - That `csrf` and `whatsapp/links` sit in the main `index-*.js` and not a lazy chunk.
 - The Mongo firewall tool (security group vs `ufw`), and whether `MONGODB_URL` already has the `lkb_app` user.
 - Which session ids to index (ask Umesh).
+
+## Server bot: settings list (plan A5, D-257, read from the code on integrate/bot-live)
+
+Names only. Values come from the owner or Secret Manager, never this file. "Bot" = the `docker/meeting-bot` container; "API" = the hosted API service. Code references are on `integrate/bot-live`.
+
+### Must be set for the finish line (pasted link and calendar meeting, notes in the live KB)
+
+| Name | Where | Secret | Why it is needed | Read at |
+|---|---|---|---|---|
+| `MONGODB_URL` | API + bot | yes | Mongo connection. The API falls back to `mongodb://localhost:27017` if unset: wrong on a server. | `apps/api/src/bootstrap.ts:14`, `scripts/webinar/send-now/queue-worker.ts:92` |
+| `MONGODB_DB` | API + bot | no | `lkb_prod`. Must be identical on API and bot: the API writes `capture_jobs` there and the bot's queue worker reads it there. | `apps/api/src/db-name.ts:25`, `queue-worker.ts:96` |
+| `MONGO_WORK_DB` | bot | no | `lkb_prod`. The database `--index` writes the notes to; must equal `MONGODB_DB`. | `scripts/lib/transcript-provenance.mjs:97` |
+| `LKB_INDEX_PRODUCTION` | bot | no | Exactly `1`. Forwards D-204's `--i-know-this-is-production` from the recorder (A7) and the calendar scheduler (A8). Without it notes never reach `lkb_prod`. Only works with both DB names above set to `lkb_prod`. | `packages/meeting-bot/src/capture/record-finalize.ts`, `scripts/webinar/run-pipeline.mjs` (`validateRunGate`), `graph-finalize.mjs` |
+| `GEMINI_API_KEY` | API + bot | yes | Transcript, slide vision and indexing. Checked only after the meeting, so a missing key fails late. | `scripts/transcribe-long-session.mjs:65` |
+| `LKB_STATE_BUCKET` | bot | no | Bucket for the signed-in Chrome profile, state, lease and `recordings/`. If unset nothing reaches a bucket and the sign-in is lost on every restart. | `docker/meeting-bot/entrypoint.sh:72` |
+| `LKB_SEND_NOW_QUEUE` | API + bot | no | Exactly `1` on both: turns the pasted-link queue on (API side) and the queue loop on (bot, run mode). | `send-now-queue.ts:118`, `entrypoint.sh:87` |
+| `LKB_SEND_NOW_INDEX` | bot | no | Exactly `1`: a pasted-link job also runs `--process-video --index`. Without it the job only transcribes. Needs `LKB_INDEX_PRODUCTION=1` too for the live KB. | `queue-worker.ts:34` |
+| `LKB_SEND_NOW_TENANTS` or `LKB_TENANT_ID` | API + bot | no | Tenant(s) the queue serves; must match on both sides. Falls back to `LKB_TENANT_ID`, then `vidysea`. | `send-now-queue.ts:59-60` |
+| `LKB_CAPTURE_HOST_ID` | bot | no | Stable host id (letters, digits, `._-`, max 64). A bad value now stops the bot at start (A2). | `capture-slot-readiness.ts:18-28` |
+| `LKB_ATTENDANCE_ACCOUNT` | bot | no | Google account whose calendar is attended. Needed for finish-line test 2 only. | `entrypoint.sh:85` |
+| `LKB_API_URL` | bot | no | Hosted API HTTPS origin. Defaults to `http://localhost:3300`: wrong on a server. Needed in calendar mode. | `run-pipeline-deps.mjs:32`, `deps-runtime.mjs:92` |
+| `LKB_API_KEY` | bot | yes | Bearer key the bot uses against the API (calendar mode). | `run-pipeline-deps.mjs:43` |
+| `LKB_CAPTURE_SLOTS` | bot | no | Capture slot names (one slot for go-live, D-257). Needed in calendar mode. | `deps-runtime.mjs:23` |
+| `VNC_PASSWORD` | bot | yes | Only for `BOT_MODE=login`, the one-time Google sign-in. | `entrypoint.sh:64` |
+
+### Recommended
+
+| Name | Where | Secret | Why |
+|---|---|---|---|
+| `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID` | bot | token yes | Failure and status alerts. No token = alerts off (logged once). |
+| `LKB_ALERT_EMAIL`, `LKB_ALERT_EMAIL_TO` | bot | no | Alert mail through gws (the slot-readiness alert, D-257). |
+| `LKB_CALENDAR_WORKER_HOST_ID` | bot | no | Binds this worker to the hosted calendar, with `LKB_API_URL`. |
+| `LKB_JOIN_RULES_ENFORCE` | bot | no | `last-valid` or `fail-closed`; required by `run-pipeline.mjs --watch`. |
+| `LKB_AUTOJOIN_DISCOVERY`, `_WEBINARS`, `_CAREER_PRIORITY`, `_TEST_DATA_ROUTING` | bot | no | All four `true` for `--watch`; `run-pipeline.mjs:67` refuses otherwise. |
+
+### Leave alone or unset
+
+- `LKB_ALLOW_STAGING`: keep unset on the server.
+- `OLLAMA_BASE_URL` defaults to `localhost:11434` and there is no Ollama on Cloud Run: leave the Ollama settings unset (slide vision is Gemini only).
+- Image defaults set in the Dockerfile (`LKB_PYTHON`, `LKB_BROWSER_EXECUTABLE`, `LKB_CAPTURE_BACKEND=tab`, `LKB_FFMPEG_PATH`, `TZ=Asia/Kolkata`, `DISPLAY`, `PULSE_SERVER`, `LKB_BOT_PROFILE_DIR`): leave them.
+- Tuning with safe defaults: `LKB_SNAPSHOT_INTERVAL_S` (300), `LKB_LEASE_TTL_S` (120), `LKB_LEASE_RENEW_S` (30), `LKB_STOP_WAIT_S` (3), `LKB_GCLOUD_TIMEOUT_S` (120), `LKB_ATTENDANCE_INTERVAL_S` (300), `LKB_STATE_PREFIX` (`recorder`).
+
+### Known gaps (fixed by plan A4, the start-up check)
+
+Today several of the settings above are first read mid-meeting or after it: Mongo settings at the first queue loop (the container stays up and takes no jobs), `GEMINI_API_KEY` after the meeting, `LKB_API_URL`/`LKB_API_KEY` at the first tick, a missing bucket never. `BOT_MODE=doctor` checks binaries only. Also: the image `HEALTHCHECK` expects `run-pipeline.mjs`, which queue-only mode never starts (not verified whether Cloud Run reads it), and the `docker-compose.yml` bot service does not forward the bucket, send-now, attendance or capture settings.
