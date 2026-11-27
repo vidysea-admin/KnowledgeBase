@@ -38,6 +38,16 @@ test("actual bootstrap connects then drains before constructing listening server
   assert.deepEqual(calls, ["connect", "service", "drain", "build", "listen"]);
 });
 
+test("review A2: a bad LKB_CAPTURE_HOST_ID refuses before connect or drain", async () => {
+  const calls: string[] = [];
+  await assert.rejects(startNativeServer({ MONGODB_DB: "lkb_native_launcher", LKB_CAPTURE_HOST_ID: "bad value" }, {
+    async connect() { calls.push("connect"); return {} as never; }, getDb: () => ({} as never),
+    async service() { calls.push("service"); return { async drain() { calls.push("drain"); return { pending: 0 }; } } as unknown as NativeArchiveServerService; },
+    startServer() { calls.push("listen"); return createServer(); },
+  }), /LKB_CAPTURE_HOST_ID refused: bad character/);
+  assert.deepEqual(calls, []);
+});
+
 test("failed bounded drain never reaches server readiness", async () => {
   let listens = 0;
   await assert.rejects(startNativeServer({ MONGODB_DB: "lkb_native_launcher" }, {
@@ -54,3 +64,10 @@ test("trusted root host adapter construction stays lazy; ordinary API requires e
   assert.equal(typeof adapter.accept, "function");
   assert.equal(typeof adapter.revoke, "function");
 });
+
+test("ISS-B3HOSTID-001: the trusted readiness host refuses a bad LKB_CAPTURE_HOST_ID when it is built, not on first receipt", () => {
+  assert.throws(() => createTrustedCaptureReadinessHost(nativeRootForHostIdTest, { LKB_CAPTURE_HOST_ID: "bad value" }), /LKB_CAPTURE_HOST_ID refused: bad character/);
+  assert.doesNotThrow(() => createTrustedCaptureReadinessHost(nativeRootForHostIdTest, { LKB_CAPTURE_HOST_ID: "cloud-run-recorder-1" }));
+  assert.doesNotThrow(() => createTrustedCaptureReadinessHost(nativeRootForHostIdTest, {}));
+});
+const nativeRootForHostIdTest = process.cwd();

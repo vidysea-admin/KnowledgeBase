@@ -194,3 +194,17 @@ test('remote snapshots bind rotated and revoked credentials, keep readOnly pure,
   const full={...config,stateDir:join(f.root,'blocked-test')},blocked=joinRulesFilePath(full.stateDir,'fixture').replace(/\.json$/,'.remote.json');mkdirSync(blocked,{recursive:true});const healthyBefore=recoveries;behavior='good';
   assert.equal((await enforceJoinRules(remoteSelection,full)).skipped[0].reason,'rule-denied','current authenticated policy still enforced when snapshot persistence fails');assert.equal(recoveries,healthyBefore);assert.ok(logs.some(m=>m.includes('remote snapshot not persisted')));assert.deepEqual(readdirSync(join(blocked,'..')),['fixture.remote.json']);
 }));
+
+test('ISS-B3HOSTID-001: a bad LKB_CAPTURE_HOST_ID stops the runtime at construction, naming the reason, never the value', () => {
+  const root = mkdtempSync(join(tmpdir(), 'lkb-scheduler-hostid-'));
+  try {
+    for (const [value, reason] of [['', 'empty'], [' x', 'whitespace'], ['bad/value-zz9', 'bad character'], ['a'.repeat(65), 'too long']]) {
+      const env = {LKB_TENANT_ID: 'fixture', LKB_CAPTURE_SLOTS: 'career-a', LKB_CAPTURE_HOST_ID: value};
+      assert.throws(() => createSchedulerRuntime(root, env, () => {}, () => 'fixture'), error => {
+        assert.match(error.message, new RegExp(`LKB_CAPTURE_HOST_ID refused: ${reason}`));
+        if (value.length > 2) assert.ok(!error.message.includes(value), 'the raw value is never echoed');
+        return true;
+      });
+    }
+  } finally { rmSync(root, {recursive: true, force: true}); }
+});
