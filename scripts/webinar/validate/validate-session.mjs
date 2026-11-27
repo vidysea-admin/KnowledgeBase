@@ -36,7 +36,7 @@ import { validateTurns } from "../process-video.mjs";
 import { loadWebinarSession } from "../session-rows.mjs";
 import { evaluateTranscriptQaGeneration } from "./transcript-qa-binding.mjs";
 import { turnIntegrityReasons } from "./turn-integrity.mjs";
-import { loadTrustedRecordingPrivacy, evaluateRecordingCoverage } from "../../lib/transcription/private-recording.mjs";
+import { loadTrustedRecordingPrivacy, evaluateRecordingCoverage, detectSilentIntervals, verifiedSilenceIntervals } from "../../lib/transcription/private-recording.mjs";
 
 const DEFAULT_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..", "..", "..");
 const sha = (bytes) => createHash("sha256").update(bytes).digest("hex");
@@ -51,15 +51,15 @@ export function probeDurationSeconds(audioPath) {
 }
 
 /** QA evidence + failure reasons from transcript-qa.json (T-044). Counts only, never transcript text. */
-async function qaEvidence(dir, turns, turnsBytes, durationSec, env, privacy) {
-  const path = join(dir, "transcript-qa.json");
-  if (!existsSync(path)) {
+async function qaEvidence(dir, turns, turnsBytes, durationSec, env, privacy, early) {
+  if (!early.exists) {
     return { qa: null, qaSha256: null, reasons: privacy ? ["trusted captured privacy requires generation-bound transcript-qa.json"] :
       flagOn(env, TRANSCRIPT_QA_FLAG) ? [`${TRANSCRIPT_QA_FLAG}=1 but transcript-qa.json is missing`] : [] };
   }
   let proof;
   let qaBytes;
-  try { qaBytes = readFileSync(path); proof = JSON.parse(qaBytes.toString("utf8")); } catch { return { qa: null, qaSha256: null, reasons: ["transcript-qa.json is unreadable"] }; }
+  // The same bytes the silence decision read (one read, so coverage and qaSha256 describe one generation).
+  try { qaBytes = early.bytes; if (!qaBytes) throw new Error(); proof = JSON.parse(qaBytes.toString("utf8")); } catch { return { qa: null, qaSha256: null, reasons: ["transcript-qa.json is unreadable"] }; }
   register();
   const { clampAndValidateTurns } = await import("../../../packages/ai/src/stt/transcript-qa.ts");
   return { ...evaluateTranscriptQaGeneration({ proof, turnsBytes, turns, durationSec, clamp: clampAndValidateTurns, privacy }), qaSha256: sha(qaBytes) };
@@ -70,7 +70,8 @@ async function qaEvidence(dir, turns, turnsBytes, durationSec, env, privacy) {
  * @param {{root?: string, sessionId: string, durationSec?: number, acceptPartial?: boolean, dryRun?: boolean,
  *          env?: object, now?: () => Date, findTimeGaps?: Function}} opts  `durationSec` skips the ffprobe of the audio (tests).
  */
-export async function validateSession({ root = DEFAULT_ROOT, sessionId, durationSec, acceptPartial = false, dryRun = false, env = process.env, now = () => new Date(), findTimeGaps } = {}) {
+export async function validateSession({ root = DEFAULT_ROOT, sessionId, durationSec, acceptPartial = false, dryRun = false, env = process.env, now = () => new Date(), findTimeGaps,
+  detectSilence = detectSilentIntervals } = {}) {
   const dataDir = join(root, "data", "toc-migrated"), dir = join(dataDir, sessionId);
   const tenantId = transcriptTenant(dataDir, sessionId); // validates the sessionId shape too
   const probedAudioPath = durationSec === undefined ? findAudioFile(dataDir, join(root, "raw", "TOC", "TOC-Materials", "Audio"), sessionId).path : undefined;
@@ -101,11 +102,31 @@ export async function validateSession({ root = DEFAULT_ROOT, sessionId, duration
     });
   }
   const lastTEnd = turns.length ? Math.max(...turns.map((t) => (Number.isFinite(t.tEnd) ? t.tEnd : 0))) : 0;
-  const publicCoverage = privacy ? evaluateRecordingCoverage({ privacy, turns, durationSeconds: duration,
-    gapThresholdSeconds: GAP_THRESHOLD_SECONDS, tailThresholdSeconds: SHORTFALL_THRESHOLD_SECONDS }) : null;
+  // Silence-aware coverage (2026-11-27), agreeing with transcribe time and admission:
+  //  - stored QA silence evidence is used only if this validator independently re-detects the identical intervals from
+  //    the hashed audio (privacy: the receipt-bound sanitized audio, re-hashed by verifyCurrent below); else refuse;
+  //  - provided audio without stored evidence uses a fresh detection; captured audio without it uses none, because
+  //    admission (verifyTrustedRecordingPrivacyAdmission) can only read the qaSha256-bound evidence;
+  //  - any detection failure means no silence: exactly the previous, stricter guard.
+  const qaPath = join(dir, "transcript-qa.json"), early = { exists: existsSync(qaPath), bytes: null };
+  let claimedSilence;
+  if (early.exists) { try { early.bytes = readFileSync(qaPath); const p = JSON.parse(early.bytes.toString("utf8")); if (p && typeof p === "object") claimedSilence = p.silence; } catch { /* reported by qaEvidence */ } }
+  const silenceAudio = privacy ? privacy.audioPath : probedAudioPath;
+  let detected = null, silentIntervals = [], silenceApplied = false;
+  if (silenceAudio) { try { detected = detectSilence(silenceAudio, { durationSeconds: duration }); } catch { detected = null; } }
+  if (claimedSilence !== undefined) {
+    step(() => {
+      const claimed = verifiedSilenceIntervals(claimedSilence, privacy ? privacy.sanitizedAudioSha256 : silenceAudio ? sha(readFileSync(silenceAudio)) : null);
+      if (!detected || JSON.stringify(detected) !== JSON.stringify(claimed)) throw new Error("QA silence evidence differs from the independently detected silence of the hashed audio");
+      silentIntervals = claimed; silenceApplied = true;
+    });
+  } else if (!privacy && detected) { silentIntervals = detected; silenceApplied = true; }
+  const silenceAware = !privacy && silentIntervals.length > 0;
+  const publicCoverage = privacy || silenceAware ? evaluateRecordingCoverage({ privacy: privacy ?? { publicIntervals: [{ tStart: 0, tEnd: duration }] }, turns, durationSeconds: duration,
+    gapThresholdSeconds: GAP_THRESHOLD_SECONDS, tailThresholdSeconds: SHORTFALL_THRESHOLD_SECONDS, silentIntervals }) : null;
   const gaps = publicCoverage ? publicCoverage.gaps : turns.length ? findTimeGaps(turns, GAP_THRESHOLD_SECONDS) : [];
   const shortfallSec = publicCoverage ? publicCoverage.tailShortfall : duration - lastTEnd;
-  const coverage = round(publicCoverage ? publicCoverage.coveredPublicSeconds / publicCoverage.expectedPublicSeconds : Math.min(lastTEnd / duration, 1), 4);
+  const coverage = round(publicCoverage ? (publicCoverage.expectedPublicSeconds > 0 ? publicCoverage.coveredPublicSeconds / publicCoverage.expectedPublicSeconds : 1) : Math.min(lastTEnd / duration, 1), 4);
   const partial = turns.length > 0 && (publicCoverage ? !publicCoverage.complete : gaps.length > 0 || shortfallSec > SHORTFALL_THRESHOLD_SECONDS);
   if (partial && !acceptPartial) {
     reasons.push(`partial coverage ${(coverage * 100).toFixed(1)}% (${gaps.length} internal gap(s) > ${GAP_THRESHOLD_SECONDS}s, tail shortfall ${round(shortfallSec, 1)}s > ${SHORTFALL_THRESHOLD_SECONDS}s); re-run with --accept-partial to record it as accepted`);
@@ -114,7 +135,7 @@ export async function validateSession({ root = DEFAULT_ROOT, sessionId, duration
     register();
     reasons.push(...turnIntegrityReasons({ turns, durationSec: duration, qa: await import("../../../packages/ai/src/stt/transcript-qa.ts") }));
   }
-  const { qa, qaSha256, reasons: qaReasons } = await qaEvidence(dir, turns, turnsBytes, duration, env, privacy);
+  const { qa, qaSha256, reasons: qaReasons } = await qaEvidence(dir, turns, turnsBytes, duration, env, privacy, early);
   reasons.push(...qaReasons);
   if (privacy) { try { await privacy.verifyCurrent(); } catch (e) { reasons.push(`recording privacy evidence changed: ${e.message}`); } }
   if (sourceBytes) step(() => {
@@ -127,6 +148,7 @@ export async function validateSession({ root = DEFAULT_ROOT, sessionId, duration
     qa, qaSha256, turnsSha256: turns.length ? sha(turnsBytes) : null, sourceSha256: sourceBytes ? sha(sourceBytes) : null,
     ...(privacy ? { privacy: { receiptSha256: privacy.receiptSha256, sanitizedAudioSha256: privacy.sanitizedAudioSha256,
       publicIntervals: privacy.publicIntervals }, privacyCoverage: publicCoverage } : {}),
+    silence: silenceApplied ? { intervals: silentIntervals.length, silentSeconds: round(silentIntervals.reduce((s, w) => s + w.tEnd - w.tStart, 0), 3) } : null,
     validatedAt: now().toISOString(), validator: "scripts/webinar/validate/validate-session.mjs" };
   const report = passed
     ? { status: "passed", transcriptValidated: true, ...evidence, ...(partial ? { partialAccepted: true } : {}) }

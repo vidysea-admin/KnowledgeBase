@@ -53,6 +53,19 @@ export function assertQaGenerationShape(proof) {
       previousEnd = window.tEnd;
     }
   }
+  if (Object.hasOwn(proof, "silence")) {
+    // Silence the producer excluded from expected speech; admission re-reads it under qaSha256 (private-recording.mjs).
+    const s = proof.silence, keys = ["version", "detector", "noiseDb", "minSeconds", "audioSha256", "intervals"];
+    if (!object(s) || Object.keys(s).length !== keys.length || Object.keys(s).some(k => !keys.includes(k)) || s.version !== 1 ||
+        typeof s.detector !== "string" || !s.detector || !finite(s.noiseDb) || !finite(s.minSeconds) || s.minSeconds <= 0 ||
+        !/^[0-9a-f]{64}$/.test(s.audioSha256 ?? "") || !Array.isArray(s.intervals) ||
+        (proof.privacy && s.audioSha256 !== proof.privacy.sanitizedAudioSha256)) fail("invalid silence evidence");
+    let previousEnd = 0;
+    for (const w of s.intervals) {
+      if (!object(w) || !finite(w.tStart) || !finite(w.tEnd) || w.tStart < previousEnd || w.tEnd <= w.tStart || w.tEnd > proof.durationSec) fail("invalid silence evidence");
+      previousEnd = w.tEnd;
+    }
+  }
   const ids = new Set();
   let accepted = 0;
   let retainedOutputCount = 0;
@@ -86,9 +99,9 @@ export function assertQaGenerationShape(proof) {
 }
 
 /** Producer calls AFTER committing turns.json; bytes are read from that actual committed file. */
-export function buildTranscriptQaGeneration({ turnsBytes, durationSec, spans, merged, privacy }) {
+export function buildTranscriptQaGeneration({ turnsBytes, durationSec, spans, merged, privacy, silence }) {
   const proof = structuredClone({ version: 1, turnsSha256: transcriptBytesSha256(turnsBytes), durationSec, spans, merged,
-    ...(privacy === undefined ? {} : { privacy }) });
+    ...(privacy === undefined ? {} : { privacy }), ...(silence === undefined ? {} : { silence }) });
   assertQaGenerationShape(proof);
   return proof;
 }
