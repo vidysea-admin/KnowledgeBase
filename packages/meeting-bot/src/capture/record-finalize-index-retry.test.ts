@@ -93,3 +93,27 @@ test("redactSecrets: URL userinfo, bearer tokens and key=value secrets", () => {
   assert.equal(redactSecrets("GEMINI_API_KEY=AIzaSyABC123 ok"), "GEMINI_API_KEY=*** ok");
   assert.equal(redactSecrets("no secrets here, https://example.com/a?b=c"), "no secrets here, https://example.com/a?b=c");
 });
+
+test("redactSecrets: review 2026-11-27 leak corpus (quoted/JSON keys, headers, query keys, bare token shapes)", () => {
+  const cases: Array<[string, string]> = [
+    ['{"apiKey":"sk-ant-AAAA1234"}', "sk-ant-AAAA1234"],
+    ['{"apiKey": "sk-ant-abc12345"}', "sk-ant-abc12345"],
+    ['OPENAI_API_KEY="sk-proj-abc12345"', "sk-proj-abc12345"],
+    ['password: "hunter2"', "hunter2"],
+    ['{"password":"hunter2"}', "hunter2"],
+    ['{"refresh_token":"1//abcdefghijklmnopqrstuvwxyz"}', "1//abcdefghijklmnopqrstuvwxyz"],
+    ["x-api-key: abc123secret", "abc123secret"],
+    ["x-goog-api-key: AIzaSyDUMMY1234567890abcdefgh", "AIzaSyDUMMY1234567890abcdefgh"],
+    ["POST https://generativelanguage.googleapis.com/v1/models/x:generateContent?key=AIzaSyDUMMY123", "AIzaSyDUMMY123"],
+    ["Authorization: Basic dXNlcjpwYXNz", "dXNlcjpwYXNz"],
+    ["failed with sk-ant-api03-XYZXYZXYZXYZ in it", "sk-ant-api03-XYZXYZXYZXYZ"],
+    ['api_key="abc999"', "abc999"],
+    ['token = "tok999"', "tok999"],
+    ["mongodb://u:p@ss@h/db", "p@ss"],
+    ["mongodb://u:pa/ss@h/db", "pa/ss"],
+  ];
+  for (const [input, secret] of cases) assert.ok(!redactSecrets(input).includes(secret), `leaked ${secret} from ${input} -> ${redactSecrets(input)}`);
+  // over-redaction guard: the next query parameter survives
+  assert.match(redactSecrets("access_token=ya29.abc&x=1"), /&x=1$/);
+  assert.ok(!redactSecrets("access_token=ya29.abc&x=1").includes("ya29.abc"));
+});

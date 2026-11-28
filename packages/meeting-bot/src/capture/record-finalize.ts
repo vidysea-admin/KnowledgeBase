@@ -261,10 +261,15 @@ const syncSleep = (ms: number): void => { if (ms > 0) Atomics.wait(new Int32Arra
 
 /** Strip credentials before child output is persisted: URL userinfo, bearer tokens, KEY/TOKEN/SECRET/PASSWORD=value pairs. */
 export function redactSecrets(text: string): string {
+  // Review 2026-11-27: userinfo up to the LAST '@' of the token (a password may hold '@' or '/'); quoted/JSON and hyphenated
+  // header names; `?key=` query params; bare provider token shapes. Over-redaction is acceptable in a log, a leak is not.
   return text
-    .replace(/\b([a-z][a-z0-9+.-]*:\/\/)[^\s/@]+@/gi, "$1***@")
-    .replace(/\b(Bearer)\s+[A-Za-z0-9._~+/=-]+/gi, "$1 ***")
-    .replace(/\b([A-Za-z0-9_]*(?:API_?KEY|TOKEN|SECRET|PASSWORD|PASSWD)[A-Za-z0-9_]*)(\s*[=:]\s*)[^\s"',;]+/gi, "$1$2***");
+    .replace(/\b([a-z][a-z0-9+.-]*:\/\/)\S*@/gi, "$1***@")
+    .replace(/\b(Bearer|Basic)\s+[A-Za-z0-9._~+/=-]+/gi, "$1 ***")
+    .replace(/(?<![A-Za-z0-9_.-])(["']?)([A-Za-z0-9_.-]{0,64}?(?:api[_-]?key|token|secret|passw(?:or)?d|credential|authorization)[A-Za-z0-9_.-]{0,64})\1(\s*[=:]\s*)(["']?)(?!(?:Bearer|Basic) \*\*\*)[^\s"'&,;}]+/gi, "$1$2$1$3$4***")
+    .replace(/([?&](?:key|api_key|apikey|access_token|token)=)[^&\s"']+/gi, "$1***")
+    .replace(/\b(?:sk-[A-Za-z0-9_-]{8,}|AIza[0-9A-Za-z_-]{10,}|ya29\.[0-9A-Za-z._-]+|gh[pousr]_[A-Za-z0-9]{20,})/g, "***")
+    .replace(/1\/\/[0-9A-Za-z_-]{20,}/g, "***");
 }
 
 /** Append to the log, then keep only its last INDEX_LOG_MAX_BYTES (UTF-8 boundary tolerated: a split char is replaced, not fatal). */

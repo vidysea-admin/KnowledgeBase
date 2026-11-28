@@ -43,7 +43,12 @@ export function createPipelineDeps(env = process.env, inject = {}) {
       if (!env.LKB_TENANT_ID || !env.LKB_API_KEY) throw new Error('Explicit lane owner and API key required');
       const response = await fetch(`${api}/webinar-operations`, { headers: { authorization: `Bearer ${env.LKB_API_KEY}` }, redirect: 'error', signal: AbortSignal.timeout(30000) });
       try {
-        if (!response.ok || response.headers.get('x-lkb-tenant') !== env.LKB_TENANT_ID) throw new Error('Connected API owner does not match the configured capture lane');
+        const owner = response.headers.get('x-lkb-tenant');
+        // Review 2026-11-27: an API that is briefly unavailable (redeploy, overload) is a transient refusal the scheduler retries,
+        // not an ownership failure. A foreign owner header is never transient.
+        if (!response.ok && (response.status >= 500 || [408, 429].includes(response.status)) && (owner === null || owner === env.LKB_TENANT_ID))
+          throw new Error(`Connected API unavailable (${response.status}); retry later`, {cause: {code: 'LKB_API_UNAVAILABLE'}});
+        if (!response.ok || owner !== env.LKB_TENANT_ID) throw new Error('Connected API owner does not match the configured capture lane');
         verifiedTenant = env.LKB_TENANT_ID;
       } finally { await response.body?.cancel(); }
     },

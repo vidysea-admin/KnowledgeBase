@@ -15,7 +15,7 @@ export function isTransientNetworkError(error) {
   if (error.name === 'AbortError' || error.name === 'TimeoutError') return true;
   if (error instanceof TypeError && error.message === 'fetch failed') return true;
   const code = error.cause?.code ?? error.cause?.cause?.code;
-  return typeof code === 'string' && (['ECONNRESET', 'ECONNREFUSED', 'ETIMEDOUT'].includes(code) || code.startsWith('UND_ERR_'));
+  return typeof code === 'string' && (['ECONNRESET', 'ECONNREFUSED', 'ETIMEDOUT', 'LKB_API_UNAVAILABLE'].includes(code) || code.startsWith('UND_ERR_'));
 }
 
 /**

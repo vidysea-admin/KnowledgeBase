@@ -86,7 +86,12 @@ export function createCanonicalAlerts({state, tenantId, autojoin, flush, assertO
         const flapping = next.findIndex(saved => FLAPPING.has(saved?.kind));
         if (flapping >= 0) next.splice(flapping, 1);
         else if (FLAPPING.has(snapshot.kind)) {keep = false; dropped++; break;}
-        else {const other = next.findIndex(saved => saved?.kind !== 'capture-failed'); next.splice(other >= 0 ? other : 0, 1);}
+        else {
+          const other = next.findIndex(saved => saved?.kind !== 'capture-failed');
+          // Review 2026-11-27: a lower-value newcomer never pushes out a capture-failed alert; it is dropped (and counted) instead.
+          if (other < 0 && snapshot.kind !== 'capture-failed') {keep = false; dropped++; break;}
+          next.splice(other >= 0 ? other : 0, 1);
+        }
         dropped++;
       }
       if (keep) next.push(snapshot);

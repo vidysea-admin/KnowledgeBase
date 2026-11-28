@@ -347,7 +347,16 @@ test('a flapping feed keeps one pending entry per kind instead of growing the ou
   assert.deepEqual(kinds, ['discovery-degraded', 'discovery-recovered']);
 });
 
-test('at capacity a capture-failed alert evicts a flapping entry and capture-failed entries are never the ones dropped', async () => {
+test('review 2026-11-27: an outbox full of capture-failed alerts drops an incoming lower-value alert, never a capture-failed one', async () => {
+  const full = {operations: {'session-c': {...row('failed'), schedulerAlertOutbox: Array.from({length: 8}, (_, n) => ({kind: 'capture-failed', sessionKey: 'session-c', title: 'T', interruption: {n: n + 1, outcome: 'rejoining'}}))}}};
+  const g = fixture(full, stuck);
+  assert.doesNotThrow(() => g.alerts.update('session-c', {status: 'ready', reason: undefined}));
+  const kinds = full.operations['session-c'].schedulerAlertOutbox.map(a => a.kind);
+  assert.deepEqual(kinds, Array(8).fill('capture-failed'));
+  assert.ok(full.operations['session-c'].schedulerAlertsDropped >= 1, 'the dropped incoming alert is counted');
+});
+
+test('at capacity a capture-failed alert evicts a flapping entry; only a capture-failed newcomer can evict an older capture-failed', async () => {
   const mixed = [{kind: 'capture-failed', sessionKey: 'session-a', title: 'T'}, ...Array.from({length: 7}, (_, n) => recovered(n))];
   const state = {operations: {'session-a': {...row('failed'), schedulerAlertOutbox: mixed}}}, f = fixture(state, stuck);
   assert.doesNotThrow(() => f.alerts.update('session-a', {status: 'failed', reason: 'retry-limit'}));
