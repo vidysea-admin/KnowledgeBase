@@ -70,6 +70,9 @@ const REASON_LABELS = new Map<string, string>([
   ["rescheduled", "rescheduled"], ["rescheduled-completed", "rescheduled, completed"], ["recurring-series", "recurring series"],
   ["unknown-tombstone", "unknown tombstone"], ["ambiguous-provider", "ambiguous provider"], ["contradictory-revision", "contradictory revision"],
   ["missing-revision", "missing revision"], ["ambiguous-identity", "ambiguous identity"],
+  ["prelaunch-transient", "API briefly unavailable, will retry"], ["prelaunch-transient-limit", "API unavailable too long, gave up"],
+  ["capture-slot-unavailable", "no recording slot available"], ["capacity-full", "all recording slots busy, waiting"],
+  ["interrupted-rejoining", "interrupted, rejoining"], ["interrupted-ended", "interrupted, meeting ended"], ["service-stopped", "bot service stopped, will retry"],
 ]);
 export function reasonLabel(reason: unknown): string {
   return typeof reason === "string" && REASON_LABELS.has(reason) ? REASON_LABELS.get(reason)! : "unrecognised reason";

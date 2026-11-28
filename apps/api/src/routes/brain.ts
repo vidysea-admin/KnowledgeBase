@@ -34,7 +34,9 @@ const SKIP_REASON_KEYS: Record<SkipReason, true> = {
 /** Operation reasons that are not SkipReasons. Anything outside both lists is shown as the neutral "processing-failed". */
 const OPERATION_ONLY_REASONS = ["retry-limit", "interrupted-no-recording-artifact", "missed-while-processing", "missed-coverage", "controller-disconnected",
   "coverage-review", "source-discontinuity", "unproven-calendar-history", "rejected", "rescheduled", "rescheduled-completed", "recurring-series",
-  "unknown-tombstone", "ambiguous-provider", "contradictory-revision", "missing-revision", "ambiguous-identity"];
+  "unknown-tombstone", "ambiguous-provider", "contradictory-revision", "missing-revision", "ambiguous-identity",
+  // Scheduler dispatch reasons (review 2026-11-27): shown as themselves, not as "processing-failed". brain-operation-reasons.test.ts pins this.
+  "prelaunch-transient", "prelaunch-transient-limit", "capture-slot-unavailable", "capacity-full", "interrupted-rejoining", "interrupted-ended", "service-stopped"];
 export const WEBINAR_OPERATION_REASONS: readonly string[] = [...OPERATION_ONLY_REASONS, ...Object.keys(SKIP_REASON_KEYS)];
 
 export interface SessionAsset { path: string; bytes: number; mime: string }

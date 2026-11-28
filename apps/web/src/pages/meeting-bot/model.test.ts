@@ -50,6 +50,8 @@ describe("reasonLabel", () => {
   test("known vocabulary maps to a neutral label; unknown, hostile and non-string values never echo", () => {
     expect(reasonLabel("needs-registration")).toBe("needs registration");
     expect(reasonLabel("opted-out")).toBe("opt-out recorded");
+    expect(reasonLabel("prelaunch-transient")).toBe("API briefly unavailable, will retry");
+    expect(reasonLabel("capacity-full")).toBe("all recording slots busy, waiting");
     for (const v of ["<script>alert(1)</script>", "__proto__", "constructor", "made-up", 5, null, undefined, {}]) expect(reasonLabel(v)).toBe("unrecognised reason");
   });
 });
