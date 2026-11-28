@@ -6,6 +6,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { EventEmitter } from "node:events";
 import { spawn } from "node:child_process";
+import { inspect } from "node:util";
 
 import { collectGapEvent, gapsForSourceDoc, validateCaptureControlGaps, installCaptureControl, launchControlledRecording, type RecordingControl, type GapWindow } from "./reconnect-gaps.js";
 
@@ -218,4 +219,14 @@ test("B10-C7e: stdout lines still reach onLine and a clean exit still resolves",
   const started = launchControlledRecording(process.cwd(), ["record", "--session-id", "session"], {LKB_TENANT_ID: "owned"}, () => {}, undefined,
     fakeSpawn(child => child.emit("error", new Error("spawn ENOENT private-path"))));
   assert.equal((await failure(started))?.message, "Recording child could not start");
+});
+
+test("D-264: a failed launch carries its last 8 non-empty stderr lines on stderrTail, never in the message", async () => {
+  const lines = Array.from({ length: 12 }, (_, i) => `line ${i}`);
+  const err = await stderrOf(`${lines.join("\n")}\n\nlkb capture failed: no_audio: secret=abc\n`) as (Error & { stderrTail?: string[] }) | undefined;
+  assert.deepEqual(err?.stderrTail, [...lines.slice(-7), "lkb capture failed: no_audio: secret=abc"]);
+  assert.equal(err?.message, "Recording pipeline exited 1");
+  assert.ok(!String(err?.stack).split("\n")[0]!.includes("secret"));
+  assert.ok(!JSON.stringify(err).includes("secret") && !inspect(err).includes("secret"), "the tail is not enumerable (review F)");
+  assert.deepEqual((await stderrOf() as (Error & { stderrTail?: string[] }) | undefined)?.stderrTail, []);
 });

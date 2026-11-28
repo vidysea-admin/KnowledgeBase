@@ -122,7 +122,9 @@ export function installCaptureControl(context: {tenantId: string; sessionId: str
   };
 }
 /** B10 (D-236 A6, D-238 item 3): the only child stderr text ever kept is ONE name from this fixed list, read from the LAST line that
- * starts with the marker the CLI prints (cli.ts: `lkb capture failed: <message>`). Nothing else from stderr is stored, logged or reported. */
+ * starts with the marker the CLI prints (cli.ts: `lkb capture failed: <message>`). D-264 narrows this for ONE sink: a failed launch's error
+ * also carries `stderrTail` (last 8 non-empty lines, raw), which only the hosted queue worker's log may print, after redactRecorderLine.
+ * Never put it in a job record, API response, alert or the error message. */
 const CAPTURE_FAILURE_NAMES = ["admission_denied"], FAILURE_MARKER = "lkb capture failed: ", STDERR_WINDOW = 65536;
 function captureFailureName(window: string, truncated: boolean): string | undefined {
   const lines = window.split("\n"); if (truncated) lines.shift(); // the first line of a cut window began before it
@@ -162,7 +164,10 @@ export function launchControlledRecording(root: string, args: string[], env: Nod
     child.once("close", code => {
       cleanup(); if (code === 0) return done();
       const name = captureFailureName(errWindow, errTruncated), message = `Recording pipeline exited ${code}`;
-      fail(name ? Object.assign(new Error(`${name}: ${message}`), {code: name}) : new Error(message));
+      const stderrTail = errWindow.split("\n").slice(errTruncated ? 1 : 0).filter(line => line.trim()).slice(-8); // D-264, see B10 above
+      const error = name ? Object.assign(new Error(`${name}: ${message}`), {code: name}) : new Error(message);
+      Object.defineProperty(error, "stderrTail", {value: stderrTail, enumerable: false}); // never in JSON.stringify/inspect (review F)
+      fail(error);
     });
     if (managed && onControl) onControl({generation, privacy: privacy!.privacy, privacyStatus: privacy!.privacyStatus, stop: reason => {
       if (!["cancelled", "rescheduled"].includes(reason) || closed || !child.connected || (requested && requested !== reason)) return Promise.resolve("unavailable");

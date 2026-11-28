@@ -47,10 +47,12 @@ export function redactRecorderLine(line: string): string {
     .replace(/\S*%(?:2F|3A)\S*/gi, "[link]")
     .replace(/\b(?:https?:\/\/|www\.)\S+/gi, "[link]")
     .replace(/\b[a-z0-9-]+(?:\.[a-z0-9-]+)*\.[a-z]{2,24}\b(?::\d+)?(?:\/\S*)?/gi, "[link]")
-    .replace(/\bbearer\s+\S+/gi, "Bearer ***")
+    .replace(/\bbearer\b\s*:?\s*\S+/gi, "Bearer ***")
     .replace(/\blv_\w+/gi, "***")
-    // Review E: keys after "_" (GEMINI_API_KEY), "api key", cookies/sessions, and prose ("is", "was", "of") or a bare space.
-    .replace(/(["']?)(?<![a-z0-9])((?:set-)?cookie|session(?:[_-]?id)?|sid|pass(?:code|word)?|pwd|tk|token|secret|api[_\s-]?key)(?![a-z])\1\s*(?:[:=]|\b(?:is|was|of)\b)?\s*["']?[^\s"',}]+/gi, "$2=***")
+    .replace(/(['"])value\1\s*:\s*(['"])[^'"]*\2/gi, "'value': '***'") // Selenium cookie dicts (review F)
+    // Reviews E+F: once a secret key shows (also after "_", as "api key", "gemini key", cookies/sessions), the REST OF THE LINE
+    // is masked: values with spaces, "is:", and every further cookie pair. Over-redaction is accepted, a leak is not.
+    .replace(/(["']?)(?<![a-z0-9])((?:set-)?cookie|session(?:[_-]?id)?|sid|pass(?:code|word)?|pwd|pw|tkn?|token|secret|(?:api|gemini|google)[_\s-]?(?:api[_\s-]?)?key)(?![a-z]).*$/gim, "$2=***")
     .replace(/\d{3,4}(?:[\s-]\d{3,4}){2,}(?:[\s-]\d{1,4})?/g, "[id]") // grouped Zoom ids (3-4-4, 4-4-4-1, ...)
     .replace(/\d{6,}/g, "[id]")                                       // any long digit run, also inside zoom_86151605223_x
     .replace(/\b[a-z]{3}-[a-z]{4}-[a-z]{3}\b/gi, "[id]")

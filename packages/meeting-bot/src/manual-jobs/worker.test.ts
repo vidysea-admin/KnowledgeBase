@@ -168,10 +168,11 @@ test("review D: --until under 5 min away is also the end-not-before", async () =
   await runManualWorker("/root", store, "a", id, { schedule: () => () => {}, launch: async (_r, args) => { argv = args; } });
   assert.equal(argv[argv.indexOf("--end-not-before") + 1], "2026-10-14T10:03:00.000Z");
 }, "2026-10-14T10:03:00.000Z"));
-test("review D: a failed recording tells the log sink the launcher's fixed message only (B10: never stderr); a throwing sink is harmless", async () => fixture(async (store, id) => {
+test("D-264: a failed recording tells the log sink why (message, then stderr tail); never the job record; a throwing sink is harmless", async () => fixture(async (store, id) => {
   const seen: string[] = [];
   await runManualWorker("/root", store, "a", id, { schedule: () => () => {}, onRecorderLine: line => { seen.push(line); throw new Error("sink down"); },
-    launch: async (_r, _a, _e, onLine) => { onLine("[bot] joining"); throw Object.assign(new Error("Recording pipeline exited 1"), { stderrTail: ["lkb capture failed: passcode 4242"] }); } });
-  assert.deepEqual(seen, ["[bot] joining", "[failed] Recording pipeline exited 1"]);
+    launch: async (_r, _a, _e, onLine) => { onLine("[bot] joining"); throw Object.assign(new Error("Recording pipeline exited 1"), { stderrTail: ["lkb capture failed: no audio", 7] }); } });
+  assert.deepEqual(seen, ["[bot] joining", "[failed] Recording pipeline exited 1", "[stderr] lkb capture failed: no audio"]);
+  assert.ok(!JSON.stringify(store.summary("a", id)).includes("no audio"), "the job record never carries stderr");
   assert.equal(store.summary("a", id)?.state, "failed");
 }));

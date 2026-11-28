@@ -183,7 +183,7 @@ test("masterclass 2026-11-28: recorder lines are redacted (no link, host, token 
   const cases: [string, string][] = [
     ["[bot] joining https://us06web.zoom.us/w/86151605223?tk=abc.def&pwd=xyz now", "[bot] joining [link] now"],
     ["[finalize] gemini failed: 429 quota", "[finalize] gemini failed: 429 quota"],
-    ["passcode: 4242 pwd=998877 Password = opensesame token:abc", "passcode=*** pwd=*** Password=*** token=***"],
+    ["passcode: 4242 pwd=998877 Password = opensesame token:abc", "passcode=***"],
   ];
   for (const [raw, want] of cases) assert.equal(redactRecorderLine(raw), want);
   assert.ok(redactRecorderLine("x".repeat(2000)).length <= 400);
@@ -203,6 +203,10 @@ test("masterclass 2026-11-28: recorder lines are redacted (no link, host, token 
     "api key abc123def", "Cookie: session=ck1abc; sid=ck2xyz", "Set-Cookie: SID=ck3abc", "sessionid=ck4abcd",
     "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIn0.sig1234567", "AKIAIOSFODNN7EXAMPLE1234", "lv_ab12", "id 8615 1605 2234 5"];
   for (const raw of e) { const out = redactRecorderLine(raw); for (const s of ["86151605223", "hun2ter", "hun3ter", "abc123def", "ck1abc", "ck2xyz", "ck3abc", "ck4abcd", "eyJhbGci", "AKIAIOSF", "ab12", "1605 2234"]) assert.ok(!out.includes(s), `${raw} -> ${out} leaks ${s}`); }
+  // Review F (2026-11-28): every cookie pair, Selenium cookie dicts, "is:" and multi-word values, colon bearer, pw/tkn, "gemini key".
+  const f = ["[stderr] Cookie: SID=fa1; HSID=fa2; APISID=fa3", "driver.add_cookie({'name': 'zm_sid', 'value': 'fa4qwerty'})", "{'name':'SSID','value':'Fa5AbCd'}",
+    "meeting passcode is: Fa6", "Meeting password: fa7 fa8", "Bearer: fa9", "gemini key is fb1", "pw: fb2", "tkn=fb3"];
+  for (const raw of f) { const out = redactRecorderLine(raw); for (const s of ["fa1", "fa2", "fa3", "fa4", "Fa5", "Fa6", "fa7", "fa8", "fa9", "fb1", "fb2", "fb3"]) assert.ok(!out.includes(s), `${raw} -> ${out} leaks ${s}`); }
   assert.equal(redactRecorderLine("[finalize] gemini failed: 429 quota"), "[finalize] gemini failed: 429 quota");
   assert.equal(redactRecorderLine("[bot] recording until 11:00"), "[bot] recording until 11:00");
   const t = Date.now(); redactRecorderLine("a.".repeat(40_000)); assert.ok(Date.now() - t < 300, "long lines stay cheap");
@@ -211,7 +215,11 @@ test("masterclass 2026-11-28: recorder lines are redacted (no link, host, token 
 test("masterclass 2026-11-28: the hosted worker logs the recorder's redacted lines, so a failed job shows why", { skip }, () => withQueued(async ({ queue, jobId }) => {
   const lines: string[] = [];
   await runQueueOnce({ queue, tenants: ["a"], root, maxWaitS: 0, recordArgs: [], log: line => lines.push(line), sleep: async () => {},
-    deps: { ...noTicks, launch: async (_r, _a, _e, onLine) => { onLine("[finalize] transcript failed: https://x.example/?pwd=secret"); throw new Error("exit 1"); } } });
+    deps: { ...noTicks, launch: async (_r, _a, _e, onLine) => { onLine("[finalize] transcript failed: https://x.example/?pwd=secret");
+      throw Object.assign(new Error("exit 1"), { stderrTail: ["selenium TimeoutException: navigating to us06web.zoom.us/j/86151605223?pwd=secret", "lkb capture failed: no_audio"] }); } } });
+  assert.ok(lines.includes(`[recorder ${jobId}] [failed] exit 1`), lines.join(" | "));
+  assert.ok(lines.includes(`[recorder ${jobId}] [stderr] lkb capture failed: no_audio`), lines.join(" | "));
+  assert.ok(lines.some(l => l.startsWith(`[recorder ${jobId}] [stderr] selenium TimeoutException: navigating to [link]`)), lines.join(" | "));
   assert.ok(lines.some(l => l === `[recorder ${jobId}] [finalize] transcript failed: [link]`), lines.join(" | "));
   assert.ok(!lines.join(" | ").includes("secret"));
 }));

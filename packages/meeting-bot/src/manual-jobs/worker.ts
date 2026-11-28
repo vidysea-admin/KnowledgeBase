@@ -109,8 +109,11 @@ export async function runManualWorker(root: string, store: ManualWorkerStore, te
   } catch (error) {
     succeeded = false;
     // 2026-11-28: say why in the log sink (the consumer redacts); the job record keeps only the state.
-    // The launcher's message is fixed text (exit code, or a B10 typed name); child stderr itself stays unlogged (B10, D-236 A6).
-    try { deps.onRecorderLine?.(`[failed] ${error instanceof Error ? error.message.slice(0, 200) : "recording failed"}`); } catch { /* a log sink never affects the job */ }
+    // D-264: the launcher's fixed message, then its stderr tail, go to the log sink ONLY (its owner redacts); never the job record.
+    const tail = (error as { stderrTail?: unknown } | null)?.stderrTail;
+    const said = [`[failed] ${error instanceof Error ? error.message.slice(0, 200) : "recording failed"}`,
+      ...(Array.isArray(tail) ? tail.filter((line): line is string => typeof line === "string").slice(-8).map(line => `[stderr] ${line}`) : [])];
+    for (const line of said) { try { deps.onRecorderLine?.(line); } catch { /* a log sink never affects the job */ } }
   } finally {
     stopTicks(); await publication; await activeTick;
     try { await disposePrivate?.(); } catch (error) { stateError = error; }
