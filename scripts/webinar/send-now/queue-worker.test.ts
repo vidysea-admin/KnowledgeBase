@@ -12,7 +12,7 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 import { CAPTURE_JOBS, CaptureJobQueue } from "../../../apps/api/src/join-rules/capture-job-queue.js";
 import { createQueuedSendNowDeps } from "../../../apps/api/src/join-rules/send-now-queue.js";
 import type { ManualWorkerDeps } from "../../../packages/meeting-bot/src/manual-jobs/worker.js";
-import { parseArgs, recordArgsFor, runQueueOnce } from "./queue-worker.js";
+import { parseArgs, recordArgsFor, redactRecorderLine, runQueueOnce } from "./queue-worker.js";
 
 /** Typed from the queue, so the test never resolves a second `mongodb` copy for types. */
 type Db = ConstructorParameters<typeof CaptureJobQueue>[0];
@@ -177,4 +177,41 @@ test("joined status end to end: a recorder that never prints the admitted line e
   const result = await runQueueOnce({ queue, tenants: ["a"], root, maxWaitS: 0, deps, ...quiet });
   assert.deepEqual(result, { job: jobId, state: "failed" });
   assert.equal((await queue.detail("a", jobId))!.joined, "no");
+}));
+
+test("masterclass 2026-11-28: recorder lines are redacted (no link, host, token or passcode) before they reach the server log", () => {
+  const cases: [string, string][] = [
+    ["[bot] joining https://us06web.zoom.us/w/86151605223?tk=abc.def&pwd=xyz now", "[bot] joining [link] now"],
+    ["[finalize] gemini failed: 429 quota", "[finalize] gemini failed: 429 quota"],
+    ["passcode: 4242 pwd=998877 Password = opensesame token:abc", "passcode=*** pwd=*** Password=*** token=***"],
+  ];
+  for (const [raw, want] of cases) assert.equal(redactRecorderLine(raw), want);
+  assert.ok(redactRecorderLine("x".repeat(2000)).length <= 400);
+  assert.equal(redactRecorderLine("meet.google.com/abc-defg-hij joined"), "[link] joined");
+  // Review C (2026-11-28): each of these leaked through the first version.
+  const leaks = ["Meeting ID: 861 5160 5223 Passcode 123456", "passcode is 778899", '{"pwd":"q1w2","tk":"zz9"}', '"password": "opensesame"',
+    "https%3A%2F%2Fus06web.zoom.us%2Fj%2F861?pwd%3Dqq11", "[bot] joining abc-defg-hij", "us06web.zoom.us:443/j/1", "host zoom.us up", "meet.google.com",
+    "token = Bearer abc.def", "key lv_0123456789abcdef0123"];
+  const secrets = ["5160", "123456", "778899", "q1w2", "zz9", "opensesame", "zoom", "qq11", "abc-defg-hij", "google", "abc.def", "lv_0123"];
+  for (const raw of leaks) { const out = redactRecorderLine(raw); for (const s of secrets) assert.ok(!out.includes(s), `${raw} -> ${out} leaks ${s}`); }
+  // Review D (2026-11-28): key and URI shapes, via the shared redactSecrets.
+  const d = ["GEMINI_API_KEY=gk111", "access_token=at222", "mypassword=mp333", "Authorization: Bearer ab444", "key=AIzaSyA5555555555555",
+    "mongodb://u:pw666@host:27017/db", "postgres://u:pw777@h/db", "mongodb+srv://u:pw888@c0.abc.mongodb.net/db"];
+  for (const raw of d) { const out = redactRecorderLine(raw); for (const s of ["gk111", "at222", "mp333", "ab444", "AIzaSyA5", "pw666", "pw777", "pw888"]) assert.ok(!out.includes(s), `${raw} -> ${out} leaks ${s}`); }
+  // Review E (2026-11-28): ids without word boundaries, escaped JSON, prose and space-separated keys, cookies, opaque tokens.
+  const e = ["zoom_86151605223_profile", "meeting_86151605223", '\\"pwd\\":\\"hun2ter\\"', "the passcode was hun2ter", "GEMINI_API_KEY hun3ter",
+    "api key abc123def", "Cookie: session=ck1abc; sid=ck2xyz", "Set-Cookie: SID=ck3abc", "sessionid=ck4abcd",
+    "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIn0.sig1234567", "AKIAIOSFODNN7EXAMPLE1234", "lv_ab12", "id 8615 1605 2234 5"];
+  for (const raw of e) { const out = redactRecorderLine(raw); for (const s of ["86151605223", "hun2ter", "hun3ter", "abc123def", "ck1abc", "ck2xyz", "ck3abc", "ck4abcd", "eyJhbGci", "AKIAIOSF", "ab12", "1605 2234"]) assert.ok(!out.includes(s), `${raw} -> ${out} leaks ${s}`); }
+  assert.equal(redactRecorderLine("[finalize] gemini failed: 429 quota"), "[finalize] gemini failed: 429 quota");
+  assert.equal(redactRecorderLine("[bot] recording until 11:00"), "[bot] recording until 11:00");
+  const t = Date.now(); redactRecorderLine("a.".repeat(40_000)); assert.ok(Date.now() - t < 300, "long lines stay cheap");
+});
+
+test("masterclass 2026-11-28: the hosted worker logs the recorder's redacted lines, so a failed job shows why", { skip }, () => withQueued(async ({ queue, jobId }) => {
+  const lines: string[] = [];
+  await runQueueOnce({ queue, tenants: ["a"], root, maxWaitS: 0, recordArgs: [], log: line => lines.push(line), sleep: async () => {},
+    deps: { ...noTicks, launch: async (_r, _a, _e, onLine) => { onLine("[finalize] transcript failed: https://x.example/?pwd=secret"); throw new Error("exit 1"); } } });
+  assert.ok(lines.some(l => l === `[recorder ${jobId}] [finalize] transcript failed: [link]`), lines.join(" | "));
+  assert.ok(!lines.join(" | ").includes("secret"));
 }));

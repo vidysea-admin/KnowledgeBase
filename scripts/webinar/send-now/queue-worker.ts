@@ -21,6 +21,7 @@ import { createRequire } from "node:module";
 import { CaptureJobQueue, type CaptureJobDoc } from "../../../apps/api/src/join-rules/capture-job-queue.js";
 import { requireDatabaseName } from "../../../apps/api/src/db-name.js";
 import { servedTenants } from "../../../apps/api/src/join-rules/send-now-queue.js";
+import { redactSecrets } from "../../../packages/meeting-bot/src/capture/record-finalize.js";
 import { defaultManualWorkerDeps, runManualWorker, type ManualWorkerDeps } from "../../../packages/meeting-bot/src/manual-jobs/worker.js";
 import { assertCaptureHostIdSetting } from "../../../packages/meeting-bot/src/capture/workspace/capture-slot-readiness.js";
 import { QueueJobMirror } from "./queue-store.js";
@@ -32,6 +33,29 @@ type MongoClientCtor = new (url: string) => { connect(): Promise<{ db(name: stri
 export function recordArgsFor(env: Record<string, string | undefined>): string[] {
   if (env.LKB_SEND_NOW_TRANSCRIBE === "0") return [];
   return env.LKB_SEND_NOW_INDEX === "1" ? ["--transcribe", "--process-video", "--index"] : ["--transcribe"];
+}
+
+/**
+ * Masterclass 2026-11-28: a hosted job failed and nothing said why, because no recorder line reached Cloud Logging.
+ * Lines now do, after this: links in any form (scheme, bare host, host:port, percent-encoded) become [link]; passcode, pwd,
+ * tk, token, secret and API-key values (also JSON-quoted or "is ...") and bearer/lv_ keys become ***; Zoom meeting ids and
+ * Meet codes become [id]. Over-redaction (a file name read as a host) is accepted; a leak is not. 400 chars max.
+ */
+export function redactRecorderLine(line: string): string {
+  // Review D: key=value, URI passwords, AIza/sk- keys and access_token first, with the shared index-log redactor.
+  return redactSecrets(line.slice(0, 2000).replace(/\\+"/g, '"')) // bound the regex work (cut to 400 below); unescape \" JSON
+    .replace(/\S*%(?:2F|3A)\S*/gi, "[link]")
+    .replace(/\b(?:https?:\/\/|www\.)\S+/gi, "[link]")
+    .replace(/\b[a-z0-9-]+(?:\.[a-z0-9-]+)*\.[a-z]{2,24}\b(?::\d+)?(?:\/\S*)?/gi, "[link]")
+    .replace(/\bbearer\s+\S+/gi, "Bearer ***")
+    .replace(/\blv_\w+/gi, "***")
+    // Review E: keys after "_" (GEMINI_API_KEY), "api key", cookies/sessions, and prose ("is", "was", "of") or a bare space.
+    .replace(/(["']?)(?<![a-z0-9])((?:set-)?cookie|session(?:[_-]?id)?|sid|pass(?:code|word)?|pwd|tk|token|secret|api[_\s-]?key)(?![a-z])\1\s*(?:[:=]|\b(?:is|was|of)\b)?\s*["']?[^\s"',}]+/gi, "$2=***")
+    .replace(/\d{3,4}(?:[\s-]\d{3,4}){2,}(?:[\s-]\d{1,4})?/g, "[id]") // grouped Zoom ids (3-4-4, 4-4-4-1, ...)
+    .replace(/\d{6,}/g, "[id]")                                       // any long digit run, also inside zoom_86151605223_x
+    .replace(/\b[a-z]{3}-[a-z]{4}-[a-z]{3}\b/gi, "[id]")
+    .replace(/[A-Za-z0-9_+/=.-]{24,}/g, "***")                         // JWTs, provider keys, opaque tokens
+    .slice(0, 400);
 }
 
 export function parseArgs(argv: readonly string[]): { maxWaitS: number } {
@@ -75,7 +99,8 @@ export async function runQueueOnce(o: QueueWorkerOptions): Promise<QueueWorkerRe
   if (o.stop?.aborted) onStop(); else o.stop?.addEventListener("abort", onStop, { once: true });
   let final = "failed";
   try {
-    await runManualWorker(o.root, mirror, job.tenantId, job._id, { ...(o.deps ?? defaultManualWorkerDeps), recordArgs: o.recordArgs });
+    await runManualWorker(o.root, mirror, job.tenantId, job._id, { ...(o.deps ?? defaultManualWorkerDeps), recordArgs: o.recordArgs,
+      onRecorderLine: line => log(`[recorder ${job!._id}] ${redactRecorderLine(line)}`) });
   } catch {
     // runManualWorker only throws before launch (unreadable request): record that as a failure.
     mirror.writeProgress(mirror.request, "failed");

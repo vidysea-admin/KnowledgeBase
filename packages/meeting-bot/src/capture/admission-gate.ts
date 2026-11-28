@@ -13,7 +13,7 @@
  */
 import { existsSync, readFileSync, rmSync, statSync } from "node:fs";
 import { writeOwnedTabStatus } from "./tab-browser.js";
-export interface GateEvent { event: string; error?: unknown; seconds?: unknown; limit?: unknown; assumed?: unknown; reason?: unknown }
+export interface GateEvent { event: string; error?: unknown; seconds?: unknown; limit?: unknown; assumed?: unknown; reason?: unknown; in_call?: unknown }
 /** How the bot came to be `admitted`: positively seen in the call, or assumed (non-Meet, no lobby signal, D-167). */
 export interface AdmissionInfo { assumed: boolean; reason?: string }
 export interface GateWatchdog { start(): void }
@@ -33,6 +33,25 @@ export function parseAdmissionLine(raw: string): "yes" | "assumed" | undefined {
   const rest = line.slice(ADMITTED_LINE_PREFIX.length);
   if (rest === " (seen in call)") return "yes";
   return /^ \(assumed: [a-z0-9_-]{1,64}\)$/.test(rest) ? "assumed" : undefined;
+}
+
+/** 2026-11-28: an "ended" phrase not re-seen for this long no longer counts (sb_join re-emits it every ~2 s tick while shown). */
+export const ENDED_STALE_MS = 30_000;
+export interface EndTrack { endedAt?: number; seenAt: number }
+/**
+ * Feed one bot event (review E, 2026-11-28). sb_join matches the end phrases against the whole page text, chat included, so an
+ * `ended` sent while the call controls still show (`in_call: true`) is chat or caption text and never counts. An arrival after a
+ * stale gap starts a new run instead of joining the old one.
+ */
+export function noteEnded(t: EndTrack, ev: GateEvent, now: number): EndTrack {
+  if (ev.event !== "ended" || ev.in_call === true) return t;
+  const fresh = t.endedAt !== undefined && now - t.seenAt <= ENDED_STALE_MS;
+  return { endedAt: fresh ? t.endedAt : now, seenAt: now };
+}
+/** An end phrase stops a capture only when it was shown CONTINUOUSLY for 60 s and end-not-before has passed. */
+export function sustainedEnd(endedAt: number | undefined, seenAt: number, now: number, endNotBefore: number): { endedAt: number | undefined; stop: boolean } {
+  const still = endedAt !== undefined && now - seenAt <= ENDED_STALE_MS ? endedAt : undefined;
+  return { endedAt: still, stop: still !== undefined && now >= endNotBefore && now - still > 60_000 };
 }
 
 /** A reload this recent before a capture-error is treated as its cause. */

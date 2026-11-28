@@ -59,13 +59,14 @@ def run_session(sb, a, *, os, time, emit):
                     emit("clicked", text=hit)
             body = (sb.execute_script(BODY_TEXT_JS) or "").lower()
             ended = next((p for p in END_PHRASES if p in body), None)
-            if ended:
-                emit("ended", reason=ended)
-
             try:
                 in_call_dom = bool(sb.execute_script(in_call_js))
             except Exception:
                 in_call_dom = False
+            if ended:
+                # Review E 2026-11-28: the phrase is matched on the whole page text, chat included; in_call tells the
+                # controller the call controls still show, so a chat line is never taken for the end.
+                emit("ended", reason=ended, in_call=in_call_dom)
             state = classify_admission(platform, in_call_dom, body)
             if state == "refused" and not admission.admitted:
                 # B2 / D-232: Meet refused the bot. Never click or reload; end the capture now instead of

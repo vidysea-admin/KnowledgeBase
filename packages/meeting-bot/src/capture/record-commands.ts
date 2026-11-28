@@ -5,7 +5,7 @@ import { OBSWebSocket } from "obs-websocket-js";
 import { createBrowserJoiner } from "../joiners/browser-joiner.js";
 import { detectPlatform } from "../platform.js";
 import { selectJoinStrategy } from "../strategy.js";
-import { admissionLine, createAdmissionGate, settleDeniedCapture } from "./admission-gate.js";
+import { admissionLine, createAdmissionGate, noteEnded, settleDeniedCapture, sustainedEnd, type EndTrack, type GateEvent } from "./admission-gate.js";
 import { createAudioWatchdog, createRealLevelSource, silenceReconnect } from "./audio-watchdog.js";
 import { type ControllerRecoveryActions, type ControllerRecoveryContext, cleanupOwnedBrowserProfile, finalizeControllerRecording, getProcessStartTime, removeControllerState, writeControllerState } from "./controller-state.js";
 import { AUDIO_INPUT, createObsBrowserDeps, type ObsBrowserConfig, type ObsBrowserDepsOverrides, type ObsClientLike } from "./obs/obs-windows.js";
@@ -111,7 +111,7 @@ export async function runRecord(rest: string[], inject: RecordInject = {}): Prom
   const control = consentControl.captureControl;
   try {
   seeded = seedSlotFromArgs(rest, workspace); profileDirectory = selectedBrowserProfile(rest, profileDir); // w24: fresh signed-in slot copy, fail-closed
-  let endedAt: number | undefined;
+  let ended: EndTrack = { seenAt: 0 };
   let leftMeeting = false;
   const gaps: GapWindow[] = [];
   const telegram = inject.telegram ?? createTelegramNotifier();
@@ -124,7 +124,7 @@ export async function runRecord(rest: string[], inject: RecordInject = {}): Prom
     const gateFailure = gate.onEvent(ev as Parameters<typeof gate.onEvent>[0]);
     if (ev.event === "admitted" && !joinedNotified) { joinedNotified = true; if (gate.admission) console.log(admissionLine(gate.admission)); telegram.notifyJoined(title, platform, { assumed: (ev as { assumed?: unknown }).assumed === true }); } // T-030, now only once admitted (ISS-CAPTUREFIX-001)
     owner.until = (until = onairUntilFromEvent(ev as { event?: unknown; seconds?: unknown }, Date.now()) ?? until).getTime(); // the capture-control gap end follows the adjusted end
-    if (ev.event === "ended" && endedAt === undefined) endedAt = Date.now();
+    ended = noteEnded(ended, ev as GateEvent, Date.now()); // sb_join re-emits it every tick while the phrase shows
     // ISS-ADMISSION-STABLE-001: sb_join emits this only after admission, once the tab sat outside the meeting
     // (sent back to Meet home) for LEFT_MEETING_TICKS ticks. The bot is no longer in the call: stop now, not at --until.
     if (ev.event === "ended" && (ev as { reason?: unknown }).reason === "left-meeting") leftMeeting = true;
@@ -195,7 +195,8 @@ export async function runRecord(rest: string[], inject: RecordInject = {}): Prom
         if (now >= until.getTime()) { console.log("[bot] --until reached"); break; }
         if (gone) { console.log("[bot] bot browser exited"); break; }
         if (leftMeeting) { console.log("[bot] bot is no longer in the meeting (left-meeting)"); break; }
-        if (endedAt !== undefined && now >= endNotBefore.getTime() && now - endedAt > 60_000) {
+        const end = sustainedEnd(ended.endedAt, ended.seenAt, now, endNotBefore.getTime()); ended = { endedAt: end.endedAt, seenAt: ended.seenAt }; // a passing chat line is not an end
+        if (end.stop) {
           console.log("[bot] webinar reported ended"); break;
         }
         await (inject.wait ?? ((ms) => new Promise<void>((r) => setTimeout(r, ms))))(5000);

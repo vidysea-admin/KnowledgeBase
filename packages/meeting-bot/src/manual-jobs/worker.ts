@@ -12,6 +12,8 @@ export interface ManualWorkerDeps {
   publishPrivate?(owner: { tenantId: string; sessionId: string }, control: RecordingControl): Promise<() => Promise<void>>;
   /** Flags appended to `record` (e.g. --transcribe --process-video --index for the hosted queue worker). Fixed values, never user input. */
   recordArgs?: readonly string[];
+  /** Every recorder output line, raw. The caller MUST redact before logging (the hosted queue worker does; the laptop path omits it). */
+  onRecorderLine?(line: string): void;
 }
 /** Admission evidence the worker reports with each progress write: "pending" until the recorder's admitted line. */
 export type JoinEvidence = "pending" | "yes" | "assumed";
@@ -30,6 +32,9 @@ export const defaultManualWorkerDeps: ManualWorkerDeps = {
     return bridge.publishCapturePrivacyController({ directory, ...owner, control: value });
   },
 };
+
+/** How long after launch an "ended" report may stop a send-now capture (the recorder still waits 60 s of sustained end). */
+export const SEND_NOW_END_GRACE_MS = 5 * 60_000;
 
 export async function runManualWorker(root: string, store: ManualWorkerStore, tenantId: string, jobId: string, deps: ManualWorkerDeps = defaultManualWorkerDeps): Promise<void> {
   const request = store.readRequest(tenantId, jobId);
@@ -81,9 +86,14 @@ export async function runManualWorker(root: string, store: ManualWorkerStore, te
   const stopTicks = deps.schedule(requestTick);
   let succeeded = false;
   try {
-    await deps.launch(root, ["record", plan.request.meetingUrl, "--until", req.until, "--tenant", tenantId,
+    // Masterclass 2026-11-28: --until is only the user's upper bound for a meeting that is already running. Without
+    // --end-not-before the recorder treats --until as the end-not-before too, so "webinar has been ended by host" could not
+    // stop it and 61 min of silence were recorded. A real end may stop the capture from SEND_NOW_END_GRACE_MS after launch.
+    const endNotBefore = new Date(Math.min(until, store.now().getTime() + SEND_NOW_END_GRACE_MS)).toISOString();
+    await deps.launch(root, ["record", plan.request.meetingUrl, "--until", req.until, "--end-not-before", endNotBefore, "--tenant", tenantId,
       "--session-id", jobId, "--title", `manual ${req.platform}`, ...(deps.recordArgs ?? [])], { ...process.env, LKB_TENANT_ID: tenantId },
       line => {
+        try { deps.onRecorderLine?.(line); } catch { /* a log sink never affects the capture */ }
         // This fixed recorder line occurs after installCaptureControl and joiner setup. It is NOT admission evidence.
         if (line.startsWith("[bot] recording until ")) {
           ready = true; state = "running";
@@ -93,11 +103,14 @@ export async function runManualWorker(root: string, store: ManualWorkerStore, te
         }
         const admitted = joined === "pending" ? parseAdmissionLine(line) : undefined;
         if (admitted) { joined = admitted; try { persist(); } catch (error) { stateError = error; } }
-        // Capture logs can carry links/passcodes; do not duplicate them into manual-job logs.
+        // Lines go to onRecorderLine only; its owner redacts them (links/passcodes never reach the job record).
       }, value => { control = value; publishPrivate(); });
     succeeded = true;
-  } catch {
+  } catch (error) {
     succeeded = false;
+    // 2026-11-28: say why in the log sink (the consumer redacts); the job record keeps only the state.
+    // The launcher's message is fixed text (exit code, or a B10 typed name); child stderr itself stays unlogged (B10, D-236 A6).
+    try { deps.onRecorderLine?.(`[failed] ${error instanceof Error ? error.message.slice(0, 200) : "recording failed"}`); } catch { /* a log sink never affects the job */ }
   } finally {
     stopTicks(); await publication; await activeTick;
     try { await disposePrivate?.(); } catch (error) { stateError = error; }

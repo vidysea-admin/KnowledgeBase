@@ -207,3 +207,32 @@ test("admission line: a trailing CR (CRLF stream) still parses", async () => {
   const { parseAdmissionLine } = await import("./admission-gate.js");
   assert.equal(parseAdmissionLine("[bot] admitted to the meeting (seen in call)\r"), "yes");
 });
+
+test("sustained end (2026-11-28): only a phrase shown continuously for 60 s after end-not-before stops; a passing one resets", async () => {
+  const { sustainedEnd } = await import("./admission-gate.js");
+  const t0 = 1_000_000;
+  // Zoom "ended by host" dialog stays up: seen every tick -> stops 60 s after it first appeared.
+  assert.deepEqual(sustainedEnd(t0, t0 + 60_000, t0 + 61_000, t0), { endedAt: t0, stop: true });
+  // A chat line "thank you for attending" at t0, gone after one tick: 40 s later the end is forgotten, nothing stops.
+  assert.deepEqual(sustainedEnd(t0, t0, t0 + 40_000, t0), { endedAt: undefined, stop: false });
+  assert.equal(sustainedEnd(t0, t0, t0 + 61_000, t0).stop, false);
+  // Before end-not-before nothing stops, even when sustained.
+  assert.equal(sustainedEnd(t0, t0 + 90_000, t0 + 91_000, t0 + 200_000).stop, false);
+  assert.deepEqual(sustainedEnd(undefined, 0, t0, t0), { endedAt: undefined, stop: false });
+});
+test("review E: an end phrase while the call controls show is chat text; a stale arrival starts a new run", async () => {
+  const { noteEnded, sustainedEnd } = await import("./admission-gate.js");
+  let t = noteEnded({ seenAt: 0 }, { event: "ended", in_call: true, reason: "thank you for attending" }, 1000);
+  assert.deepEqual(t, { seenAt: 0 }, "in-call phrase ignored");
+  for (let at = 1000; at <= 120_000; at += 2000) t = noteEnded(t, { event: "ended", in_call: true }, at);
+  assert.equal(sustainedEnd(t.endedAt, t.seenAt, 125_000, 0).stop, false, "chat history kept visible never stops the capture");
+  t = noteEnded({ seenAt: 0 }, { event: "ended", in_call: false }, 10_000);
+  assert.deepEqual(t, { endedAt: 10_000, seenAt: 10_000 });
+  t = noteEnded(t, { event: "ended" }, 45_000); // 35 s gap: stale, a new run
+  assert.deepEqual(t, { endedAt: 45_000, seenAt: 45_000 });
+  t = noteEnded(t, { event: "admitted" }, 46_000);
+  assert.deepEqual(t, { endedAt: 45_000, seenAt: 45_000 }, "other events leave it alone");
+  for (let at = 47_000; at <= 110_000; at += 2000) t = noteEnded(t, { event: "ended", in_call: false }, at);
+  assert.equal(sustainedEnd(t.endedAt, t.seenAt, 110_000, 0).stop, true, "a real end screen held 60 s stops");
+});
+

@@ -7,9 +7,9 @@ import { ManualJobStore } from "./store.js";
 import { runManualWorker, type ManualWorkerDeps } from "./worker.js";
 
 const now = () => new Date("2026-10-14T10:00:00.000Z");
-async function fixture(fn: (store: ManualJobStore, id: string) => Promise<void>) {
+async function fixture(fn: (store: ManualJobStore, id: string) => Promise<void>, until = "2026-10-14T11:00:00.000Z") {
   const dir = mkdtempSync(path.join(os.tmpdir(), "manual-worker-")), store = new ManualJobStore(dir, now);
-  const req = store.create("a", { meetingUrl: "https://meet.google.com/abc-defg-hij", meetingKey: "meet:abc-defg-hij", platform: "meet" }, "2026-10-14T11:00:00.000Z");
+  const req = store.create("a", { meetingUrl: "https://meet.google.com/abc-defg-hij", meetingKey: "meet:abc-defg-hij", platform: "meet" }, until);
   try { await fn(store, req.jobId); } finally { rmSync(dir, { recursive: true, force: true }); }
 }
 const flush = async () => { for (let i = 0; i < 8; i++) await Promise.resolve(); };
@@ -154,4 +154,24 @@ test("joined status: a non-Meet admission assumed by D-167 is reported as assume
     onLine("[bot] recording until 11:00"); onLine("[bot] admitted to the meeting (assumed: no-lobby-signal)");
   } });
   assert.equal(seen.at(-1), "assumed");
+}));
+test("masterclass 2026-11-28: a send-now job lets a real 'ended' stop it 5 min after launch, not only at --until", async () => fixture(async (store, id) => {
+  let argv: string[] = [];
+  await runManualWorker("/root", store, "a", id, { schedule: () => () => {}, launch: async (_r, args) => { argv = args; } });
+  const at = argv.indexOf("--end-not-before");
+  assert.ok(at > 0, "the worker passes --end-not-before");
+  assert.equal(argv[at + 1], new Date(now().getTime() + 5 * 60_000).toISOString());
+  assert.ok(argv[at + 1]! < argv[argv.indexOf("--until") + 1]!, "earlier than --until");
+}));
+test("review D: --until under 5 min away is also the end-not-before", async () => fixture(async (store, id) => {
+  let argv: string[] = [];
+  await runManualWorker("/root", store, "a", id, { schedule: () => () => {}, launch: async (_r, args) => { argv = args; } });
+  assert.equal(argv[argv.indexOf("--end-not-before") + 1], "2026-10-14T10:03:00.000Z");
+}, "2026-10-14T10:03:00.000Z"));
+test("review D: a failed recording tells the log sink the launcher's fixed message only (B10: never stderr); a throwing sink is harmless", async () => fixture(async (store, id) => {
+  const seen: string[] = [];
+  await runManualWorker("/root", store, "a", id, { schedule: () => () => {}, onRecorderLine: line => { seen.push(line); throw new Error("sink down"); },
+    launch: async (_r, _a, _e, onLine) => { onLine("[bot] joining"); throw Object.assign(new Error("Recording pipeline exited 1"), { stderrTail: ["lkb capture failed: passcode 4242"] }); } });
+  assert.deepEqual(seen, ["[bot] joining", "[failed] Recording pipeline exited 1"]);
+  assert.equal(store.summary("a", id)?.state, "failed");
 }));
