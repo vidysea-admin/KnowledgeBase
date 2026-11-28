@@ -1,5 +1,5 @@
 /** Immediate CLI consumer of the same authenticated durable host service as the API. */
-import { MANUAL_JOB_ID, MANUAL_STATES, type ManualSummary } from "./store.js";
+import { MANUAL_JOB_ID, MANUAL_JOINED, MANUAL_STATES, type ManualSummary } from "./store.js";
 export interface ManualCommandDeps {
   send(meetingUrl: string, until: string): Promise<unknown>;
   list(): unknown | Promise<unknown>;
@@ -17,9 +17,10 @@ export function createHttpManualCommandDeps(env: NodeJS.ProcessEnv = process.env
   if (!key || /[\r\n]/.test(key)) throw new Error("LKB_API_KEY is required");
   const summary = (v: unknown): ManualSummary => {
     const x = v as ManualSummary;
-    if (!x || !MANUAL_JOB_ID.test(x.jobId) || !MANUAL_STATES.includes(x.state) || x.joined !== "unknown" || !/^[a-z-]{1,32}$/.test(x.platform) ||
+    if (!x || !MANUAL_JOB_ID.test(x.jobId) || !MANUAL_STATES.includes(x.state) || !MANUAL_JOINED.includes(x.joined) || !/^[a-z-]{1,32}$/.test(x.platform) ||
       typeof x.requestedAt !== "string" || typeof x.updatedAt !== "string" || !Number.isFinite(Date.parse(x.requestedAt)) || !Number.isFinite(Date.parse(x.updatedAt))) throw new Error("manual job response invalid");
-    return { jobId: x.jobId, platform: x.platform, state: x.state, requestedAt: x.requestedAt, updatedAt: x.updatedAt, joined: "unknown" };
+    const joinedAt = (x.joined === "yes" || x.joined === "assumed") && typeof x.joinedAt === "string" && Number.isFinite(Date.parse(x.joinedAt)) ? { joinedAt: x.joinedAt } : {};
+    return { jobId: x.jobId, platform: x.platform, state: x.state, requestedAt: x.requestedAt, updatedAt: x.updatedAt, joined: x.joined, ...joinedAt };
   };
   async function request(route: string, body?: unknown): Promise<any> {
     let response: Response;

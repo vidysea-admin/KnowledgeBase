@@ -192,3 +192,18 @@ test("runRecord: a zero-byte recording is NOT removed on the admission_timeout p
   assert.equal(r.seen?.files.length, 1);
   assert.equal(r.seen?.files[0]?.size, 0);
 });
+
+test("admission line round-trips: seen -> yes, assumed -> assumed; page text in the reason never reaches the line", async () => {
+  const { admissionLine, parseAdmissionLine } = await import("./admission-gate.js");
+  assert.equal(parseAdmissionLine(admissionLine({ assumed: false })), "yes");
+  assert.equal(parseAdmissionLine(admissionLine({ assumed: true, reason: "no-lobby-signal" })), "assumed");
+  const hostile = admissionLine({ assumed: true, reason: "https://x.example/?pwd=secret" });
+  assert.ok(!hostile.includes("secret")); assert.equal(parseAdmissionLine(hostile), "assumed");
+  for (const bad of ["[bot] recording until 11:00", "[bot] admitted to the meeting", "[bot] admitted to the meeting (seen in call) extra", "x [bot] admitted to the meeting (seen in call)"])
+    assert.equal(parseAdmissionLine(bad), undefined, bad);
+});
+
+test("admission line: a trailing CR (CRLF stream) still parses", async () => {
+  const { parseAdmissionLine } = await import("./admission-gate.js");
+  assert.equal(parseAdmissionLine("[bot] admitted to the meeting (seen in call)\r"), "yes");
+});

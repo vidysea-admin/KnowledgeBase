@@ -4,6 +4,7 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 import { ManualJobStore, type ManualState } from "./store.js";
 import { launchControlledRecording, type RecordingControl } from "../capture/reconnect-gaps.js";
 import { planSendNow } from "../send-now.js";
+import { parseAdmissionLine } from "../capture/admission-gate.js";
 
 export interface ManualWorkerDeps {
   launch(root: string, args: string[], env: NodeJS.ProcessEnv, onLine: (line: string) => void, onControl: (control: RecordingControl) => void): Promise<void>;
@@ -12,6 +13,8 @@ export interface ManualWorkerDeps {
   /** Flags appended to `record` (e.g. --transcribe --process-video --index for the hosted queue worker). Fixed values, never user input. */
   recordArgs?: readonly string[];
 }
+/** Admission evidence the worker reports with each progress write: "pending" until the recorder's admitted line. */
+export type JoinEvidence = "pending" | "yes" | "assumed";
 /** What the worker needs from a job store: the file store, or the hosted Mongo mirror (scripts/webinar/send-now/queue-store.ts). */
 export type ManualWorkerStore = Pick<ManualJobStore, "now" | "readRequest" | "claimWorker" | "writeProgress" | "cancellation">;
 export const defaultManualWorkerDeps: ManualWorkerDeps = {
@@ -45,7 +48,9 @@ export async function runManualWorker(root: string, store: ManualWorkerStore, te
   let activeTick: Promise<void> = Promise.resolve();
   let publication: Promise<void> = Promise.resolve(), publishing = false, disposePrivate: (() => Promise<void>) | undefined;
   let publicationError: unknown;
-  const persist = () => store.writeProgress(req, state, ready);
+  // Join evidence (2026-11-28): "pending" until the recorder prints its admitted line; a job that ends still pending never joined.
+  let joined: JoinEvidence = "pending";
+  const persist = () => store.writeProgress(req, state, ready, joined);
   persist();
   async function tick(): Promise<void> {
     if (checking) return;
@@ -86,6 +91,8 @@ export async function runManualWorker(root: string, store: ManualWorkerStore, te
           publishPrivate();
           requestTick();
         }
+        const admitted = joined === "pending" ? parseAdmissionLine(line) : undefined;
+        if (admitted) { joined = admitted; try { persist(); } catch (error) { stateError = error; } }
         // Capture logs can carry links/passcodes; do not duplicate them into manual-job logs.
       }, value => { control = value; publishPrivate(); });
     succeeded = true;

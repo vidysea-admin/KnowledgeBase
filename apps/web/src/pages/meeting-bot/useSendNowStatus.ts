@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { ApiError } from "../../api/client.js";
-import { getSendNowStatus, SEND_NOW_JOB_ID } from "../../api/send-now.js";
+import { getSendNowStatus, SEND_NOW_JOB_ID, type SendNowStatus } from "../../api/send-now.js";
 
 export const STATUS_POLL_MS = 2000;
 export const STATUS_MAX_POLLS = 60;
@@ -11,6 +11,13 @@ const messages = {
   running: "Running. The recorder process is alive. Meeting admission is unknown.",
   "not-running": "Not running. This does not establish whether the recording finished or failed. Meeting admission is unknown.",
 };
+
+/** Replaces the "admission is unknown" sentence when the server measured admission. */
+function withJoined(text: string, joined: SendNowStatus["joined"]): string {
+  // joined = the bot GOT IN at some point, not that it is still inside; "no" = no admission was recorded before the job ended.
+  const said = { yes: "The bot got into the meeting.", assumed: "The bot joined (assumed: the platform showed no lobby).", no: "No admission was recorded; the bot was never confirmed inside." } as const;
+  return joined === "unknown" ? text : text.replace("Meeting admission is unknown.", said[joined]);
+}
 
 /** Sequential, bounded polling. Cleanup cancels timers and ignores outstanding HTTP results. */
 export function useSendNowStatus(apiKey: string | null, jobId: string | null): string | null {
@@ -30,9 +37,9 @@ export function useSendNowStatus(apiKey: string | null, jobId: string | null): s
         ]);
         clearTimeout(deadline);
         if (cancelled) return;
-        show(messages[value.status]);
+        show(withJoined(messages[value.status], value.joined));
         if (value.status === "not-running") return;
-        if (count >= STATUS_MAX_POLLS) { show(`${messages[value.status]} Automatic status checks stopped after ${STATUS_MAX_POLLS} requests.`); return; }
+        if (count >= STATUS_MAX_POLLS) { show(`${withJoined(messages[value.status], value.joined)} Automatic status checks stopped after ${STATUS_MAX_POLLS} requests.`); return; }
         timer = setTimeout(() => { void poll(); }, STATUS_POLL_MS);
       } catch (e) {
         clearTimeout(deadline);

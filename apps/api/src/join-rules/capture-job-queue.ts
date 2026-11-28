@@ -29,10 +29,20 @@ export interface CaptureJobDoc {
   _id: string; tenantId: string; nonce: string; meetingUrl: string; meetingKey: string; platform: string;
   until: string; requestedAt: string; updatedAt: string; state: CaptureState; cancelRequested: boolean;
   recorderReady?: boolean; ownerId?: string; claimedAt?: string; failure?: string;
+  /** Worker admission evidence (2026-11-28): "pending" until the recorder printed its admitted line. Absent on rows from older workers. */
+  joined?: "pending" | "yes" | "assumed"; joinedAt?: string;
   /** `${tenantId}\u0000${meetingKey}` while live; absent once terminal. Unique (sparse). */
   activeKey?: string;
 }
-export interface CaptureJobSummary { jobId: string; platform: string; state: CaptureState; requestedAt: string; updatedAt: string; joined: "unknown" }
+/** yes = seen in the call; assumed = D-167 (no lobby signal on a non-Meet platform); no = ended with NO admission evidence recorded
+ * (it includes reaped and cancelled jobs, so it means "never confirmed inside", not proof of refusal); unknown = not reported. */
+export type CaptureJoined = "yes" | "assumed" | "no" | "unknown";
+export const CAPTURE_JOINED: readonly CaptureJoined[] = ["yes", "assumed", "no", "unknown"];
+export interface CaptureJobSummary { jobId: string; platform: string; state: CaptureState; requestedAt: string; updatedAt: string; joined: CaptureJoined; joinedAt?: string }
+export function joinedOf(doc: Pick<CaptureJobDoc, "joined" | "state">): CaptureJoined {
+  if (doc.joined === "yes" || doc.joined === "assumed") return doc.joined;
+  return doc.joined === "pending" && terminalCaptureState(doc.state) ? "no" : "unknown";
+}
 export interface CaptureJobPlan { meetingUrl: string; meetingKey: string; platform: string }
 
 export class CaptureJobDuplicate extends Error { readonly code = "manual_duplicate"; constructor() { super("manual meeting already owned"); } }
@@ -90,7 +100,9 @@ export class CaptureJobQueue {
     let state = doc.state;
     if (!terminalCaptureState(state) && state !== "queued" && doc.updatedAt < this.staleBefore(OWNER_SILENT_MS)) state = "unknown";
     else if (!terminalCaptureState(state) && state !== "cancel-acknowledged" && doc.cancelRequested) state = "cancel-requested";
-    return { jobId: doc._id, platform: doc.platform, state, requestedAt: doc.requestedAt, updatedAt: doc.updatedAt, joined: "unknown" };
+    const joined = joinedOf(doc);
+    return { jobId: doc._id, platform: doc.platform, state, requestedAt: doc.requestedAt, updatedAt: doc.updatedAt, joined,
+      ...((joined === "yes" || joined === "assumed") && doc.joinedAt ? { joinedAt: doc.joinedAt } : {}) };
   }
   async detail(tenantId: string, jobId: string): Promise<CaptureJobSummary | null> {
     if (!CAPTURE_JOB_ID.test(jobId)) return null;
@@ -126,9 +138,12 @@ export class CaptureJobQueue {
   }
 
   /** Worker side: write progress for a job this owner holds. False when ownership was lost (reaped). */
-  async writeProgress(job: Pick<CaptureJobDoc, "_id" | "nonce">, ownerId: string, state: CaptureState, recorderReady?: boolean): Promise<boolean> {
-    const set: Partial<CaptureJobDoc> = { state, updatedAt: this.iso(), ...(recorderReady === undefined ? {} : { recorderReady }) };
-    const update = terminalCaptureState(state) ? { $set: { ...set, ...ENDED }, $unset: { activeKey: "" as const } } : { $set: set };
+  async writeProgress(job: Pick<CaptureJobDoc, "_id" | "nonce">, ownerId: string, state: CaptureState, recorderReady?: boolean, joined?: CaptureJobDoc["joined"]): Promise<boolean> {
+    const at = this.iso();
+    const set: Partial<CaptureJobDoc> = { state, updatedAt: at, ...(recorderReady === undefined ? {} : { recorderReady }), ...(joined === undefined ? {} : { joined }) };
+    // joinedAt is the FIRST admitted write ($min over ISO strings); repeated heartbeats never move it.
+    const first = joined === "yes" || joined === "assumed" ? { $min: { joinedAt: at } } : {};
+    const update = terminalCaptureState(state) ? { $set: { ...set, ...ENDED }, $unset: { activeKey: "" as const }, ...first } : { $set: set, ...first };
     const result = await this.jobs.updateOne({ _id: job._id, nonce: job.nonce, ownerId, activeKey: { $exists: true } }, update);
     return result.matchedCount === 1;
   }

@@ -79,3 +79,16 @@ test("client uses exact scoped GET and rejects mismatched/malformed responses", 
     expect(fetch).toHaveBeenCalledTimes(4);
   } finally { vi.unstubAllGlobals(); }
 });
+
+test("a server that measured admission replaces the unknown sentence: yes, assumed, never", async () => {
+  vi.spyOn(api, "getSendNowStatus")
+    .mockResolvedValueOnce({ ...reply("running"), joined: "yes" })
+    .mockResolvedValueOnce({ ...reply("running"), joined: "assumed" })
+    .mockResolvedValueOnce({ ...reply("running"), joined: "no" })
+    .mockResolvedValueOnce({ ...reply("not-running"), joined: "yes" });
+  const h = renderHook(() => useSendNowStatus("key", ID)); await flush();
+  expect(h.result.current).toContain("The bot got into the meeting."); expect(h.result.current).not.toContain("unknown");
+  await tick(); expect(h.result.current).toContain("joined (assumed");
+  await tick(); expect(h.result.current).toContain("No admission was recorded");
+  await tick(); expect(h.result.current).toContain("Not running"); expect(h.result.current).toContain("got into the meeting"); expect(h.result.current).not.toMatch(/is in the meeting/);
+});

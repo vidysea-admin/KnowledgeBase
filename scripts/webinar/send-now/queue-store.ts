@@ -12,7 +12,7 @@
  */
 import type { CaptureJobDoc, CaptureJobQueue, CaptureState } from "../../../apps/api/src/join-rules/capture-job-queue.js";
 import type { ManualRequest, ManualState } from "../../../packages/meeting-bot/src/manual-jobs/store.js";
-import type { ManualWorkerStore } from "../../../packages/meeting-bot/src/manual-jobs/worker.js";
+import type { JoinEvidence, ManualWorkerStore } from "../../../packages/meeting-bot/src/manual-jobs/worker.js";
 
 export const HEARTBEAT_MS = 5_000;
 export const POLL_MS = 2_000;
@@ -26,8 +26,8 @@ export class QueueJobMirror implements ManualWorkerStore {
   readonly now: () => Date;
   private cancelSeen = false;
   private lost = false;
-  private desired: { state: ManualState; ready?: boolean } | undefined;
-  private written: { state: ManualState; ready?: boolean; at: number } | undefined;
+  private desired: { state: ManualState; ready?: boolean; joined?: JoinEvidence } | undefined;
+  private written: { state: ManualState; ready?: boolean; joined?: JoinEvidence; at: number } | undefined;
   private writing: Promise<void> = Promise.resolve();
   private failure: unknown;
   private stopPoll: (() => void) | undefined;
@@ -65,10 +65,10 @@ export class QueueJobMirror implements ManualWorkerStore {
     if (req.nonce !== this.job.nonce) throw new Error("manual cancel request unavailable");
     return this.cancelSeen || this.lost;
   }
-  writeProgress(req: ManualRequest, state: ManualState, recorderReady?: boolean): void {
+  writeProgress(req: ManualRequest, state: ManualState, recorderReady?: boolean, joined?: JoinEvidence): void {
     if (req.nonce !== this.job.nonce) throw new Error("manual worker ownership refused");
     if (this.interrupted) return;   // frozen: the interrupt wrote the final state
-    this.desired = { state, ...(recorderReady === undefined ? {} : { ready: recorderReady }) };
+    this.desired = { state, ...(recorderReady === undefined ? {} : { ready: recorderReady }), ...(joined === undefined ? {} : { joined }) };
     this.flush(false);
   }
 
@@ -76,12 +76,12 @@ export class QueueJobMirror implements ManualWorkerStore {
     const want = this.desired;
     if (!want || this.lost || (this.interrupted && !force)) return;
     const w = this.written, t = this.now().getTime();
-    const changed = !w || w.state !== want.state || w.ready !== want.ready;
+    const changed = !w || w.state !== want.state || w.ready !== want.ready || w.joined !== want.joined;
     if (!force && !changed && t - w!.at < HEARTBEAT_MS) return;
     this.written = { ...want, at: t };
     this.writing = this.writing.then(async () => {
       try {
-        if (await this.queue.writeProgress(this.job, this.ownerId, want.state as CaptureState, want.ready)) this.confirmed = want.state;
+        if (await this.queue.writeProgress(this.job, this.ownerId, want.state as CaptureState, want.ready, want.joined)) this.confirmed = want.state;
         else this.lost = true;
       } catch (error) { this.failure = error; this.written = undefined; }
     });
@@ -94,7 +94,7 @@ export class QueueJobMirror implements ManualWorkerStore {
       this.stopPoll?.(); this.stopPoll = undefined;
       await this.writing;
       if (this.lost || this.isEnded()) return;
-      this.desired = { state: "failed" };
+      this.desired = { state: "failed", ...(this.desired?.joined ? { joined: this.desired.joined } : {}) };   // keep admission evidence a failed write had not landed yet
       for (let attempt = 0; attempt < 2 && !this.lost && !this.isEnded(); attempt++) {
         this.failure = undefined; this.written = undefined;
         this.flush(true); await this.writing;

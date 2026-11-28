@@ -29,3 +29,11 @@ test("CLI rejects credential-bearing/untrusted API origin and invalid job id bef
   assert.equal(calls, 0);
   await assert.rejects(runManualJobsCommand(["list"], deps), /acceptance is unknown/);
 });
+test("CLI passes the hosted joined status through (yes/assumed/no with joinedAt) and still refuses junk", async () => {
+  const rows = [{ ...summary, joined: "yes", joinedAt: "2026-10-14T10:01:00Z" }, { ...summary, jobId: "send-now-20261014100000-bbbbbb", joined: "no" }];
+  const deps = createHttpManualCommandDeps({ LKB_API_URL: "https://api.example.com", LKB_API_KEY: "key" }, (async () => new Response(JSON.stringify({ jobs: rows }), { status: 200 })) as typeof fetch);
+  const listed = await deps.list() as { jobs: { joined: string; joinedAt?: string }[] };
+  assert.deepEqual(listed.jobs.map(j => [j.joined, j.joinedAt]), [["yes", "2026-10-14T10:01:00Z"], ["no", undefined]]);
+  const bad = createHttpManualCommandDeps({ LKB_API_URL: "https://api.example.com", LKB_API_KEY: "key" }, (async () => new Response(JSON.stringify({ jobs: [{ ...summary, joined: "maybe" }] }), { status: 200 })) as typeof fetch);
+  await assert.rejects(Promise.resolve(bad.list()), /manual job response invalid/);
+});

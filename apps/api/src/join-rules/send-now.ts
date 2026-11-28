@@ -51,18 +51,23 @@ export interface SendNowDeps {
 export interface ManualJobValue {
   jobId: string; platform: string;
   state: "queued" | "launching" | "running" | "cancel-requested" | "cancel-acknowledged" | "cancelled" | "completed" | "failed" | "unknown";
-  requestedAt: string; updatedAt: string; joined: "unknown";
+  requestedAt: string; updatedAt: string; joined: JoinedValue; joinedAt?: string;
 }
+/** Admission as the recorder reported it (2026-11-28): yes = seen in call, assumed = D-167, no = ended without admission. */
+export type JoinedValue = "yes" | "assumed" | "no" | "unknown";
+const JOINED_VALUES: readonly string[] = ["yes", "assumed", "no", "unknown"];
+const isIso = (v: unknown): v is string => typeof v === "string" && Number.isFinite(Date.parse(v));
 const MANUAL_JOB_STATES = ["queued", "launching", "running", "cancel-requested", "cancel-acknowledged", "cancelled", "completed", "failed", "unknown"];
 /** Whitelist response metadata even if an injected host returns an object with private fields. */
 function publicManualJob(job: ManualJobValue): ManualJobValue {
-  if (!job || !JOB_ID_PATTERN.test(job.jobId) || !/^[a-z-]{1,32}$/.test(job.platform) || !MANUAL_JOB_STATES.includes(job.state) || job.joined !== "unknown" ||
+  if (!job || !JOB_ID_PATTERN.test(job.jobId) || !/^[a-z-]{1,32}$/.test(job.platform) || !MANUAL_JOB_STATES.includes(job.state) || !JOINED_VALUES.includes(job.joined) ||
     typeof job.requestedAt !== "string" || typeof job.updatedAt !== "string" || !Number.isFinite(Date.parse(job.requestedAt)) || !Number.isFinite(Date.parse(job.updatedAt))) throw new Error("manual job response unavailable");
-  return { jobId: job.jobId, platform: job.platform, state: job.state, requestedAt: job.requestedAt, updatedAt: job.updatedAt, joined: "unknown" };
+  return { jobId: job.jobId, platform: job.platform, state: job.state, requestedAt: job.requestedAt, updatedAt: job.updatedAt, joined: job.joined,
+    ...((job.joined === "yes" || job.joined === "assumed") && isIso(job.joinedAt) ? { joinedAt: job.joinedAt } : {}) };
 }
 export type SendNowJobState = "launching" | "running" | "not-running";
 export type SendNowStatusValue =
-  | { ok: true; status: SendNowJobState; meetingKey?: string; startedAt?: string; until?: string | null }
+  | { ok: true; status: SendNowJobState; meetingKey?: string; startedAt?: string; until?: string | null; joined?: JoinedValue }
   | { ok: false; kind: "unreadable" | "forbidden"; reason: string; message: string };
 /** Shape of a job id minted by the host adapter (`send-now-<14 digits>-<6 hex>`); anything else is a 400 before the host is asked. */
 export const JOB_ID_PATTERN = /^send-now-\d{14}-[0-9a-f]{6}$/;
@@ -171,7 +176,8 @@ export function createSendNowRouter(deps: SendNowDeps): Router {
         res.status(200).json({
           jobId, status: v.status, ...(v.meetingKey ? { meetingKey: v.meetingKey } : {}),
           ...(v.startedAt ? { startedAt: v.startedAt } : {}), ...(v.until !== undefined ? { until: v.until } : {}),
-          joined: "unknown", // process state only; whether the bot is inside the meeting is not measured
+          // Only a host that measures admission (the hosted queue) reports it; the laptop launcher stays "unknown".
+          joined: v.joined && JOINED_VALUES.includes(v.joined) ? v.joined : "unknown",
         });
       } catch {
         res.status(503).json({ error: "send_now_unavailable", message: "send-now status is unavailable" });

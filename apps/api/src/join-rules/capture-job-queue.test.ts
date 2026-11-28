@@ -109,7 +109,7 @@ test("hosted deps: queue end to end through plan, launch, list, status and cance
   const dup = await deps.plan("a", { meetingUrl: "https://meet.google.com/ABC-DEFG-HIJ?authuser=1", until });
   assert.equal(dup.ok ? "ok" : dup.kind, "duplicate");
   await assert.rejects(deps.launch("a", checked, until), (e: { code?: string }) => e.code === "manual_duplicate");
-  assert.deepEqual(await deps.status!("a", jobId), { ok: true, status: "launching", startedAt: new Date(clock.t).toISOString() });
+  assert.deepEqual(await deps.status!("a", jobId), { ok: true, status: "launching", startedAt: new Date(clock.t).toISOString(), joined: "unknown" });
   assert.equal((await deps.manualJobs!.list("a"))[0]?.state, "queued");
   await assert.rejects(Promise.resolve().then(() => deps.manualJobs!.list("b")), (e: { code?: string }) => e.code === "tenant_not_served");
   assert.equal((await deps.manualJobs!.cancel("a", jobId))?.state, "cancelled");
@@ -153,4 +153,48 @@ test("review B-low: a terminal row no longer holds the meeting URL (it can carry
   assert.equal(raw.length, 3);
   for (const row of raw) assert.ok(!JSON.stringify(row).includes("s3cret"), `${row._id} ${row.state}`);
   void expired;
+}));
+
+test("joined status: unknown before any evidence, yes with the FIRST joinedAt, no when it ends still pending", { skip }, () => withDb(async (db, clock) => {
+  const q = await queueOf(db, clock);
+  const job = await q.create("a", plan, "2026-11-26T11:00:00.000Z");
+  assert.equal((await q.detail("a", job._id))!.joined, "unknown", "a queued job has no evidence");
+  await q.claimNext("w1", ["a"]);
+  await q.writeProgress(job, "w1", "running", true, "pending");
+  assert.equal((await q.detail("a", job._id))!.joined, "unknown", "pending while live is not a no");
+  clock.t += 1000; await q.writeProgress(job, "w1", "running", true, "yes");
+  const firstAt = new Date(clock.t).toISOString();
+  clock.t += 5000; await q.writeProgress(job, "w1", "running", true, "yes");
+  const live = (await q.detail("a", job._id))!;
+  assert.equal(live.joined, "yes"); assert.equal(live.joinedAt, firstAt, "heartbeats never move joinedAt");
+  await q.writeProgress(job, "w1", "completed", true, "yes");
+  assert.equal((await q.detail("a", job._id))!.joined, "yes");
+
+  const other = await q.create("a", { ...plan, meetingUrl: "https://meet.google.com/zzz-zzzz-zzz", meetingKey: "meet:zzz-zzzz-zzz" }, "2026-11-26T11:00:00.000Z");
+  await q.claimNext("w1", ["a"]);
+  await q.writeProgress(other, "w1", "running", true, "pending");
+  await q.writeProgress(other, "w1", "failed", true, "pending");
+  const ended = (await q.detail("a", other._id))!;
+  assert.equal(ended.joined, "no"); assert.equal(ended.joinedAt, undefined);
+}));
+
+test("joined status: a row from an older worker (no joined field) stays unknown even when terminal", { skip }, () => withDb(async (db, clock) => {
+  const q = await queueOf(db, clock);
+  const job = await q.create("a", plan, "2026-11-26T11:00:00.000Z");
+  await q.claimNext("w1", ["a"]); await q.writeProgress(job, "w1", "completed", true);
+  assert.equal((await q.detail("a", job._id))!.joined, "unknown");
+}));
+
+test("joined status: hosted status route reports joined; summaries still carry no URL or nonce", { skip }, () => withDb(async (db, clock) => {
+  const deps = createQueuedSendNowDeps({ db, env: { LKB_SEND_NOW_TENANTS: "a" }, now: () => new Date(clock.t) });
+  const checked = await deps.plan("a", { meetingUrl: plan.meetingUrl, until: "2026-11-26T11:00:00Z" });
+  assert.ok(checked.ok);
+  const { jobId } = await deps.launch("a", checked as Extract<typeof checked, { ok: true }>, "2026-11-26T11:00:00Z");
+  const q = new CaptureJobQueue(db, () => new Date(clock.t));
+  const claimed = (await q.claimNext("w1", ["a"]))!;
+  await q.writeProgress(claimed, "w1", "running", true, "assumed");
+  const status = await deps.status!("a", jobId);
+  assert.deepEqual(status.ok && status.joined, "assumed");
+  const listed = JSON.stringify(await deps.manualJobs!.list("a"));
+  assert.ok(listed.includes('"joined":"assumed"')); assert.ok(!listed.includes("meet.google.com")); assert.ok(!listed.includes(claimed.nonce));
 }));

@@ -157,3 +157,24 @@ test("ISS-B3HOSTID-001: a bad LKB_CAPTURE_HOST_ID refuses before any claim, so t
     deps: { ...noTicks, launch: async () => { throw new Error("must not launch"); } }, ...quiet }), /LKB_CAPTURE_HOST_ID refused: empty/);
   assert.equal((await db.collection(CAPTURE_JOBS).findOne({}))?.state, "queued");
 }));
+
+test("joined status end to end: the recorder's admitted line reaches capture_jobs and the API reads yes", { skip }, () => withQueued(async ({ queue, jobId }) => {
+  let seen = "";
+  const deps: ManualWorkerDeps = { ...noTicks, async launch(_root, _args, _env, onLine) {
+    onLine("[bot] recording until 11:00");
+    onLine("[bot] admitted to the meeting (seen in call)");
+    for (let i = 0; i < 60 && seen !== "yes"; i++) { await new Promise(resolve => setTimeout(resolve, 50)); seen = (await queue.detail("a", jobId))!.joined; }
+  } };
+  const result = await runQueueOnce({ queue, tenants: ["a"], root, maxWaitS: 0, deps, ...quiet });
+  assert.deepEqual(result, { job: jobId, state: "completed" });
+  assert.equal(seen, "yes");
+  const done = (await queue.detail("a", jobId))!;
+  assert.equal(done.joined, "yes"); assert.ok(done.joinedAt);
+}));
+
+test("joined status end to end: a recorder that never prints the admitted line ends with joined no", { skip }, () => withQueued(async ({ queue, jobId }) => {
+  const deps: ManualWorkerDeps = { ...noTicks, async launch(_root, _args, _env, onLine) { onLine("[bot] recording until 11:00"); throw new Error("admission_timeout"); } };
+  const result = await runQueueOnce({ queue, tenants: ["a"], root, maxWaitS: 0, deps, ...quiet });
+  assert.deepEqual(result, { job: jobId, state: "failed" });
+  assert.equal((await queue.detail("a", jobId))!.joined, "no");
+}));

@@ -18,6 +18,23 @@ export interface GateEvent { event: string; error?: unknown; seconds?: unknown; 
 export interface AdmissionInfo { assumed: boolean; reason?: string }
 export interface GateWatchdog { start(): void }
 
+/**
+ * The ONE stdout line the recorder prints when the gate first sees `admitted` (2026-11-28, joined status). The manual/queue
+ * worker reads it as admission evidence: "yes" when the bot was seen in the call, "assumed" when D-167 assumed it.
+ */
+export const ADMITTED_LINE_PREFIX = "[bot] admitted to the meeting";
+export function admissionLine(info: AdmissionInfo): string {
+  const reason = info.reason && /^[a-z0-9_-]{1,64}$/.test(info.reason) ? info.reason : "no-lobby-signal"; // page text never reaches the log
+  return info.assumed ? `${ADMITTED_LINE_PREFIX} (assumed: ${reason})` : `${ADMITTED_LINE_PREFIX} (seen in call)`;
+}
+export function parseAdmissionLine(raw: string): "yes" | "assumed" | undefined {
+  const line = raw.endsWith(String.fromCharCode(13)) ? raw.slice(0, -1) : raw; // a CRLF child stream must not turn a real admission into "no"
+  if (!line.startsWith(ADMITTED_LINE_PREFIX)) return undefined;
+  const rest = line.slice(ADMITTED_LINE_PREFIX.length);
+  if (rest === " (seen in call)") return "yes";
+  return /^ \(assumed: [a-z0-9_-]{1,64}\)$/.test(rest) ? "assumed" : undefined;
+}
+
 /** A reload this recent before a capture-error is treated as its cause. */
 export const RELOAD_CAUSE_WINDOW_MS = 180_000;
 

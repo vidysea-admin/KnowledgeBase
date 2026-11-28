@@ -2,6 +2,16 @@ import { useEffect, useRef, useState } from "react";
 import { cancelManualJob, listManualJobs, type ManualJob } from "../../api/send-now.js";
 import { ApiError } from "../../api/client.js";
 
+/** Admission as the server bot reported it. "assumed": the platform shows no lobby, so being inside could not be confirmed on screen. */
+export function joinedText(job: Pick<ManualJob, "joined" | "joinedAt">): string {
+  const at = job.joinedAt ? ` at ${new Date(job.joinedAt).toLocaleTimeString()}` : "";
+  switch (job.joined) {
+    case "yes": return `joined the meeting${at}`;
+    case "assumed": return `joined (assumed, no lobby seen)${at}`;
+    case "no": return "no admission recorded";
+    default: return "meeting admission unknown";
+  }
+}
 const terminal = (job: ManualJob) => ["cancelled", "completed", "failed"].includes(job.state);
 /** Persistent server history survives navigation/reload. Cancel is intent until the owner acknowledges and exits. */
 export function ManualJobsSection({ apiKey, refresh }: { apiKey: string | null; refresh: number }): React.ReactElement {
@@ -43,12 +53,12 @@ export function ManualJobsSection({ apiKey, refresh }: { apiKey: string | null; 
   }
   return <div aria-label="Manual bot jobs">
     <h3>Manual jobs</h3>
-    <p>Recorder status is shown here. Meeting admission remains unknown. A requested cancellation can wait while the recorder starts.</p>
+    <p>Recorder status and whether the bot got into the meeting are shown here. A requested cancellation can wait while the recorder starts.</p>
     <button type="button" disabled={!apiKey || busy} onClick={() => setTick(value => value + 1)}>{busy ? "Loading jobs..." : "Refresh jobs"}</button>
     {visibleMessage && <p role="status">{visibleMessage}</p>}
     {!busy && !visibleMessage && visibleJobs.length === 0 && <p>No manual jobs were returned.</p>}
     {visibleJobs.map(job => <div key={job.jobId}>
-      <p>{job.platform} — {job.state} — {job.jobId}</p>
+      <p>{job.platform} — {job.state} — {joinedText(job)} — {job.jobId}</p>
       {!terminal(job) && <button type="button" disabled={busy || !apiKey || job.state === "cancel-requested" || job.state === "cancel-acknowledged"}
         onClick={() => void cancel(job.jobId)}>Cancel job</button>}
     </div>)}

@@ -13,7 +13,10 @@ export interface ManualRequest {
   platform: string; until: string; requestedAt: string;
 }
 export interface ManualProgress { version: 1; tenantId: string; jobId: string; nonce: string; state: ManualState; updatedAt: string; recorderReady?: boolean }
-export interface ManualSummary { jobId: string; platform: string; state: ManualState; requestedAt: string; updatedAt: string; joined: "unknown" }
+/** The file store always reports "unknown"; the hosted queue reports yes/assumed/no (apps/api capture-job-queue.ts). */
+export type ManualJoined = "yes" | "assumed" | "no" | "unknown";
+export const MANUAL_JOINED: readonly ManualJoined[] = ["yes", "assumed", "no", "unknown"];
+export interface ManualSummary { jobId: string; platform: string; state: ManualState; requestedAt: string; updatedAt: string; joined: ManualJoined; joinedAt?: string }
 const object = (v: unknown): v is Record<string, unknown> => typeof v === "object" && v !== null && !Array.isArray(v);
 const iso = (v: unknown): v is string => typeof v === "string" && /^\d{4}-\d\d-\d\dT/.test(v) && Number.isFinite(Date.parse(v));
 const present = (file: string) => {
@@ -140,7 +143,8 @@ export class ManualJobStore {
     try { writeFileSync(temp, JSON.stringify(value), { flag: "wx", mode: 0o600 }); linkSync(temp, file); }
     finally { rmSync(temp, { force: true }); }
   }
-  writeProgress(req: ManualRequest, state: ManualState, recorderReady?: boolean): void {
+  /** `_joined` is the worker's admission evidence; the laptop file store does not keep it (its summary stays "unknown"). */
+  writeProgress(req: ManualRequest, state: ManualState, recorderReady?: boolean, _joined?: "pending" | "yes" | "assumed"): void {
     const actual = this.readRequest(req.tenantId, req.jobId);
     if (!actual || actual.nonce !== req.nonce || !MANUAL_STATES.includes(state)) throw new Error("manual worker ownership refused");
     this.atomic(this.file(req.tenantId, req.jobId, ".state"), { version: 1, tenantId: req.tenantId, jobId: req.jobId, nonce: req.nonce, state, updatedAt: this.now().toISOString(), ...(recorderReady === undefined ? {} : { recorderReady }) });

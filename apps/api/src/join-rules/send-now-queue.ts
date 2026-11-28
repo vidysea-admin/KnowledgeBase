@@ -102,7 +102,7 @@ export function createQueuedSendNowDeps(options: { db: Db; env: Record<string, s
         if (!job) return { ok: true, status: "not-running" };
         if (job.state === "unknown") return { ok: false, kind: "unreadable", reason: "capture-owner-silent", message: "the server bot has stopped reporting on this job" };
         const status = terminalCaptureState(job.state) ? "not-running" : job.state === "queued" || job.state === "launching" ? "launching" : "running";
-        return { ok: true, status, startedAt: job.requestedAt };
+        return { ok: true, status, startedAt: job.requestedAt, joined: job.joined };
       } catch { return { ok: false, kind: "unreadable", reason: "capture-jobs-unreadable", message: "capture jobs are unavailable" }; }
     },
     manualJobs: {

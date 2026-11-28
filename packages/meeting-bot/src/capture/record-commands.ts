@@ -5,7 +5,7 @@ import { OBSWebSocket } from "obs-websocket-js";
 import { createBrowserJoiner } from "../joiners/browser-joiner.js";
 import { detectPlatform } from "../platform.js";
 import { selectJoinStrategy } from "../strategy.js";
-import { createAdmissionGate, settleDeniedCapture } from "./admission-gate.js";
+import { admissionLine, createAdmissionGate, settleDeniedCapture } from "./admission-gate.js";
 import { createAudioWatchdog, createRealLevelSource, silenceReconnect } from "./audio-watchdog.js";
 import { type ControllerRecoveryActions, type ControllerRecoveryContext, cleanupOwnedBrowserProfile, finalizeControllerRecording, getProcessStartTime, removeControllerState, writeControllerState } from "./controller-state.js";
 import { AUDIO_INPUT, createObsBrowserDeps, type ObsBrowserConfig, type ObsBrowserDepsOverrides, type ObsClientLike } from "./obs/obs-windows.js";
@@ -122,7 +122,7 @@ export async function runRecord(rest: string[], inject: RecordInject = {}): Prom
     consentControl.privacy.onCaptureEvent(ev);
     consentControl.readiness.onCaptureEvent(ev);
     const gateFailure = gate.onEvent(ev as Parameters<typeof gate.onEvent>[0]);
-    if (ev.event === "admitted" && !joinedNotified) { joinedNotified = true; telegram.notifyJoined(title, platform, { assumed: (ev as { assumed?: unknown }).assumed === true }); } // T-030, now only once admitted (ISS-CAPTUREFIX-001)
+    if (ev.event === "admitted" && !joinedNotified) { joinedNotified = true; if (gate.admission) console.log(admissionLine(gate.admission)); telegram.notifyJoined(title, platform, { assumed: (ev as { assumed?: unknown }).assumed === true }); } // T-030, now only once admitted (ISS-CAPTUREFIX-001)
     owner.until = (until = onairUntilFromEvent(ev as { event?: unknown; seconds?: unknown }, Date.now()) ?? until).getTime(); // the capture-control gap end follows the adjusted end
     if (ev.event === "ended" && endedAt === undefined) endedAt = Date.now();
     // ISS-ADMISSION-STABLE-001: sb_join emits this only after admission, once the tab sat outside the meeting

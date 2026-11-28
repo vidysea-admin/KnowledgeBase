@@ -128,3 +128,30 @@ test("acknowledged operator cancellation remains cancelled if actual exit invali
   finish(); rejectPublication(new Error("recorder exited during publication")); await running;
   assert.equal(store.summary("a", id)!.state, "cancelled");
 }));
+test("joined status: pending until the recorder's admitted line, then yes; a forged or late line never changes it", async () => fixture(async (store, id) => {
+  const seen: (string | undefined)[] = [];
+  const write = store.writeProgress.bind(store);
+  store.writeProgress = (req, state, ready, joined) => { seen.push(joined); write(req, state, ready, joined); };
+  let line!: (line: string) => void, finish!: () => void;
+  const running = runManualWorker("/root", store, "a", id, { schedule: () => () => {}, launch: async (_r, _a, _e, onLine) => { line = onLine; await new Promise<void>(resolve => { finish = resolve; }); } });
+  await flush();
+  line("[bot] recording until 11:00");
+  assert.equal(seen.at(-1), "pending", "recording-until is NOT admission evidence");
+  line("[bot] admitted to the meeting (assumed: <script>)");
+  assert.equal(seen.at(-1), "pending", "a malformed admitted line is ignored");
+  line("[bot] admitted to the meeting (seen in call)");
+  assert.equal(seen.at(-1), "yes");
+  line("[bot] admitted to the meeting (assumed: no-lobby-signal)");
+  assert.equal(seen.at(-1), "yes", "the first admission wins");
+  finish(); await running;
+  assert.equal(seen.at(-1), "yes"); assert.equal(store.summary("a", id)!.state, "completed");
+}));
+test("joined status: a non-Meet admission assumed by D-167 is reported as assumed", async () => fixture(async (store, id) => {
+  const seen: (string | undefined)[] = [];
+  const write = store.writeProgress.bind(store);
+  store.writeProgress = (req, state, ready, joined) => { seen.push(joined); write(req, state, ready, joined); };
+  await runManualWorker("/root", store, "a", id, { schedule: () => () => {}, launch: async (_r, _a, _e, onLine) => {
+    onLine("[bot] recording until 11:00"); onLine("[bot] admitted to the meeting (assumed: no-lobby-signal)");
+  } });
+  assert.equal(seen.at(-1), "assumed");
+}));
